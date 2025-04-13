@@ -1,0 +1,109 @@
+/* Hizmetler Mega Menü Stilleri */
+.hover-mega-menu {
+    width: 100%;
+    padding: 1.5rem;
+    background-color: #f9fafb;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.hover-mega-menu .service-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    background-color: white;
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+    transition: all 0.2s ease;
+    height: 110px;
+}
+
+.hover-mega-menu .service-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.hover-mega-menu .service-card .material-icons {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+    color: #4f46e5;
+}
+
+.hover-mega-menu .service-card span.text {
+    font-size: 0.875rem;
+    text-align: center;
+    font-weight: 500;
+    color: #374151;
+}
+
+.hover-mega-menu .related-groups {
+    margin-bottom: 1.5rem;
+}
+
+.hover-mega-menu .related-groups h3 {
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 0.75rem;
+}
+
+.hover-mega-menu .related-groups .group-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.hover-mega-menu .related-groups .group-btn {
+    padding: 0.5rem 1rem;
+    background-color: #e0e7ff;
+    color: #4f46e5;
+    border-radius: 0.25rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.hover-mega-menu .related-groups .group-btn:hover {
+    background-color: #c7d2fe;
+}
+
+.hover-mega-menu .back-to-categories {
+    cursor: pointer;
+}
+
+/* Tab içeriği stilleri */
+.hover-mega-menu .tab-pane {
+    background-color: white;
+    border-radius: 0.5rem;
+    padding: 1rem;
+}
+
+.hover-mega-menu .tab-pane h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 1rem;
+    border-bottom: 2px solid #f3f4f6;
+    padding-bottom: 0.5rem;
+}
+
+.hover-mega-menu .tab-pane ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.hover-mega-menu .tab-pane ul li {
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.hover-mega-menu .tab-pane ul li a {
+    color: #4b5563;
+    transition: color 0.2s ease;
+    display: block;
+}
+
+.hover-mega-menu .tab-pane ul li a:hover {
+    color: #4f46e5;
+} 

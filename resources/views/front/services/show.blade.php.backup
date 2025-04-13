@@ -1,0 +1,1042 @@
+@extends('layouts.front')
+
+@section('title', $service->title)
+
+@section('meta_description', $service->meta_description ?? Str::limit(strip_tags($service->summary), 160))
+
+@section('styles')
+<!-- Özel stiller kaldırıldı -->
+
+<!-- Sayfa Grid Düzeni (25%-75%) -->
+<style>
+    /* Sol menü ve içerik alanı için grid düzeni */
+    .sayfa-duzeni {
+        display: grid !important;
+        grid-template-columns: 25% 75% !important;
+        grid-gap: 20px !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+        position: relative !important;
+    }
+    
+    /* Sol menü stili - İyileştirilmiş Sticky Tasarım */
+    .sol-menu {
+        position: -webkit-sticky !important; /* Safari desteği */
+        position: sticky !important;
+        top: 80px !important;
+        align-self: flex-start !important;
+        height: auto !important;
+        max-height: calc(100vh - 100px) !important;
+        overflow-y: auto !important;
+        background-color: #f8f9fa !important;
+        padding: 20px !important;
+        border: 1px solid #e5e7eb !important;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08) !important;
+        border-radius: 12px !important;
+        transition: box-shadow 0.3s ease, transform 0.3s ease !important;
+        z-index: 20 !important;
+    }
+    
+    .sol-menu:hover {
+        box-shadow: 0 8px 25px rgba(0,0,0,0.1) !important;
+    }
+    
+    /* Webkit tarayıcıları için kaydırma çubuğu stili */
+    .sol-menu::-webkit-scrollbar {
+        width: 6px !important;
+    }
+    
+    .sol-menu::-webkit-scrollbar-track {
+        background: #f1f1f1 !important;
+        border-radius: 10px !important;
+    }
+    
+    .sol-menu::-webkit-scrollbar-thumb {
+        background: #c1c1c1 !important;
+        border-radius: 10px !important;
+    }
+    
+    .sol-menu::-webkit-scrollbar-thumb:hover {
+        background: #a8a8a8 !important;
+    }
+    
+    /* Sol menü içeriği */
+    .sol-menu-baslik {
+        color: #00352b !important;
+        font-weight: bold !important;
+        font-size: 1.25rem !important;
+        margin-bottom: 15px !important;
+        padding-bottom: 15px !important;
+        border-bottom: 1px solid #e5e7eb !important;
+    }
+    
+    .sol-menu-liste {
+        list-style-type: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+    
+    .sol-menu-liste li {
+        margin-bottom: 10px !important;
+    }
+    
+    .sol-menu-liste a {
+        display: flex !important;
+        align-items: center !important;
+        padding: 12px !important;
+        color: #4b5563 !important;
+        text-decoration: none !important;
+        border-radius: 8px !important;
+        transition: all 0.2s ease !important;
+    }
+    
+    .sol-menu-liste a:hover, .sol-menu-liste a.aktif {
+        background-color: #00352b !important;
+        color: white !important;
+        transform: translateX(5px) !important;
+    }
+    
+    .sol-menu-liste a.aktif {
+        position: relative !important;
+    }
+    
+    .sol-menu-liste a.aktif:before {
+        content: "" !important;
+        position: absolute !important;
+        left: 0 !important;
+        top: 50% !important;
+        transform: translateY(-50%) !important;
+        width: 4px !important;
+        height: 70% !important;
+        background-color: #fbbf24 !important;
+        border-radius: 0 2px 2px 0 !important;
+    }
+    
+    .sol-menu-liste .icon {
+        margin-right: 10px !important;
+        font-size: 1.25rem !important;
+    }
+    
+    /* İçerik alanı stili */
+    .icerik-alani {
+        width: 100% !important;
+    }
+    
+    /* Mobil görünüm için düzenleme */
+    @media (max-width: 767px) {
+        .sayfa-duzeni {
+            grid-template-columns: 1fr !important;
+            display: block !important;
+        }
+        
+        .sol-menu {
+            position: relative !important;
+            top: 0 !important;
+            width: 100% !important;
+            margin-bottom: 20px !important;
+            max-height: none !important;
+            overflow-y: visible !important;
+        }
+        
+        .sol-menu-liste a:hover, .sol-menu-liste a.aktif {
+            transform: translateX(0) !important;
+        }
+        
+        .icerik-alani {
+            width: 100% !important;
+        }
+    }
+</style>
+@endsection
+
+@section('content')
+<!-- Hero Bölümü - Yeni Tasarım (Masaüstü için) -->
+<section class="relative pt-20 pb-1 overflow-hidden bg-cover bg-center hidden md:block" style="background-image: url('{{ asset('storage/' . str_replace('/storage/', '', $service->image ?? 'services/default-bg.jpg')) }}');">
+    <!-- İçerik Konteyneri -->
+    <div class="container max-w-7xl mx-auto px-[0px] py-6 relative z-10">
+        <div class="bg-[#00352b]/70 rounded-xl p-10 shadow-lg border border-white/10 w-full">
+            <div class="flex flex-col md:flex-row justify-between gap-8">
+                <!-- Sol Bölüm: Başlık ve Açıklama -->
+                <div class="md:w-7/12 md:pr-6 md:flex md:flex-col md:justify-center">
+                    <h1 class="text-2xl md:text-3xl font-bold mb-3 text-white leading-tight">{{ $service->title }}</h1>
+                    
+                    @if($service->summary)
+                    <p class="text-base text-white/90 mb-3 max-w-xl">{{ $service->summary }}</p>
+                    @else
+                    <p class="text-base text-white/90 mb-3 max-w-xl">Bu hizmetimiz hakkında detaylı bilgi almak ve firmanıza özel çözümler için hemen iletişime geçin.</p>
+                    @endif
+                </div>
+                
+                <!-- Sağ Bölüm: Özellikler Listesi -->
+                <div class="md:w-5/12 text-white md:border-l border-white/20 md:pl-8">
+                    <h3 class="text-base font-bold mb-4 text-white">Bu hizmetimiz şunları içerir:</h3>
+                    
+                    <ul class="space-y-2">
+                        @if(is_array($service->features) && count($service->features) > 0)
+                            @foreach($service->features as $feature)
+                            <li class="flex items-start">
+                                <span class="material-icons text-yellow-400 mr-2 text-sm">check_circle</span>
+                                <span class="text-sm">{{ $feature }}</span>
+                            </li>
+                            @endforeach
+                        @else
+                            <li class="flex items-start">
+                                <span class="material-icons text-yellow-400 mr-2 text-sm">check_circle</span>
+                                <span class="text-sm">Profesyonel ekip ile hızlı ve güvenilir hizmet</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="material-icons text-yellow-400 mr-2 text-sm">check_circle</span>
+                                <span class="text-sm">İhtiyacınıza özel çözümler</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="material-icons text-yellow-400 mr-2 text-sm">check_circle</span>
+                                <span class="text-sm">Modern ekipman ve teknoloji kullanımı</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="material-icons text-yellow-400 mr-2 text-sm">check_circle</span>
+                                <span class="text-sm">7/24 teknik destek imkanı</span>
+                            </li>
+                        @endif
+                    </ul>
+                    
+                    <div class="mt-5 flex justify-start">
+                        @if($service->cta_text)
+                        <a href="{{ $service->cta_url ?: '/iletisim' }}" class="group inline-flex items-center px-6 py-3 bg-gradient-to-r from-yellow-400 to-yellow-500 text-[#00352b] font-bold rounded-lg shadow-md hover:shadow-xl transition-all text-base border-2 border-transparent hover:border-white/30 hover:from-yellow-500 hover:to-yellow-600">
+                            <span class="mr-2">{{ $service->cta_text }}</span>
+                            <span class="material-icons group-hover:translate-x-1 transition-transform duration-300">arrow_forward</span>
+                        </a>
+                        @else
+                        <a href="/iletisim" class="group inline-flex items-center px-6 py-3 bg-gradient-to-r from-yellow-400 to-yellow-500 text-[#00352b] font-bold rounded-lg shadow-md hover:shadow-xl transition-all text-base border-2 border-transparent hover:border-white/30 hover:from-yellow-500 hover:to-yellow-600">
+                            <span class="mr-2">TEKLİF ALIN</span>
+                            <span class="material-icons group-hover:translate-x-1 transition-transform duration-300">arrow_forward</span>
+                        </a>
+                        @endif
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Hero Bölümü - Mobil Optimize Edilmiş -->
+<section class="relative md:hidden">
+    <!-- Arkaplan Görsel (Daha Büyük) -->
+    <div class="h-64 relative overflow-hidden">
+        <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('{{ asset('storage/' . str_replace('/storage/', '', $service->image ?? 'services/default-bg.jpg')) }}');">
+            <!-- Arkaplan Overlay Gradyanı (Daha Şık) -->
+            <div class="absolute inset-0 bg-gradient-to-b from-[#00352b]/70 via-[#00352b]/85 to-[#00352b]/95"></div>
+        </div>
+        
+        <!-- İçerik -->
+        <div class="container mx-auto px-5 relative h-full flex flex-col justify-end pb-8 pt-16">
+            <!-- Başlık ve özet -->
+            <div class="text-white">
+                <h1 class="text-2xl sm:text-3xl font-bold mb-2 leading-tight">{{ $service->title }}</h1>
+                @if($service->summary)
+                <p class="text-sm sm:text-base text-white/90 mb-2">{{ $service->summary }}</p>
+                @else
+                <p class="text-sm sm:text-base text-white/90 mb-2">Bu hizmetimiz hakkında detaylı bilgi almak ve firmanıza özel çözümler için hemen iletişime geçin.</p>
+                @endif
+            </div>
+        </div>
+    </div>
+    
+    <!-- Özellikler (Aşağıda - Üst üste bindirme efekti ile) -->
+    <div class="container mx-auto px-5 -mt-6 mb-8 relative">
+        <div class="bg-white rounded-xl p-5 shadow-xl border border-gray-100">
+            <h3 class="text-sm font-bold mb-3 text-[#00352b] flex items-center">
+                <span class="material-icons text-[#00352b] mr-2 text-base">verified</span>
+                Bu hizmetimiz şunları içerir:
+            </h3>
+            
+            <div class="grid grid-cols-2 gap-3">
+                @if(is_array($service->features) && count($service->features) > 0)
+                    @foreach($service->features as $feature)
+                    <div class="flex items-start">
+                        <span class="material-icons text-yellow-500 mr-1 text-sm">check_circle</span>
+                        <span class="text-xs text-gray-700">{{ $feature }}</span>
+                    </div>
+                    @endforeach
+                @else
+                    <div class="flex items-start">
+                        <span class="material-icons text-yellow-500 mr-1 text-sm">check_circle</span>
+                        <span class="text-xs text-gray-700">Profesyonel ekip ile hızlı ve güvenilir hizmet</span>
+                    </div>
+                    <div class="flex items-start">
+                        <span class="material-icons text-yellow-500 mr-1 text-sm">check_circle</span>
+                        <span class="text-xs text-gray-700">İhtiyacınıza özel çözümler</span>
+                    </div>
+                    <div class="flex items-start">
+                        <span class="material-icons text-yellow-500 mr-1 text-sm">check_circle</span>
+                        <span class="text-xs text-gray-700">Modern ekipman ve teknoloji kullanımı</span>
+                    </div>
+                    <div class="flex items-start">
+                        <span class="material-icons text-yellow-500 mr-1 text-sm">check_circle</span>
+                        <span class="text-xs text-gray-700">7/24 teknik destek imkanı</span>
+                    </div>
+                @endif
+            </div>
+            
+            <!-- Kısa Alt Bilgi -->
+            <div class="mt-3 pt-3 border-t border-gray-100 flex items-center justify-end">
+                <div class="text-xs text-[#00352b] font-medium">
+                    <a href="#hizmetin-amaci">Detayları gör ↓</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Mobil için İçerik Navigasyonu - Native App Görünümü -->
+<div class="block md:hidden sticky top-0 z-50 w-full bg-white border-b border-gray-200 shadow-sm">
+    <style>
+        /* Kaydırma çubuğunu gizle (tüm tarayıcılar için) */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none; /* Chrome, Safari, Opera */
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;  /* IE ve Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
+        
+        /* Aktif sekme stili */
+        .tab-active {
+            position: relative;
+            background-color: #00352b;
+            color: white;
+        }
+        .tab-active::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background-color: #00352b;
+        }
+    </style>
+    
+    <!-- Native App Tab Bar -->
+    <div class="bg-white pb-1 pt-3 px-3">
+        <div class="no-scrollbar flex items-center space-x-2 overflow-x-auto pb-1">
+            <a href="#hizmetin-amaci" class="tab-item flex-shrink-0 flex flex-col items-center px-5 py-2 rounded-full text-sm font-medium text-gray-700 hover:bg-[#00352b]/5 hover:text-[#00352b] transition-all">
+                <span class="material-icons mb-1">lightbulb</span>
+                <span class="text-xs">Amaç</span>
+            </a>
+            <a href="#kimler-basvurabilir" class="tab-item flex-shrink-0 flex flex-col items-center px-5 py-2 rounded-full text-sm font-medium text-gray-700 hover:bg-[#00352b]/5 hover:text-[#00352b] transition-all">
+                <span class="material-icons mb-1">people</span>
+                <span class="text-xs">Kimler</span>
+            </a>
+            <a href="#basvuru-sartlari" class="tab-item flex-shrink-0 flex flex-col items-center px-5 py-2 rounded-full text-sm font-medium text-gray-700 hover:bg-[#00352b]/5 hover:text-[#00352b] transition-all">
+                <span class="material-icons mb-1">fact_check</span>
+                <span class="text-xs">Şartlar</span>
+            </a>
+            <a href="#islem-suresi" class="tab-item flex-shrink-0 flex flex-col items-center px-5 py-2 rounded-full text-sm font-medium text-gray-700 hover:bg-[#00352b]/5 hover:text-[#00352b] transition-all">
+                <span class="material-icons mb-1">timer</span>
+                <span class="text-xs">Süre</span>
+            </a>
+            <a href="#diger-bilgiler" class="tab-item flex-shrink-0 flex flex-col items-center px-5 py-2 rounded-full text-sm font-medium text-gray-700 hover:bg-[#00352b]/5 hover:text-[#00352b] transition-all">
+                <span class="material-icons mb-1">info</span>
+                <span class="text-xs">SSS</span>
+            </a>
+            <a href="#haberler" class="tab-item flex-shrink-0 flex flex-col items-center px-5 py-2 rounded-full text-sm font-medium text-gray-700 hover:bg-[#00352b]/5 hover:text-[#00352b] transition-all">
+                <span class="material-icons mb-1">article</span>
+                <span class="text-xs">Haberler</span>
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Sayfa İçerik Bölümü -->
+<section class="py-8 bg-gradient-to-b from-white to-gray-50 border-b border-gray-200">
+    <div class="container max-w-7xl mx-auto px-4">
+        <!-- Grid tabanlı layout yapısı -->
+        <div class="sayfa-duzeni clearfix">
+            <!-- Sol Menü (Sticky) -->
+            <div class="sol-menu">
+                <h3 class="sol-menu-baslik">Bu Sayfada</h3>
+                <ul class="sol-menu-liste">
+                    <li>
+                        <a href="#hizmetin-amaci" class="aktif">
+                            <span class="material-icons icon">lightbulb</span>
+                            <span>Hizmetin Amacı</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#kimler-basvurabilir">
+                            <span class="material-icons icon">people</span>
+                            <span>Kimler Başvurabilir</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#basvuru-sartlari">
+                            <span class="material-icons icon">fact_check</span>
+                            <span>Başvuru Şartları</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#basvuru-sureci">
+                            <span class="material-icons icon">assignment</span>
+                            <span>Başvuru Süreci</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#standart-formlar">
+                            <span class="material-icons icon">description</span>
+                            <span>Standart Formlar</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#islem-suresi">
+                            <span class="material-icons icon">timer</span>
+                            <span>İşlem Süresi</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#ucretler">
+                            <span class="material-icons icon">payments</span>
+                            <span>Ücretler</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#diger-bilgiler">
+                            <span class="material-icons icon">help</span>
+                            <span>Sıkça Sorulan Sorular</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#haberler">
+                            <span class="material-icons icon">article</span>
+                            <span>İlgili Haberler</span>
+                        </a>
+                    </li>
+                </ul>
+                
+                <div class="mt-8 p-4 bg-[#00352b]/10 rounded-lg">
+                    <h4 class="font-medium text-[#00352b] mb-2">Yardım İster misiniz?</h4>
+                    <p class="text-sm text-gray-600 mb-3">Sorularınız için bize ulaşın</p>
+                    <a href="/iletisim" class="inline-block w-full py-2 px-4 bg-[#00352b] text-white text-center rounded-md hover:bg-[#00352b]/90 transition-colors">
+                        İletişime Geç
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Ana İçerik Alanı -->
+            <div class="icerik-alani">
+                <!-- Hizmetin Amacı -->
+                <div id="hizmetin-amaci" class="mb-6 md:mb-12 bg-white p-4 md:p-8 rounded-lg md:rounded-xl shadow-sm border border-gray-100">
+                    <div class="inline-block bg-[#00352b]/10 px-3 py-1 rounded-full text-[#00352b] text-xs md:text-sm font-semibold mb-3 md:mb-4">Hizmetin Amacı</div>
+                    <h2 class="text-xl md:text-2xl font-bold text-gray-800 mb-3 md:mb-6">{{ $service->title }} Hakkında</h2>
+                    <p class="text-sm md:text-base text-gray-700 leading-relaxed">
+                        {{ $service->title }} hizmetimiz, işletmenizin ihtiyaçlarına özel çözümler sunar. 
+                        Profesyonel ekibimiz ve modern ekipmanlarımızla en kaliteli hizmeti en uygun fiyatlarla sunmaktayız.
+                    </p>
+                    <div class="mt-4 md:mt-6 p-3 md:p-5 rounded-lg border-l-4 border-[#00352b] bg-[#00352b]/5">
+                        <p class="text-sm md:text-base text-gray-700 leading-relaxed italic">
+                            "{{ $service->title }} hizmetimiz, şirketinizin iş süreçlerini optimize etmek, maliyetlerinizi azaltmak ve verimliliği artırmak amacıyla tasarlanmıştır."
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- Kimler Başvurabilir -->
+                <div id="kimler-basvurabilir" class="mb-6 md:mb-12 bg-white p-4 md:p-8 rounded-lg md:rounded-xl shadow-sm border border-gray-100">
+                    <div class="inline-block bg-[#00352b]/10 px-3 py-1 rounded-full text-[#00352b] text-xs md:text-sm font-semibold mb-3 md:mb-4">Kimler Başvurabilir</div>
+                    <h2 class="text-xl md:text-2xl font-bold text-gray-800 mb-3 md:mb-6">Kimler Bu Hizmetten Yararlanabilir?</h2>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-6">
+                        <div class="bg-white p-3 md:p-5 rounded-lg md:rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-all hover:border-gray-200">
+                            <div class="flex items-start">
+                                <div class="w-8 h-8 md:w-10 md:h-10 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mr-3 md:mr-4 mt-1">
+                                    <span class="material-icons text-sm md:text-base">business</span>
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold text-gray-800 mb-1 md:mb-2 text-sm md:text-base">Kurumsal Firmalar</h4>
+                                    <p class="text-gray-700 text-xs md:text-sm">Her ölçekteki kurumsal firmalar bu hizmetten faydalanabilir.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-white p-3 md:p-5 rounded-lg md:rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-all hover:border-gray-200">
+                            <div class="flex items-start">
+                                <div class="w-8 h-8 md:w-10 md:h-10 bg-green-50 text-green-600 rounded-full flex items-center justify-center mr-3 md:mr-4 mt-1">
+                                    <span class="material-icons text-sm md:text-base">store</span>
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold text-gray-800 mb-1 md:mb-2 text-sm md:text-base">KOBİ'ler</h4>
+                                    <p class="text-gray-700 text-xs md:text-sm">Küçük ve orta ölçekli işletmeler için özel çözümler sunulmaktadır.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-white p-3 md:p-5 rounded-lg md:rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-all hover:border-gray-200">
+                            <div class="flex items-start">
+                                <div class="w-8 h-8 md:w-10 md:h-10 bg-purple-50 text-purple-600 rounded-full flex items-center justify-center mr-3 md:mr-4 mt-1">
+                                    <span class="material-icons text-sm md:text-base">person</span>
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold text-gray-800 mb-1 md:mb-2 text-sm md:text-base">Şahıs İşletmeleri</h4>
+                                    <p class="text-gray-700 text-xs md:text-sm">Bireysel girişimciler ve şahıs şirketleri için uygun paketler mevcuttur.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-white p-3 md:p-5 rounded-lg md:rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-all hover:border-gray-200">
+                            <div class="flex items-start">
+                                <div class="w-8 h-8 md:w-10 md:h-10 bg-amber-50 text-amber-600 rounded-full flex items-center justify-center mr-3 md:mr-4 mt-1">
+                                    <span class="material-icons text-sm md:text-base">account_balance</span>
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold text-gray-800 mb-1 md:mb-2 text-sm md:text-base">Kamu Kurumları</h4>
+                                    <p class="text-gray-700 text-xs md:text-sm">Kamu kurumları için özel olarak tasarlanmış çözümler sunulmaktadır.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Başvuru Şartları -->
+                <div id="basvuru-sartlari" class="mb-6 md:mb-12 bg-white p-4 md:p-8 rounded-lg md:rounded-xl shadow-sm border border-gray-100">
+                    <div class="inline-block bg-[#00352b]/10 px-3 py-1 rounded-full text-[#00352b] text-xs md:text-sm font-semibold mb-3 md:mb-4">Başvuru Şartları</div>
+                    <h2 class="text-xl md:text-2xl font-bold text-gray-800 mb-3 md:mb-6">Hizmetten Yararlanmak İçin Gerekenler</h2>
+                    <div class="bg-white rounded-lg md:rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                        <div class="divide-y divide-gray-100">
+                            <div class="p-3 md:p-5 hover:bg-gray-50 transition-all">
+                                <div class="flex items-center mb-1 md:mb-2">
+                                    <div class="w-6 h-6 md:w-8 md:h-8 bg-[#00352b] text-white rounded-full flex items-center justify-center mr-2 md:mr-3 text-xs md:text-sm">1</div>
+                                    <h4 class="font-semibold text-gray-800 text-sm md:text-base">Geçerli Ticaret Sicil Kaydı</h4>
+                                </div>
+                                <p class="text-gray-700 ml-8 md:ml-11 text-xs md:text-sm">İşletmenize ait geçerli ticaret sicil kaydının bulunması gerekmektedir.</p>
+                            </div>
+                            <div class="p-3 md:p-5 hover:bg-gray-50 transition-all">
+                                <div class="flex items-center mb-1 md:mb-2">
+                                    <div class="w-6 h-6 md:w-8 md:h-8 bg-[#00352b] text-white rounded-full flex items-center justify-center mr-2 md:mr-3 text-xs md:text-sm">2</div>
+                                    <h4 class="font-semibold text-gray-800 text-sm md:text-base">Vergi Levhası</h4>
+                                </div>
+                                <p class="text-gray-700 ml-8 md:ml-11 text-xs md:text-sm">Güncel vergi levhasının elektronik veya basılı kopyası gereklidir.</p>
+                            </div>
+                            <div class="p-3 md:p-5 hover:bg-gray-50 transition-all">
+                                <div class="flex items-center mb-1 md:mb-2">
+                                    <div class="w-6 h-6 md:w-8 md:h-8 bg-[#00352b] text-white rounded-full flex items-center justify-center mr-2 md:mr-3 text-xs md:text-sm">3</div>
+                                    <h4 class="font-semibold text-gray-800 text-sm md:text-base">Yetkili Kişi Kimlik Bilgileri</h4>
+                                </div>
+                                <p class="text-gray-700 ml-8 md:ml-11 text-xs md:text-sm">Başvuruyu yapan kişinin yetkili olduğunu gösteren imza sirküleri ve kimlik bilgileri gereklidir.</p>
+                            </div>
+                            <div class="p-3 md:p-5 hover:bg-gray-50 transition-all">
+                                <div class="flex items-center mb-1 md:mb-2">
+                                    <div class="w-6 h-6 md:w-8 md:h-8 bg-[#00352b] text-white rounded-full flex items-center justify-center mr-2 md:mr-3 text-xs md:text-sm">4</div>
+                                    <h4 class="font-semibold text-gray-800 text-sm md:text-base">Hizmet Başvuru Formu</h4>
+                                </div>
+                                <p class="text-gray-700 ml-8 md:ml-11 text-xs md:text-sm">Başvuru formunu eksiksiz doldurup imzalamanız gerekmektedir.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Başvuru Süreci -->
+                <div id="basvuru-sureci" class="mb-12 bg-white p-8 rounded-xl shadow-sm border border-gray-100">
+                    <div class="inline-block bg-[#00352b]/10 px-3 py-1 rounded-full text-[#00352b] text-sm font-semibold mb-4">Başvuru Süreci</div>
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6">Adım Adım Başvuru İşlemleri</h2>
+                    <div class="relative">
+                        <!-- Süreç Çizgisi -->
+                        <div class="absolute left-4 top-2 bottom-2 w-0.5 bg-gray-200 hidden md:block"></div>
+                        
+                        <ol class="space-y-8 relative">
+                            <li class="relative md:pl-12">
+                                <div class="absolute left-0 top-0 md:top-1 bg-[#00352b] text-white rounded-full w-8 h-8 flex items-center justify-center shadow-md hidden md:flex z-10">1</div>
+                                <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 md:ml-4">
+                                    <div class="flex items-center mb-3">
+                                        <div class="md:hidden bg-[#00352b] text-white rounded-full w-8 h-8 flex items-center justify-center mr-3">1</div>
+                                        <h5 class="font-semibold text-gray-800 text-lg">İletişime Geçin</h5>
+                                    </div>
+                                    <p class="text-gray-700">İletişim sayfamızdan veya telefon ile bizimle iletişime geçin. Uzman ekibimiz en kısa sürede size dönüş yapacaktır.</p>
+                                </div>
+                            </li>
+                            <li class="relative md:pl-12">
+                                <div class="absolute left-0 top-0 md:top-1 bg-[#00352b] text-white rounded-full w-8 h-8 flex items-center justify-center shadow-md hidden md:flex z-10">2</div>
+                                <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 md:ml-4">
+                                    <div class="flex items-center mb-3">
+                                        <div class="md:hidden bg-[#00352b] text-white rounded-full w-8 h-8 flex items-center justify-center mr-3">2</div>
+                                        <h5 class="font-semibold text-gray-800 text-lg">Başvuru Formunu Doldurun</h5>
+                                    </div>
+                                    <p class="text-gray-700">Size özel hazırlanan başvuru formunu eksiksiz bir şekilde doldurup gerekli belgeleri hazırlayın.</p>
+                                </div>
+                            </li>
+                            <li class="relative md:pl-12">
+                                <div class="absolute left-0 top-0 md:top-1 bg-[#00352b] text-white rounded-full w-8 h-8 flex items-center justify-center shadow-md hidden md:flex z-10">3</div>
+                                <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 md:ml-4">
+                                    <div class="flex items-center mb-3">
+                                        <div class="md:hidden bg-[#00352b] text-white rounded-full w-8 h-8 flex items-center justify-center mr-3">3</div>
+                                        <h5 class="font-semibold text-gray-800 text-lg">Ön Değerlendirme</h5>
+                                    </div>
+                                    <p class="text-gray-700">Başvurunuz uzman ekibimiz tarafından değerlendirilir ve ihtiyaçlarınıza özel çözüm önerileri hazırlanır.</p>
+                                </div>
+                            </li>
+                            <li class="relative md:pl-12">
+                                <div class="absolute left-0 top-0 md:top-1 bg-[#00352b] text-white rounded-full w-8 h-8 flex items-center justify-center shadow-md hidden md:flex z-10">4</div>
+                                <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 md:ml-4">
+                                    <div class="flex items-center mb-3">
+                                        <div class="md:hidden bg-[#00352b] text-white rounded-full w-8 h-8 flex items-center justify-center mr-3">4</div>
+                                        <h5 class="font-semibold text-gray-800 text-lg">Teklif ve Onay</h5>
+                                    </div>
+                                    <p class="text-gray-700">Size özel hazırlanan teklifi inceleyin ve onaylayın. Teklif içeriği, maliyet, süre ve diğer detayları şeffaf bir şekilde paylaşırız.</p>
+                                </div>
+                            </li>
+                            <li class="relative md:pl-12">
+                                <div class="absolute left-0 top-0 md:top-1 bg-[#00352b] text-white rounded-full w-8 h-8 flex items-center justify-center shadow-md hidden md:flex z-10">5</div>
+                                <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 md:ml-4">
+                                    <div class="flex items-center mb-3">
+                                        <div class="md:hidden bg-[#00352b] text-white rounded-full w-8 h-8 flex items-center justify-center mr-3">5</div>
+                                        <h5 class="font-semibold text-gray-800 text-lg">Hizmet Başlangıcı</h5>
+                                    </div>
+                                    <p class="text-gray-700">Onay sonrası hizmetimiz planlandığı şekilde başlatılır ve düzenli raporlarla sizi bilgilendiririz.</p>
+                                </div>
+                            </li>
+                        </ol>
+                    </div>
+                </div>
+                
+                <!-- Standart Formlar -->
+                <div id="standart-formlar" class="mb-12 bg-white p-8 rounded-xl shadow-sm border border-gray-100">
+                    <div class="inline-block bg-[#00352b]/10 px-3 py-1 rounded-full text-[#00352b] text-sm font-semibold mb-4">Standart Formlar</div>
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6">Gerekli Formlar ve Belgeler</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-all hover:border-gray-200 flex flex-col">
+                            <div class="flex items-center mb-4">
+                                <div class="w-10 h-10 bg-red-50 rounded-lg flex items-center justify-center mr-3">
+                                    <span class="material-icons text-red-500">description</span>
+                                </div>
+                                <h4 class="font-semibold text-gray-800">Hizmet Başvuru Formu</h4>
+                            </div>
+                            <p class="text-gray-700 text-sm mb-4">Hizmet talebinizi iletmek için gereken temel formdur. Tüm başvurular için doldurulması zorunludur.</p>
+                            <div class="mt-auto">
+                                <a href="#" class="inline-flex items-center text-sm font-medium text-[#00352b] hover:underline">
+                                    <span class="material-icons mr-1 text-sm">file_download</span>
+                                    PDF İndir
+                                </a>
+                            </div>
+                        </div>
+                        <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-all hover:border-gray-200 flex flex-col">
+                            <div class="flex items-center mb-4">
+                                <div class="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center mr-3">
+                                    <span class="material-icons text-blue-500">assignment</span>
+                                </div>
+                                <h4 class="font-semibold text-gray-800">Firma Bilgi Formu</h4>
+                            </div>
+                            <p class="text-gray-700 text-sm mb-4">Firmanıza ait temel bilgilerin yer aldığı bilgi formudur. Kurumsal müşteriler için doldurulması gereklidir.</p>
+                            <div class="mt-auto">
+                                <a href="#" class="inline-flex items-center text-sm font-medium text-[#00352b] hover:underline">
+                                    <span class="material-icons mr-1 text-sm">file_download</span>
+                                    DOCX İndir
+                                </a>
+                            </div>
+                        </div>
+                        <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-all hover:border-gray-200 flex flex-col">
+                            <div class="flex items-center mb-4">
+                                <div class="w-10 h-10 bg-green-50 rounded-lg flex items-center justify-center mr-3">
+                                    <span class="material-icons text-green-500">fact_check</span>
+                                </div>
+                                <h4 class="font-semibold text-gray-800">Kontrol Listesi</h4>
+                            </div>
+                            <p class="text-gray-700 text-sm mb-4">Başvuru öncesi hazırlamanız gereken belgelerin listesini içerir. Başvuru öncesi kontrol etmeniz önerilir.</p>
+                            <div class="mt-auto">
+                                <a href="#" class="inline-flex items-center text-sm font-medium text-[#00352b] hover:underline">
+                                    <span class="material-icons mr-1 text-sm">file_download</span>
+                                    PDF İndir
+                                </a>
+                            </div>
+                        </div>
+                        <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-all hover:border-gray-200 flex flex-col">
+                            <div class="flex items-center mb-4">
+                                <div class="w-10 h-10 bg-purple-50 rounded-lg flex items-center justify-center mr-3">
+                                    <span class="material-icons text-purple-500">gavel</span>
+                                </div>
+                                <h4 class="font-semibold text-gray-800">Hizmet Sözleşmesi</h4>
+                            </div>
+                            <p class="text-gray-700 text-sm mb-4">Hizmet koşullarını ve tarafların yükümlülüklerini belirleyen sözleşme örneğidir. İncelemeniz önerilir.</p>
+                            <div class="mt-auto">
+                                <a href="#" class="inline-flex items-center text-sm font-medium text-[#00352b] hover:underline">
+                                    <span class="material-icons mr-1 text-sm">file_download</span>
+                                    PDF İndir
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- İşlem Süresi -->
+                <div id="islem-suresi" class="mb-12 bg-white p-8 rounded-xl shadow-sm border border-gray-100">
+                    <div class="inline-block bg-[#00352b]/10 px-3 py-1 rounded-full text-[#00352b] text-sm font-semibold mb-4">İşlem Süresi</div>
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6">Hizmet Sürecimiz</h2>
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                        <div class="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-gray-100">
+                            <div class="p-5 hover:bg-gray-50 transition-all flex flex-col items-center text-center">
+                                <div class="w-16 h-16 bg-indigo-50 rounded-full flex items-center justify-center mb-3">
+                                    <span class="material-icons text-indigo-600 text-2xl">timer</span>
+                                </div>
+                                <h4 class="font-semibold text-gray-800 mb-1">Başvuru Değerlendirmesi</h4>
+                                <p class="text-gray-700 text-sm mb-3">Başvurunuzun değerlendirilmesi</p>
+                                <div class="bg-indigo-50 text-indigo-700 px-4 py-1 rounded-full font-medium mt-auto">1-3 İş Günü</div>
+                            </div>
+                            <div class="p-5 hover:bg-gray-50 transition-all flex flex-col items-center text-center">
+                                <div class="w-16 h-16 bg-indigo-50 rounded-full flex items-center justify-center mb-3">
+                                    <span class="material-icons text-indigo-600 text-2xl">event_available</span>
+                                </div>
+                                <h4 class="font-semibold text-gray-800 mb-1">Hizmet Hazırlığı</h4>
+                                <p class="text-gray-700 text-sm mb-3">Hizmet için gereken hazırlıklar</p>
+                                <div class="bg-indigo-50 text-indigo-700 px-4 py-1 rounded-full font-medium mt-auto">3-5 İş Günü</div>
+                            </div>
+                            <div class="p-5 hover:bg-gray-50 transition-all flex flex-col items-center text-center">
+                                <div class="w-16 h-16 bg-indigo-50 rounded-full flex items-center justify-center mb-3">
+                                    <span class="material-icons text-indigo-600 text-2xl">event_available</span>
+                                </div>
+                                <h4 class="font-semibold text-gray-800 mb-1">Uygulama Süreci</h4>
+                                <p class="text-gray-700 text-sm mb-3">Hizmetin uygulanması süreci</p>
+                                <div class="bg-indigo-50 text-indigo-700 px-4 py-1 rounded-full font-medium mt-auto">7-14 İş Günü</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-6 bg-blue-50 p-4 rounded-lg border-l-4 border-blue-400">
+                        <p class="text-gray-700 flex items-start">
+                            <span class="material-icons text-blue-500 mr-2 mt-0.5">info</span>
+                            <span>Belirtilen süreler genel ortalamadır. Hizmetin kapsamına, yoğunluğa ve diğer faktörlere bağlı olarak değişiklik gösterebilir. Tahmini tamamlanma süreleri başvuru onayından sonra paylaşılacaktır.</span>
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- Ücretler -->
+                <div id="ucretler" class="mb-12 bg-white p-8 rounded-xl shadow-sm border border-gray-100">
+                    <div class="inline-block bg-[#00352b]/10 px-3 py-1 rounded-full text-[#00352b] text-sm font-semibold mb-4">Ücretler</div>
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6">Hizmet Paketlerimiz</h2>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full bg-white border border-gray-200 rounded-lg">
+                            <thead>
+                                <tr>
+                                    <th class="px-6 py-4 bg-[#00352b]/5 text-left text-sm font-semibold text-gray-700 border-b">Hizmet Paketi</th>
+                                    <th class="px-6 py-4 bg-[#00352b]/5 text-left text-sm font-semibold text-gray-700 border-b">Açıklama</th>
+                                    <th class="px-6 py-4 bg-[#00352b]/5 text-left text-sm font-semibold text-gray-700 border-b">Fiyat</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="hover:bg-gray-50 transition-colors">
+                                    <td class="px-6 py-4 border-b text-sm font-medium text-gray-800">Başlangıç Paketi</td>
+                                    <td class="px-6 py-4 border-b text-sm text-gray-700">Temel hizmetler ve destek içerir</td>
+                                    <td class="px-6 py-4 border-b text-sm">
+                                        <span class="inline-block bg-blue-50 text-blue-700 px-3 py-1 rounded-full font-medium">Teklif Alın</span>
+                                    </td>
+                                </tr>
+                                <tr class="hover:bg-gray-50 transition-colors">
+                                    <td class="px-6 py-4 border-b text-sm font-medium text-gray-800">Standart Paket</td>
+                                    <td class="px-6 py-4 border-b text-sm text-gray-700">Gelişmiş özellikler ve öncelikli destek</td>
+                                    <td class="px-6 py-4 border-b text-sm">
+                                        <span class="inline-block bg-blue-50 text-blue-700 px-3 py-1 rounded-full font-medium">Teklif Alın</span>
+                                    </td>
+                                </tr>
+                                <tr class="hover:bg-gray-50 transition-colors">
+                                    <td class="px-6 py-4 text-sm font-medium text-gray-800">Premium Paket</td>
+                                    <td class="px-6 py-4 text-sm text-gray-700">Tüm özellikler ve 7/24 öncelikli destek</td>
+                                    <td class="px-6 py-4 text-sm">
+                                        <span class="inline-block bg-blue-50 text-blue-700 px-3 py-1 rounded-full font-medium">Teklif Alın</span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="mt-6 bg-yellow-50 p-4 rounded-lg border-l-4 border-yellow-400">
+                        <p class="text-sm text-gray-700 flex items-start">
+                            <span class="material-icons text-yellow-400 mr-2 mt-0.5">info</span>
+                            <span>Fiyatlarımız işletmenizin büyüklüğüne ve ihtiyaçlarınıza göre değişiklik gösterebilir. Detaylı bilgi ve özel teklif için lütfen iletişime geçin.</span>
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- Diğer Bilgiler -->
+                <div id="diger-bilgiler" class="mb-12 bg-white p-8 rounded-xl shadow-sm border border-gray-100">
+                    <div class="inline-block bg-[#00352b]/10 px-3 py-1 rounded-full text-[#00352b] text-sm font-semibold mb-4">Diğer Bilgiler</div>
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6">Sıkça Sorulan Sorular</h2>
+                    <div class="space-y-4">
+                        <div class="border border-gray-200 rounded-lg overflow-hidden">
+                            <details class="group">
+                                <summary class="flex items-center justify-between cursor-pointer bg-white p-4 font-medium text-gray-800 hover:bg-gray-50">
+                                    <span>Bu hizmet hangi sektörlere uygundur?</span>
+                                    <span class="material-icons transition-transform group-open:rotate-180">expand_more</span>
+                                </summary>
+                                <div class="p-4 bg-gray-50 border-t border-gray-200">
+                                    <p class="text-gray-700">Bu hizmet finans, üretim, teknoloji, perakende, sağlık ve daha birçok sektördeki işletmeler için uygundur. Uzman ekibimiz her sektöre özel çözümler sunmaktadır.</p>
+                                </div>
+                            </details>
+                        </div>
+                        <div class="border border-gray-200 rounded-lg overflow-hidden">
+                            <details class="group">
+                                <summary class="flex items-center justify-between cursor-pointer bg-white p-4 font-medium text-gray-800 hover:bg-gray-50">
+                                    <span>Hizmet kapsamı değiştirilebilir mi?</span>
+                                    <span class="material-icons transition-transform group-open:rotate-180">expand_more</span>
+                                </summary>
+                                <div class="p-4 bg-gray-50 border-t border-gray-200">
+                                    <p class="text-gray-700">Evet, hizmet kapsamı ihtiyaçlarınıza göre özelleştirilebilir. Başvuru sırasında özel taleplerinizi belirtebilirsiniz. Uzman ekibimiz size en uygun çözümü sunacaktır.</p>
+                                </div>
+                            </details>
+                        </div>
+                        <div class="border border-gray-200 rounded-lg overflow-hidden">
+                            <details class="group">
+                                <summary class="flex items-center justify-between cursor-pointer bg-white p-4 font-medium text-gray-800 hover:bg-gray-50">
+                                    <span>Hizmet süresi uzatılabilir mi?</span>
+                                    <span class="material-icons transition-transform group-open:rotate-180">expand_more</span>
+                                </summary>
+                                <div class="p-4 bg-gray-50 border-t border-gray-200">
+                                    <p class="text-gray-700">Evet, ihtiyaçlarınıza göre hizmet süresi uzatılabilir. Hizmet süresi dolmadan önce talebinizi iletmeniz durumunda ek süre planlaması yapılabilir.</p>
+                                </div>
+                            </details>
+                        </div>
+                    </div>
+                    
+                    <h3 class="text-xl font-bold text-gray-800 mt-8 mb-4">İlgili Mevzuat</h3>
+                    <ul class="list-disc list-inside space-y-2 text-gray-700 ml-2">
+                        <li>6698 Sayılı Kişisel Verilerin Korunması Kanunu</li>
+                        <li>5651 Sayılı İnternet Ortamında Yapılan Yayınların Düzenlenmesi Kanunu</li>
+                        <li>5846 Sayılı Fikir ve Sanat Eserleri Kanunu</li>
+                        <li>6563 Sayılı Elektronik Ticaretin Düzenlenmesi Hakkında Kanun</li>
+                    </ul>
+                    
+                    <div class="bg-gradient-to-br from-[#00352b] to-[#004d3f] p-6 rounded-xl shadow-md flex flex-col md:flex-row md:items-center justify-between text-white mt-8">
+                        <div>
+                            <h3 class="text-xl font-bold mb-4">Detaylı bilgi ve özel teklif için</h3>
+                            <p class="text-white/80 mb-4">Tüm sorularınız için hizmet ekibimiz yanınızda</p>
+                        </div>
+                        <div class="mt-4 md:mt-0">
+                            <a href="/iletisim" class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-yellow-400 to-yellow-500 text-[#00352b] font-bold rounded-lg shadow-md hover:shadow-xl transition-all text-base border-2 border-transparent hover:border-white/30 hover:from-yellow-500 hover:to-yellow-600 group">
+                                <span class="mr-2">İLETİŞİME GEÇ</span>
+                                <span class="material-icons group-hover:translate-x-1 transition-transform duration-300">arrow_forward</span>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <!-- Basit Sayfa Değerlendirme -->
+                    <div class="mt-8 bg-white p-4 rounded-lg shadow-sm border border-gray-100 flex items-center justify-center gap-4">
+                        <span class="text-gray-700">Bu sayfayı yararlı buldunuz mu?</span>
+                        <button id="feedback-yes" class="px-4 py-1.5 bg-[#00352b] text-white rounded hover:bg-[#00352b]/90 transition-colors">Evet</button>
+                        <button id="feedback-no" class="px-4 py-1.5 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition-colors">Hayır</button>
+                        <div id="feedback-thanks" class="hidden text-green-600 font-medium flex items-center">
+                            <span class="material-icons mr-1 text-sm">check_circle</span>
+                            Teşekkürler!
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Haberler Bölümü - Minimal Tasarım -->
+                <div id="haberler" class="mb-12 bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                    <div class="inline-block bg-[#00352b]/10 px-3 py-1 rounded-full text-[#00352b] text-sm font-semibold mb-3">Haberler</div>
+                    <h2 class="text-xl font-bold text-gray-800 mb-4">İlgili Haberler</h2>
+                    
+                    @php
+                    $relatedNews = \App\Models\News::published()
+                        ->orderBy('published_at', 'desc')
+                        ->limit(8)
+                        ->get();
+                    @endphp
+                    
+                    @if($relatedNews->isEmpty())
+                        <div class="text-center p-4 bg-gray-50 rounded-lg">
+                            <span class="material-icons text-gray-400 text-2xl">article</span>
+                            <p class="text-sm text-gray-600">Bu hizmetle ilgili haber bulunmamaktadır.</p>
+                        </div>
+                    @else
+                        <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-2 sm:gap-3">
+                            @foreach($relatedNews as $news)
+                            <div class="group flex flex-col border border-gray-100 rounded-lg overflow-hidden hover:shadow-sm transition-all">
+                                <!-- Resim & İçerik -->
+                                <div class="flex flex-col h-full">
+                                    <!-- Resim (Küçültülmüş) -->
+                                    <div class="relative h-28 overflow-hidden">
+                                        @if($news->image)
+                                            @php
+                                            // URL'deki tekrarlanmış storage kısmını düzeltme
+                                            $imagePath = $news->image;
+                                            if (strpos($imagePath, 'http://localhost:8000/storage/') === 0) {
+                                                $imagePath = str_replace('http://localhost:8000/storage/', '', $imagePath);
+                                            }
+                                            @endphp
+                                            <img src="{{ asset('storage/' . $imagePath) }}" alt="{{ $news->title }}" 
+                                                 class="w-full h-full object-cover">
+                                        @else
+                                            <div class="w-full h-full flex items-center justify-center bg-gray-50">
+                                                <span class="material-icons text-gray-300 text-xl">article</span>
+                                            </div>
+                                        @endif
+                                        <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-2">
+                                            <span class="text-white text-xs">
+                                                {{ $news->published_at ? $news->published_at->format('d.m.Y') : $news->created_at->format('d.m.Y') }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- İçerik Bölümü (Minimal) -->
+                                    <div class="p-3 flex-grow flex flex-col">
+                                        <h3 class="text-sm font-medium text-gray-800 line-clamp-2 mb-2 hover:text-[#00352b]">
+                                            <a href="/haberler/{{ $news->slug }}">{{ $news->title }}</a>
+                                        </h3>
+                                        
+                                        <div class="mt-auto text-right">
+                                            <a href="/haberler/{{ $news->slug }}" class="text-xs text-[#00352b] hover:underline inline-flex items-center">
+                                                Detay
+                                                <span class="material-icons text-xs ml-0.5">arrow_forward</span>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            @endforeach
+                        </div>
+                        
+                        <div class="mt-4 text-right">
+                            <a href="/haberler" class="text-sm inline-flex items-center text-[#00352b] hover:underline">
+                                <span>Tümünü görüntüle</span>
+                                <span class="material-icons text-sm ml-1">arrow_forward</span>
+                            </a>
+                        </div>
+                    @endif
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+@endsection
+
+@section('after_scripts')
+<!-- Grid yapısını zorlayan ve sticky menüyü iyileştiren JavaScript -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Grid yapısını zorlayan fonksiyon
+        function enforceGridLayout() {
+            const container = document.querySelector('.sayfa-duzeni');
+            if (container) {
+                if (window.innerWidth >= 768) { // Sadece masaüstü görünümde
+                    container.style.display = 'grid';
+                    container.style.gridTemplateColumns = '25% 75%';
+                    
+                    // Sol menü sticky pozisyonunu kontrol et
+                    const solMenu = document.querySelector('.sol-menu');
+                    if (solMenu) {
+                        solMenu.style.position = 'sticky';
+                        solMenu.style.top = '80px';
+                    }
+                } else {
+                    // Mobil görünümde grid'i devre dışı bırak
+                    container.style.display = 'block';
+                    
+                    const solMenu = document.querySelector('.sol-menu');
+                    if (solMenu) {
+                        solMenu.style.position = 'relative';
+                        solMenu.style.top = '0';
+                    }
+                }
+            }
+        }
+        
+        // Aktif menü bağlantısını güncelle
+        function setActiveMenuLink() {
+            const menuLinks = document.querySelectorAll('.sol-menu-liste a');
+            const sections = document.querySelectorAll('[id^="hizmetin-"], [id^="kimler-"], [id^="basvuru-"], [id^="standart-"], [id^="islem-"], [id^="ucretler"], [id^="diger-"], [id^="haberler"]');
+            
+            // Hangi bölümün görünür olduğunu kontrol et
+            let currentSectionId = null;
+            let maxVisibleHeight = 0;
+            
+            sections.forEach(section => {
+                const rect = section.getBoundingClientRect();
+                const visibleHeight = Math.min(rect.bottom, window.innerHeight) - Math.max(rect.top, 0);
+                
+                if (visibleHeight > 0 && visibleHeight > maxVisibleHeight) {
+                    maxVisibleHeight = visibleHeight;
+                    currentSectionId = '#' + section.id;
+                }
+            });
+            
+            // Menü bağlantılarını güncelle
+            if (currentSectionId) {
+                menuLinks.forEach(link => {
+                    link.classList.remove('aktif');
+                    if (link.getAttribute('href') === currentSectionId) {
+                        link.classList.add('aktif');
+                        
+                        // Aktif bağlantıyı görünür alana kaydır
+                        const solMenu = document.querySelector('.sol-menu');
+                        if (solMenu && window.innerWidth >= 768) {
+                            const linkRect = link.getBoundingClientRect();
+                            const menuRect = solMenu.getBoundingClientRect();
+                            
+                            if (linkRect.top < menuRect.top || linkRect.bottom > menuRect.bottom) {
+                                link.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            }
+                        }
+                    }
+                });
+            }
+        }
+        
+        // Sayfa yüklendiğinde ve kaydırıldığında aktif menü bağlantısını güncelle
+        window.addEventListener('load', setActiveMenuLink);
+        
+        // Kaydırma işlemini optimize etmek için throttle fonksiyonu
+        let scrollTimeout;
+        window.addEventListener('scroll', function() {
+            if (!scrollTimeout) {
+                scrollTimeout = setTimeout(function() {
+                    setActiveMenuLink();
+                    scrollTimeout = null;
+                }, 100);
+            }
+        });
+        
+        // Menü öğelerine tıklama olayı
+        const menuLinks = document.querySelectorAll('.sol-menu-liste a');
+        menuLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                const targetId = this.getAttribute('href');
+                const targetElement = document.querySelector(targetId);
+                
+                if (targetElement) {
+                    // Tüm aktif sınıflarını kaldır
+                    menuLinks.forEach(menuLink => menuLink.classList.remove('aktif'));
+                    
+                    // Tıklanan bağlantıya aktif sınıfı ekle
+                    this.classList.add('aktif');
+                    
+                    // Hedef bölüme yumuşak bir şekilde kaydır
+                    const headerOffset = 100;
+                    const elementPosition = targetElement.getBoundingClientRect().top;
+                    const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+                    
+                    window.scrollTo({
+                        top: offsetPosition,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+        
+        // Sayfa boyutu değiştiğinde grid yapısını zorla
+        window.addEventListener('resize', function() {
+            enforceGridLayout();
+        });
+        
+        // İlk yüklemede grid yapısını zorla
+        enforceGridLayout();
+        
+        // Sayfa tamamen yüklendiğinde tekrar grid yapısını kontrol et
+        window.addEventListener('load', function() {
+            enforceGridLayout();
+            
+            // Sticky pozisyonun düzgün çalışması için layout'u zorla
+            setTimeout(function() {
+                const solMenu = document.querySelector('.sol-menu');
+                if (solMenu && window.innerWidth >= 768) {
+                    // Force reflow
+                    void solMenu.offsetHeight;
+                    solMenu.style.position = 'sticky';
+                    solMenu.style.position = '-webkit-sticky';
+                }
+            }, 100);
+        });
+    });
+</script>
+@endsection 

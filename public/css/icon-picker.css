@@ -1,0 +1,62 @@
+/* Icon Picker CSS */
+.icon-item {
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.icon-item:hover {
+    background-color: #f8f9fa;
+    transform: scale(1.05);
+}
+
+.icon-item.selected {
+    background-color: #e9ecef;
+    border-color: #007bff !important;
+}
+
+.icon-item i {
+    font-size: 24px !important;
+}
+
+.icon-preview {
+    min-width: 40px;
+}
+
+.icon-preview i {
+    font-size: 24px;
+}
+
+.icons-container {
+    border: 1px solid #dee2e6;
+    border-radius: 0.25rem;
+    padding: 15px;
+    background-color: #f8f9fa;
+}
+
+/* İkon kategorileri */
+.icon-type-selector .btn.active {
+    background-color: #007bff;
+    color: #fff;
+}
+
+/* İkon arama kutusu */
+#iconSearch {
+    border-top-right-radius: 0.25rem !important;
+    border-bottom-right-radius: 0.25rem !important;
+}
+
+/* Modal ayarları */
+#iconPickerModal .modal-body {
+    padding: 20px;
+}
+
+/* Mobil görünüm iyileştirmeleri */
+@media (max-width: 576px) {
+    .icon-item {
+        padding: 10px 5px !important;
+    }
+    
+    .icon-name {
+        font-size: 10px;
+    }
+} 

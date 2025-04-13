@@ -1,0 +1,237 @@
+<!-- #### Hero Slider Section -->
+<section id="hero-slider-section" class="hero-slider-section relative w-full overflow-hidden" style="margin-top: -100px;">
+    <div class="swiper heroSwiper h-screen">
+        <div class="swiper-wrapper">
+            @php
+            // Aktif sliderları sıralı bir şekilde getir
+            $sliders = \App\Models\Slider::where('is_active', true)->orderBy('order')->get();
+            
+            // URL'deki yinelenen /storage/ yolunu düzelten yardımcı fonksiyon
+            function fixStoragePath($url) {
+                if (empty($url)) {
+                    return $url;
+                }
+                
+                // Yinelenen /storage/ yolunu düzelt
+                if (strpos($url, '/storage//storage/') !== false) {
+                    return str_replace('/storage//storage/', '/storage/', $url);
+                }
+                
+                if (strpos($url, '/storage/storage/') !== false) {
+                    return str_replace('/storage/storage/', '/storage/', $url);
+                }
+                
+                return $url;
+            }
+            @endphp
+            
+            @forelse ($sliders as $slider)
+            <!-- Slider {{ $loop->iteration }} -->
+            <div class="swiper-slide relative">
+                <!-- Gradient overlay -->
+                <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-black/20 z-10"></div>
+                
+                <!-- Slide image -->
+                <img src="{{ fixStoragePath($slider->image) }}" alt="{{ $slider->title }}" 
+                     class="w-full h-full object-cover scale-105 transform transition-transform duration-10000 swiper-lazy">
+                
+                <!-- Content -->
+                <div class="absolute inset-x-0 bottom-0 z-20 text-white p-8 md:p-16 lg:p-24">
+                    <div class="container mx-auto">
+                        <div class="max-w-3xl slide-content opacity-0 translate-y-8">
+                            @if($slider->title)
+                            <h2 class="text-3xl md:text-5xl lg:text-6xl font-bold mb-3 text-white leading-tight">
+                                {{ $slider->title }}
+                            </h2>
+                            @endif
+                            
+                            @if($slider->subtitle)
+                            <p class="text-xl md:text-2xl text-white/90 mb-8 max-w-2xl">
+                                {{ $slider->subtitle }}
+                            </p>
+                            @endif
+                            
+                            @if($slider->button_text && $slider->button_url)
+                            <a href="{{ $slider->button_url }}" 
+                               class="group inline-flex items-center px-8 py-4 bg-primary hover:bg-primary-dark text-white font-medium rounded-lg transition-all duration-300 shadow-lg hover:shadow-primary/30 transform hover:-translate-y-1">
+                                <span>{{ $slider->button_text }}</span>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2 transform group-hover:translate-x-1 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                                </svg>
+                            </a>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @empty
+            <!-- Fallback slider eğer veritabanında slider yoksa -->
+            <div class="swiper-slide relative">
+                <!-- Gradient overlay -->
+                <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-black/20 z-10"></div>
+                
+                <!-- Slide image -->
+                <img src="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=1200&h=800&fit=crop"
+                     alt="Varsayılan Slider" class="w-full h-full object-cover scale-105 transform transition-transform duration-10000">
+                
+                <!-- Content -->
+                <div class="absolute inset-x-0 bottom-0 z-20 text-white p-8 md:p-16 lg:p-24">
+                    <div class="container mx-auto">
+                        <div class="max-w-3xl slide-content opacity-0 translate-y-8">
+                            <h2 class="text-3xl md:text-5xl lg:text-6xl font-bold mb-3 text-white leading-tight">
+                                Sitemize Hoş Geldiniz
+                            </h2>
+                            <p class="text-xl md:text-2xl text-white/90 mb-8 max-w-2xl">
+                                Daha fazla bilgi için bizimle iletişime geçin
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @endforelse
+        </div>
+        
+        <!-- Pagination dots -->
+        <div class="swiper-pagination !bottom-8"></div>
+        
+        <!-- Navigation buttons -->
+        <div class="swiper-button-next !right-8 !text-white opacity-0 hover:opacity-100 transition-opacity duration-300 after:!text-2xl md:after:!text-3xl !w-12 !h-12 md:!w-14 md:!h-14 hover:!bg-primary/80 !bg-black/20 backdrop-blur-sm rounded-full"></div>
+        <div class="swiper-button-prev !left-8 !text-white opacity-0 hover:opacity-100 transition-opacity duration-300 after:!text-2xl md:after:!text-3xl !w-12 !h-12 md:!w-14 md:!h-14 hover:!bg-primary/80 !bg-black/20 backdrop-blur-sm rounded-full"></div>
+    </div>
+    
+    <!-- Slider Inicializasyon Kodu - Sorun: Sayfa içinde bu kod var, ayrıca layout dosyasında ve main.js dosyasında benzer kodlar var.
+         Bu durum slider'ın birden fazla kez initialize edilmesine ve doğru çalışmamasına sebep olabilir. -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Sayfa yüklendiğinde scroll pozisyonunu en üste getir
+            window.scrollTo(0, 0);
+            
+            // Eğer zaten heroSwiper initialize edilmişse temizle (çakışmayı önlemek için)
+            if (window.heroSwiperInstance) {
+                window.heroSwiperInstance.destroy(true, true);
+            }
+            
+            // Yeni swiper oluştur ve global değişkene kaydet
+            window.heroSwiperInstance = new Swiper('.heroSwiper', {
+                loop: true,
+                effect: 'fade', // Fade efekti kullanıyoruz
+                fadeEffect: {
+                  crossFade: true // Geçişlerin daha pürüzsüz olması için
+                },
+                speed: 1500, // Geçiş hızı
+                autoplay: {
+                    delay: 6000, // 6 saniyede bir geçiş
+                    disableOnInteraction: false, // Kullanıcı etkileşiminde bile autoplay devam etsin
+                },
+                lazy: {
+                  loadPrevNext: true, // Önceki ve sonraki slider'ları da yükle
+                },
+                pagination: {
+                    el: '.swiper-pagination',
+                    clickable: true, // Tıklanabilir pagination noktaları
+                },
+                navigation: {
+                    nextEl: '.swiper-button-next',
+                    prevEl: '.swiper-button-prev',
+                },
+                on: {
+                    init: function() {
+                        console.log("Slider başlatıldı!"); // Debug için konsola log eklendi
+                        // İlk slide'ın içeriğini animasyonla göster
+                        let activeSlide = document.querySelector('.swiper-slide-active');
+                        if (activeSlide) {
+                            let content = activeSlide.querySelector('.slide-content');
+                            if (content) {
+                                setTimeout(function() {
+                                    content.classList.add('animate-slide-up');
+                                    content.classList.remove('opacity-0', 'translate-y-8');
+                                }, 500);
+                            }
+                        }
+                    },
+                    slideChange: function() {
+                        console.log("Slide değişti!"); // Debug için konsola log eklendi
+                        // Görüntülenen slide'ın içeriğini animasyonla göster
+                        let slides = document.querySelectorAll('.swiper-slide');
+                        slides.forEach(slide => {
+                            let content = slide.querySelector('.slide-content');
+                            if (content) {
+                                content.classList.remove('animate-slide-up');
+                                content.classList.add('opacity-0', 'translate-y-8');
+                            }
+                        });
+                        
+                        setTimeout(function() {
+                            let activeSlide = document.querySelector('.swiper-slide-active');
+                            if (activeSlide) {
+                                let content = activeSlide.querySelector('.slide-content');
+                                if (content) {
+                                    content.classList.add('animate-slide-up');
+                                    content.classList.remove('opacity-0', 'translate-y-8');
+                                }
+                            }
+                        }, 500);
+                    }
+                }
+            });
+            
+            // Resim yakınlaştırma animasyonu
+            window.heroSwiperInstance.on('slideChangeTransitionStart', function() {
+                let activeSlide = document.querySelector('.swiper-slide-active img');
+                let nextSlide = document.querySelector('.swiper-slide-next img');
+                
+                if (activeSlide) activeSlide.style.transform = 'scale(1.05)';
+                
+                setTimeout(function() {
+                    if (activeSlide) activeSlide.style.transform = 'scale(1)';
+                    if (nextSlide) nextSlide.style.transform = 'scale(1.05)';
+                }, 6000); // Autoplay süresine eşit
+            });
+        });
+    </script>
+    
+    <style>
+        .animate-slide-up {
+            animation: slide-up 1s ease forwards;
+        }
+        
+        @keyframes slide-up {
+            from { opacity: 0; transform: translateY(2rem); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Slider tam ekran sığması için ek stiller */
+        .hero-slider-section {
+            height: 100vh;
+            max-height: 100vh;
+            min-height: 500px;
+            overflow: hidden;
+            position: relative;
+            margin-top: -100px; /* Header yüksekliği kadar negatif margin */
+        }
+        
+        .hero-slider-section .swiper {
+            height: 100% !important;
+            max-height: 100% !important;
+        }
+        
+        @media (max-height: 800px) {
+            .hero-slider-section {
+                height: 100vh;
+                min-height: 500px;
+            }
+        }
+        
+        /* Quick menu geçişi için ek stil */
+        #hero-slider-section::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 20px;
+            background: linear-gradient(to bottom, transparent, rgba(0,0,0,0.1));
+            z-index: 5;
+        }
+    </style>
+</section> 

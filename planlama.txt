@@ -1,0 +1,38 @@
+# Etkinlik Görselleri Sorun Tespiti ve Çözüm Planı
+
+## Tespit Edilen Sorun
+Etkinlik verileri çekildiğinde, görseller events klasörüne indirilmekle birlikte, bu görsel dosyaları veritabanındaki 'cover_image' alanına doğru şekilde kaydedilmiyor veya kaydedilse bile web'de gösterilemiyor.
+
+## Yapılan Geliştirmeler
+
+### 1. `downloadImage` Metodunda İyileştirmeler:
+- Görsel indirme işlemi iki farklı yöntemle deneniyor: `Storage::put` ve PHP'nin `file_put_contents` fonksiyonu.
+- Dosya yolları ve isimleri oluşturma süreci daha detaylı loglanıyor.
+- Dosyanın varlığı ve boyutu çift kontrol ediliyor.
+- Kaydedilen dosya yolunun `public/` öneki kaldırılarak, daha temiz bir format (events/dosyaadi.jpg) döndürülüyor.
+
+### 2. `addSingleEventFromData` Metodunda İyileştirmeler:
+- URL'lerdeki @ işareti gibi sorunlu karakterler temizleniyor.
+- Mükerrer domain sorunu daha kapsamlı kontrol ediliyor.
+- Tüm süreç adımları loglanıyor: URL kontrolü, görsel indirme, veritabanına kayıt.
+- Event::create çağrısı ve sonucu ayrıntılı loglanıyor.
+- Etkinlik oluştuktan sonra nesne üzerindeki cover_image değeri kontrol ediliyor.
+
+### 3. Routes Kontrolü:
+- Web.php içinde `/events/{filename}` route'u kontrol edildi ve çalışır durumda.
+- Bu route, storage_path('app/public/events/') dizininden dosya sunuyor.
+
+### 4. Storage Linkleri:
+- `php artisan storage:link` ile storage-public bağlantısı kontrol edildi.
+
+## Test Adımları
+1. Etkinlik görseli indirme süreci loglarını kontrol et.
+2. Etkinlik oluşturma süreci loglarını kontrol et.
+3. Storage dizininde dosyaların fiziksel olarak var olup olmadığını kontrol et.
+4. `storage/logs/laravel.log` dosyasında hata mesajlarını kontrol et.
+5. `/events/{filename}` rotasının doğru çalışıp çalışmadığını test et.
+
+## Beklenen Sonuçlar
+- Loglar, görselin başarıyla indirildiğini ve doğru formatta döndürüldüğünü göstermeli.
+- Etkinlik veritabanına kaydedildiğinde cover_image değeri doğru şekilde (events/dosyaadi.jpg) kaydedilmeli.
+- Etkinlik listelendiğinde görsel URL'i doğru formatta oluşturulmalı: `http://localhost:8000/events/dosyaadi.jpg` 
