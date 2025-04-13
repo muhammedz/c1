@@ -310,6 +310,80 @@
         text-align: center;
         margin-right: 10px;
     }
+    
+    /* Kategori kartı ve rozet stilleri */
+    .category-badge {
+        display: inline-flex;
+        align-items: center;
+        background: #e9ecef;
+        border-radius: 0.25rem;
+        padding: 0.25rem 0.5rem;
+        margin: 0.125rem;
+        font-size: 0.875rem;
+    }
+    
+    .category-badge .remove-category {
+        margin-left: 0.5rem;
+        color: #dc3545;
+        cursor: pointer;
+    }
+    
+    .selected-categories {
+        margin-top: 10px;
+    }
+    
+    .hover-bg-light:hover {
+        background-color: rgba(0,0,0,0.05);
+    }
+    
+    .category-item {
+        cursor: pointer;
+        margin-bottom: 5px;
+        transition: all 0.2s;
+    }
+    
+    /* Görsel önizleme */
+    .image-preview-container {
+        position: relative;
+        margin-top: 10px;
+        border-radius: 0.375rem;
+        overflow: hidden;
+        border: 1px solid #dee2e6;
+    }
+    
+    .image-preview-container img {
+        max-width: 100%;
+        height: auto;
+    }
+    
+    .image-preview-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        opacity: 0;
+        transition: opacity 0.3s;
+    }
+    
+    .image-preview-container:hover .image-preview-overlay {
+        opacity: 1;
+    }
+    
+    .image-preview-info {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: rgba(0,0,0,0.7);
+        color: white;
+        padding: 5px 10px;
+        font-size: 0.8rem;
+    }
 </style>
 @stop
 
@@ -328,6 +402,9 @@
         </div>
         
         <div>
+            <a href="{{ route('pages.show', $page->slug) }}" target="_blank" class="btn btn-outline-primary me-2">
+                <i class="fas fa-eye"></i> Önizleme
+            </a>
             <a href="{{ route('admin.pages.index') }}" class="btn btn-outline-secondary">
                 <i class="fas fa-arrow-left"></i> Geri Dön
             </a>
@@ -378,14 +455,31 @@
                         
                         <div class="mb-4">
                             <label for="slug" class="form-label">URL</label>
-                            <div class="input-group">
-                                <span class="input-group-text text-muted" id="slug-addon">{{ url('/') }}/</span>
-                                <input type="text" class="form-control @error('slug') is-invalid @enderror" id="slug" name="slug" value="{{ old('slug', $page->slug) }}" aria-describedby="slug-addon">
+                            <!-- Slug ve URL Önizleme Kutusu -->
+                            <div class="mt-2 p-2 bg-light border rounded mb-2">
+                                <div class="small text-muted mb-1">
+                                    <i class="fas fa-link me-1"></i> Oluşturulacak URL:
+                                </div>
+                                <div class="d-flex align-items-center">
+                                    <span class="text-secondary small fw-bold">{{ url('/') }}/</span>
+                                    <span class="text-primary fw-bold" id="slug-preview">{{ old('slug', $page->slug) }}</span>
+                                </div>
+                                <div class="small text-muted mt-2">
+                                    <i class="fas fa-info-circle me-1"></i> Slug:
+                                </div>
+                                <div class="input-group mt-1">
+                                    <input type="text" class="form-control form-control-sm @error('slug') is-invalid @enderror" id="slug" name="slug" value="{{ old('slug', $page->slug) }}" placeholder="Otomatik oluşturulur">
+                                    <button class="btn btn-sm btn-outline-secondary" type="button" id="slug-regenerate" title="Başlıktan yeniden oluştur">
+                                        <i class="fas fa-sync-alt"></i> Yenile
+                                    </button>
+                                </div>
+                                <small class="form-text text-muted mt-1">
+                                    <i class="fas fa-info-circle me-1"></i> Otomatik oluşturulan slug'ı düzenleyebilirsiniz. Boş bırakırsanız başlıktan otomatik oluşturulacaktır.
+                                </small>
                             </div>
                             @error('slug')
-                                <div class="invalid-feedback">{{ $message }}</div>
+                                <div class="text-danger small">{{ $message }}</div>
                             @enderror
-                            <small class="text-muted">Boş bırakırsanız başlıktan otomatik oluşturulacaktır.</small>
                         </div>
                                 
                         <div class="mb-4">
@@ -409,58 +503,74 @@
                         
                 <!-- Medya -->
                 <div class="card mb-4">
-                    <div class="card-header d-flex justify-content-between align-items-center">
+                    <div class="card-header bg-light d-flex align-items-center">
+                        <i class="fas fa-images me-2 text-primary"></i>
                         <h5 class="mb-0">Medya</h5>
                     </div>
                     <div class="card-body">
-                        <div class="mb-4">
+                        <div class="form-group">
                             <label for="image" class="form-label">Ana Görsel <span class="text-danger">*</span></label>
                             <div class="input-group">
                                 <input type="text" class="form-control @error('image') is-invalid @enderror" id="image" name="image" value="{{ old('image', $page->image) }}" required readonly>
-                                <button class="btn btn-primary" type="button" id="image-browser">
-                                    <i class="fas fa-folder-open"></i> Göz At
-                                </button>
-                                <button class="btn btn-danger" type="button" id="image-clear">
-                                    <i class="fas fa-times"></i>
-                                </button>
-                            </div>
-                            <div id="image-preview" class="mt-3" style="{{ old('image', $page->image) ? '' : 'display: none;' }}">
-                                <div class="position-relative d-inline-block">
-                                    <img src="{{ old('image', $page->image) }}" class="img-fluid" alt="Seçilen görsel" style="max-height: 200px; max-width: 100%; width: auto; height: auto; object-fit: contain;">
+                                <div class="input-group-append">
+                                    <button class="btn btn-primary" type="button" id="image-browser" data-input="image" data-preview="image-preview">
+                                        <i class="fas fa-folder-open"></i> Göz At
+                                    </button>
+                                    <button class="btn btn-danger" type="button" id="image-clear">
+                                        <i class="fas fa-times"></i> Temizle
+                                    </button>
                                 </div>
                             </div>
                             @error('image')
-                                <div class="invalid-feedback">{{ $message }}</div>
+                                <span class="text-danger">{{ $message }}</span>
                             @enderror
-                            <small class="text-muted mt-2 d-block">
-                                <i class="fas fa-info-circle"></i> Önerilen görsel boyutu: 1200x630 piksel
-                            </small>
+                            
+                            <div id="image-preview" class="mt-3" style="{{ old('image', $page->image) ? '' : 'display: none;' }}">
+                                <img src="{{ old('image', $page->image) }}" alt="Görsel Önizleme" class="img-fluid" style="max-height: 200px; border-radius: 8px;">
+                                <div class="mt-2 small text-muted">
+                                    <span id="image-dimensions">0 x 0</span> &bull; <span id="image-size">0 KB</span>
+                                </div>
+                            </div>
                         </div>
                                 
-                        <div class="mb-4">
-                            <label class="form-label d-flex justify-content-between align-items-center">
-                                <span>Galeri</span>
-                                <small class="text-muted">En fazla 10 görsel ekleyebilirsiniz</small>
-                            </label>
-                            <div class="d-flex mb-3">
-                                <button type="button" id="gallery-browser" class="btn btn-outline-primary">
-                                    <i class="fas fa-images me-1"></i> Görsel Ekle
+                        <div class="form-group">
+                            <label for="gallery">Galeri Görselleri <small class="text-muted">(En fazla 10 görsel)</small></label>
+                            <div class="d-flex">
+                                <button type="button" id="gallery-browser" class="btn btn-outline-primary" data-input="fake-gallery-input">
+                                    <i class="fas fa-images"></i> Görsel Ekle (<span id="gallery-count">{{ is_array($page->gallery) ? count($page->gallery) : 0 }}</span>/10)
                                 </button>
                             </div>
-                            <div class="gallery-container" id="gallery-preview" style="{{ count($page->gallery ?? []) > 0 ? 'display: grid;' : 'display: none;' }}">
-                                @if(!empty($page->gallery))
-                                    @foreach($page->gallery as $index => $galleryItem)
-                                        <div class="gallery-item" data-id="gallery-existing-{{ $index }}">
-                                            <img src="{{ $galleryItem }}" class="img-fluid" alt="Galeri görsel">
-                                            <button type="button" class="remove-btn" data-id="gallery-existing-{{ $index }}">
-                                                <i class="fas fa-times"></i>
-                                            </button>
-                                        </div>
-                                        <input type="hidden" name="gallery[]" id="gallery-existing-{{ $index }}" value="{{ $galleryItem }}">
-                                    @endforeach
-                                @endif
+                            <input type="hidden" id="fake-gallery-input" class="fake-gallery-input">
+                            
+                            <div id="gallery-preview" class="mt-3" style="{{ is_array($page->gallery) && count($page->gallery) > 0 ? '' : 'display: none;' }}">
+                                <div id="gallery-items" class="d-flex flex-wrap gap-3">
+                                    @if(!empty($page->gallery))
+                                        @foreach($page->gallery as $index => $galleryItem)
+                                            <div class="gallery-item" data-id="gallery-existing-{{ $index }}" style="position: relative; width: 150px; height: 150px; overflow: hidden; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                                                <img src="{{ $galleryItem }}" alt="Galeri görseli" style="width: 100%; height: 100%; object-fit: cover;">
+                                                <button type="button" class="btn btn-sm btn-danger position-absolute" 
+                                                    style="top: 5px; right: 5px; border-radius: 50%; width: 25px; height: 25px; padding: 0; display: flex; align-items: center; justify-content: center;"
+                                                    data-id="gallery-existing-{{ $index }}">
+                                                    <i class="fas fa-times" style="font-size: 12px;"></i>
+                                                </button>
+                                            </div>
+                                        @endforeach
+                                    @endif
+                                </div>
+                                <div id="gallery-inputs">
+                                    @if(!empty($page->gallery))
+                                        @foreach($page->gallery as $index => $galleryItem)
+                                            <input type="hidden" name="gallery[]" value="{{ $galleryItem }}">
+                                        @endforeach
+                                    @endif
+                                </div>
                             </div>
-                            <div id="gallery-inputs"></div>
+                            @error('gallery')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
+                            @error('gallery.*')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
                         </div>
                     </div>
                 </div>
@@ -561,21 +671,52 @@
                         
                 <!-- Kategoriler -->
                 <div class="card mb-3">
-                    <div class="card-header d-flex justify-content-between align-items-center">
+                    <div class="card-header bg-light d-flex align-items-center">
+                        <i class="fas fa-folder-tree me-2 text-primary"></i>
                         <h5 class="mb-0">Kategoriler</h5>
-                        <a href="{{ route('admin.page-categories.create') }}" target="_blank" class="btn btn-sm btn-outline-primary">
-                            <i class="fas fa-plus"></i> Yeni Kategori
-                        </a>
+                        <span class="badge bg-primary ms-2 category-count">{{ count(old('categories', $page->categories->pluck('id')->toArray())) }}</span>
                     </div>
                     <div class="card-body">
-                        <div class="category-select-container mb-3">
-                            <select id="categories" name="categories[]" multiple class="form-control">
-                                @foreach($categories ?? [] as $category)
-                                    <option value="{{ $category->id }}" {{ in_array($category->id, old('categories', $page->categories->pluck('id')->toArray())) ? 'selected' : '' }}>
-                                        {{ $category->name }}
-                                    </option>
+                        <div class="category-wrapper">
+                            <!-- Arama ve Tümünü Seç -->
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="ms-auto">
+                                    <button type="button" class="btn btn-light btn-sm border" id="select-all-categories" style="font-size: 0.8rem; padding: 0.25rem 0.5rem;">
+                                        <i class="fas fa-check-square me-1"></i>Tümü
+                                    </button>
+                                    <a href="{{ route('admin.page-categories.create') }}" target="_blank" class="btn btn-primary btn-sm" style="font-size: 0.8rem; padding: 0.25rem 0.5rem;">
+                                        <i class="fas fa-plus me-1"></i>Yeni Kategori
+                                    </a>
+                                </div>
+                            </div>
+
+                            <!-- Kategori Listesi -->
+                            <div class="category-list mb-3" style="max-height: 400px; overflow-y: auto; border: 1px solid #dee2e6; border-radius: 4px;">
+                                @foreach($pageCategories as $category)
+                                <div class="category-item d-flex align-items-center py-1 px-2 mb-1 rounded hover-bg-light">
+                                    <div class="form-check mb-0 w-100">
+                                        <label class="d-flex align-items-center gap-1">
+                                            <input type="checkbox" name="categories[]" value="{{ $category->id }}" class="form-check-input me-1" {{ in_array($category->id, old('categories', $page->categories->pluck('id')->toArray())) ? 'checked' : '' }}>
+                                            @if($category->icon)
+                                                <i class="{{ $category->icon }}" style="margin-right: 3px; font-size: 0.9em;"></i>
+                                            @endif
+                                            <span class="category-name">{{ $category->name }}</span>
+                                            @if($category->description)
+                                                <i class="fas fa-info-circle ms-1 text-muted" style="font-size: 0.85em;" data-bs-toggle="tooltip" title="{{ $category->description }}"></i>
+                                            @endif
+                                        </label>
+                                    </div>
+                                </div>
                                 @endforeach
-                            </select>
+                            </div>
+
+                            <!-- Seçili Kategoriler -->
+                            <div class="selected-categories">
+                                <label class="form-label text-muted mb-2">
+                                    <i class="fas fa-tags me-1"></i> Seçili Kategoriler
+                                </label>
+                                <div class="d-flex flex-wrap gap-2" id="selected-categories-list"></div>
+                            </div>
                         </div>
                         @error('categories')
                             <div class="text-danger small">{{ $message }}</div>
@@ -584,21 +725,44 @@
                 </div>
                         
                 <!-- Etiketler -->
-                <div class="card mb-3">
-                    <div class="card-header d-flex justify-content-between align-items-center">
+                <div class="card tag-card mb-3">
+                    <div class="card-header bg-light d-flex align-items-center">
+                        <i class="fas fa-tags me-2 text-primary"></i>
                         <h5 class="mb-0">Etiketler</h5>
+                        <span class="badge bg-primary ms-2 tag-count">{{ $page->tags && is_object($page->tags) ? $page->tags->count() : 0 }}</span>
                     </div>
                     <div class="card-body">
-                        <div class="tag-select-container mb-3">
-                            <input type="text" id="tags-input" name="tags" value="{{ old('tags', $page->tags ? implode(',', $page->tags) : '') }}" class="form-control">
+                        <div class="tag-wrapper">
+                            <!-- Ekleme Alanı -->
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="input-group">
+                                    <input type="text" id="tag-input" class="form-control" placeholder="Etiket eklemek için yazın...">
+                                    <button class="btn btn-outline-primary" type="button" id="add-tag-btn">
+                                        <i class="fas fa-plus"></i> Ekle
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- Etiket Açıklaması -->
+                            <div class="mb-3">
+                                <small class="text-muted">
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    Birden fazla etiket eklemek için her eklemeden sonra "Ekle" butonuna tıklayın veya virgül ile ayırın.
+                                </small>
+                            </div>
+
+                            <!-- Seçili Etiketler -->
+                            <div class="selected-tags">
+                                <label class="form-label text-muted mb-2">
+                                    <i class="fas fa-hashtag me-1"></i> Eklenen Etiketler
+                                </label>
+                                <div class="d-flex flex-wrap gap-2" id="selected-tags-list"></div>
+                                <input type="hidden" id="tags" name="tags" value="{{ old('tags', $page->tags ? implode(',', $page->tags->pluck('name')->toArray()) : '') }}">
+                            </div>
                         </div>
                         @error('tags')
                             <div class="text-danger small">{{ $message }}</div>
                         @enderror
-                        <small class="text-muted">
-                            <i class="fas fa-info-circle"></i> 
-                            Birden fazla etiket eklemek için virgül kullanın veya Enter tuşuna basın.
-                        </small>
                     </div>
                 </div>
                 
@@ -617,7 +781,10 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/locales/bootstrap-datepicker.tr.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/js/tom-select.complete.min.js"></script>
-<script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+
+<!-- TinyMCE Editör -->
+<script src="{{ asset('js/tinymce/tinymce.min.js') }}" referrerpolicy="origin"></script>
+<script src="/vendor/laravel-filemanager/js/stand-alone-button.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         // TinyMCE için düzenleyici ayarları
@@ -652,19 +819,72 @@
             }
         });
         
-        // URL oluşturucu
-        document.getElementById('title').addEventListener('blur', function() {
-            const slugInput = document.getElementById('slug');
-            if (slugInput.value === '') {
-                const title = this.value;
-                const slug = title.toLowerCase()
-                    .replace(/[^\w\s-]/g, '') // Özel karakterleri kaldır
-                    .replace(/\s+/g, '-') // Boşlukları tirelere çevir
-                    .replace(/--+/g, '-') // Çoklu tireleri tek tireye indir
-                    .trim('-'); // Baştaki ve sondaki tireleri kaldır
-                slugInput.value = slug;
+        // Slug oluşturma fonksiyonu
+        function createSlug(text) {
+            const trMap = {
+                'ğ': 'g', 'Ğ': 'G', 'ü': 'u', 'Ü': 'U', 'ş': 's', 'Ş': 'S', 'ı': 'i', 'İ': 'I',
+                'ö': 'o', 'Ö': 'O', 'ç': 'c', 'Ç': 'C'
+            };
+
+            for (let key in trMap) {
+                text = text.replace(new RegExp(key, 'g'), trMap[key]);
+            }
+
+            return text
+                .toLowerCase()
+                .trim()
+                .replace(/[^a-z0-9-]/g, '-')
+                .replace(/-+/g, '-')
+                .replace(/^-|-$/g, '');
+        }
+        
+        // Slug işlevselliği
+        const titleInput = document.getElementById('title');
+        const slugPreview = document.getElementById('slug-preview');
+        const slugInput = document.getElementById('slug');
+        const slugRegenerateBtn = document.getElementById('slug-regenerate');
+        let slugIsManual = false; // Kullanıcı manuel olarak slug değiştirmiş mi?
+        
+        // Başlık yazıldığında otomatik slug oluşturma
+        titleInput.addEventListener('input', function() {
+            if (!slugIsManual || slugInput.value === '') {
+                const newSlug = createSlug(this.value);
+                slugInput.value = newSlug;
+                updateSlugPreview();
             }
         });
+        
+        // Slug manuel değiştirildiğinde
+        slugInput.addEventListener('input', function() {
+            slugIsManual = true;
+            updateSlugPreview();
+        });
+        
+        // Slug yeniden oluşturma butonu
+        slugRegenerateBtn.addEventListener('click', function() {
+            const title = titleInput.value;
+            if (title.trim() !== '') {
+                const slug = createSlug(title);
+                slugInput.value = slug;
+                slugIsManual = false;
+                updateSlugPreview();
+                
+                // Efekt ekleyelim
+                slugInput.classList.add('border-success');
+                setTimeout(() => {
+                    slugInput.classList.remove('border-success');
+                }, 1000);
+            }
+        });
+        
+        // Slug önizlemesini güncelleme
+        function updateSlugPreview() {
+            const slugValue = slugInput.value.trim() || 'ornek-sayfa';
+            slugPreview.textContent = slugValue;
+        }
+        
+        // Sayfa yüklendiğinde önizlemeyi güncelle
+        updateSlugPreview();
         
         // Durum seçici
         document.querySelectorAll('.status-option').forEach(option => {
@@ -718,106 +938,364 @@
         
         // Medya yönetimi
         document.getElementById('image-browser').addEventListener('click', function() {
-            window.open('/filemanager/dialog.php?type=1&field_id=image', 'filemanager', 'width=900,height=600');
+            window.currentFileInput = $('#image');
+            window.open('/admin/file-manager?type=image', 'FileManager', 'width=900,height=600');
+            return false;
         });
         
         document.getElementById('image-clear').addEventListener('click', function() {
             document.getElementById('image').value = '';
             document.getElementById('image-preview').style.display = 'none';
             document.querySelector('#image-preview img').src = '';
+            document.getElementById('image-dimensions').textContent = '0 x 0';
+            document.getElementById('image-size').textContent = '0 KB';
         });
         
         // Ana görsel önizleme
         const imageInput = document.getElementById('image');
         imageInput.addEventListener('change', updateImagePreview);
         
-        function updateImagePreview() {
-            const preview = document.getElementById('image-preview');
-            const previewImg = preview.querySelector('img');
-            
-            if (imageInput.value) {
-                previewImg.src = imageInput.value;
-                preview.style.display = 'block';
-            } else {
-                preview.style.display = 'none';
-            }
+        // Yüklü bir resim varsa önizleme göster
+        if (imageInput.value) {
+            updateImagePreview();
         }
+    });
+    
+    // Bu fonksiyonlar global olarak tanımlanmış
+    function updateImagePreview() {
+        const imageValue = document.getElementById('image').value;
+        const preview = document.getElementById('image-preview');
+        const previewImg = preview.querySelector('img');
         
-        // Galeri yönetimi
-        let galleryCounter = {{ count($page->gallery ?? []) }};
-        
-        document.getElementById('gallery-browser').addEventListener('click', function() {
-            window.open('/filemanager/dialog.php?type=1&field_id=gallery-' + galleryCounter, 'filemanager', 'width=900,height=600');
-            window.SetUrl = function(url, width, height, alt) {
-                addGalleryItem(url);
-                galleryCounter++;
+        if (imageValue) {
+            previewImg.src = imageValue;
+            preview.style.display = 'block';
+            
+            // Görsel boyutlarını ve dosya boyutunu hesapla
+            const img = new Image();
+            img.onload = function() {
+                document.getElementById('image-dimensions').textContent = this.width + ' x ' + this.height;
+                
+                // Dosya boyutunu tahmin et (yaklaşık değer)
+                const size = Math.round((this.width * this.height * 4) / 1024);
+                document.getElementById('image-size').textContent = size + ' KB';
             };
+            img.src = imageValue;
+        } else {
+            preview.style.display = 'none';
+        }
+    }
+    
+    // FileManager callback işlevi - Laravel FileManager'ın pencereyi kapatırken çağıracağı işlev
+    window.SetUrl = function(items) {
+        console.log('FileManager SetUrl çağrıldı', items);
+        // Bu işlev filemanager tarafından otomatik olarak çağrılır
+        if (window.currentFileInput) {
+            if (items.length > 0) {
+                var url = items[0].url;
+                window.currentFileInput.val(url).trigger('change');
+                
+                if (window.currentFileInput.attr('id') === 'fake-gallery-input') {
+                    addGalleryItem(url);
+                    window.currentFileInput.val(''); // Galeri input'unu temizle
+                }
+            }
+        }
+        window.currentFileInput = null; // İşlem tamamlandığında referansı temizle
+    };
+    
+    // Galeri yönetimi
+    let galleryItems = [];
+    
+    // Sayfa yüklendiğinde mevcut galeri öğelerini yükle
+    $(document).ready(function() {
+        // Laravel File Manager butonları
+        $('#image-browser').filemanager('image');
+        $('#gallery-browser').filemanager('image');
+        
+        // Hata ayıklama için
+        console.log('FileManager script yüklendi');
+        
+        // Galeri filemanager değişikliğini dinleme
+        $('#fake-gallery-input').on('change', function() {
+            // Seçilen görseli al
+            var url = $(this).val();
+            console.log('Seçilen galeri görseli: ', url);
+            if (url) {
+                // URL'yi rölatif yola dönüştür (gerekirse)
+                url = makeRelativeUrl(url);
+                addGalleryItem(url);
+                $(this).val(''); // input'u temizle
+            }
         });
         
-        function addGalleryItem(url) {
-            const galleryContainer = document.getElementById('gallery-preview');
-            const inputsContainer = document.getElementById('gallery-inputs');
-            const id = 'gallery-' + galleryCounter;
-            
-            // Önizleme öğesini oluştur
-            const galleryItem = document.createElement('div');
-            galleryItem.className = 'gallery-item';
-            galleryItem.dataset.id = id;
-            galleryItem.innerHTML = `
-                <img src="${url}" class="img-fluid" alt="Galeri görsel">
-                <button type="button" class="remove-btn" data-id="${id}">
-                    <i class="fas fa-times"></i>
-                </button>
-            `;
-            
-            // Gizli input oluştur
-            const input = document.createElement('input');
-            input.type = 'hidden';
-            input.name = 'gallery[]';
-            input.id = id;
-            input.value = url;
-            
-            galleryContainer.appendChild(galleryItem);
-            inputsContainer.appendChild(input);
-            galleryContainer.style.display = 'grid';
-            
-            // Silme işlemini ekle
-            galleryItem.querySelector('.remove-btn').addEventListener('click', function() {
-                const itemId = this.dataset.id;
-                document.querySelector(`.gallery-item[data-id="${itemId}"]`).remove();
-                document.getElementById(itemId).remove();
-                
-                if (galleryContainer.children.length === 0) {
-                    galleryContainer.style.display = 'none';
-                }
-            });
+        // Clear Button for Main Image
+        $('#image-clear').on('click', function() {
+            $('#image').val('');
+            $('#image-preview').hide().find('img').attr('src', '');
+            $('#image-dimensions').text('0 x 0');
+            $('#image-size').text('0 KB');
+        });
+        
+        // Ana görsel değişikliğini dinleme
+        $('#image').on('change', function() {
+            updateImagePreview();
+        });
+        
+        // File Browser Button for Gallery
+        $('#gallery-browser').on('click', function() {
+            if (galleryItems.length >= 10) {
+                alert('En fazla 10 görsel ekleyebilirsiniz.');
+                return;
+            }
+        });
+        
+        // Mevcut galeri öğelerini topla
+        @if(!empty($page->gallery))
+            @foreach($page->gallery as $index => $galleryItem)
+                galleryItems.push({
+                    id: 'gallery-existing-{{ $index }}',
+                    url: '{{ $galleryItem }}'
+                });
+            @endforeach
+        @endif
+        
+        // Başlangıçta render et
+        renderGalleryItems();
+        
+        // Silme işlevini ekle
+        $(document).on('click', '#gallery-items button', function() {
+            const itemId = $(this).data('id');
+            galleryItems = galleryItems.filter(item => item.id !== itemId);
+            renderGalleryItems();
+        });
+    });
+    
+    // URL'yi rölatif yola dönüştür (gerekirse)
+    function makeRelativeUrl(url) {
+        // Aynı domain'e ait URL'leri rölatif hale getir
+        const origin = window.location.origin;
+        if (url.startsWith(origin)) {
+            url = url.replace(origin, '');
+        }
+        return url;
+    }
+    
+    // Medya yöneticisinden seçilen görsel için callback (laravel-filemanager tarafından otomatik çağrılır)
+    function addGalleryItem(url) {
+        if (galleryItems.length >= 10) {
+            alert('En fazla 10 görsel ekleyebilirsiniz.');
+            return;
         }
         
-        // Var olan galeri öğeleri için silme fonksiyonu ekle
-        document.querySelectorAll('.gallery-item .remove-btn').forEach(button => {
-            button.addEventListener('click', function() {
-                const itemId = this.dataset.id;
-                document.querySelector(`.gallery-item[data-id="${itemId}"]`).remove();
-                document.getElementById(itemId).remove();
-                
-                const galleryContainer = document.getElementById('gallery-preview');
-                if (galleryContainer.children.length === 0) {
-                    galleryContainer.style.display = 'none';
-                }
-            });
+        const itemId = 'gallery-' + new Date().getTime() + Math.floor(Math.random() * 1000);
+        galleryItems.push({
+            id: itemId,
+            url: url
         });
         
-        // Responsinator için medya yükleme callback'i
-        window.responsive_filemanager_callback = function(field_id) {
-            const url = document.getElementById(field_id).value;
+        renderGalleryItems();
+    }
+    
+    function renderGalleryItems() {
+        // Galeri görselleri görünürlüğünü ayarla
+        if (galleryItems.length > 0) {
+            $('#gallery-preview').show();
+        } else {
+            $('#gallery-preview').hide();
+        }
+        
+        // Sayacı güncelle
+        $('#gallery-count').text(galleryItems.length);
+        
+        // Galeri öğelerini temizle
+        $('#gallery-items').empty();
+        $('#gallery-inputs').empty();
+        
+        // Galeri öğelerini oluştur
+        galleryItems.forEach(item => {
+            // Görsel öğesi
+            const galleryItem = $('<div class="gallery-item"></div>');
+            galleryItem.css({
+                'position': 'relative',
+                'width': '150px',
+                'height': '150px',
+                'overflow': 'hidden',
+                'border-radius': '8px',
+                'box-shadow': '0 2px 5px rgba(0,0,0,0.1)'
+            });
             
-            if (field_id === 'image') {
-                updateImagePreview();
-            } else if (field_id.startsWith('gallery-')) {
-                // Galeri için işlem yapma (url zaten eklenmiş olacak)
-                document.getElementById('gallery-preview').style.display = 'grid';
-            }
-        };
+            galleryItem.html(`
+                <img src="${item.url}" alt="Galeri görseli" style="width: 100%; height: 100%; object-fit: cover;">
+                <button type="button" class="btn btn-sm btn-danger position-absolute" 
+                    style="top: 5px; right: 5px; border-radius: 50%; width: 25px; height: 25px; padding: 0; display: flex; align-items: center; justify-content: center;"
+                    data-id="${item.id}">
+                    <i class="fas fa-times" style="font-size: 12px;"></i>
+                </button>
+            `);
+            
+            $('#gallery-items').append(galleryItem);
+            
+            // Gizli input
+            const input = $('<input type="hidden" name="gallery[]" value="' + item.url + '">');
+            $('#gallery-inputs').append(input);
+        });
+    }
+    
+    // Kategori işlemleri
+    const categoryItems = $('.category-item input[type="checkbox"]');
+    const selectedCategoriesList = $('#selected-categories-list');
+    const categoryCount = $('.category-count');
+    
+    // Başlangıçta kategori sayısını güncelle
+    function updateCategoryCount() {
+        const checkedCount = categoryItems.filter(':checked').length;
+        categoryCount.text(checkedCount);
+    }
+    
+    // Tümünü seç butonu
+    $('#select-all-categories').on('click', function() {
+        // Tüm checkboxlar seçili mi kontrol et
+        const allChecked = categoryItems.length === categoryItems.filter(':checked').length;
+        
+        // Eğer tümü seçiliyse, hepsini kaldır; değilse hepsini seç
+        categoryItems.each(function() {
+            $(this).prop('checked', !allChecked);
+        });
+        
+        // Seçili kategorileri güncelle
+        updateSelectedCategories();
+    });
+    
+    // Kategori checkbox'larını dinle
+    categoryItems.on('change', function() {
+        updateSelectedCategories();
+    });
+    
+    // Seçili kategorileri göster
+    function updateSelectedCategories() {
+        // Seçili kategorileri temizle
+        selectedCategoriesList.empty();
+        
+        // Seçili tüm kategorileri bul
+        const selectedCategories = categoryItems.filter(':checked');
+        
+        // Kategori sayacını güncelle
+        updateCategoryCount();
+        
+        // Her seçili kategori için rozet oluştur
+        selectedCategories.each(function() {
+            const categoryName = $(this).closest('.form-check').find('.category-name').text();
+            const categoryId = $(this).val();
+            
+            const categoryBadge = $('<div class="category-badge"></div>');
+            categoryBadge.html(`
+                <span>${categoryName}</span>
+                <i class="fas fa-times remove-category" data-id="${categoryId}"></i>
+            `);
+            selectedCategoriesList.append(categoryBadge);
+        });
+    }
+    
+    // Kategori rozetinden kategori kaldırma
+    selectedCategoriesList.on('click', '.remove-category', function() {
+        const categoryId = $(this).data('id');
+        const checkbox = categoryItems.filter(`[value="${categoryId}"]`);
+        if (checkbox.length > 0) {
+            checkbox.prop('checked', false);
+            updateSelectedCategories();
+        }
+    });
+
+    // Başlangıçta seçili kategorileri göster
+    updateSelectedCategories();
+    
+    // Etiket sistemi
+    const tagInput = $('#tag-input');
+    const addTagBtn = $('#add-tag-btn');
+    const selectedTagsList = $('#selected-tags-list');
+    const tagsInput = $('#tags');
+    const tagCount = $('.tag-count');
+    
+    // Mevcut etiketleri yükle (varsa)
+    let selectedTags = [];
+    if (tagsInput.val()) {
+        selectedTags = tagsInput.val().split(',').map(tag => tag.trim()).filter(tag => tag);
+        updateTagsDisplay();
+    }
+    
+    // Etiket ekle butonuna tıklandığında
+    addTagBtn.on('click', function() {
+        addTag();
+    });
+    
+    // Enter tuşuna basıldığında etiket ekle
+    tagInput.on('keydown', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            addTag();
+        }
+        
+        // Virgül tuşuna basıldığında da etiket ekle
+        if (e.key === ',') {
+            e.preventDefault();
+            addTag();
+        }
+    });
+    
+    // Etiket ekleme işlevi
+    function addTag() {
+        const tagValue = tagInput.val().trim();
+        
+        if (tagValue) {
+            // Virgülle ayrılmış birden fazla etiket olabilir
+            const tags = tagValue.split(',').map(tag => tag.trim()).filter(tag => tag);
+            
+            tags.forEach(tag => {
+                // Eğer etiket zaten eklenmediyse ekle
+                if (!selectedTags.includes(tag)) {
+                    selectedTags.push(tag);
+                }
+            });
+            
+            // Input alanını temizle
+            tagInput.val('');
+            
+            // Etiketleri güncelle
+            updateTagsDisplay();
+        }
+    }
+    
+    // Etiketleri görüntüleme işlevi
+    function updateTagsDisplay() {
+        // Etiketleri hidden input'a ekle
+        tagsInput.val(selectedTags.join(','));
+        
+        // Etiket sayacını güncelle
+        tagCount.text(selectedTags.length);
+        
+        // Etiket listesini temizle ve yeniden oluştur
+        selectedTagsList.empty();
+        
+        selectedTags.forEach(tag => {
+            const tagBadge = $('<div class="category-badge"></div>');
+            tagBadge.html(`
+                <span>#${tag}</span>
+                <i class="fas fa-times remove-tag" data-tag="${tag}"></i>
+            `);
+            selectedTagsList.append(tagBadge);
+        });
+    }
+    
+    // Etiket silme işlevi (Event delegation)
+    selectedTagsList.on('click', '.remove-tag', function() {
+        const tagToRemove = $(this).data('tag');
+        
+        // Etiketi diziden kaldır
+        selectedTags = selectedTags.filter(tag => tag !== tagToRemove);
+        
+        // Etiket görüntüsünü güncelle
+        updateTagsDisplay();
     });
 </script>
 @stop 

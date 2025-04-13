@@ -90,7 +90,7 @@ class PageRepository extends BaseRepository
         $page = $this->create($data);
         
         // Kategorileri ekle
-        if (isset($data['categories']) && is_array($data['categories'])) {
+        if (isset($data['categories']) && is_array($data['categories']) && !empty($data['categories'])) {
             $page->categories()->sync($data['categories']);
         }
         
@@ -112,7 +112,7 @@ class PageRepository extends BaseRepository
         $updated = $page->update($data);
         
         // Kategorileri güncelle
-        if (isset($data['categories']) && is_array($data['categories'])) {
+        if (isset($data['categories']) && is_array($data['categories']) && !empty($data['categories'])) {
             $page->categories()->sync($data['categories']);
         }
         

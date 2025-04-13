@@ -46,12 +46,24 @@ class PageService
         try {
             DB::beginTransaction();
             
+            // Kategori kontrolü ekleyelim
+            \Illuminate\Support\Facades\Log::info('PageService createPage kategori kontrolü: ', [
+                'categories' => $data['categories'] ?? 'yok'
+            ]);
+            
+            // Kategoriler yoksa boş dizi olarak ayarla
+            if (!isset($data['categories'])) {
+                $data['categories'] = [];
+            }
+            
             // Yayın tarihi
             if (isset($data['published_at']) && $data['published_at']) {
-                $data['is_scheduled'] = strtotime($data['published_at']) > time();
+                // is_scheduled sütunu olmadığı için kaldırıldı
+                // $data['is_scheduled'] = strtotime($data['published_at']) > time();
             } else {
                 $data['published_at'] = now();
-                $data['is_scheduled'] = false;
+                // is_scheduled sütunu olmadığı için kaldırıldı
+                // $data['is_scheduled'] = false;
             }
             
             // Öne çıkarma
@@ -61,10 +73,12 @@ class PageService
                 }
                 
                 $data['is_featured'] = true;
-                $data['featured_order'] = Page::where('is_featured', true)->count() + 1;
+                // featured_order sütunu olmadığı için kaldırıldı
+                // $data['featured_order'] = Page::where('is_featured', true)->count() + 1;
             } else {
                 $data['is_featured'] = false;
-                $data['featured_order'] = null;
+                // featured_order sütunu olmadığı için kaldırıldı
+                // $data['featured_order'] = null;
             }
             
             // Sayfayı oluştur
@@ -80,8 +94,11 @@ class PageService
             return $page;
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Sayfa oluşturma hatası: ' . $e->getMessage());
-            return null;
+            Log::error('Sayfa oluşturma hatası: ' . $e->getMessage(), [
+                'exception' => $e,
+                'trace' => $e->getTraceAsString()
+            ]);
+            throw $e; // Hatayı yukarı fırlat ki kullanıcıya gösterebilelim
         }
     }
     

@@ -319,128 +319,127 @@ $(document).ready(function () {
 @endpush
 
 @section('content')
-<div class="row">
-    <div class="col-12">
-        <div class="card">
-            <div class="card-header bg-gradient-primary">
-                <h3 class="card-title">Sayfalar</h3>
-                <div class="card-tools">
-                    <a href="{{ route('admin.pages.create') }}" class="btn btn-sm btn-success">
-                        <i class="fas fa-plus"></i> Yeni Sayfa Ekle
-                    </a>
-                </div>
-            </div>
-            <div class="card-body">
-                @if (session('success'))
-                    <div class="alert alert-success alert-dismissible">
-                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-                        <h5><i class="icon fas fa-check"></i> Başarılı!</h5>
-                        {{ session('success') }}
-                    </div>
-                @endif
-                
-                @if (session('error'))
-                    <div class="alert alert-danger alert-dismissible">
-                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-                        <h5><i class="icon fas fa-ban"></i> Hata!</h5>
-                        {{ session('error') }}
-                    </div>
-                @endif
-                
-                <div class="mb-3">
-                    <form action="{{ route('admin.pages.index') }}" method="GET" class="form-inline">
-                        <div class="form-group mr-2">
-                            <select name="category" class="form-control">
-                                <option value="">Kategori Seçin</option>
-                                @foreach($pageCategories as $category)
-                                    <option value="{{ $category->id }}" {{ request('category') == $category->id ? 'selected' : '' }}>
-                                        {{ $category->name }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
-                        
-                        <div class="form-group mr-2">
-                            <select name="status" class="form-control">
-                                <option value="">Durum Seçin</option>
-                                <option value="published" {{ request('status') == 'published' ? 'selected' : '' }}>Yayında</option>
-                                <option value="draft" {{ request('status') == 'draft' ? 'selected' : '' }}>Taslak</option>
-                            </select>
-                        </div>
-                        
-                        <div class="form-group mr-2">
-                            <div class="input-group">
-                                <input type="text" name="search" class="form-control" placeholder="Ara..." value="{{ request('search') }}">
-                                <div class="input-group-append">
-                                    <button type="submit" class="btn btn-default">
-                                        <i class="fas fa-search"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        @if(request('category') || request('status') || request('search'))
-                            <a href="{{ route('admin.pages.index') }}" class="btn btn-default">Filtreleri Temizle</a>
-                        @endif
-                    </form>
-                </div>
-                
-                <table id="pagesTable" class="table table-bordered table-striped">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Başlık</th>
-                            <th>Kategoriler</th>
-                            <th>Durum</th>
-                            <th>Yayın Tarihi</th>
-                            <th>Öne Çıkan</th>
-                            <th>İşlemler</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($pages as $page)
-                            <tr>
-                                <td>{{ $page->id }}</td>
-                                <td>
-                                    <img src="{{ $page->image }}" alt="{{ $page->title }}" class="img-thumbnail mr-2" style="max-width: 50px;">
-                                    {{ $page->title }}
-                                </td>
-                                <td>
-                                    @foreach($page->categories as $category)
-                                        <span class="badge bg-primary">{{ $category->name }}</span>
-                                    @endforeach
-                                </td>
-                                <td>
-                                    <button class="btn btn-sm toggle-status {{ $page->status == 'published' ? 'btn-success' : 'btn-secondary' }}" data-id="{{ $page->id }}">
-                                        {{ $page->status == 'published' ? 'Yayında' : 'Taslak' }}
-                                    </button>
-                                </td>
-                                <td>{{ $page->published_at ? $page->published_at->format('d.m.Y H:i') : '-' }}</td>
-                                <td class="text-center">
-                                    <button class="btn btn-sm {{ $page->is_featured ? 'btn-primary' : 'btn-outline-primary' }} toggle-featured" data-id="{{ $page->id }}">
-                                        <i class="{{ $page->is_featured ? 'fas' : 'far' }} fa-star"></i>
-                                    </button>
-                                </td>
-                                <td>
-                                    <div class="btn-group">
-                                        <a href="{{ route('admin.pages.edit', $page->id) }}" class="btn btn-sm btn-info">
-                                            <i class="fas fa-edit"></i> Düzenle
-                                        </a>
-                                        <form action="{{ route('admin.pages.destroy', $page->id) }}" method="POST" class="d-inline">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="button" class="btn btn-sm btn-danger delete-page">
-                                                <i class="fas fa-trash"></i> Sil
-                                            </button>
-                                        </form>
-                                    </div>
-                                </td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
+<div class="card mt-3">
+    <div class="card-header">
+        <h3 class="card-title text-lg font-weight-bold">Sayfalar</h3>
+        <div class="card-tools">
+            <a href="{{ route('pages.index') }}" target="_blank" class="btn btn-sm btn-outline-primary mr-2">
+                <i class="fas fa-eye"></i> Site Ön Yüzünde Görüntüle
+            </a>
+            <a href="{{ route('admin.pages.create') }}" class="btn btn-sm btn-primary">
+                <i class="fas fa-plus"></i> Yeni Sayfa Ekle
+            </a>
         </div>
+    </div>
+    <div class="card-body">
+        @if (session('success'))
+            <div class="alert alert-success alert-dismissible">
+                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                <h5><i class="icon fas fa-check"></i> Başarılı!</h5>
+                {{ session('success') }}
+            </div>
+        @endif
+        
+        @if (session('error'))
+            <div class="alert alert-danger alert-dismissible">
+                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                <h5><i class="icon fas fa-ban"></i> Hata!</h5>
+                {{ session('error') }}
+            </div>
+        @endif
+        
+        <div class="mb-3">
+            <form action="{{ route('admin.pages.index') }}" method="GET" class="form-inline">
+                <div class="form-group mr-2">
+                    <select name="category" class="form-control">
+                        <option value="">Kategori Seçin</option>
+                        @foreach($pageCategories as $category)
+                            <option value="{{ $category->id }}" {{ request('category') == $category->id ? 'selected' : '' }}>
+                                {{ $category->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+                
+                <div class="form-group mr-2">
+                    <select name="status" class="form-control">
+                        <option value="">Durum Seçin</option>
+                        <option value="published" {{ request('status') == 'published' ? 'selected' : '' }}>Yayında</option>
+                        <option value="draft" {{ request('status') == 'draft' ? 'selected' : '' }}>Taslak</option>
+                    </select>
+                </div>
+                
+                <div class="form-group mr-2">
+                    <div class="input-group">
+                        <input type="text" name="search" class="form-control" placeholder="Ara..." value="{{ request('search') }}">
+                        <div class="input-group-append">
+                            <button type="submit" class="btn btn-default">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                @if(request('category') || request('status') || request('search'))
+                    <a href="{{ route('admin.pages.index') }}" class="btn btn-default">Filtreleri Temizle</a>
+                @endif
+            </form>
+        </div>
+        
+        <table id="pagesTable" class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Başlık</th>
+                    <th>Kategoriler</th>
+                    <th>Durum</th>
+                    <th>Yayın Tarihi</th>
+                    <th>Öne Çıkan</th>
+                    <th>İşlemler</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($pages as $page)
+                    <tr>
+                        <td>{{ $page->id }}</td>
+                        <td>
+                            <img src="{{ $page->image }}" alt="{{ $page->title }}" class="img-thumbnail mr-2" style="max-width: 50px;">
+                            {{ $page->title }}
+                        </td>
+                        <td>
+                            @foreach($page->categories as $category)
+                                <span class="badge bg-primary">{{ $category->name }}</span>
+                            @endforeach
+                        </td>
+                        <td>
+                            <button class="btn btn-sm toggle-status {{ $page->status == 'published' ? 'btn-success' : 'btn-secondary' }}" data-id="{{ $page->id }}">
+                                {{ $page->status == 'published' ? 'Yayında' : 'Taslak' }}
+                            </button>
+                        </td>
+                        <td>{{ $page->published_at ? $page->published_at->format('d.m.Y H:i') : '-' }}</td>
+                        <td class="text-center">
+                            <button class="btn btn-sm {{ $page->is_featured ? 'btn-primary' : 'btn-outline-primary' }} toggle-featured" data-id="{{ $page->id }}">
+                                <i class="{{ $page->is_featured ? 'fas' : 'far' }} fa-star"></i>
+                            </button>
+                        </td>
+                        <td>
+                            <div class="btn-group">
+                                <a href="{{ route('admin.pages.edit', $page->id) }}" class="btn btn-sm btn-info">
+                                    <i class="fas fa-edit"></i> Düzenle
+                                </a>
+                                <form action="{{ route('admin.pages.destroy', $page->id) }}" method="POST" class="d-inline">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="button" class="btn btn-sm btn-danger delete-page">
+                                        <i class="fas fa-trash"></i> Sil
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
     </div>
 </div>
 @stop 

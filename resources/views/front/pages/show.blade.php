@@ -12,68 +12,289 @@
     @section('meta_image', asset($page->image))
 @endif
 
+@section('css')
+<style>
+    :root {
+        --header-height: 96px; /* Varsayılan header yüksekliği */
+        --primary-color: #00352b; /* Ana renk */
+        --primary-light: rgba(0, 53, 43, 0.1); /* Ana rengin açık tonu */
+        --primary-dark: #002a22; /* Ana rengin koyu tonu */
+        --secondary-color: #20846c; /* İkincil renk */
+        --accent-color: #e6a23c; /* Vurgu rengi */
+    }
+    
+    .page-layout-container {
+        max-width: 1280px;
+        margin: 0 auto;
+        padding: 0 1rem;
+    }
+    
+    .page-grid-layout {
+        display: grid;
+        grid-template-columns: 300px 1fr;
+        gap: 2rem;
+        margin-top: -20px;
+        align-items: flex-start; /* İki sütunun da üstten başlamasını sağlar */
+    }
+    
+    .page-grid-layout::before {
+        content: "";
+        display: block;
+        grid-column: 1;
+        min-height: 1px;
+    }
+    
+    .page-content-area {
+        grid-column: 2;
+        padding-top: 0; /* Üst padding'i kaldırdık */
+    }
+    
+    .page-content-section {
+        background-color: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
+        padding: 30px;
+        margin-bottom: 30px;
+        border-top: 4px solid var(--primary-color);
+    }
+    
+    .page-content-section h2 {
+        font-size: 24px;
+        font-weight: 700;
+        color: var(--primary-color);
+        margin-top: 0;
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid #e5e7eb;
+    }
+    
+    @media (max-width: 768px) {
+        .page-grid-layout {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+        
+        .page-content-area {
+            grid-column: 1;
+        }
+        
+        .page-grid-layout::before {
+            display: none;
+        }
+    }
+
+    /* İçindekiler stillerini sol tarafta sticky olacak şekilde düzenle */
+    #sidebar {
+        grid-column: 1;
+        align-self: flex-start; /* Üst hizalama */
+        position: relative;
+        width: 300px; /* Sabit genişlik tanımı */
+        margin-top: 0; /* İçindekiler menüsünün üst marjinini sıfırla */
+    }
+
+    #sidebar .sticky-container {
+        width: 100%;
+        position: relative;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        transition: none; /* Animasyonları kaldır */
+        max-height: calc(100vh - 120px);
+        overflow-y: auto;
+        padding: 30px; /* Sağdaki içerik bölümü ile aynı padding değeri */
+    }
+
+    #sidebar.scrolledDown .sticky-container {
+        position: fixed;
+        top: 20px;
+        width: 300px; /* Sabit genişlik */
+        z-index: 40;
+    }
+
+    #sidebar .sticky-container::-webkit-scrollbar {
+        width: 4px;
+    }
+
+    #sidebar .sticky-container::-webkit-scrollbar-track {
+        background: #f5f5f5;
+        border-radius: 10px;
+    }
+
+    #sidebar .sticky-container::-webkit-scrollbar-thumb {
+        background: #00352b;
+        border-radius: 10px;
+    }
+
+    @media (max-width: 768px) {
+        #sidebar {
+            display: none;
+        }
+        
+        #sidebar.active {
+            display: block;
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            right: 15px;
+            width: auto;
+            z-index: 100;
+        }
+        
+        #sidebar.scrolledDown .sticky-container {
+            position: relative;
+            top: 0;
+            left: 0 !important; /* Mobilde varsayılan pozisyon, JS'in eklediği style'ı ezmek için !important kullanıldı */
+            width: 100% !important; /* Tam genişlik */
+            transform: none; /* Transform değerini kaldırdık */
+        }
+    }
+</style>
+@endsection
+
 @section('content')
-<div class="container mx-auto px-4 py-8">
-    <div class="max-w-4xl mx-auto">
-        <!-- Üst Bilgiler -->
-        <div class="mb-8">
-            <!-- Kategori ve Tarih Bilgileri -->
-            <div class="flex flex-wrap items-center gap-3 text-sm text-gray-500 mb-4">
-                <div class="flex items-center">
-                    <i class="far fa-calendar-alt mr-1"></i>
-                    <span>{{ $page->published_at ? $page->published_at->format('d.m.Y') : $page->created_at->format('d.m.Y') }}</span>
+<!-- Hero Bölümü -->
+<div class="relative bg-gradient-to-r from-[#00352b] to-[#20846c] overflow-hidden">
+    <div class="absolute inset-0 opacity-20">
+        <!-- Pattern overlay -->
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-full h-full" preserveAspectRatio="none">
+            <defs>
+                <pattern id="hero-pattern" width="40" height="40" patternUnits="userSpaceOnUse">
+                    <path d="M0 20 L40 20 M20 0 L20 40" stroke="currentColor" stroke-width="1" fill="none" />
+                </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#hero-pattern)" />
+        </svg>
+    </div>
+    
+    <!-- Dekoratif şekiller -->
+    <div class="absolute -right-20 -bottom-20 w-64 h-64 rounded-full bg-[#e6a23c]/10 blur-3xl"></div>
+    <div class="absolute -left-10 top-10 w-40 h-40 rounded-full bg-white/5 blur-2xl"></div>
+    
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-10 relative z-10">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 items-center">
+            <div class="md:col-span-2">
+                <div class="inline-block bg-white/10 backdrop-blur-sm px-4 py-1 rounded-full text-white/90 text-sm mb-3 border border-white/10">
+                    <span class="material-icons text-xs align-middle mr-1">article</span>
+                    <span>Sayfalar</span>
                 </div>
+                <h1 class="text-3xl md:text-4xl font-bold text-white mb-4">{{ $page->title }}</h1>
+                <p class="text-white/80 text-lg mb-5">{{ $page->summary ?? 'Bu sayfa ile ilgili tüm detayları bu sayfada bulabilirsiniz.' }}</p>
                 
-                <span class="text-gray-300">|</span>
-                
-                <div class="flex items-center">
-                    <i class="far fa-eye mr-1"></i>
-                    <span>{{ $page->view_count ?? 0 }} görüntülenme</span>
-                </div>
-                
-                @if($page->categories->count() > 0)
-                    <span class="text-gray-300">|</span>
-                    
-                    <div class="flex items-center flex-wrap gap-2">
+                <div class="flex flex-wrap gap-4">
+                    @if($page->categories->count() > 0)
                         @foreach($page->categories as $category)
-                            <a href="{{ route('pages.category', $category->slug) }}" class="text-primary hover:underline">
-                                #{{ $category->name }}
+                            <a href="{{ route('pages.category', $category->slug) }}" class="inline-flex items-center px-3 py-1 bg-white/10 text-white border border-white/20 rounded-md hover:bg-white/20 transition-colors shadow-lg shadow-black/5">
+                                @if($category->icon)
+                                    <i class="{{ $category->icon }} mr-2 text-sm"></i>
+                                @endif
+                                {{ $category->name }}
                             </a>
                         @endforeach
+                    @endif
+                </div>
+            </div>
+            <div class="hidden md:flex justify-end">
+                <div class="bg-white/10 backdrop-blur-sm p-6 rounded-lg border border-white/20 shadow-lg">
+                    <div class="text-white text-center">
+                        <span class="material-icons text-4xl text-[#e6a23c] mb-2">info</span>
+                        <h3 class="text-xl font-semibold mb-2">Bilgi</h3>
+                        <p class="text-sm text-white/80">Bu sayfanın içeriği bilgilendirme amaçlıdır.</p>
+                        <div class="mt-4 pt-4 border-t border-white/10">
+                            <div class="flex items-center justify-center text-[#e6a23c]">
+                                <span class="material-icons mr-2">event</span>
+                                <span class="font-bold">{{ $page->published_at ? $page->published_at->format('d.m.Y') : $page->created_at->format('d.m.Y') }}</span>
+                            </div>
+                        </div>
                     </div>
-                @endif
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Ana İçerik Grid Düzeni -->
+<div class="page-layout-container page-grid-layout py-12">
+    
+    <!-- Sol Taraf - İçindekiler Menüsü -->
+    <div id="sidebar" class="relative">
+        <div class="sticky-container">
+            <div class="mb-6 border-b border-gray-200 pb-4">
+                <h3 class="text-xl font-bold text-[#00352b] mb-2">Kategoriler</h3>
+                <div class="space-y-2">
+                    @foreach($categories as $category)
+                        <a href="{{ route('pages.category', $category->slug) }}" 
+                           class="flex items-center justify-between px-3 py-2 rounded-lg {{ $page->categories->contains('id', $category->id) ? 'bg-[#00352b] text-white' : 'text-gray-700 hover:bg-gray-100' }} transition-all">
+                            <div class="flex items-center">
+                                @if($category->icon)
+                                    <i class="{{ $category->icon }} mr-2.5 {{ $page->categories->contains('id', $category->id) ? 'text-white' : 'text-gray-500' }}"></i>
+                                @endif
+                                <span>{{ $category->name }}</span>
+                            </div>
+                            <span class="text-xs py-1 px-2.5 rounded-full {{ $page->categories->contains('id', $category->id) ? 'bg-white text-[#00352b]' : 'bg-gray-100 text-gray-600' }}">
+                                {{ $category->pages_count }}
+                            </span>
+                        </a>
+                    @endforeach
+                </div>
             </div>
             
-            <!-- Başlık -->
-            <h1 class="text-3xl md:text-4xl font-bold text-gray-800 mb-6">{{ $page->title }}</h1>
+            <!-- İletişim Bölümü -->
+            <div class="mb-6 border-b border-gray-200 pb-4">
+                <h3 class="text-xl font-bold text-[#00352b] mb-2">İletişim</h3>
+                <p class="text-sm text-gray-600 mb-4">Sorularınız için bizimle iletişime geçebilirsiniz.</p>
+                <a href="#" class="inline-flex items-center justify-center w-full px-4 py-2.5 bg-[#00352b] text-white rounded-lg hover:bg-[#002a22] transition-all shadow-sm hover:shadow">
+                    <i class="fas fa-phone-alt mr-2"></i> İletişime Geç
+                </a>
+            </div>
             
-            <!-- Özet -->
-            @if($page->summary)
-                <div class="text-lg text-gray-600 mb-6 font-medium border-l-4 border-primary pl-4 py-2 bg-gray-50">
-                    {{ $page->summary }}
+            <!-- İlgili Sayfalar -->
+            @if(isset($relatedPages) && $relatedPages->count() > 0)
+                <div>
+                    <h3 class="text-xl font-bold text-[#00352b] mb-4">İlgili İçerikler</h3>
+                    <div class="space-y-4">
+                        @foreach($relatedPages->take(3) as $relatedPage)
+                            <div class="group">
+                                <a href="{{ route('pages.show', $relatedPage->slug) }}" class="block p-3 rounded-lg border border-transparent hover:border-[#00352b]/20 hover:bg-gray-50 transition-all">
+                                    <h4 class="font-medium text-gray-800 mb-2 line-clamp-2 group-hover:text-[#00352b] transition-all">{{ $relatedPage->title }}</h4>
+                                    <div class="text-xs text-gray-500 flex items-center">
+                                        <i class="far fa-calendar-alt mr-1.5"></i>
+                                        {{ $relatedPage->published_at ? $relatedPage->published_at->format('d.m.Y') : $relatedPage->created_at->format('d.m.Y') }}
+                                    </div>
+                                </a>
+                            </div>
+                        @endforeach
+                    </div>
                 </div>
             @endif
         </div>
-        
-        <!-- Resim -->
-        @if($page->image)
-            <div class="mb-8 rounded-xl overflow-hidden shadow-md">
-                <img src="{{ asset($page->image) }}" alt="{{ $page->title }}" class="w-full h-auto">
-            </div>
-        @endif
-        
-        <!-- İçerik -->
-        <article class="prose prose-lg max-w-none mb-10">
-            {!! $page->content !!}
-        </article>
+    </div>
+    
+    <!-- Sağ Taraf - Ana İçerik Alanı -->
+    <div class="page-content-area">
+        <!-- İçerik Bölümü -->
+        <div class="page-content-section">
+            <h2 class="mb-6">İçerik</h2>
+            
+            <!-- Özet -->
+            @if($page->summary)
+                <div class="text-lg text-gray-600 mb-8 font-medium border-l-4 border-[#00352b] pl-5 py-4 bg-slate-50 rounded-r-lg">
+                    {{ $page->summary }}
+                </div>
+            @endif
+            
+            <!-- İçerik -->
+            <article class="prose prose-lg max-w-none mb-8 prose-headings:text-gray-800 prose-p:text-gray-700 prose-a:text-[#00352b] prose-a:no-underline hover:prose-a:text-[#20846c] hover:prose-a:underline prose-img:rounded-lg">
+                {!! $page->content !!}
+            </article>
+        </div>
         
         <!-- Galeri Bölümü -->
         @if(isset($page->gallery) && count($page->gallery) > 0)
-            <div class="my-10">
-                <h3 class="text-2xl font-bold text-gray-800 mb-6">Galeri</h3>
+            <div class="page-content-section">
+                <h2 class="mb-6">Galeri</h2>
                 <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
                     @foreach($page->gallery as $image)
-                        <a href="{{ asset($image) }}" data-fancybox="gallery" class="gallery-item block rounded-lg overflow-hidden shadow-sm border border-gray-200 aspect-square bg-gray-100">
+                        <a href="{{ asset($image) }}" data-fancybox="gallery" class="gallery-item block rounded-lg overflow-hidden shadow-md border-0 aspect-square bg-white hover:shadow-lg transition-all">
                             <img src="{{ asset($image) }}" alt="{{ $page->title }} - Görsel {{ $loop->iteration }}" class="w-full h-full object-cover hover:scale-105 transition-transform duration-300">
                         </a>
                     @endforeach
@@ -81,98 +302,73 @@
             </div>
         @endif
         
-        <!-- Etiketler -->
-        @if(isset($page->tags) && count($page->tags) > 0)
-            <div class="border-t border-gray-200 pt-6 mt-10">
-                <h3 class="text-lg font-bold text-gray-700 mb-4">Etiketler</h3>
-                <div class="flex flex-wrap gap-2">
-                    @foreach($page->tags as $tag)
-                        <a href="{{ route('pages.tag', $tag->slug) }}" class="px-3 py-1 bg-gray-100 text-gray-700 text-sm rounded-full hover:bg-primary hover:text-white transition">
-                            {{ $tag->name }}
-                        </a>
-                    @endforeach
+        <!-- Etiketler ve Paylaşım -->
+        <div class="page-content-section">
+            <h2 class="mb-6">Paylaşım</h2>
+            
+            <!-- Etiketler -->
+            @if(isset($page->tags) && count($page->tags) > 0)
+                <div class="mb-6">
+                    <div class="font-medium text-gray-700 mb-3">Etiketler:</div>
+                    <div class="flex flex-wrap gap-2">
+                        @foreach($page->tags as $tag)
+                            <a href="{{ route('pages.tag', $tag->slug) }}" class="px-3.5 py-1.5 bg-slate-100 text-gray-700 text-sm rounded-full hover:bg-[#00352b] hover:text-white transition-all shadow-sm hover:shadow">
+                                {{ $tag->name }}
+                            </a>
+                        @endforeach
+                    </div>
                 </div>
-            </div>
-        @endif
-        
-        <!-- Paylaşım Butonları -->
-        <div class="border-t border-gray-200 pt-6 mt-8">
-            <h3 class="text-lg font-bold text-gray-700 mb-4">Bu Sayfayı Paylaş</h3>
-            <div class="flex gap-2">
-                <a href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode(route('pages.show', $page->slug)) }}" target="_blank" class="w-10 h-10 bg-blue-600 text-white flex items-center justify-center rounded-full hover:bg-blue-700 transition">
-                    <i class="fab fa-facebook-f"></i>
-                </a>
-                <a href="https://twitter.com/intent/tweet?url={{ urlencode(route('pages.show', $page->slug)) }}&text={{ urlencode($page->title) }}" target="_blank" class="w-10 h-10 bg-blue-400 text-white flex items-center justify-center rounded-full hover:bg-blue-500 transition">
-                    <i class="fab fa-twitter"></i>
-                </a>
-                <a href="https://wa.me/?text={{ urlencode($page->title . ' - ' . route('pages.show', $page->slug)) }}" target="_blank" class="w-10 h-10 bg-green-500 text-white flex items-center justify-center rounded-full hover:bg-green-600 transition">
-                    <i class="fab fa-whatsapp"></i>
-                </a>
-                <a href="https://www.linkedin.com/shareArticle?mini=true&url={{ urlencode(route('pages.show', $page->slug)) }}&title={{ urlencode($page->title) }}" target="_blank" class="w-10 h-10 bg-blue-700 text-white flex items-center justify-center rounded-full hover:bg-blue-800 transition">
-                    <i class="fab fa-linkedin-in"></i>
-                </a>
+            @endif
+            
+            <!-- Paylaşım Butonları -->
+            <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 pt-5">
+                <div class="font-medium text-gray-700">Bu sayfayı paylaşın:</div>
+                <div class="flex gap-3">
+                    <a href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode(route('pages.show', $page->slug)) }}" target="_blank" class="w-10 h-10 bg-blue-600 text-white flex items-center justify-center rounded-full hover:bg-blue-700 transition-all shadow-sm hover:shadow-md">
+                        <i class="fab fa-facebook-f"></i>
+                    </a>
+                    <a href="https://twitter.com/intent/tweet?url={{ urlencode(route('pages.show', $page->slug)) }}&text={{ urlencode($page->title) }}" target="_blank" class="w-10 h-10 bg-blue-400 text-white flex items-center justify-center rounded-full hover:bg-blue-500 transition-all shadow-sm hover:shadow-md">
+                        <i class="fab fa-twitter"></i>
+                    </a>
+                    <a href="https://wa.me/?text={{ urlencode($page->title . ' - ' . route('pages.show', $page->slug)) }}" target="_blank" class="w-10 h-10 bg-green-500 text-white flex items-center justify-center rounded-full hover:bg-green-600 transition-all shadow-sm hover:shadow-md">
+                        <i class="fab fa-whatsapp"></i>
+                    </a>
+                    <a href="https://www.linkedin.com/shareArticle?mini=true&url={{ urlencode(route('pages.show', $page->slug)) }}&title={{ urlencode($page->title) }}" target="_blank" class="w-10 h-10 bg-blue-700 text-white flex items-center justify-center rounded-full hover:bg-blue-800 transition-all shadow-sm hover:shadow-md">
+                        <i class="fab fa-linkedin-in"></i>
+                    </a>
+                </div>
             </div>
         </div>
-        
-        <!-- İlgili Sayfalar -->
-        @if(isset($relatedPages) && $relatedPages->count() > 0)
-            <div class="border-t border-gray-200 pt-8 mt-8">
-                <h3 class="text-2xl font-bold text-gray-800 mb-6">İlgili Sayfalar</h3>
-                
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    @foreach($relatedPages as $relatedPage)
-                        <div class="flex gap-4 bg-white rounded-lg border border-gray-200 p-4 hover:shadow-md transition">
-                            <div class="flex-shrink-0 w-20 h-20 bg-gray-100 overflow-hidden rounded">
-                                @if($relatedPage->image)
-                                    <img src="{{ asset($relatedPage->image) }}" alt="{{ $relatedPage->title }}" class="w-full h-full object-cover">
-                                @else
-                                    <div class="w-full h-full flex items-center justify-center text-gray-400">
-                                        <i class="fas fa-file-alt text-xl"></i>
-                                    </div>
-                                @endif
-                            </div>
-                            
-                            <div class="flex-1">
-                                <h4 class="font-bold text-gray-800 mb-1 line-clamp-2">
-                                    <a href="{{ route('pages.show', $relatedPage->slug) }}" class="hover:text-primary">
-                                        {{ $relatedPage->title }}
-                                    </a>
-                                </h4>
-                                
-                                <div class="text-xs text-gray-500 mb-2">
-                                    {{ $relatedPage->published_at ? $relatedPage->published_at->format('d.m.Y') : $relatedPage->created_at->format('d.m.Y') }}
-                                </div>
-                                
-                                @if($relatedPage->summary)
-                                    <p class="text-sm text-gray-600 line-clamp-2">
-                                        {{ $relatedPage->summary }}
-                                    </p>
-                                @endif
-                            </div>
-                        </div>
-                    @endforeach
-                </div>
-            </div>
-        @endif
     </div>
 </div>
-@endsection
 
-@push('styles')
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@4.0/dist/fancybox.css" />
-<style>
-    .prose img {
-        border-radius: 0.375rem;
-    }
-</style>
-@endpush
-
-@push('scripts')
-<script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@4.0/dist/fancybox.umd.js"></script>
+@section('js')
 <script>
-    // Galeri için lightbox
-    Fancybox.bind("[data-fancybox], .gallery-item", {
-        // Options
+    document.addEventListener('DOMContentLoaded', function() {
+        const sidebar = document.getElementById('sidebar');
+        const stickyContainer = sidebar.querySelector('.sticky-container');
+        const headerHeight = 96; // Header yüksekliğini ayarlayın
+        
+        function updateSidebarPosition() {
+            const rect = sidebar.getBoundingClientRect();
+            const stickyTop = rect.top;
+            
+            if (stickyTop <= headerHeight) {
+                sidebar.classList.add('scrolledDown');
+                stickyContainer.style.width = rect.width + 'px';
+                stickyContainer.style.left = rect.left + 'px';
+            } else {
+                sidebar.classList.remove('scrolledDown');
+                stickyContainer.style.width = '';
+                stickyContainer.style.left = '';
+            }
+        }
+        
+        window.addEventListener('scroll', updateSidebarPosition);
+        window.addEventListener('resize', updateSidebarPosition);
+        updateSidebarPosition();
     });
 </script>
-@endpush 
+@endsection
+
+@endsection 

@@ -374,6 +374,12 @@ return [
                     'active' => ['admin/pages/create']
                 ],
                 [
+                    'text' => 'Sayfaları Görüntüle',
+                    'url'  => 'sayfalar',
+                    'icon' => 'fas fa-fw fa-eye',
+                    'target' => '_blank'
+                ],
+                [
                     'text' => 'Sayfa Kategorileri',
                     'url'  => 'admin/page-categories',
                     'icon' => 'fas fa-fw fa-folder',

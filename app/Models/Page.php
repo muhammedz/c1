@@ -19,15 +19,12 @@ class Page extends Model
     protected $fillable = [
         'title',
         'slug',
-        'summary',
         'content',
         'featured_image',
         'gallery',
         'is_featured',
-        'featured_order',
         'view_count',
         'status',
-        'is_scheduled',
         'meta_title',
         'meta_description',
         'meta_keywords',
@@ -209,8 +206,7 @@ class Page extends Model
      */
     public function categories()
     {
-        // return $this->belongsToMany(PageCategory::class, 'page_category', 'page_id', 'category_id');
-        return $this->hasMany(PageCategory::class, 'page_id', 'id');
+        return $this->belongsToMany(PageCategory::class, 'page_category', 'page_id', 'category_id');
     }
     
     /**
@@ -218,7 +214,19 @@ class Page extends Model
      */
     public function tags()
     {
-        // return $this->belongsToMany(PageTag::class, 'page_tag', 'page_id', 'tag_id');
-        return $this->hasMany(PageTag::class, 'page_id', 'id');
+        return $this->belongsToMany(PageTag::class, 'page_tag', 'page_id', 'tag_id');
+    }
+    
+    /**
+     * Get tags as string.
+     */
+    public function getTagsAsString()
+    {
+        // tags collection'ını array'e çevirip implode
+        if ($this->tags && $this->tags->count() > 0) {
+            $tagNames = $this->tags->pluck('name')->toArray();
+            return implode(',', $tagNames);
+        }
+        return '';
     }
 }

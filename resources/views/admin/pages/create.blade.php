@@ -334,22 +334,37 @@
         </div>
     </div>
     
+    <!-- Hata ve Uyarılar -->
     @if(session('error'))
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            {{ session('error') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <strong>Hata!</strong> {{ session('error') }}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
     @endif
-    
-    @if ($errors->any())
-        <div class="validation-errors-summary">
-            <h5><i class="fas fa-exclamation-triangle"></i> Lütfen aşağıdaki hataları düzeltin:</h5>
-            <ul>
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
+
+    @if(session('success'))
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <strong>Başarılı!</strong> {{ session('success') }}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    @endif
+
+    @if($errors->any())
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <strong>Doğrulama Hataları!</strong>
+        <ul>
+            @foreach($errors->all() as $error)
+            <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
     @endif
             
     <form action="{{ route('admin.pages.store') }}" method="POST" id="page-form">
@@ -370,14 +385,31 @@
                         
                         <div class="mb-4">
                             <label for="slug" class="form-label">URL</label>
-                            <div class="input-group">
-                                <span class="input-group-text text-muted" id="slug-addon">{{ url('/') }}/</span>
-                                <input type="text" class="form-control @error('slug') is-invalid @enderror" id="slug" name="slug" value="{{ old('slug') }}" aria-describedby="slug-addon">
+                            <!-- Slug ve URL Önizleme -->
+                            <div class="mt-2 p-2 bg-light border rounded">
+                                <div class="small text-muted mb-1">
+                                    <i class="fas fa-link me-1"></i> Oluşturulacak URL:
+                                </div>
+                                <div class="d-flex align-items-center">
+                                    <span class="text-secondary">{{ url('/') }}/</span>
+                                    <span class="text-primary fw-bold" id="slug-preview">-</span>
+                                </div>
+                                <div class="small text-muted mt-1">
+                                    <i class="fas fa-info-circle me-1"></i> Slug:
+                                </div>
+                                <div class="input-group mt-1">
+                                    <input type="text" class="form-control form-control-sm @error('slug') is-invalid @enderror" id="slug" name="slug" value="{{ old('slug') }}" placeholder="Otomatik oluşturulur">
+                                    <button class="btn btn-sm btn-outline-secondary" type="button" id="slug-regenerate">
+                                        <i class="fas fa-sync-alt"></i> Yenile
+                                    </button>
+                                </div>
+                                <small class="form-text text-muted mt-1">
+                                    Otomatik oluşturulan slug'ı düzenleyebilirsiniz. Boş bırakırsanız otomatik oluşturulacaktır.
+                                </small>
                             </div>
                             @error('slug')
-                                <div class="invalid-feedback">{{ $message }}</div>
+                                <div class="text-danger small">{{ $message }}</div>
                             @enderror
-                            <small class="text-muted">Boş bırakırsanız başlıktan otomatik oluşturulacaktır.</small>
                         </div>
                                 
                         <div class="mb-4">
@@ -676,6 +708,104 @@
 <script src="/vendor/laravel-filemanager/js/stand-alone-button.js"></script>
 <script>
     $(document).ready(function() {
+        // Slug oluşturma fonksiyonu
+        function createSlug(text) {
+            return text
+                .toString()
+                .toLowerCase()
+                .trim()
+                .replace(/\s+/g, '-')           // Boşlukları tire ile değiştir
+                .replace(/[ğ]/g, 'g')           // Türkçe karakterleri değiştir
+                .replace(/[ç]/g, 'c')
+                .replace(/[ş]/g, 's')
+                .replace(/[ı]/g, 'i')
+                .replace(/[ö]/g, 'o')
+                .replace(/[ü]/g, 'u')
+                .replace(/[^a-z0-9\-]/g, '')    // Alfanümerik ve tire dışındaki karakterleri kaldır
+                .replace(/\-\-+/g, '-')         // Birden fazla tireyi tek tireye dönüştür
+                .replace(/^-+/, '')             // Baştaki tireleri kaldır
+                .replace(/-+$/, '');            // Sondaki tireleri kaldır
+        }
+        
+        // Slug önizleme ve oluşturma
+        const titleInput = document.getElementById('title');
+        const slugInput = document.getElementById('slug');
+        const slugPreview = document.getElementById('slug-preview');
+        const slugRegenerateBtn = document.getElementById('slug-regenerate');
+        
+        // Başlık değiştiğinde slug oluştur (boşsa)
+        titleInput.addEventListener('input', function() {
+            if (slugInput.value === '' || slugInput.dataset.manuallyChanged !== "true") {
+                const newSlug = createSlug(this.value);
+                slugInput.value = newSlug;
+                updateSlugPreview();
+            }
+        });
+        
+        // Slug input değiştiğinde önizlemeyi güncelle
+        slugInput.addEventListener('input', function() {
+            // Kullanıcı manuel olarak değiştirmiş
+            this.dataset.manuallyChanged = "true";
+            updateSlugPreview();
+        });
+        
+        // Yeniden oluştur butonuna tıklandığında
+        slugRegenerateBtn.addEventListener('click', function() {
+            const newSlug = createSlug(titleInput.value);
+            slugInput.value = newSlug;
+            slugInput.dataset.manuallyChanged = "false";
+            updateSlugPreview();
+            
+            // Yenile butonu animasyonu
+            const icon = this.querySelector('i');
+            icon.classList.add('fa-spin');
+            setTimeout(() => {
+                icon.classList.remove('fa-spin');
+            }, 500);
+        });
+        
+        // Slug önizlemeyi güncelle
+        function updateSlugPreview() {
+            slugPreview.textContent = slugInput.value || 'ornek-sayfa';
+        }
+        
+        // Sayfa yüklendiğinde önizlemeyi güncelle
+        updateSlugPreview();
+        
+        // TinyMCE için düzenleyici ayarları
+        tinymce.init({
+            selector: '#content',
+            plugins: 'preview importcss searchreplace autolink autosave save directionality code visualblocks visualchars fullscreen image link media template codesample table charmap pagebreak nonbreaking anchor insertdatetime advlist lists wordcount help charmap quickbars emoticons',
+            menubar: 'file edit view insert format tools table help',
+            toolbar: 'undo redo | bold italic underline strikethrough | fontfamily fontsize blocks | alignleft aligncenter alignright alignjustify | outdent indent |  numlist bullist | forecolor backcolor removeformat | pagebreak | charmap emoticons | fullscreen  preview save print | insertfile image media template link anchor codesample | ltr rtl',
+            toolbar_sticky: true,
+            image_advtab: true,
+            height: 500,
+            quickbars_selection_toolbar: 'bold italic | quicklink h2 h3 blockquote quickimage quicktable',
+            noneditable_class: 'mceNonEditable',
+            toolbar_mode: 'sliding',
+            contextmenu: 'link image table',
+            skin: 'oxide',
+            content_css: 'default',
+            content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, San Francisco, Segoe UI, Roboto, Helvetica Neue, sans-serif; font-size: 16px; }',
+            language: 'tr',
+            language_url: '/js/tinymce/langs/tr.js', // Türkçe dil dosyası
+            relative_urls: false,
+            remove_script_host: false,
+            convert_urls: true,
+            branding: false,
+            promotion: false,
+            file_picker_callback: function (callback, value, meta) {
+                // Dosya seçicisi için özel entegrasyon
+                if (meta.filetype === 'file' || meta.filetype === 'image') {
+                    window.open('/filemanager/dialog.php?type=' + meta.filetype + '&field_id=tinymce-file', 'filemanager', 'width=900,height=600');
+                    window.SetUrl = function (url, width, height, alt) {
+                        callback(url, {alt: alt});
+                    };
+                }
+            }
+        });
+        
         // Laravel File Manager butonları
         $('#image-browser').filemanager('image');
         $('#gallery-browser').filemanager('image');

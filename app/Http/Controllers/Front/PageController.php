@@ -14,11 +14,22 @@ class PageController extends Controller
      */
     public function index()
     {
-        $featuredPages = Page::featured()->published()->orderBy('featured_order', 'asc')->get();
-        $recentPages = Page::published()->orderBy('published_at', 'desc')->paginate(12);
+        $query = Page::published();
+        
+        // Arama sorgusu varsa filtrele
+        if (request()->has('search') && request('search')) {
+            $searchTerm = request('search');
+            $query->where(function($q) use ($searchTerm) {
+                $q->where('title', 'like', '%' . $searchTerm . '%')
+                  ->orWhere('content', 'like', '%' . $searchTerm . '%');
+            });
+        }
+        
+        $featuredPage = Page::featured()->published()->orderBy('featured_order', 'asc')->first();
+        $pages = $query->orderBy('published_at', 'desc')->paginate(12);
         $categories = PageCategory::where('is_active', true)->orderBy('name')->get();
         
-        return view('front.pages.index', compact('featuredPages', 'recentPages', 'categories'));
+        return view('front.pages.index', compact('featuredPage', 'pages', 'categories'));
     }
     
     /**
@@ -31,7 +42,7 @@ class PageController extends Controller
             ->firstOrFail();
             
         // Görüntülenme sayısını artır
-        $page->incrementViewCount();
+        $page->incrementViews();
         
         // İlişkili sayfaları getir
         $relatedPages = Page::published()
@@ -41,8 +52,17 @@ class PageController extends Controller
             ->where('id', '!=', $page->id)
             ->limit(4)
             ->get();
+        
+        // Tüm aktif kategorileri getir
+        $categories = PageCategory::where('is_active', true)
+            ->withCount(['pages' => function($query) {
+                $query->published();
+            }])
+            ->having('pages_count', '>', 0)
+            ->orderBy('name')
+            ->get();
             
-        return view('front.pages.show', compact('page', 'relatedPages'));
+        return view('front.pages.show', compact('page', 'relatedPages', 'categories'));
     }
     
     /**
@@ -53,13 +73,22 @@ class PageController extends Controller
         $category = PageCategory::where('slug', $slug)
             ->where('is_active', true)
             ->firstOrFail();
+        
+        $query = Page::published()
+            ->whereHas('categories', function($q) use ($category) {
+                $q->where('category_id', $category->id);
+            });
+        
+        // Arama sorgusu varsa filtrele
+        if (request()->has('search') && request('search')) {
+            $searchTerm = request('search');
+            $query->where(function($q) use ($searchTerm) {
+                $q->where('title', 'like', '%' . $searchTerm . '%')
+                  ->orWhere('content', 'like', '%' . $searchTerm . '%');
+            });
+        }
             
-        $pages = Page::published()
-            ->whereHas('categories', function($query) use ($category) {
-                $query->where('category_id', $category->id);
-            })
-            ->orderBy('published_at', 'desc')
-            ->paginate(12);
+        $pages = $query->orderBy('published_at', 'desc')->paginate(12);
             
         return view('front.pages.category', compact('category', 'pages'));
     }

@@ -3,190 +3,165 @@
 @section('title', $category->name . ' - ' . config('app.name'))
 @section('meta_description', $category->description ?? 'Bu kategorideki tüm içerikleri keşfedin. ' . $category->name . ' kategorisindeki sayfalar, makaleler ve daha fazlası.')
 
+@include('helpers.functions')
+
 @section('content')
-<div class="container mx-auto px-4 py-8">
-    <div class="max-w-7xl mx-auto">
-        <!-- Kategori Başlığı -->
-        <div class="mb-10 text-center">
-            <h1 class="text-3xl md:text-4xl font-bold text-gray-800 mb-4">
-                @if($category->icon)
-                    <i class="{{ $category->icon }} mr-2 text-primary"></i>
-                @endif
-                {{ $category->name }}
-            </h1>
-            
-            @if($category->description)
-                <p class="text-gray-600 max-w-3xl mx-auto">{{ $category->description }}</p>
-            @endif
-            
-            <div class="mt-4 flex justify-center items-center text-sm text-gray-500">
-                <span class="bg-primary bg-opacity-10 text-primary px-3 py-1 rounded-full">
-                    {{ $pages->total() }} içerik
-                </span>
+<!-- Hero Bölümü - Yeniden Tasarlandı -->
+<section class="relative bg-[#00352b] pt-28 pb-16 overflow-hidden">
+    <!-- Arka Plan Desenleri -->
+    <div class="absolute inset-0 overflow-hidden opacity-10">
+        <div class="absolute -right-10 -top-10 w-64 h-64 rounded-full bg-white"></div>
+        <div class="absolute left-1/3 bottom-0 w-96 h-96 rounded-full bg-white"></div>
+    </div>
+    
+    <div class="container max-w-7xl mx-auto px-4 relative z-10">
+        <div class="flex flex-col md:flex-row justify-between gap-8 items-center">
+            <!-- Sol Taraf: Başlık ve Açıklama -->
+            <div class="md:w-1/2">
+                <h1 class="text-3xl md:text-5xl font-bold mb-4 text-white leading-tight">{{ $category->name }}</h1>
+                <p class="text-lg text-white/80 mb-6 max-w-xl">{{ $category->description ?? 'Bu kategorideki içerikleri inceleyebilirsiniz' }}</p>
+                
+                <!-- Modern Arama Kutusu -->
+                <form action="{{ route('pages.category', $category->slug) }}" method="GET" class="mt-8">
+                    <div class="bg-white/10 backdrop-blur-md rounded-xl p-1 flex items-center shadow-lg hover:bg-white/20 transition duration-300 border border-white/20">
+                        <input 
+                            type="text" 
+                            name="search" 
+                            placeholder="Kategori içinde ara..." 
+                            class="w-full bg-transparent px-4 py-3 text-white placeholder-white/70 outline-none"
+                            value="{{ request()->get('search') }}"
+                        >
+                        <button type="submit" class="bg-white hover:bg-gray-100 text-[#00352b] font-medium px-6 py-3 rounded-lg transition duration-300 flex items-center">
+                            <span class="material-icons mr-1">search</span>
+                            Ara
+                        </button>
+                    </div>
+                </form>
             </div>
-        </div>
-        
-        <!-- Filtre ve Sıralama -->
-        <div class="mb-8 flex flex-col md:flex-row justify-between items-center bg-gray-50 rounded-lg p-4">
-            <!-- Arama Formu -->
-            <form action="{{ route('pages.category', $category->slug) }}" method="GET" class="w-full md:w-auto mb-4 md:mb-0">
-                <div class="relative">
-                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Kategori içinde ara..." 
-                           class="w-full md:w-80 pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary">
-                    <button type="submit" class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
-                        <i class="fas fa-search"></i>
-                    </button>
-                    @if(request('search'))
-                        <a href="{{ route('pages.category', $category->slug) }}" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600">
-                            <i class="fas fa-times"></i>
-                        </a>
-                    @endif
-                </div>
-            </form>
             
-            <!-- Sıralama Seçenekleri -->
-            <div class="flex items-center gap-2">
-                <span class="text-sm text-gray-700">Sırala:</span>
-                <a href="{{ route('pages.category', ['slug' => $category->slug, 'sort' => 'newest', 'search' => request('search')]) }}" 
-                   class="text-sm px-3 py-1.5 rounded {{ request('sort', 'newest') == 'newest' ? 'bg-primary text-white' : 'bg-white text-gray-700 hover:bg-gray-100' }}">
-                    En Yeni
-                </a>
-                <a href="{{ route('pages.category', ['slug' => $category->slug, 'sort' => 'oldest', 'search' => request('search')]) }}" 
-                   class="text-sm px-3 py-1.5 rounded {{ request('sort') == 'oldest' ? 'bg-primary text-white' : 'bg-white text-gray-700 hover:bg-gray-100' }}">
-                    En Eski
-                </a>
-                <a href="{{ route('pages.category', ['slug' => $category->slug, 'sort' => 'popular', 'search' => request('search')]) }}" 
-                   class="text-sm px-3 py-1.5 rounded {{ request('sort') == 'popular' ? 'bg-primary text-white' : 'bg-white text-gray-700 hover:bg-gray-100' }}">
-                    Popüler
-                </a>
-            </div>
-        </div>
-        
-        <!-- Arama Sonuçları Bildirimi -->
-        @if(request('search'))
-            <div class="mb-6 bg-blue-50 border-l-4 border-blue-400 p-4 rounded-md">
-                <p class="text-blue-700">
-                    <span class="font-medium">"{{ request('search') }}"</span> araması için 
-                    <span class="font-medium">{{ $pages->total() }}</span> sonuç bulundu.
-                </p>
-            </div>
-        @endif
-        
-        <!-- Sayfalar Listesi -->
-        @if($pages->count() > 0)
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
-                @foreach($pages as $page)
-                    <div class="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-md transition-shadow group">
-                        <!-- Sayfa Görseli -->
-                        <a href="{{ route('pages.show', $page->slug) }}" class="block aspect-[3/2] overflow-hidden bg-gray-100">
-                            @if($page->image)
-                                <img src="{{ asset($page->image) }}" alt="{{ $page->title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
-                            @else
-                                <div class="w-full h-full flex items-center justify-center text-gray-400">
-                                    <i class="fas fa-file-alt text-4xl"></i>
-                                </div>
-                            @endif
-                        </a>
-                        
-                        <div class="p-5">
-                            <!-- Kategori İsmi (Alt kategorileri gösterme) -->
-                            @if($page->categories->count() > 0 && $page->categories->where('id', '!=', $category->id)->count() > 0)
-                                <div class="flex flex-wrap gap-2 mb-3">
-                                    @foreach($page->categories->where('id', '!=', $category->id)->take(2) as $cat)
-                                        <a href="{{ route('pages.category', $cat->slug) }}" class="text-xs text-primary hover:underline">
-                                            #{{ $cat->name }}
-                                        </a>
-                                    @endforeach
-                                </div>
-                            @endif
-                            
-                            <!-- Başlık -->
-                            <h2 class="text-xl font-bold text-gray-800 mb-3 line-clamp-2 group-hover:text-primary transition-colors">
-                                <a href="{{ route('pages.show', $page->slug) }}">
-                                    {{ $page->title }}
-                                </a>
-                            </h2>
-                            
-                            <!-- Özet -->
-                            @if($page->summary)
-                                <p class="text-gray-600 text-sm mb-4 line-clamp-3">
-                                    {{ $page->summary }}
-                                </p>
-                            @endif
-                            
-                            <!-- Alt Bilgiler -->
-                            <div class="flex justify-between items-center text-xs text-gray-500 mt-auto">
-                                <span>
-                                    <i class="far fa-calendar-alt mr-1"></i>
-                                    {{ $page->published_at ? $page->published_at->format('d.m.Y') : $page->created_at->format('d.m.Y') }}
-                                </span>
-                                
-                                <span>
-                                    <i class="far fa-eye mr-1"></i>
-                                    {{ $page->view_count ?? 0 }} görüntülenme
-                                </span>
-                            </div>
+            <!-- Sağ Taraf: İstatistikler veya Görsel -->
+            <div class="md:w-1/2 flex justify-end">
+                <div class="bg-white/10 backdrop-blur-md p-6 rounded-xl border border-white/20 shadow-lg">
+                    <div class="grid grid-cols-2 gap-6">
+                        <div class="text-center">
+                            <div class="text-3xl font-bold text-white mb-1">{{ $pages->total() }}</div>
+                            <div class="text-white/70 text-sm">Aktif İçerik</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-3xl font-bold text-white mb-1">{{ \App\Models\PageCategory::where('is_active', true)->count() }}</div>
+                            <div class="text-white/70 text-sm">Toplam Kategori</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-3xl font-bold text-white mb-1">100%</div>
+                            <div class="text-white/70 text-sm">Bilgi Güvenliği</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-3xl font-bold text-white mb-1">7/24</div>
+                            <div class="text-white/70 text-sm">Erişim</div>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Kategori Filtreleme - Geliştirilmiş Tasarım -->
+<section class="py-5 bg-gradient-to-r from-white to-slate-50 shadow-md border-b border-slate-200">
+    <div class="container max-w-7xl mx-auto px-4">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center">
+                <span class="hidden md:inline-block text-[#00352b] font-semibold mr-4">Kategoriler:</span>
+            </div>
+            
+            <div class="overflow-x-auto scrollbar-hide flex-grow">
+                <div class="flex items-center space-x-3 min-w-max py-1">
+                    <a href="{{ route('pages.index') }}" 
+                        class="relative px-5 py-2.5 rounded-lg flex items-center {{ request()->routeIs('pages.index') && !request()->query('search') ? 'bg-gradient-to-r from-[#00352b] to-[#005540] text-white font-medium shadow-md' : 'bg-white hover:bg-slate-50 text-gray-700 border border-slate-200 hover:border-[#00352b]/30' }} transition-all duration-300 group">
+                        <i class="fas fa-layer-group {{ request()->routeIs('pages.index') && !request()->query('search') ? 'text-white' : 'text-[#00352b] group-hover:text-[#00352b]' }} mr-2"></i>
+                        <span class="font-medium">Tüm Sayfalar</span>
+                        
+                        @if(request()->routeIs('pages.index') && !request()->query('search'))
+                        <span class="absolute top-0 right-0 h-2 w-2 bg-white rounded-full transform -translate-y-1 translate-x-1 shadow"></span>
+                        @endif
+                    </a>
+                    
+                    @foreach(\App\Models\PageCategory::where('is_active', true)->withCount(['pages' => function($query) {
+                        $query->published();
+                    }])->having('pages_count', '>', 0)->orderBy('pages_count', 'desc')->take(10)->get() as $cat)
+                    <a href="{{ route('pages.category', $cat->slug) }}" 
+                        class="relative px-5 py-2.5 rounded-lg flex items-center {{ $cat->id == $category->id ? 'bg-gradient-to-r from-[#00352b] to-[#005540] text-white font-medium shadow-md' : 'bg-white hover:bg-slate-50 text-gray-700 border border-slate-200 hover:border-[#00352b]/30' }} transition-all duration-300 group">
+                        @if($cat->icon)
+                            <i class="{{ $cat->icon }} {{ $cat->id == $category->id ? 'text-white' : 'text-[#00352b] group-hover:text-[#00352b]' }} mr-2"></i>
+                        @endif
+                        <span class="font-medium">{{ $cat->name }}</span>
+                        
+                        @if($cat->id == $category->id)
+                        <span class="absolute top-0 right-0 h-2 w-2 bg-white rounded-full transform -translate-y-1 translate-x-1 shadow"></span>
+                        @endif
+                    </a>
+                    @endforeach
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Ana İçerik - Mevcut tasarıma uygun kart yapısı -->
+<section class="py-12 bg-slate-100">
+    <div class="container max-w-7xl mx-auto px-4">
+        @if($pages->isEmpty())
+            <div class="bg-white p-8 rounded-lg shadow-md text-center">
+                <span class="material-icons text-gray-400 text-5xl mb-4">info</span>
+                <h3 class="text-xl font-bold text-gray-800 mb-2">Bu kategoride henüz içerik bulunmamaktadır</h3>
+                <p class="text-gray-600">Lütfen daha sonra tekrar kontrol ediniz veya başka bir kategori seçiniz.</p>
+            </div>
+        @else
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                @foreach($pages as $page)
+                <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+                    <!-- Görsel -->
+                    <div class="h-48 overflow-hidden">
+                        @if($page->image)
+                            <img src="{{ asset($page->image) }}" alt="{{ $page->title }}" class="w-full h-full object-cover">
+                        @else
+                            <div class="w-full h-full flex items-center justify-center bg-slate-100">
+                                <span class="material-icons text-gray-400 text-4xl">article</span>
+                            </div>
+                        @endif
+                    </div>
+                    
+                    <!-- İçerik -->
+                    <div class="p-5">
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">{{ $page->title }}</h3>
+                        <p class="text-gray-600 mb-4 line-clamp-2">{{ $page->summary ?? Str::limit(strip_tags($page->content), 120) }}</p>
+                        
+                        <!-- Kategoriler -->
+                        @if($page->categories->isNotEmpty())
+                        <div class="mb-4 flex flex-wrap gap-2">
+                            @foreach($page->categories as $cat)
+                            <a href="{{ route('pages.category', $cat->slug) }}" class="text-xs bg-slate-100 hover:bg-[#00352b] hover:text-white px-3 py-1 rounded-full transition-colors text-gray-700 {{ $cat->id == $category->id ? 'bg-[#00352b] text-white' : '' }}">
+                                {{ $cat->name }}
+                            </a>
+                            @endforeach
+                        </div>
+                        @endif
+                        
+                        <!-- Detay Butonu -->
+                        <a href="{{ route('pages.show', $page->slug) }}" class="inline-flex items-center text-[#00352b] hover:underline">
+                            Detaylı Bilgi
+                            <span class="material-icons text-sm ml-1">arrow_forward</span>
+                        </a>
+                    </div>
+                </div>
                 @endforeach
             </div>
             
             <!-- Sayfalama -->
-            <div class="mt-8">
+            <div class="mt-12">
                 {{ $pages->withQueryString()->links() }}
             </div>
-        @else
-            <div class="bg-gray-50 rounded-lg p-8 text-center">
-                <div class="text-gray-400 text-6xl mb-4">
-                    <i class="far fa-folder-open"></i>
-                </div>
-                
-                <h3 class="text-2xl font-bold text-gray-700 mb-2">İçerik Bulunamadı</h3>
-                
-                @if(request('search'))
-                    <p class="text-gray-600 mb-6">
-                        "{{ request('search') }}" aramanıza uygun içerik bulunamadı. Farklı bir arama terimi deneyebilir veya tüm içerikleri görmek için aramayı temizleyebilirsiniz.
-                    </p>
-                    
-                    <a href="{{ route('pages.category', $category->slug) }}" class="inline-flex items-center px-4 py-2 bg-primary text-white rounded hover:bg-primary-dark transition">
-                        <i class="fas fa-sync-alt mr-2"></i> Tüm İçerikleri Göster
-                    </a>
-                @else
-                    <p class="text-gray-600">
-                        Bu kategoride henüz içerik bulunmuyor. Lütfen daha sonra tekrar kontrol edin.
-                    </p>
-                @endif
-            </div>
         @endif
-        
-        <!-- Diğer Kategoriler -->
-        <div class="mt-16 mb-8">
-            <h3 class="text-2xl font-bold text-gray-800 mb-6 text-center">Diğer Kategoriler</h3>
-            
-            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                @foreach(\App\Models\PageCategory::where('id', '!=', $category->id)->where('is_active', true)->orderBy('name')->get() as $otherCategory)
-                    <a href="{{ route('pages.category', $otherCategory->slug) }}" class="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-md hover:border-primary transition-all text-center">
-                        @if($otherCategory->icon)
-                            <div class="text-2xl text-primary mb-2">
-                                <i class="{{ $otherCategory->icon }}"></i>
-                            </div>
-                        @endif
-                        
-                        <h4 class="font-medium text-gray-800">{{ $otherCategory->name }}</h4>
-                        
-                        @php
-                            $pageCount = \App\Models\Page::published()->whereHas('categories', function($query) use ($otherCategory) {
-                                $query->where('category_id', $otherCategory->id);
-                            })->count();
-                        @endphp
-                        
-                        <div class="text-xs text-gray-500 mt-1">
-                            {{ $pageCount }} içerik
-                        </div>
-                    </a>
-                @endforeach
-            </div>
-        </div>
     </div>
-</div>
+</section>
 @endsection 

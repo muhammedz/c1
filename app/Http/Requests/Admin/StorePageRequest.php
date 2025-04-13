@@ -21,11 +21,11 @@ class StorePageRequest extends FormRequest
     {
         return [
             'title' => 'required|string|max:255',
-            'content' => 'required|string',
-            'image' => 'required|string',
-            'status' => 'required|in:published,draft',
-            'categories' => 'required|array|min:1',
-            'categories.*' => 'exists:page_categories,id',
+            'content' => 'nullable|string',
+            'image' => 'nullable|string',
+            'status' => 'nullable|in:published,draft',
+            'categories' => 'nullable|array',
+            'categories.*' => 'nullable|exists:page_categories,id',
             'published_at' => 'nullable|date',
             'end_date' => 'nullable|date|after_or_equal:published_at',
             'summary' => 'nullable|string',
@@ -33,7 +33,7 @@ class StorePageRequest extends FormRequest
             'meta_description' => 'nullable|string',
             'meta_keywords' => 'nullable|string',
             'gallery' => 'nullable|array',
-            'gallery.*' => 'string',
+            'gallery.*' => 'nullable|string',
             'is_featured' => 'nullable|boolean',
             'tags' => 'nullable|string',
             'template' => 'nullable|string'

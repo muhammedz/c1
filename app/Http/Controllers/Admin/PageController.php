@@ -52,7 +52,14 @@ class PageController extends Controller
     {
         $featuredCount = Page::where('is_featured', true)->count();
         $maxFeaturedReached = $featuredCount >= 4;
-        $pageCategories = collect();
+        $pageCategories = PageCategory::where('is_active', true)->orderBy('name')->get();
+        
+        // Debug bilgisi
+        \Illuminate\Support\Facades\Log::info('Page Create Debug: ', [
+            'pageCategories' => $pageCategories->toArray(),
+            'count' => $pageCategories->count(),
+            'maxFeaturedReached' => $maxFeaturedReached
+        ]);
         
         return view('admin.pages.create', compact('maxFeaturedReached', 'pageCategories'));
     }
@@ -62,13 +69,51 @@ class PageController extends Controller
      */
     public function store(StorePageRequest $request)
     {
-        $page = $this->pageService->createPage($request->validated());
+        // Debug başlangıcı
+        \Illuminate\Support\Facades\Log::info('Page Store Debug - Başlangıç: ', [
+            'request_all' => $request->all(),
+            'request_validated' => $request->validated(),
+            'submitted_categories' => $request->input('categories', [])
+        ]);
         
-        if ($page) {
-            return redirect()->route('admin.pages.index')->with('success', 'Sayfa başarıyla oluşturuldu.');
+        try {
+            // PageService'i çağırmadan önce sadece title kontrolü yap
+            $validatedData = $request->validated();
+            
+            // Title kontrolü
+            if (empty($validatedData['title'])) {
+                throw new \Exception('Başlık alanı boş olamaz');
+            }
+            
+            // Eğer kategori seçilmemişse boş dizi olarak ayarla
+            if (!isset($validatedData['categories'])) {
+                $validatedData['categories'] = [];
+            }
+            
+            $page = $this->pageService->createPage($validatedData);
+            
+            \Illuminate\Support\Facades\Log::info('Page Store Debug - Sonuç: ', [
+                'success' => !empty($page),
+                'page_id' => $page->id ?? null,
+                'page_title' => $page->title ?? null
+            ]);
+            
+            if ($page) {
+                return redirect()->route('admin.pages.index')->with('success', 'Sayfa başarıyla oluşturuldu.');
+            }
+            
+            return redirect()->back()->with('error', 'Sayfa oluşturulurken bir hata oluştu.')->withInput();
+        } catch (\Exception $e) {
+            // Hata bilgisini doğrudan kullanıcıya göster
+            \Illuminate\Support\Facades\Log::error('Page Store Debug - Hata: ', [
+                'error_message' => $e->getMessage(),
+                'error_trace' => $e->getTraceAsString()
+            ]);
+            
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Sayfa oluşturulurken bir hata oluştu: ' . $e->getMessage());
         }
-        
-        return redirect()->back()->with('error', 'Sayfa oluşturulurken bir hata oluştu.');
     }
 
     /**
@@ -87,9 +132,31 @@ class PageController extends Controller
     {
         $featuredCount = Page::where('is_featured', true)->count();
         $maxFeaturedReached = $featuredCount >= 4 && !$page->is_featured;
-        $pageCategories = collect();
-        $selectedCategories = [];
-        $tags = $page->tags->pluck('name')->implode(',');
+        $pageCategories = PageCategory::where('is_active', true)->orderBy('name')->get();
+        $selectedCategories = $page->categories->pluck('id')->toArray();
+        
+        // Collection sorununu çözmek için
+        try {
+            // PHP 8.2 uyumlu yol - pluck ve sonra toArray
+            if ($page->tags && $page->tags->count() > 0) {
+                $tagsArray = $page->tags->pluck('name')->toArray();
+                $tags = implode(',', $tagsArray);
+            } else {
+                $tags = '';
+            }
+        } catch (\Exception $e) {
+            // Hata durumunda boş string
+            $tags = '';
+            \Illuminate\Support\Facades\Log::error('Tags implode error: ' . $e->getMessage());
+        }
+        
+        // Debug
+        \Illuminate\Support\Facades\Log::info('Page Edit Debug: ', [
+            'page_id' => $page->id,
+            'tags_type' => gettype($tags),
+            'tags_value' => $tags,
+            'tags_count' => $page->tags->count()
+        ]);
         
         return view('admin.pages.edit', compact('page', 'maxFeaturedReached', 'pageCategories', 'selectedCategories', 'tags'));
     }
