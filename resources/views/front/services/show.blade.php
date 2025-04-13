@@ -15,45 +15,6 @@
         --accent-color: #e6a23c; /* Belediye vurgu rengi */
     }
     
-    /* mSticky Element Stili */
-    #mSticky {
-        position: fixed;
-        bottom: 20px;
-        right: 20px;
-        z-index: 50;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-        transition: all 0.3s ease;
-        border-radius: 8px;
-        max-width: 400px;
-        opacity: 0; /* Başlangıçta saydam */
-        transform: translateY(100px); /* Başlangıçta aşağıda */
-    }
-    
-    #mSticky.active {
-        background-color: #00352b;
-        color: white;
-        border-left-color: #e6a23c;
-    }
-    
-    #mSticky.active .material-icons {
-        color: #e6a23c;
-    }
-    
-    #mSticky:hover {
-        transform: translateY(-5px) !important;
-        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
-    }
-    
-    #mSticky.clicked {
-        animation: pulse 0.5s;
-    }
-    
-    @keyframes pulse {
-        0% { transform: scale(1); }
-        50% { transform: scale(1.05); }
-        100% { transform: scale(1); }
-    }
-    
     .service-layout-container {
         max-width: 1280px;
         margin: 0 auto;
@@ -837,18 +798,6 @@
         </div>
     </div>
 </div>
-
-<!-- mSticky Test Kutusu -->
-<div id="mSticky" class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-800 p-4 mb-5 cursor-pointer shadow-lg">
-    <div class="flex items-center justify-between">
-        <div class="flex items-center">
-            <span class="material-icons mr-2">info</span>
-            <p class="font-bold">Test mSticky</p>
-        </div>
-        <span class="material-icons text-sm transform transition-transform" id="mStickyIcon">keyboard_arrow_up</span>
-    </div>
-    <p class="text-sm mt-1">Bu bir test sticky elementidir. Tıklayınca sayfanın üstüne gider.</p>
-</div>
 @endsection
 
 @section('after_scripts')
@@ -1005,44 +954,6 @@
                 }
             }
         });
-        
-        // mSticky element davranışı
-        const mStickyElement = document.getElementById('mSticky');
-        const mStickyIcon = document.getElementById('mStickyIcon');
-
-        if (mStickyElement) {
-            // Başlangıçta mSticky'i gizle
-            mStickyElement.style.transform = 'translateY(100px)';
-            mStickyElement.style.opacity = '0';
-            
-            // Sayfa kaydırıldığında sticky elementinin görünürlüğünü izle
-            window.addEventListener('scroll', function() {
-                // Sayfa yeterince aşağı kaydırıldıysa göster
-                if (window.scrollY > 300) {
-                    mStickyElement.style.transform = 'translateY(0)';
-                    mStickyElement.style.opacity = '1';
-                    mStickyIcon.style.transform = 'rotate(180deg)';
-                } else {
-                    mStickyElement.style.transform = 'translateY(100px)';
-                    mStickyElement.style.opacity = '0';
-                    mStickyIcon.style.transform = 'rotate(0)';
-                }
-            });
-            
-            // Sticky elemente tıklandığında sayfanın başına dön
-            mStickyElement.addEventListener('click', function() {
-                window.scrollTo({
-                    top: 0,
-                    behavior: 'smooth'
-                });
-                
-                // Animasyon ekleyelim
-                mStickyElement.classList.add('clicked');
-                setTimeout(() => {
-                    mStickyElement.classList.remove('clicked');
-                }, 500);
-            });
-        }
     });
 </script>
 @endsection 

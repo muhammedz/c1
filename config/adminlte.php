@@ -322,6 +322,12 @@ return [
         ],
         ['header' => 'İÇERİK YÖNETİMİ'],
         [
+            'text'    => 'Duyurular',
+            'icon'    => 'fas fa-fw fa-bullhorn',
+            'url'     => 'admin/announcements',
+            'active'  => ['admin/announcements', 'admin/announcements/*'],
+        ],
+        [
             'text'    => 'Haberler',
             'icon'    => 'fas fa-fw fa-newspaper',
             'submenu' => [

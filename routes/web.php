@@ -15,6 +15,8 @@ use App\Http\Controllers\Admin\ServiceTagController;
 use App\Http\Controllers\Admin\PageController;
 use App\Http\Controllers\Admin\PageCategoryController;
 use App\Http\Controllers\Admin\PageTagController;
+use App\Http\Controllers\Admin\AnnouncementController;
+use App\Http\Controllers\AnnouncementFrontController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\FrontController;
 use App\Http\Controllers\HomeController;
@@ -170,6 +172,10 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     Route::resource('page-tags', App\Http\Controllers\Admin\PageTagController::class)->names('page-tags');
     Route::get('/page-tags/cleanup', [App\Http\Controllers\Admin\PageTagController::class, 'cleanup'])->name('page-tags.cleanup');
     Route::get('/page-tags/search', [App\Http\Controllers\Admin\PageTagController::class, 'search'])->name('page-tags.search');
+
+    // Duyurular Yönetimi
+    Route::resource('announcements', AnnouncementController::class);
+    Route::post('/announcements/{id}/toggle-active', [AnnouncementController::class, 'toggleActive'])->name('announcements.toggle-active');
 });
 
 // Proje Yönetimi Rotaları
@@ -355,3 +361,6 @@ Route::get('/events/{filename}', function($filename) {
     
     return response()->json(['error' => 'Görsel bulunamadı'], 404);
 })->where('filename', '.*\.(?:jpg|jpeg|png|gif|webp)$');
+
+// Frontend Duyuru İşlemleri
+Route::post('/announcements/mark-viewed', [AnnouncementFrontController::class, 'markViewed'])->name('announcements.mark-viewed');
