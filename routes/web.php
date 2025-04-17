@@ -405,3 +405,12 @@ Route::get('/events/{filename}', function($filename) {
 // Frontend Duyuru İşlemleri
 Route::post('/announcements/mark-viewed', [AnnouncementFrontController::class, 'markViewed'])->name('announcements.mark-viewed');
 
+// Storage görselleri için doğrudan erişim route'u
+Route::get('/storage/{path}', function($path){
+    $storagePath = storage_path('app/public/' . $path);
+    if (file_exists($storagePath)) {
+        return response()->file($storagePath);
+    }
+    return response()->json(['error' => 'Dosya bulunamadı'], 404);
+})->where('path', '.*');
+
