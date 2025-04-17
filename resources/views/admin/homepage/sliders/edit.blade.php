@@ -139,12 +139,10 @@
             var onFileSelected = function(url, path) {
                 console.log('Original URL: ', url);
                 
-                // Görece yolları tam URL'ye çevir
-                if (url && url.indexOf('http') !== 0) {
-                    // URL'yi doğrudan değiştir (storage yerine uploads)
-                    if (url.indexOf('/storage/') !== -1) {
-                        url = url.replace('/storage/', '/uploads/');
-                    }
+                // URL'yi düzenle
+                if (url) {
+                    // URL'yi tam yol olarak kullan
+                    url = url.replace('/storage/', '/uploads/');
                     
                     // Eğer URL'de /images/ kısmı varsa /photos/ olarak değiştir
                     if (url.indexOf('/images/') !== -1) {
@@ -162,8 +160,12 @@
                 preview.html('<img src="' + url + '" alt="Önizleme" class="img-fluid" style="max-height: 300px">');
             };
             
-            // File Manager butonunu özelleştir
-            $('#slider_image_button').filemanager('image', {onFileSelected: onFileSelected});
+            // File Manager butonunu özelleştir - filemanager prefix'i ile kullan
+            $('#slider_image_button').filemanager('image', {
+                prefix: '/admin/filemanager',
+                base_path: '/',
+                onFileSelected: onFileSelected
+            });
             
             // Form gönderiminden önce URL formatını kontrol et
             $('#slider-form').on('submit', function(e) {

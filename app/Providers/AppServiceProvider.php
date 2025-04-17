@@ -50,5 +50,22 @@ class AppServiceProvider extends ServiceProvider
             }
             return $response;
         });
+
+        // File Manager için yolları düzelt
+        // Uploads klasörünün varlığını kontrol et ve yoksa oluştur
+        $uploadsPaths = [
+            public_path('uploads'),
+            public_path('uploads/photos'),
+            public_path('uploads/photos/1'),
+            public_path('uploads/photos/shares'),
+        ];
+        
+        foreach ($uploadsPaths as $path) {
+            if (!file_exists($path)) {
+                mkdir($path, 0777, true);
+            } else {
+                chmod($path, 0777);
+            }
+        }
     }
 }

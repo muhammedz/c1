@@ -57,10 +57,9 @@ class Slider extends Model
             return $this->image;
         }
 
-        // Eğer /storage/ ile başlıyorsa, uploads'a çevir
+        // Eğer /storage/ ile başlıyorsa, asset() ile çevir
         if (strpos($this->image, '/storage/') === 0) {
-            $path = str_replace('/storage/', '/uploads/', $this->image);
-            return asset($path);
+            return asset(str_replace('/storage/', 'storage/', $this->image));
         }
         
         // Eğer /images/ içeriyorsa, /photos/ ile değiştir
@@ -71,7 +70,8 @@ class Slider extends Model
 
         // Eğer /uploads/ ile başlıyorsa
         if (strpos($this->image, '/uploads/') === 0) {
-            return asset($this->image);
+            // Başındaki slash'ı kaldır
+            return asset(ltrim($this->image, '/'));
         }
 
         // Eğer bir dosya yolu ise uploads/ ile birleştir
@@ -79,7 +79,7 @@ class Slider extends Model
             return asset('uploads/' . $this->image);
         }
 
-        // Varsayılan olarak olduğu gibi döndür
-        return asset($this->image);
+        // Varsayılan olarak olduğu gibi döndür ama başındaki slash'ı kaldır
+        return asset(ltrim($this->image, '/'));
     }
 }

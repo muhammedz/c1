@@ -19,6 +19,13 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | CUSTOM URL PATH FOR ROUTE - ÖZELLEŞTİRİLMİŞ ROUTE YOLU 
+    |--------------------------------------------------------------------------
+     */
+    'url_prefix' => 'filemanager',
+
+    /*
+    |--------------------------------------------------------------------------
     | Shared folder / Private folder
     |--------------------------------------------------------------------------
     |
@@ -100,15 +107,15 @@ return [
     |--------------------------------------------------------------------------
      */
 
-    'disk'                     => 'public',
+    'disk'                     => 'uploads',
 
-    'rename_file'              => true,
+    'rename_file'              => false,
 
-    'rename_duplicates'        => true,
+    'rename_duplicates'        => false,
 
-    'alphanumeric_filename'    => true,
+    'alphanumeric_filename'    => false,
 
-    'alphanumeric_directory'   => true,
+    'alphanumeric_directory'   => false,
 
     'should_validate_size'     => true,
 
