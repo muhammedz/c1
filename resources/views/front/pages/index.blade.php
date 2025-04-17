@@ -6,66 +6,99 @@
 
 @include('helpers.functions')
 
+@php
+    $pageSettings = \App\Models\PageSetting::getSettings();
+@endphp
+
 @section('content')
-<!-- Hero Bölümü - Yeniden Tasarlandı -->
-<section class="relative bg-[#00352b] pt-28 pb-16 overflow-hidden">
-    <!-- Arka Plan Desenleri -->
-    <div class="absolute inset-0 overflow-hidden opacity-10">
-        <div class="absolute -right-10 -top-10 w-64 h-64 rounded-full bg-white"></div>
-        <div class="absolute left-1/3 bottom-0 w-96 h-96 rounded-full bg-white"></div>
+<!-- Hero Bölümü - Split Layout -->
+<div class="relative bg-gradient-to-r from-[#00352b] to-[#20846c] overflow-hidden">
+    <div class="absolute inset-0 opacity-20">
+        <!-- Pattern overlay -->
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-full h-full" preserveAspectRatio="none">
+            <defs>
+                <pattern id="hero-pattern" width="40" height="40" patternUnits="userSpaceOnUse">
+                    <path d="M0 20 L40 20 M20 0 L20 40" stroke="currentColor" stroke-width="1" fill="none" />
+                </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#hero-pattern)" />
+        </svg>
     </div>
     
-    <div class="container max-w-7xl mx-auto px-4 relative z-10">
-        <div class="flex flex-col md:flex-row justify-between gap-8 items-center">
-            <!-- Sol Taraf: Başlık ve Açıklama -->
-            <div class="md:w-1/2">
-                <h1 class="text-3xl md:text-5xl font-bold mb-4 text-white leading-tight">Sayfalar</h1>
-                <p class="text-lg text-white/80 mb-6 max-w-xl">Tüm içeriklerimizi keşfedin. İlginizi çeken konular hakkında detaylı bilgilere ulaşabilirsiniz.</p>
+    <!-- Dekoratif şekiller -->
+    <div class="absolute -right-20 -bottom-20 w-64 h-64 rounded-full bg-[#e6a23c]/10 blur-3xl"></div>
+    <div class="absolute -left-10 top-10 w-40 h-40 rounded-full bg-white/5 blur-2xl"></div>
+    
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-8 md:py-10 relative z-10">
+        <div class="flex flex-col md:flex-row items-center justify-between">
+            <!-- Sol taraf - başlık ve açıklama -->
+            <div class="w-full md:w-1/2 mb-6 md:mb-0 md:pr-8">
+                @if(!empty($pageSettings->hero_badge_text))
+                <div class="inline-flex items-center px-3 py-1 rounded-full bg-white/10 text-white/90 text-sm border border-white/10 mb-3">
+                    <span class="material-icons text-xs mr-1">auto_stories</span>
+                    <span>{{ $pageSettings->hero_badge_text }}</span>
+                </div>
+                @endif
                 
-                <!-- Modern Arama Kutusu -->
-                <form action="{{ route('pages.index') }}" method="GET" class="mt-8">
-                    <div class="bg-white/10 backdrop-blur-md rounded-xl p-1 flex items-center shadow-lg hover:bg-white/20 transition duration-300 border border-white/20">
-                        <input 
-                            type="text" 
-                            name="search" 
-                            placeholder="Ne arıyorsunuz?" 
-                            class="w-full bg-transparent px-4 py-3 text-white placeholder-white/70 outline-none"
-                            value="{{ request()->get('search') }}"
-                        >
-                        <button type="submit" class="bg-white hover:bg-gray-100 text-[#00352b] font-medium px-6 py-3 rounded-lg transition duration-300 flex items-center">
-                            <span class="material-icons mr-1">search</span>
-                            Ara
-                        </button>
-                    </div>
-                </form>
+                @if(!empty($pageSettings->hero_title))
+                <h1 class="text-3xl md:text-4xl font-extrabold text-white leading-tight mb-3">
+                    @if(!empty($pageSettings->hero_title_highlight))
+                        {!! str_replace($pageSettings->hero_title_highlight, '<span class="text-[#e6a23c]">' . $pageSettings->hero_title_highlight . '</span>', $pageSettings->hero_title) !!}
+                    @else
+                        {{ $pageSettings->hero_title }}
+                    @endif
+                </h1>
+                @endif
+                
+                @if(!empty($pageSettings->hero_description))
+                <p class="text-white/80 text-base mb-0 max-w-lg">
+                    {{ $pageSettings->hero_description }}
+                </p>
+                @endif
             </div>
             
-            <!-- Sağ Taraf: İstatistikler veya Görsel -->
-            <div class="md:w-1/2 flex justify-end">
-                <div class="bg-white/10 backdrop-blur-md p-6 rounded-xl border border-white/20 shadow-lg">
-                    <div class="grid grid-cols-2 gap-6">
-                        <div class="text-center">
-                            <div class="text-3xl font-bold text-white mb-1">{{ $pages->total() }}</div>
-                            <div class="text-white/70 text-sm">Aktif Sayfa</div>
+            <!-- Sağ taraf - arama kutusu -->
+            <div class="w-full md:w-1/2 md:pl-8">
+                <div class="bg-white/10 backdrop-blur-md rounded-xl p-4 border border-white/20 shadow-xl">
+                    @if(!empty($pageSettings->search_title))
+                    <h3 class="text-lg text-white font-medium mb-3">{{ $pageSettings->search_title }}</h3>
+                    @endif
+                    
+                    <form action="{{ route('pages.index') }}" method="GET">
+                        <div class="mb-3">
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-white/60">
+                                    <span class="material-icons">search</span>
+                                </span>
+                                <input 
+                                    type="text" 
+                                    name="search" 
+                                    placeholder="{{ !empty($pageSettings->search_placeholder) ? $pageSettings->search_placeholder : 'Ara...' }}" 
+                                    class="w-full bg-white/10 border border-white/20 text-white placeholder-white/60 pl-10 pr-4 py-3 rounded-xl focus:ring-2 focus:ring-white/30 outline-none"
+                                    value="{{ request()->get('search') }}"
+                                >
+                            </div>
                         </div>
-                        <div class="text-center">
-                            <div class="text-3xl font-bold text-white mb-1">{{ \App\Models\PageCategory::where('is_active', true)->count() }}</div>
-                            <div class="text-white/70 text-sm">Sayfa Kategorisi</div>
-                        </div>
-                        <div class="text-center">
-                            <div class="text-3xl font-bold text-white mb-1">100%</div>
-                            <div class="text-white/70 text-sm">Bilgi Güvenliği</div>
-                        </div>
-                        <div class="text-center">
-                            <div class="text-3xl font-bold text-white mb-1">7/24</div>
-                            <div class="text-white/70 text-sm">Erişim</div>
-                        </div>
-                    </div>
+                        <button type="submit" class="w-full bg-white hover:bg-gray-100 text-[#00352b] font-semibold py-3 px-5 rounded-xl transition-all duration-300 flex items-center justify-center">
+                            <span class="material-icons mr-2">search</span>
+                            {{ !empty($pageSettings->search_button_text) ? $pageSettings->search_button_text : 'Ara' }}
+                        </button>
+                        
+                        @if(!empty($pageSettings->popular_searches_title) && is_array($pageSettings->popular_searches) && count($pageSettings->popular_searches) > 0)
+                            <div class="mt-2 text-white/60 text-xs text-center">
+                                {{ $pageSettings->popular_searches_title }}
+                                @foreach($pageSettings->popular_searches as $index => $search)
+                                    <a href="{{ route('pages.index', ['search' => $search['search']]) }}" class="text-white hover:underline mx-1">{{ $search['text'] }}</a>
+                                    @if($index < count($pageSettings->popular_searches) - 1) • @endif
+                                @endforeach
+                            </div>
+                        @endif
+                    </form>
                 </div>
             </div>
         </div>
     </div>
-</section>
+</div>
 
 <!-- Kategori Filtreleme - Geliştirilmiş Tasarım -->
 <section class="py-5 bg-gradient-to-r from-white to-slate-50 shadow-md border-b border-slate-200">
@@ -120,41 +153,32 @@
         @else
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 @foreach($pages as $page)
-                <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-                    <!-- Görsel -->
-                    <div class="h-48 overflow-hidden">
-                        @if($page->image)
-                            <img src="{{ asset($page->image) }}" alt="{{ $page->title }}" class="w-full h-full object-cover">
-                        @else
-                            <div class="w-full h-full flex items-center justify-center bg-slate-100">
-                                <span class="material-icons text-gray-400 text-4xl">article</span>
-                            </div>
-                        @endif
-                    </div>
-                    
+                <a href="{{ route('pages.show', $page->slug) }}" class="block bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1 border border-slate-100">
                     <!-- İçerik -->
                     <div class="p-5">
-                        <h3 class="text-xl font-bold text-gray-800 mb-2">{{ $page->title }}</h3>
-                        <p class="text-gray-600 mb-4 line-clamp-2">{{ $page->summary ?? Str::limit(strip_tags($page->content), 120) }}</p>
+                        <h3 class="text-xl font-bold text-gray-800 mb-2 truncate">{{ $page->title }}</h3>
+                        
+                        @if($page->summary)
+                        <p class="text-gray-600 mb-4 line-clamp-2 text-sm">{{ $page->summary }}</p>
+                        @else
+                        <p class="text-gray-600 mb-4 line-clamp-2 text-sm">{{ Str::limit(html_entity_decode(strip_tags($page->content)), 120) }}</p>
+                        @endif
                         
                         <!-- Kategoriler -->
                         @if($page->categories->isNotEmpty())
-                        <div class="mb-4 flex flex-wrap gap-2">
+                        <div class="flex flex-wrap gap-1.5 mt-auto pt-1 border-t border-slate-100">
                             @foreach($page->categories as $category)
-                            <a href="{{ route('pages.category', $category->slug) }}" class="text-xs bg-slate-100 hover:bg-[#00352b] hover:text-white px-3 py-1 rounded-full transition-colors text-gray-700">
+                            <span class="inline-block text-xs bg-slate-50 px-2 py-0.5 rounded-full text-gray-500">
+                                @if($category->icon)
+                                    <i class="{{ $category->icon }} mr-1 text-xs"></i>
+                                @endif
                                 {{ $category->name }}
-                            </a>
+                            </span>
                             @endforeach
                         </div>
                         @endif
-                        
-                        <!-- Detay Butonu -->
-                        <a href="{{ route('pages.show', $page->slug) }}" class="inline-flex items-center text-[#00352b] hover:underline">
-                            Detaylı Bilgi
-                            <span class="material-icons text-sm ml-1">arrow_forward</span>
-                        </a>
                     </div>
-                </div>
+                </a>
                 @endforeach
             </div>
             

@@ -326,8 +326,11 @@ $(document).ready(function () {
             <a href="{{ route('pages.index') }}" target="_blank" class="btn btn-sm btn-outline-primary mr-2">
                 <i class="fas fa-eye"></i> Site Ön Yüzünde Görüntüle
             </a>
-            <a href="{{ route('admin.pages.create') }}" class="btn btn-sm btn-primary">
+            <a href="{{ route('admin.pages.create') }}" class="btn btn-primary">
                 <i class="fas fa-plus"></i> Yeni Sayfa Ekle
+            </a>
+            <a href="{{ route('admin.pages.settings.edit') }}" class="btn btn-info ml-2">
+                <i class="fas fa-cog"></i> Sayfa Ayarları
             </a>
         </div>
     </div>

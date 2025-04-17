@@ -15,12 +15,17 @@ use App\Http\Controllers\Admin\ServiceTagController;
 use App\Http\Controllers\Admin\PageController;
 use App\Http\Controllers\Admin\PageCategoryController;
 use App\Http\Controllers\Admin\PageTagController;
+use App\Http\Controllers\Admin\PageSettingController;
 use App\Http\Controllers\Admin\AnnouncementController;
+use App\Http\Controllers\Admin\TestController;
+use App\Http\Controllers\Admin\TestDepartmentController;
 use App\Http\Controllers\AnnouncementFrontController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\FrontController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\TinyMCEController;
+use App\Http\Controllers\Admin\ServiceSettingsController;
+use App\Http\Controllers\Admin\DepartmentController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 
@@ -37,6 +42,18 @@ use Illuminate\Support\Facades\Auth;
 
 Route::get('/', [App\Http\Controllers\FrontController::class, 'index'])->name('front.home');
 
+// Kurumsal Kadro Frontend Route'ları
+Route::get('/kurumsal-kadro', [App\Http\Controllers\CorporateController::class, 'index'])->name('corporate.index');
+
+// Kurumsal Kadro Kategori ve Üye Rotaları - Daha spesifik rotaları önce tanımla
+Route::get('/{categorySlug}/{memberSlug}', [App\Http\Controllers\CorporateController::class, 'showMember'])
+    ->name('corporate.member')
+    ->where('categorySlug', '^(?!admin|login|register|password|kurumsal-kadro|projeler|etkinlikler|hizmetler|sayfalar).*$');
+
+Route::get('/{categorySlug}', [App\Http\Controllers\CorporateController::class, 'showCategory'])
+    ->name('corporate.category')
+    ->where('categorySlug', '^(?!admin|login|register|password|kurumsal-kadro|projeler|etkinlikler|hizmetler|sayfalar).*$');
+
 // Proje Detay Sayfaları
 Route::get('/projects', [App\Http\Controllers\FrontController::class, 'projects'])->name('front.projects');
 Route::get('/projects/{slug}', [App\Http\Controllers\FrontController::class, 'projectDetail'])->name('front.projects.detail');
@@ -47,11 +64,26 @@ Auth::routes();
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
 // Admin Panel Route Tanımlamaları
-Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->group(function () {
+Route::middleware(['auth', 'role:admin'])->name('admin.')->prefix('admin')->group(function () {
     // Dashboard
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/profile', [DashboardController::class, 'profile'])->name('profile');
     Route::put('/profile', [DashboardController::class, 'updateProfile'])->name('profile.update');
+    
+    // Test Sayfası
+    Route::get('/test', [TestController::class, 'index'])->name('test.index');
+    Route::get('/test-departments', [TestDepartmentController::class, 'index'])->name('test-departments.index');
+    
+    // Sayfa Ayarları
+    Route::get('pages/settings', [PageSettingController::class, 'edit'])->name('pages.settings.edit');
+    Route::put('pages/settings', [PageSettingController::class, 'update'])->name('pages.settings.update');
+    
+    // Sayfa Yönetimi
+    Route::resource('pages', App\Http\Controllers\Admin\PageController::class);
+    Route::post('pages/{page}/toggle-featured', [App\Http\Controllers\Admin\PageController::class, 'toggleFeatured'])->name('pages.toggle-featured');
+    Route::post('pages/{page}/toggle-status', [App\Http\Controllers\Admin\PageController::class, 'toggleStatus'])->name('pages.toggle-status');
+    Route::post('pages/update-featured-order', [App\Http\Controllers\Admin\PageController::class, 'updateFeaturedOrder'])->name('pages.update-featured-order');
+    Route::post('pages/upload-gallery-image', [App\Http\Controllers\Admin\PageController::class, 'uploadGalleryImage'])->name('pages.upload-gallery-image');
     
     // File Manager Routes
     Route::get('/file-manager-page', [App\Http\Controllers\Admin\FileManagerController::class, 'index'])->name('file-manager');
@@ -125,7 +157,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     Route::post('/projects/categories/{id}/toggle-visibility', [ProjectManagerController::class, 'toggleCategoryVisibility'])->name('projects.categories.toggle-visibility');
     
     // Proje İşlemleri
-    Route::post('/projects', [ProjectManagerController::class, 'storeProject'])->name('projects.store');
+    Route::post('/projects', [ProjectManagerController::class, 'storeProject'])->name('admin.projects.store2');
     Route::put('/projects/{id}', [ProjectManagerController::class, 'updateProject'])->name('projects.update');
     Route::delete('/projects/{id}', [ProjectManagerController::class, 'deleteProject'])->name('projects.delete');
     Route::post('/projects/update-order', [ProjectManagerController::class, 'updateProjectOrder'])->name('projects.update-order');
@@ -157,13 +189,6 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     Route::get('/service-tags/cleanup', [ServiceTagController::class, 'cleanup'])->name('service-tags.cleanup');
     Route::get('/service-tags/search', [ServiceTagController::class, 'search'])->name('service-tags.search');
     
-    // Sayfa Yönetimi
-    Route::resource('pages', App\Http\Controllers\Admin\PageController::class);
-    Route::post('/pages/{page}/toggle-featured', [App\Http\Controllers\Admin\PageController::class, 'toggleFeatured'])->name('pages.toggle-featured');
-    Route::post('/pages/{page}/toggle-status', [App\Http\Controllers\Admin\PageController::class, 'toggleStatus'])->name('pages.toggle-status');
-    Route::post('/pages/update-featured-order', [App\Http\Controllers\Admin\PageController::class, 'updateFeaturedOrder'])->name('pages.update-featured-order');
-    Route::post('/pages/upload-gallery-image', [App\Http\Controllers\Admin\PageController::class, 'uploadGalleryImage'])->name('pages.upload-gallery-image');
-    
     // Sayfa Kategorileri Yönetimi
     Route::resource('page-categories', App\Http\Controllers\Admin\PageCategoryController::class)->names('page-categories');
     Route::post('/page-categories/update-order', [App\Http\Controllers\Admin\PageCategoryController::class, 'updateOrder'])->name('page-categories.update-order');
@@ -172,10 +197,25 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     Route::resource('page-tags', App\Http\Controllers\Admin\PageTagController::class)->names('page-tags');
     Route::get('/page-tags/cleanup', [App\Http\Controllers\Admin\PageTagController::class, 'cleanup'])->name('page-tags.cleanup');
     Route::get('/page-tags/search', [App\Http\Controllers\Admin\PageTagController::class, 'search'])->name('page-tags.search');
-
+    
     // Duyurular Yönetimi
     Route::resource('announcements', AnnouncementController::class);
     Route::post('/announcements/{id}/toggle-active', [AnnouncementController::class, 'toggleActive'])->name('announcements.toggle-active');
+
+    // Kurumsal Kadro Yönetimi
+    Route::prefix('corporate')->name('corporate.')->group(function () {
+        Route::resource('categories', App\Http\Controllers\Admin\CorporateCategoryController::class);
+        Route::post('categories/update-order', [App\Http\Controllers\Admin\CorporateCategoryController::class, 'updateOrder'])->name('categories.update-order');
+        
+        // Üye Yönetimi
+        Route::get('categories/{category}/members', [App\Http\Controllers\Admin\CorporateMemberController::class, 'index'])->name('members.index');
+        Route::get('categories/{category}/members/create', [App\Http\Controllers\Admin\CorporateMemberController::class, 'create'])->name('members.create');
+        Route::post('categories/{category}/members', [App\Http\Controllers\Admin\CorporateMemberController::class, 'store'])->name('members.store');
+        Route::get('members/{member}/edit', [App\Http\Controllers\Admin\CorporateMemberController::class, 'edit'])->name('members.edit');
+        Route::put('members/{member}', [App\Http\Controllers\Admin\CorporateMemberController::class, 'update'])->name('members.update');
+        Route::delete('members/{member}', [App\Http\Controllers\Admin\CorporateMemberController::class, 'destroy'])->name('members.destroy');
+        Route::post('members/order', [App\Http\Controllers\Admin\CorporateMemberController::class, 'order'])->name('members.order');
+    });
 });
 
 // Proje Yönetimi Rotaları
@@ -364,3 +404,4 @@ Route::get('/events/{filename}', function($filename) {
 
 // Frontend Duyuru İşlemleri
 Route::post('/announcements/mark-viewed', [AnnouncementFrontController::class, 'markViewed'])->name('announcements.mark-viewed');
+

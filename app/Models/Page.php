@@ -20,7 +20,8 @@ class Page extends Model
         'title',
         'slug',
         'content',
-        'featured_image',
+        'summary',
+        'image',
         'gallery',
         'is_featured',
         'view_count',
@@ -228,5 +229,49 @@ class Page extends Model
             return implode(',', $tagNames);
         }
         return '';
+    }
+    
+    /**
+     * Get the image attribute with correct URL path.
+     *
+     * @param  string|null  $value
+     * @return string|null
+     */
+    public function getImageAttribute($value)
+    {
+        if (empty($value)) {
+            return null;
+        }
+        
+        // Windows'taki yol ayırıcıları düzelt
+        $value = str_replace('\\', '/', $value);
+        
+        // Eğer yol 'storage/' ile başlıyorsa
+        if (Str::startsWith($value, 'storage/')) {
+            return url($value);
+        }
+        
+        // Eğer public/storage/ ile başlıyorsa
+        if (Str::startsWith($value, 'public/storage/')) {
+            return url(Str::replaceFirst('public/', '', $value));
+        }
+        
+        // Eğer tam URL ise
+        if (Str::startsWith($value, ['http://', 'https://'])) {
+            return $value;
+        }
+        
+        // Diğer tüm durumlar için
+        return asset($value);
+    }
+    
+    /**
+     * Get the featured_image attribute as an alias to image.
+     *
+     * @return string|null
+     */
+    public function getFeaturedImageAttribute()
+    {
+        return $this->image;
     }
 }

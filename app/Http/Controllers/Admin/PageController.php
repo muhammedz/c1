@@ -166,13 +166,44 @@ class PageController extends Controller
      */
     public function update(UpdatePageRequest $request, Page $page)
     {
-        $result = $this->pageService->updatePage($request->validated(), $page->id);
-        
-        if ($result) {
-            return redirect()->route('admin.pages.index')->with('success', 'Sayfa başarıyla güncellendi.');
+        try {
+            // Debug bilgisi
+            \Illuminate\Support\Facades\Log::info('Page Update Debug - Başlangıç: ', [
+                'request_all' => $request->all(),
+                'request_validated' => $request->validated(),
+                'page_id' => $page->id
+            ]);
+            
+            // Debug için forma gelen verileri session'a kaydet
+            $debugData = [
+                'gallery_input' => $request->input('gallery'),
+                'gallery_type' => gettype($request->input('gallery')),
+                'gallery_count' => is_array($request->input('gallery')) ? count($request->input('gallery')) : 0,
+                'request_method' => $request->method(),
+                'has_file' => $request->hasFile('gallery'),
+                'all_request' => $request->all(),
+                'timestamp' => now()->format('Y-m-d H:i:s')
+            ];
+            session()->flash('debug_data', $debugData);
+            
+            $result = $this->pageService->updatePage($request->validated(), $page->id);
+            
+            if ($result) {
+                return redirect()->route('admin.pages.index')->with('success', 'Sayfa başarıyla güncellendi.');
+            }
+            
+            return redirect()->back()->with('error', 'Sayfa güncellenirken bir hata oluştu.');
+        } catch (\Exception $e) {
+            // Hata detaylarını logla
+            \Illuminate\Support\Facades\Log::error('Page Update Debug - Hata: ', [
+                'error_message' => $e->getMessage(),
+                'error_trace' => $e->getTraceAsString()
+            ]);
+            
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Sayfa güncellenirken bir hata oluştu: ' . $e->getMessage());
         }
-        
-        return redirect()->back()->with('error', 'Sayfa güncellenirken bir hata oluştu.');
     }
 
     /**

@@ -114,7 +114,27 @@ class PageService
         try {
             DB::beginTransaction();
             
+            // Başlangıç debug
+            Log::info('updatePage başlangıç: ', [
+                'page_id' => $id,
+                'data' => $data,
+                'gallery_exists' => isset($data['gallery']),
+                'gallery_type' => isset($data['gallery']) ? gettype($data['gallery']) : 'yok',
+                'gallery_count' => isset($data['gallery']) && is_array($data['gallery']) ? count($data['gallery']) : 0
+            ]);
+            
             $page = $this->pageRepository->find($id);
+            
+            if (!$page) {
+                throw new \Exception('Sayfa bulunamadı');
+            }
+            
+            // Sayfanın güncellemeden önceki mevcut gallery değeri
+            Log::info('Güncellemeden önce mevcut gallery değeri: ', [
+                'page_gallery' => $page->gallery,
+                'page_gallery_type' => gettype($page->gallery),
+                'page_gallery_count' => is_array($page->gallery) ? count($page->gallery) : 0
+            ]);
             
             // Yayın tarihi
             if (isset($data['published_at']) && $data['published_at']) {
@@ -146,8 +166,44 @@ class PageService
                 }
             }
             
+            // Gallery değerlerini kontrol et ve düzelt (eğer varsa)
+            if (isset($data['gallery']) && is_array($data['gallery'])) {
+                Log::info('Gallery güncelleniyor: ', [
+                    'gallery_values' => $data['gallery'],
+                    'count' => count($data['gallery'])
+                ]);
+                
+                // Boş değerleri filtrele
+                $data['gallery'] = array_filter($data['gallery'], function($item) {
+                    return !empty($item);
+                });
+                
+                Log::info('Gallery filtrelendikten sonra: ', [
+                    'gallery_filtered' => $data['gallery'],
+                    'count_after_filter' => count($data['gallery'])
+                ]);
+            } else {
+                Log::warning('Gallery verisi yok veya dizi değil!', [
+                    'gallery_in_data' => isset($data['gallery']),
+                    'gallery_type' => isset($data['gallery']) ? gettype($data['gallery']) : 'yok'
+                ]);
+            }
+            
             // Sayfayı güncelle
             $result = $this->pageRepository->updatePage($data, $id);
+            
+            // Güncelleme sonrası durumu logla
+            $updatedPage = $this->pageRepository->find($id);
+            Log::info('Sayfa güncellendi, gallery durumu: ', [
+                'page_gallery_after' => $updatedPage->gallery,
+                'page_gallery_type_after' => gettype($updatedPage->gallery),
+                'page_gallery_count_after' => is_array($updatedPage->gallery) ? count($updatedPage->gallery) : 0,
+                'update_result' => $result
+            ]);
+            
+            if (!$result) {
+                throw new \Exception('Sayfa güncellenemedi');
+            }
             
             // Etiketleri güncelle
             if (isset($data['tags'])) {
@@ -159,8 +215,13 @@ class PageService
             return $result;
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Sayfa güncelleme hatası: ' . $e->getMessage());
-            return false;
+            Log::error('Sayfa güncelleme hatası: ' . $e->getMessage(), [
+                'exception' => $e,
+                'trace' => $e->getTraceAsString(),
+                'data' => $data,
+                'page_id' => $id
+            ]);
+            throw $e; // Hatayı daha üst seviyeye fırlat
         }
     }
     

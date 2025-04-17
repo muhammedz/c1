@@ -9,7 +9,7 @@
 @endif
 
 @if($page->image)
-    @section('meta_image', asset($page->image))
+    @section('meta_image', $page->image)
 @endif
 
 @section('css')
@@ -148,6 +148,61 @@
             transform: none; /* Transform değerini kaldırdık */
         }
     }
+    
+    /* Genel Tablo Stilleri */
+    table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        margin: 25px 0;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+    
+    table thead {
+        background-color: var(--primary-color);
+        color: white;
+    }
+    
+    table th {
+        font-weight: 600;
+        text-align: left;
+        padding: 14px 16px;
+        font-size: 14px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    table td {
+        padding: 12px 16px;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        font-size: 14px;
+        vertical-align: middle;
+    }
+    
+    table tr:last-child td {
+        border-bottom: none;
+    }
+    
+    table tr:nth-child(even) {
+        background-color: rgba(0, 0, 0, 0.02);
+    }
+    
+    table tr:hover {
+        background-color: rgba(0, 53, 43, 0.03);
+    }
+    
+    /* Tablo başlık stillemesi */
+    table caption {
+        background-color: var(--primary-color);
+        color: white;
+        padding: 12px 16px;
+        font-weight: 600;
+        font-size: 16px;
+        text-align: left;
+        caption-side: top;
+    }
 </style>
 @endsection
 
@@ -170,43 +225,40 @@
     <div class="absolute -right-20 -bottom-20 w-64 h-64 rounded-full bg-[#e6a23c]/10 blur-3xl"></div>
     <div class="absolute -left-10 top-10 w-40 h-40 rounded-full bg-white/5 blur-2xl"></div>
     
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-10 relative z-10">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 items-center">
-            <div class="md:col-span-2">
-                <div class="inline-block bg-white/10 backdrop-blur-sm px-4 py-1 rounded-full text-white/90 text-sm mb-3 border border-white/10">
-                    <span class="material-icons text-xs align-middle mr-1">article</span>
-                    <span>Sayfalar</span>
-                </div>
-                <h1 class="text-3xl md:text-4xl font-bold text-white mb-4">{{ $page->title }}</h1>
-                <p class="text-white/80 text-lg mb-5">{{ $page->summary ?? 'Bu sayfa ile ilgili tüm detayları bu sayfada bulabilirsiniz.' }}</p>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 md:py-4 relative z-10">
+        <div class="grid grid-cols-1 md:grid-cols-1 gap-4 items-center">
+            <div>
+                <h1 class="text-2xl md:text-3xl font-bold text-white mb-2">{{ $page->title }}</h1>
+                @if($page->summary)
+                <p class="text-white/80 text-base mb-2">{{ $page->summary }}</p>
+                @endif
                 
-                <div class="flex flex-wrap gap-4">
-                    @if($page->categories->count() > 0)
-                        @foreach($page->categories as $category)
-                            <a href="{{ route('pages.category', $category->slug) }}" class="inline-flex items-center px-3 py-1 bg-white/10 text-white border border-white/20 rounded-md hover:bg-white/20 transition-colors shadow-lg shadow-black/5">
-                                @if($category->icon)
-                                    <i class="{{ $category->icon }} mr-2 text-sm"></i>
-                                @endif
-                                {{ $category->name }}
+                <nav class="flex" aria-label="Breadcrumb">
+                    <ol class="inline-flex items-center space-x-1 md:space-x-3 text-white/70">
+                        <li class="inline-flex items-center">
+                            <a href="{{ route('front.home') }}" class="inline-flex items-center text-sm hover:text-white">
+                                <span class="material-icons text-xs mr-1">home</span>
+                                Anasayfa
                             </a>
-                        @endforeach
-                    @endif
-                </div>
-            </div>
-            <div class="hidden md:flex justify-end">
-                <div class="bg-white/10 backdrop-blur-sm p-6 rounded-lg border border-white/20 shadow-lg">
-                    <div class="text-white text-center">
-                        <span class="material-icons text-4xl text-[#e6a23c] mb-2">info</span>
-                        <h3 class="text-xl font-semibold mb-2">Bilgi</h3>
-                        <p class="text-sm text-white/80">Bu sayfanın içeriği bilgilendirme amaçlıdır.</p>
-                        <div class="mt-4 pt-4 border-t border-white/10">
-                            <div class="flex items-center justify-center text-[#e6a23c]">
-                                <span class="material-icons mr-2">event</span>
-                                <span class="font-bold">{{ $page->published_at ? $page->published_at->format('d.m.Y') : $page->created_at->format('d.m.Y') }}</span>
+                        </li>
+                        @if($page->categories->count() > 0)
+                            <li>
+                                <div class="flex items-center">
+                                    <span class="material-icons text-xs mx-1">chevron_right</span>
+                                    <a href="{{ route('pages.category', $page->categories->first()->slug) }}" class="inline-flex items-center text-sm hover:text-white">
+                                        {{ $page->categories->first()->name }}
+                                    </a>
+                                </div>
+                            </li>
+                        @endif
+                        <li aria-current="page">
+                            <div class="flex items-center">
+                                <span class="material-icons text-xs mx-1">chevron_right</span>
+                                <span class="ml-1 text-sm font-medium">{{ $page->title }}</span>
                             </div>
-                        </div>
-                    </div>
-                </div>
+                        </li>
+                    </ol>
+                </nav>
             </div>
         </div>
     </div>

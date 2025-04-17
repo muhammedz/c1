@@ -439,9 +439,9 @@
                     </div>
                     <div class="card-body">
                         <div class="form-group">
-                            <label for="image" class="form-label">Ana Görsel <span class="text-danger">*</span></label>
+                            <label for="image" class="form-label">Ana Görsel</label>
                             <div class="input-group">
-                                <input type="text" class="form-control @error('image') is-invalid @enderror" id="image" name="image" value="{{ old('image') }}" required readonly>
+                                <input type="text" class="form-control @error('image') is-invalid @enderror" id="image" name="image" value="{{ old('image') }}" readonly>
                                 <div class="input-group-append">
                                     <button class="btn btn-primary" type="button" id="image-browser" data-input="image" data-preview="image-preview">
                                         <i class="fas fa-folder-open"></i> Göz At

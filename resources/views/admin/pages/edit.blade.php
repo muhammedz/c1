@@ -509,9 +509,9 @@
                     </div>
                     <div class="card-body">
                         <div class="form-group">
-                            <label for="image" class="form-label">Ana Görsel <span class="text-danger">*</span></label>
+                            <label for="image" class="form-label">Ana Görsel</label>
                             <div class="input-group">
-                                <input type="text" class="form-control @error('image') is-invalid @enderror" id="image" name="image" value="{{ old('image', $page->image) }}" required readonly>
+                                <input type="text" class="form-control @error('image') is-invalid @enderror" id="image" name="image" value="{{ old('image', $page->image) }}" readonly>
                                 <div class="input-group-append">
                                     <button class="btn btn-primary" type="button" id="image-browser" data-input="image" data-preview="image-preview">
                                         <i class="fas fa-folder-open"></i> Göz At
@@ -546,7 +546,7 @@
                                 <div id="gallery-items" class="d-flex flex-wrap gap-3">
                                     @if(!empty($page->gallery))
                                         @foreach($page->gallery as $index => $galleryItem)
-                                            <div class="gallery-item" data-id="gallery-existing-{{ $index }}" style="position: relative; width: 150px; height: 150px; overflow: hidden; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                                            <div class="gallery-item" id="gallery-existing-{{ $index }}">
                                                 <img src="{{ $galleryItem }}" alt="Galeri görseli" style="width: 100%; height: 100%; object-fit: cover;">
                                                 <button type="button" class="btn btn-sm btn-danger position-absolute" 
                                                     style="top: 5px; right: 5px; border-radius: 50%; width: 25px; height: 25px; padding: 0; display: flex; align-items: center; justify-content: center;"
@@ -558,11 +558,7 @@
                                     @endif
                                 </div>
                                 <div id="gallery-inputs">
-                                    @if(!empty($page->gallery))
-                                        @foreach($page->gallery as $index => $galleryItem)
-                                            <input type="hidden" name="gallery[]" value="{{ $galleryItem }}">
-                                        @endforeach
-                                    @endif
+                                    <!-- Buradaki inputlar JavaScript tarafından oluşturulacak, boş bırakıyoruz -->
                                 </div>
                             </div>
                             @error('gallery')
@@ -571,6 +567,65 @@
                             @error('gallery.*')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
+                            
+                            <!-- Debug Bilgisi -->
+                            <div class="mt-3 p-3 bg-light border rounded" id="debug-info">
+                                <h6><i class="fas fa-bug text-warning"></i> Debug Bilgisi</h6>
+                                <div class="mb-2">
+                                    <strong>Sayfa Galerisi (PHP):</strong>
+                                    <pre class="bg-dark text-white p-2 mt-1 rounded" style="max-height: 100px; overflow-y: auto;">{{ var_export($page->gallery, true) }}</pre>
+                                </div>
+                                <div class="mb-2">
+                                    <strong>GalleryItems (JavaScript):</strong>
+                                    <pre class="bg-dark text-white p-2 mt-1 rounded" style="max-height: 100px; overflow-y: auto;" id="js-gallery-items">Yükleniyor...</pre>
+                                </div>
+                                <div class="mb-2">
+                                    <strong>Gallery Inputs:</strong>
+                                    <pre class="bg-dark text-white p-2 mt-1 rounded" style="max-height: 100px; overflow-y: auto;" id="js-gallery-inputs">Yükleniyor...</pre>
+                                </div>
+                                <div>
+                                    <strong>Request Data:</strong>
+                                    <pre class="bg-dark text-white p-2 mt-1 rounded" style="max-height: 100px; overflow-y: auto;">
+@if(session('debug_data'))
+{{ var_export(session('debug_data'), true) }}
+@else
+Henüz veri yok
+@endif
+                                    </pre>
+                                </div>
+                                <button type="button" class="btn btn-warning btn-sm mt-2" id="debug-submit" onclick="testFormSubmit()">
+                                    <i class="fas fa-vial"></i> Test Form Data
+                                </button>
+                                <script>
+                                    function testFormSubmit() {
+                                        // Form verilerini alıp debug-data div'inde göster
+                                        const formData = new FormData(document.getElementById('page-form'));
+                                        let output = '';
+                                        
+                                        for (let pair of formData.entries()) {
+                                            output += pair[0] + ': ' + pair[1] + '\n';
+                                        }
+                                        
+                                        // Gallery değerlerini özel olarak göster
+                                        output += '\n--- Gallery Values ---\n';
+                                        const galleryValues = formData.getAll('gallery[]');
+                                        if (galleryValues.length) {
+                                            galleryValues.forEach((val, index) => {
+                                                output += `gallery[${index}]: ${val}\n`;
+                                            });
+                                        } else {
+                                            output += 'Galeri değeri bulunamadı!';
+                                        }
+                                        
+                                        // Alert ile göster
+                                        alert('Form Verileri:\n\n' + output);
+                                        
+                                        // Konsola da yazdır
+                                        console.log('Form test verileri:', Object.fromEntries(formData));
+                                        console.log('Gallery değerleri:', galleryValues);
+                                    }
+                                </script>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -943,6 +998,16 @@
             return false;
         });
         
+        document.getElementById('gallery-browser').addEventListener('click', function() {
+            if (galleryItems.length >= 10) {
+                alert('En fazla 10 görsel ekleyebilirsiniz.');
+                return false;
+            }
+            window.currentFileInput = $('#fake-gallery-input');
+            window.open('/admin/file-manager?type=image', 'FileManager', 'width=900,height=600');
+            return false;
+        });
+        
         document.getElementById('image-clear').addEventListener('click', function() {
             document.getElementById('image').value = '';
             document.getElementById('image-preview').style.display = 'none';
@@ -974,11 +1039,21 @@
             // Görsel boyutlarını ve dosya boyutunu hesapla
             const img = new Image();
             img.onload = function() {
-                document.getElementById('image-dimensions').textContent = this.width + ' x ' + this.height;
+                const dimensionsEl = document.getElementById('image-dimensions');
+                const sizeEl = document.getElementById('image-size');
+                
+                // Null kontrolü ekleyerek hata oluşmasını engelle
+                if (dimensionsEl) {
+                    dimensionsEl.textContent = this.width + ' x ' + this.height;
+                }
                 
                 // Dosya boyutunu tahmin et (yaklaşık değer)
                 const size = Math.round((this.width * this.height * 4) / 1024);
-                document.getElementById('image-size').textContent = size + ' KB';
+                
+                // Null kontrolü ekleyerek hata oluşmasını engelle
+                if (sizeEl) {
+                    sizeEl.textContent = size + ' KB';
+                }
             };
             img.src = imageValue;
         } else {
@@ -995,10 +1070,21 @@
                 var url = items[0].url;
                 window.currentFileInput.val(url).trigger('change');
                 
+                // Debug için log
+                console.log('FileManager seçilen URL:', url);
+                console.log('currentFileInput ID:', window.currentFileInput.attr('id'));
+                
                 if (window.currentFileInput.attr('id') === 'fake-gallery-input') {
                     addGalleryItem(url);
                     window.currentFileInput.val(''); // Galeri input'unu temizle
                 }
+            }
+        } else {
+            console.log('currentFileInput null, galeri için varsayılan olarak işlenecek');
+            // İlk öğe varsa ve bir resimse, varsayılan olarak galeride işle
+            if (items.length > 0) {
+                var url = items[0].url;
+                addGalleryItem(url);
             }
         }
         window.currentFileInput = null; // İşlem tamamlandığında referansı temizle
@@ -1042,15 +1128,8 @@
             updateImagePreview();
         });
         
-        // File Browser Button for Gallery
-        $('#gallery-browser').on('click', function() {
-            if (galleryItems.length >= 10) {
-                alert('En fazla 10 görsel ekleyebilirsiniz.');
-                return;
-            }
-        });
-        
         // Mevcut galeri öğelerini topla
+        galleryItems = []; // Önce dizimizi temizleyelim
         @if(!empty($page->gallery))
             @foreach($page->gallery as $index => $galleryItem)
                 galleryItems.push({
@@ -1058,6 +1137,7 @@
                     url: '{{ $galleryItem }}'
                 });
             @endforeach
+            console.log('Mevcut galeri öğeleri yüklendi:', galleryItems);
         @endif
         
         // Başlangıçta render et
@@ -1066,9 +1146,14 @@
         // Silme işlevini ekle
         $(document).on('click', '#gallery-items button', function() {
             const itemId = $(this).data('id');
+            console.log('Silme butonuna tıklandı, itemId:', itemId);
             galleryItems = galleryItems.filter(item => item.id !== itemId);
             renderGalleryItems();
         });
+
+        // Debug bilgilerini ilk yüklenişte göster
+        $('#js-gallery-items').text(JSON.stringify(galleryItems, null, 2));
+        $('#js-gallery-inputs').text($('#gallery-inputs').html());
     });
     
     // URL'yi rölatif yola dönüştür (gerekirse)
@@ -1078,11 +1163,17 @@
         if (url.startsWith(origin)) {
             url = url.replace(origin, '');
         }
+        console.log('URL dönüştürüldü:', url);
         return url;
     }
     
     // Medya yöneticisinden seçilen görsel için callback (laravel-filemanager tarafından otomatik çağrılır)
     function addGalleryItem(url) {
+        if (!url) {
+            console.error('Geçersiz URL: URL boş olamaz');
+            return;
+        }
+        
         if (galleryItems.length >= 10) {
             alert('En fazla 10 görsel ekleyebilirsiniz.');
             return;
@@ -1094,52 +1185,111 @@
             url: url
         });
         
+        console.log('Galeri öğesi eklendi - ID:', itemId);
+        console.log('Galeri öğesi eklendi - URL:', url);
+        console.log('Güncel galeri öğe sayısı:', galleryItems.length);
         renderGalleryItems();
     }
     
     function renderGalleryItems() {
-        // Galeri görselleri görünürlüğünü ayarla
-        if (galleryItems.length > 0) {
-            $('#gallery-preview').show();
-        } else {
-            $('#gallery-preview').hide();
-        }
-        
-        // Sayacı güncelle
-        $('#gallery-count').text(galleryItems.length);
-        
-        // Galeri öğelerini temizle
-        $('#gallery-items').empty();
-        $('#gallery-inputs').empty();
-        
-        // Galeri öğelerini oluştur
-        galleryItems.forEach(item => {
-            // Görsel öğesi
-            const galleryItem = $('<div class="gallery-item"></div>');
-            galleryItem.css({
-                'position': 'relative',
-                'width': '150px',
-                'height': '150px',
-                'overflow': 'hidden',
-                'border-radius': '8px',
-                'box-shadow': '0 2px 5px rgba(0,0,0,0.1)'
+        try {
+            console.log('renderGalleryItems başladı, toplam:', galleryItems.length);
+            
+            // Galeri görselleri görünürlüğünü ayarla
+            const galleryPreview = $('#gallery-preview');
+            if (!galleryPreview.length) {
+                console.error('gallery-preview elementi bulunamadı');
+                return;
+            }
+            
+            if (galleryItems.length > 0) {
+                galleryPreview.show();
+            } else {
+                galleryPreview.hide();
+            }
+            
+            // Sayacı güncelle
+            const countElement = $('#gallery-count');
+            if (countElement.length) {
+                countElement.text(galleryItems.length);
+            }
+            
+            // Galeri öğelerini temizle
+            const galleryItemsContainer = $('#gallery-items');
+            const galleryInputsContainer = $('#gallery-inputs');
+            
+            if (!galleryItemsContainer.length || !galleryInputsContainer.length) {
+                console.error('gallery-items veya gallery-inputs elementleri bulunamadı');
+                return;
+            }
+            
+            galleryItemsContainer.empty();
+            galleryInputsContainer.empty();
+            
+            // Galeri öğelerini oluştur
+            galleryItems.forEach(item => {
+                // Görsel öğesi
+                const galleryItem = $('<div class="gallery-item"></div>');
+                galleryItem.css({
+                    'position': 'relative',
+                    'width': '150px',
+                    'height': '150px',
+                    'overflow': 'hidden',
+                    'border-radius': '8px',
+                    'box-shadow': '0 2px 5px rgba(0,0,0,0.1)'
+                });
+                
+                galleryItem.html(`
+                    <img src="${item.url}" alt="Galeri görseli" style="width: 100%; height: 100%; object-fit: cover;">
+                    <button type="button" class="btn btn-sm btn-danger position-absolute" 
+                        style="top: 5px; right: 5px; border-radius: 50%; width: 25px; height: 25px; padding: 0; display: flex; align-items: center; justify-content: center;"
+                        data-id="${item.id}">
+                        <i class="fas fa-times" style="font-size: 12px;"></i>
+                    </button>
+                `);
+                
+                galleryItemsContainer.append(galleryItem);
+                
+                // Gizli input - URL'yi array olarak kaydet
+                const input = $('<input type="hidden" name="gallery[]" value="' + item.url + '">');
+                galleryInputsContainer.append(input);
             });
             
-            galleryItem.html(`
-                <img src="${item.url}" alt="Galeri görseli" style="width: 100%; height: 100%; object-fit: cover;">
-                <button type="button" class="btn btn-sm btn-danger position-absolute" 
-                    style="top: 5px; right: 5px; border-radius: 50%; width: 25px; height: 25px; padding: 0; display: flex; align-items: center; justify-content: center;"
-                    data-id="${item.id}">
-                    <i class="fas fa-times" style="font-size: 12px;"></i>
-                </button>
-            `);
+            // Debug bilgilerini güncelle
+            $('#js-gallery-items').text(JSON.stringify(galleryItems, null, 2));
+            $('#js-gallery-inputs').text($('#gallery-inputs').html());
             
-            $('#gallery-items').append(galleryItem);
+            // Form submit işlemine galeri verilerini ekle
+            const pageForm = $('#page-form');
+            if (pageForm.length) {
+                pageForm.off('submit.gallery').on('submit.gallery', function() {
+                    // Form gönderilmeden önce tüm eski galeri inputlarını temizle
+                    galleryInputsContainer.empty();
+                    
+                    // Sonra galleryItems dizisindeki değerleri form'a ekle
+                    galleryItems.forEach(item => {
+                        const input = $('<input type="hidden" name="gallery[]" value="' + item.url + '">');
+                        galleryInputsContainer.append(input);
+                    });
+                    
+                    // Debug bilgisi güncelle
+                    $('#js-gallery-inputs').text($('#gallery-inputs').html());
+                    
+                    // Debug bilgilerini konsola yazdır
+                    console.log('Form gönderilirken gallery değerleri:', galleryItems.map(item => item.url));
+                    console.log('Form gönderilirken gallery inputları:', $('#gallery-inputs').html());
+                    
+                    // Form gönderimini engelleme - doğal form gönderimini izin ver
+                    return true;
+                });
+            } else {
+                console.error('page-form elementi bulunamadı');
+            }
             
-            // Gizli input
-            const input = $('<input type="hidden" name="gallery[]" value="' + item.url + '">');
-            $('#gallery-inputs').append(input);
-        });
+            console.log('renderGalleryItems tamamlandı');
+        } catch (error) {
+            console.error('renderGalleryItems fonksiyonunda hata:', error);
+        }
     }
     
     // Kategori işlemleri

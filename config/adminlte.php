@@ -328,6 +328,12 @@ return [
             'active'  => ['admin/announcements', 'admin/announcements/*'],
         ],
         [
+            'text'    => 'Kurumsal Kadro',
+            'icon'    => 'fas fa-fw fa-users',
+            'url'     => 'admin/corporate/categories',
+            'active'  => ['admin/corporate/categories', 'admin/corporate/categories/*', 'admin/corporate/members/*'],
+        ],
+        [
             'text'    => 'Haberler',
             'icon'    => 'fas fa-fw fa-newspaper',
             'submenu' => [

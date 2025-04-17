@@ -6,66 +6,104 @@
 
 @include('helpers.functions')
 
+@php
+    $serviceSettings = \App\Models\ServiceSetting::getSettings();
+@endphp
+
 @section('content')
-<!-- Hero Bölümü - Yeniden Tasarlandı -->
-<section class="relative bg-[#00352b] pt-28 pb-16 overflow-hidden">
-    <!-- Arka Plan Desenleri -->
-    <div class="absolute inset-0 overflow-hidden opacity-10">
-        <div class="absolute -right-10 -top-10 w-64 h-64 rounded-full bg-white"></div>
-        <div class="absolute left-1/3 bottom-0 w-96 h-96 rounded-full bg-white"></div>
+<!-- Hero Bölümü - Split Layout -->
+<div class="relative bg-gradient-to-r from-[#00352b] to-[#20846c] overflow-hidden">
+    <div class="absolute inset-0 opacity-20">
+        <!-- Pattern overlay -->
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-full h-full" preserveAspectRatio="none">
+            <defs>
+                <pattern id="hero-pattern" width="40" height="40" patternUnits="userSpaceOnUse">
+                    <path d="M0 20 L40 20 M20 0 L20 40" stroke="currentColor" stroke-width="1" fill="none" />
+                </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#hero-pattern)" />
+        </svg>
     </div>
     
-    <div class="container max-w-7xl mx-auto px-4 relative z-10">
-        <div class="flex flex-col md:flex-row justify-between gap-8 items-center">
-            <!-- Sol Taraf: Başlık ve Açıklama -->
-            <div class="md:w-1/2">
-                <h1 class="text-3xl md:text-5xl font-bold mb-4 text-white leading-tight">Hizmetlerimiz</h1>
-                <p class="text-lg text-white/80 mb-6 max-w-xl">Size özel çözümlerle profesyonel hizmet sunuyoruz. İhtiyacınıza uygun hizmeti keşfedin.</p>
+    <!-- Dekoratif şekiller -->
+    <div class="absolute -right-20 -bottom-20 w-64 h-64 rounded-full bg-[#e6a23c]/10 blur-3xl"></div>
+    <div class="absolute -left-10 top-10 w-40 h-40 rounded-full bg-white/5 blur-2xl"></div>
+    
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-8 md:py-10 relative z-10">
+        <div class="flex flex-col md:flex-row items-center justify-between">
+            <!-- Sol taraf - başlık ve açıklama -->
+            <div class="w-full md:w-1/2 mb-6 md:mb-0 md:pr-8">
+                @if(!empty($serviceSettings->hero_badge_text))
+                <div class="inline-flex items-center px-3 py-1 rounded-full bg-white/10 text-white/90 text-sm border border-white/10 mb-3">
+                    <span class="material-icons text-xs mr-1">handyman</span>
+                    <span>{{ $serviceSettings->hero_badge_text }}</span>
+                </div>
+                @endif
                 
-                <!-- Modern Arama Kutusu -->
-                <form action="{{ route('services.index') }}" method="GET" class="mt-8">
-                    <div class="bg-white/10 backdrop-blur-md rounded-xl p-1 flex items-center shadow-lg hover:bg-white/20 transition duration-300 border border-white/20">
-                        <input 
-                            type="text" 
-                            name="search" 
-                            placeholder="Hangi hizmeti arıyorsunuz?" 
-                            class="w-full bg-transparent px-4 py-3 text-white placeholder-white/70 outline-none"
-                            value="{{ request()->get('search') }}"
-                        >
-                        <button type="submit" class="bg-white hover:bg-gray-100 text-[#00352b] font-medium px-6 py-3 rounded-lg transition duration-300 flex items-center">
-                            <span class="material-icons mr-1">search</span>
-                            Ara
-                        </button>
-                    </div>
-                </form>
+                @if(!empty($serviceSettings->hero_title))
+                <h1 class="text-3xl md:text-4xl font-extrabold text-white leading-tight mb-3">
+                    @if(!empty($serviceSettings->hero_title_highlight))
+                        {!! str_replace($serviceSettings->hero_title_highlight, '<span class="text-[#e6a23c]">' . $serviceSettings->hero_title_highlight . '</span>', $serviceSettings->hero_title) !!}
+                    @else
+                        {{ $serviceSettings->hero_title }}
+                    @endif
+                </h1>
+                @endif
+                
+                @if(!empty($serviceSettings->hero_description))
+                <p class="text-white/80 text-base mb-0 max-w-lg">
+                    {{ $serviceSettings->hero_description }}
+                </p>
+                @endif
             </div>
             
-            <!-- Sağ Taraf: İstatistikler veya Görsel -->
-            <div class="md:w-1/2 flex justify-end">
-                <div class="bg-white/10 backdrop-blur-md p-6 rounded-xl border border-white/20 shadow-lg">
-                    <div class="grid grid-cols-2 gap-6">
-                        <div class="text-center">
-                            <div class="text-3xl font-bold text-white mb-1">{{ $services->total() }}</div>
-                            <div class="text-white/70 text-sm">Aktif Hizmet</div>
+            <!-- Sağ taraf - arama kutusu -->
+            <div class="w-full md:w-1/2">
+                <div class="bg-white/10 backdrop-blur-md p-6 rounded-xl border border-white/20">
+                    @if(!empty($serviceSettings->search_title))
+                    <h3 class="text-white text-xl font-bold mb-4">{{ $serviceSettings->search_title }}</h3>
+                    @else
+                    <h3 class="text-white text-xl font-bold mb-4">Hangi hizmeti arıyorsunuz?</h3>
+                    @endif
+                    
+                    <form action="{{ route('services.index') }}" method="GET" class="mb-4">
+                        <div class="flex items-center">
+                            <div class="relative flex-grow">
+                                <input 
+                                    type="text" 
+                                    name="search" 
+                                    placeholder="{{ $serviceSettings->search_placeholder ?? 'Anahtar kelime yazın...' }}" 
+                                    class="w-full bg-white/20 text-white placeholder-white/60 rounded-lg py-3 pl-4 pr-12 focus:outline-none focus:ring-2 focus:ring-white/30 transition-all"
+                                    value="{{ request()->get('search') }}"
+                                >
+                                <span class="absolute right-4 top-1/2 transform -translate-y-1/2 material-icons text-white/60">search</span>
+                            </div>
+                            <button type="submit" class="ml-2 bg-[#e6a23c] hover:bg-[#d69935] text-white px-5 py-3 rounded-lg transition duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-[#e6a23c]/50">
+                                {{ $serviceSettings->search_button_text ?? 'Ara' }}
+                            </button>
                         </div>
-                        <div class="text-center">
-                            <div class="text-3xl font-bold text-white mb-1">{{ $categories->count() }}</div>
-                            <div class="text-white/70 text-sm">Hizmet Kategorisi</div>
-                        </div>
-                        <div class="text-center">
-                            <div class="text-3xl font-bold text-white mb-1">100%</div>
-                            <div class="text-white/70 text-sm">Müşteri Memnuniyeti</div>
-                        </div>
-                        <div class="text-center">
-                            <div class="text-3xl font-bold text-white mb-1">7/24</div>
-                            <div class="text-white/70 text-sm">Destek</div>
-                        </div>
+                    </form>
+                    
+                    @if(!empty($serviceSettings->popular_searches) && is_array($serviceSettings->popular_searches) && count($serviceSettings->popular_searches) > 0)
+                    <div class="flex items-center flex-wrap gap-2">
+                        @if(!empty($serviceSettings->popular_searches_title))
+                        <span class="text-white/70 text-sm">{{ $serviceSettings->popular_searches_title }}</span>
+                        @else
+                        <span class="text-white/70 text-sm">Popüler aramalar:</span>
+                        @endif
+                        
+                        @foreach($serviceSettings->popular_searches as $search)
+                        <a href="{{ route('services.index', ['search' => $search['search']]) }}" class="text-white/90 hover:text-white text-sm bg-white/10 hover:bg-white/20 px-3 py-1 rounded-full transition duration-150 ease-in-out">
+                            {{ $search['text'] }}
+                        </a>
+                        @endforeach
                     </div>
+                    @endif
                 </div>
             </div>
         </div>
     </div>
-</section>
+</div>
 
 <!-- Kategori Filtreleme - Geliştirilmiş Tasarım -->
 <section class="py-5 bg-gradient-to-r from-white to-slate-50 shadow-md border-b border-slate-200">

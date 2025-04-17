@@ -61,6 +61,13 @@ class Service extends Model
                    ->withTimestamps();
     }
     
+    // Bölümler
+    public function departments()
+    {
+        return $this->belongsToMany(Department::class, 'service_department', 'service_id', 'department_id')
+                   ->withTimestamps();
+    }
+    
     // Kapsamlar (Scopes)
     
     // Yayında olan hizmetler

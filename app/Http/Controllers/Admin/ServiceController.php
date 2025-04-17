@@ -402,4 +402,53 @@ class ServiceController extends Controller
         
         return $url;
     }
+
+    /**
+     * Hizmetler modülü için debug bilgisi göster
+     */
+    public function debug()
+    {
+        $routes = \Route::getRoutes();
+        $serviceRoutes = [];
+        
+        foreach ($routes as $route) {
+            // Admin servisleri ile ilgili tüm rotaları göster
+            if ((str_contains($route->uri, 'services') || str_contains($route->uri, 'service')) && 
+                (str_contains($route->uri, 'admin') || str_contains($route->action['prefix'] ?? '', 'admin'))) {
+                $serviceRoutes[] = [
+                    'uri' => $route->uri,
+                    'name' => $route->getName(),
+                    'methods' => $route->methods(),
+                    'controller' => $route->getActionName(),
+                    'middleware' => isset($route->action['middleware']) ? implode(', ', (array) $route->action['middleware']) : 'none'
+                ];
+            }
+        }
+        
+        // View dosyalarını kontrol et
+        $viewPath = resource_path('views/admin/services');
+        $views = [];
+        
+        if (is_dir($viewPath)) {
+            $directories = new \RecursiveDirectoryIterator($viewPath);
+            $iterator = new \RecursiveIteratorIterator($directories);
+            
+            foreach ($iterator as $file) {
+                if ($file->isFile() && $file->getExtension() === 'php') {
+                    $relativePath = str_replace(resource_path('views/'), '', $file->getPathname());
+                    $views[] = $relativePath;
+                }
+            }
+        }
+        
+        // Mevcut debug sayfası rotaları
+        $debugRoutes = [
+            'direct' => url('/admin/services/debug'),
+            'named_direct' => route('direct.services.debug'),
+            'admin_prefix' => url('/admin/services/debug'),
+            'current_url' => request()->url(),
+        ];
+        
+        return view('admin.services.debug', compact('serviceRoutes', 'views', 'debugRoutes'));
+    }
 }

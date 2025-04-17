@@ -123,7 +123,7 @@
                     <!-- Görsel -->
                     <div class="h-48 overflow-hidden">
                         @if($page->image)
-                            <img src="{{ asset($page->image) }}" alt="{{ $page->title }}" class="w-full h-full object-cover">
+                            <img src="{{ $page->image }}" alt="{{ $page->title }}" class="w-full h-full object-cover">
                         @else
                             <div class="w-full h-full flex items-center justify-center bg-slate-100">
                                 <span class="material-icons text-gray-400 text-4xl">article</span>
