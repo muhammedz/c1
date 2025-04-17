@@ -14,9 +14,9 @@ class ImageHelper
     {
         // URL içinde storage/ ifadesi var mı kontrol et
         if (strpos($path, 'storage/') !== false) {
-            // /storage/ ifadesini çıkar ve symlinks.php üzerinden yönlendir
+            // /storage/ ifadesini çıkar ve test_image.php üzerinden yönlendir
             $path = preg_replace('/^\/?storage\//', '', $path);
-            return url('/symlinks.php?path=' . $path);
+            return url('/test_image.php?path=' . $path);
         }
         
         return $path;
@@ -30,6 +30,6 @@ class ImageHelper
      */
     public static function storageUrl($path)
     {
-        return url('/symlinks.php?path=' . $path);
+        return url('/test_image.php?path=' . $path);
     }
 } 

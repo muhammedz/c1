@@ -13,15 +13,15 @@
             
             // storage/photos/ ile başlayan resim URL'lerini düzelt
             if (src && src.match(/^\/?storage\/photos\//)) {
-                // /storage/ yolundan /symlinks.php?path= yoluna çevir
-                const newSrc = '/symlinks.php?path=' + src.replace(/^\/?storage\//, '');
+                // /storage/ yolundan /test_image.php?path= yoluna çevir
+                const newSrc = '/test_image.php?path=' + src.replace(/^\/?storage\//, '');
                 img.setAttribute('src', newSrc);
             }
             
             // Data-src özelliği varsa (lazy loading için) onu da düzelt
             const dataSrc = img.getAttribute('data-src');
             if (dataSrc && dataSrc.match(/^\/?storage\/photos\//)) {
-                const newDataSrc = '/symlinks.php?path=' + dataSrc.replace(/^\/?storage\//, '');
+                const newDataSrc = '/test_image.php?path=' + dataSrc.replace(/^\/?storage\//, '');
                 img.setAttribute('data-src', newDataSrc);
             }
         });
@@ -37,7 +37,7 @@
                 const urlMatch = bgImage.match(/url\(['"]?(.*?)['"]?\)/);
                 if (urlMatch && urlMatch[1].match(/storage\/photos\//)) {
                     const oldUrl = urlMatch[1];
-                    const newUrl = '/symlinks.php?path=' + oldUrl.replace(/^\/?storage\//, '');
+                    const newUrl = '/test_image.php?path=' + oldUrl.replace(/^\/?storage\//, '');
                     el.style.backgroundImage = `url('${newUrl}')`;
                 }
             }
