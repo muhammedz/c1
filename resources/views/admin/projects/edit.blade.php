@@ -143,7 +143,7 @@
                                 <div class="mt-3">
                                     <div id="cover-preview-holder" class="img-preview text-center">
                                         @if($project->cover_image)
-                                            <img src="{{ asset('storage/' . $project->cover_image) }}" style="max-width: 100%; max-height: 300px;">
+                                            <img src="{{ asset($project->cover_image) }}" style="max-width: 100%; max-height: 300px;">
                                         @else
                                             <p class="text-muted">Görsel bulunamadı</p>
                                         @endif
@@ -169,7 +169,7 @@
                                                 <div class="col-md-6 mb-3">
                                                     <div class="card">
                                                         <div class="card-body p-2">
-                                                            <img src="{{ asset('storage/' . $image->image_path) }}" class="img-fluid" style="max-height: 150px; margin: 0 auto; display: block;">
+                                                            <img src="{{ asset($image->image_path) }}" class="img-fluid" style="max-height: 150px; margin: 0 auto; display: block;">
                                                             <div class="d-flex justify-content-between mt-2">
                                                                 <div class="custom-control custom-checkbox">
                                                                     <input type="checkbox" class="custom-control-input" id="delete_gallery_{{ $image->id }}" name="delete_gallery[]" value="{{ $image->id }}">

@@ -60,13 +60,52 @@ class DashboardController extends Controller
         
         if ($request->hasFile('avatar')) {
             // Avatar yükleme işlemi
-            $avatarName = time() . '.' . $request->avatar->extension();
-            $request->avatar->move(public_path('uploads/avatars'), $avatarName);
-            $validated['avatar'] = 'uploads/avatars/' . $avatarName;
+            $uploadPath = 'uploads/avatars';
+            $extension = $request->avatar->extension();
+            $originalFilename = time();
+            
+            // Benzersiz dosya adı oluştur
+            $avatarName = $this->createUniqueFilename($uploadPath, $originalFilename, $extension);
+            
+            // Eski dosyayı sil
+            if ($user->avatar && file_exists(public_path($user->avatar))) {
+                unlink(public_path($user->avatar));
+            }
+            
+            $request->avatar->move(public_path($uploadPath), $avatarName);
+            $validated['avatar'] = $uploadPath . '/' . $avatarName;
         }
         
         $user->update($validated);
         
         return redirect()->route('admin.profile')->with('success', 'Profil başarıyla güncellendi.');
+    }
+    
+    /**
+     * Benzersiz dosya adı oluştur
+     * Eğer aynı isimde dosya varsa sonuna sayı ekler (örn: resim_1.jpg, resim_2.jpg)
+     *
+     * @param string $path Dizin yolu
+     * @param string $filename Dosya adı (uzantısız)
+     * @param string $extension Dosya uzantısı
+     * @return string Benzersiz dosya adı (uzantı dahil)
+     */
+    private function createUniqueFilename($path, $filename, $extension)
+    {
+        $fullFilename = $filename . '.' . $extension;
+        $fullPath = public_path($path . '/' . $fullFilename);
+        
+        if (!file_exists($fullPath)) {
+            return $fullFilename;
+        }
+        
+        $counter = 1;
+        while (file_exists($fullPath)) {
+            $fullFilename = $filename . '_' . $counter . '.' . $extension;
+            $fullPath = public_path($path . '/' . $fullFilename);
+            $counter++;
+        }
+        
+        return $fullFilename;
     }
 }

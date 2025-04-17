@@ -62,9 +62,6 @@
     <!-- Swiper JS -->
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     
-    <!-- Resim URL düzeltme helper'ı -->
-    <script src="{{ asset('js/image-helper.js') }}"></script>
-    
     @yield('after_scripts')
 </body>
 </html> 

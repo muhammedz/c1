@@ -9,6 +9,7 @@ use App\Models\Page;
 use App\Models\PageCategory;
 use App\Services\PageService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class PageController extends Controller
 {
@@ -291,10 +292,48 @@ class PageController extends Controller
         ]);
         
         try {
-            $path = $request->file('file')->store('pages/gallery', 'public');
-            return response()->json(['location' => '/storage/' . $path]);
+            $file = $request->file('file');
+            $originalFilename = time() . '_' . Str::random(10);
+            $extension = $file->getClientOriginalExtension();
+            $uploadPath = 'uploads/pages/gallery';
+            
+            // Benzersiz dosya adı oluştur
+            $filename = $this->createUniqueFilename($uploadPath, $originalFilename, $extension);
+            
+            $file->move(public_path($uploadPath), $filename);
+            $path = $uploadPath . '/' . $filename;
+            
+            return response()->json(['location' => asset($path)]);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Resim yüklenirken bir hata oluştu: ' . $e->getMessage()], 500);
         }
+    }
+    
+    /**
+     * Benzersiz dosya adı oluştur
+     * Eğer aynı isimde dosya varsa sonuna sayı ekler (örn: resim_1.jpg, resim_2.jpg)
+     *
+     * @param string $path Dizin yolu
+     * @param string $filename Dosya adı (uzantısız)
+     * @param string $extension Dosya uzantısı
+     * @return string Benzersiz dosya adı (uzantı dahil)
+     */
+    private function createUniqueFilename($path, $filename, $extension)
+    {
+        $fullFilename = $filename . '.' . $extension;
+        $fullPath = public_path($path . '/' . $fullFilename);
+        
+        if (!file_exists($fullPath)) {
+            return $fullFilename;
+        }
+        
+        $counter = 1;
+        while (file_exists($fullPath)) {
+            $fullFilename = $filename . '_' . $counter . '.' . $extension;
+            $fullPath = public_path($path . '/' . $fullFilename);
+            $counter++;
+        }
+        
+        return $fullFilename;
     }
 } 

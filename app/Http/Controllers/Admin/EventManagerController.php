@@ -65,7 +65,12 @@ class EventManagerController extends Controller
         // Kapak resmi işleme
         if ($request->hasFile('cover_image')) {
             $coverImage = $request->file('cover_image');
-            $imageName = 'events/' . time() . '_' . Str::random(10) . '.' . $coverImage->getClientOriginalExtension();
+            $originalFilename = time() . '_' . Str::random(10);
+            $extension = $coverImage->getClientOriginalExtension();
+            $uploadPath = 'uploads/events';
+            
+            // Benzersiz dosya adı oluştur
+            $filename = $this->createUniqueFilename($uploadPath, $originalFilename, $extension);
             
             // Resimi boyutlandır ve kaydet
             $img = Image::make($coverImage);
@@ -73,8 +78,9 @@ class EventManagerController extends Controller
                 $constraint->upsize();
             });
             
-            Storage::disk('public')->put($imageName, (string) $img->encode());
-            $validated['cover_image'] = $imageName;
+            // Public klasörüne kaydet
+            $img->save(public_path($uploadPath . '/' . $filename));
+            $validated['cover_image'] = $uploadPath . '/' . $filename;
         }
         
         // Etkinlik oluştur
@@ -83,20 +89,26 @@ class EventManagerController extends Controller
         // Galeri resimleri işle
         if ($request->has('gallery_images')) {
             foreach ($request->gallery_images as $index => $image) {
-                $imageName = 'events/gallery/' . time() . '_' . $index . '_' . Str::random(5) . '.' . $image->getClientOriginalExtension();
+                $originalFilename = time() . '_' . $index . '_' . Str::random(5);
+                $extension = $image->getClientOriginalExtension();
+                $uploadPath = 'uploads/events/gallery';
                 
-                // Resim boyutlandır
+                // Benzersiz dosya adı oluştur
+                $filename = $this->createUniqueFilename($uploadPath, $originalFilename, $extension);
+                
+                // Resim boyutlandır ve kaydet
                 $img = Image::make($image);
                 $img->fit(1200, 800, function ($constraint) {
                     $constraint->upsize();
                 });
                 
-                Storage::disk('public')->put($imageName, (string) $img->encode());
+                // Public klasörüne kaydet
+                $img->save(public_path($uploadPath . '/' . $filename));
                 
                 // Galeri resmi oluştur
                 EventImage::create([
                     'event_id' => $event->id,
-                    'image_path' => $imageName,
+                    'image_path' => $uploadPath . '/' . $filename,
                     'order' => $index
                 ]);
             }
@@ -147,11 +159,18 @@ class EventManagerController extends Controller
         if ($request->hasFile('cover_image')) {
             // Eski resmi sil
             if ($event->cover_image) {
-                Storage::disk('public')->delete($event->cover_image);
+                if (file_exists(public_path($event->cover_image))) {
+                    unlink(public_path($event->cover_image));
+                }
             }
             
             $coverImage = $request->file('cover_image');
-            $imageName = 'events/' . time() . '_' . Str::random(10) . '.' . $coverImage->getClientOriginalExtension();
+            $originalFilename = time() . '_' . Str::random(10);
+            $extension = $coverImage->getClientOriginalExtension();
+            $uploadPath = 'uploads/events';
+            
+            // Benzersiz dosya adı oluştur
+            $filename = $this->createUniqueFilename($uploadPath, $originalFilename, $extension);
             
             // Resimi boyutlandır ve kaydet
             $img = Image::make($coverImage);
@@ -159,8 +178,9 @@ class EventManagerController extends Controller
                 $constraint->upsize();
             });
             
-            Storage::disk('public')->put($imageName, (string) $img->encode());
-            $validated['cover_image'] = $imageName;
+            // Public klasörüne kaydet
+            $img->save(public_path($uploadPath . '/' . $filename));
+            $validated['cover_image'] = $uploadPath . '/' . $filename;
         }
         
         // Etkinliği güncelle
@@ -169,20 +189,26 @@ class EventManagerController extends Controller
         // Galeri resimleri işle
         if ($request->has('gallery_images')) {
             foreach ($request->gallery_images as $index => $image) {
-                $imageName = 'events/gallery/' . time() . '_' . $index . '_' . Str::random(5) . '.' . $image->getClientOriginalExtension();
+                $originalFilename = time() . '_' . $index . '_' . Str::random(5);
+                $extension = $image->getClientOriginalExtension();
+                $uploadPath = 'uploads/events/gallery';
                 
-                // Resim boyutlandır
+                // Benzersiz dosya adı oluştur
+                $filename = $this->createUniqueFilename($uploadPath, $originalFilename, $extension);
+                
+                // Resim boyutlandır ve kaydet
                 $img = Image::make($image);
                 $img->fit(1200, 800, function ($constraint) {
                     $constraint->upsize();
                 });
                 
-                Storage::disk('public')->put($imageName, (string) $img->encode());
+                // Public klasörüne kaydet
+                $img->save(public_path($uploadPath . '/' . $filename));
                 
                 // Galeri resmi oluştur
                 EventImage::create([
                     'event_id' => $event->id,
-                    'image_path' => $imageName,
+                    'image_path' => $uploadPath . '/' . $filename,
                     'order' => $event->images()->count() + $index
                 ]);
             }
@@ -622,12 +648,16 @@ class EventManagerController extends Controller
             foreach ($events as $event) {
                 // Etkinlik görsellerini sil
                 if ($event->cover_image) {
-                    Storage::disk('public')->delete($event->cover_image);
+                    if (file_exists(public_path($event->cover_image))) {
+                        unlink(public_path($event->cover_image));
+                    }
                 }
                 
                 // Galeri görsellerini sil
                 foreach ($event->images as $image) {
-                    Storage::disk('public')->delete($image->image_path);
+                    if (file_exists(public_path($image->image_path))) {
+                        unlink(public_path($image->image_path));
+                    }
                     $image->delete();
                 }
                 
@@ -643,5 +673,33 @@ class EventManagerController extends Controller
             return redirect()->route('admin.events.index')
                 ->with('error', 'Etkinlikler silinirken bir hata oluştu: ' . $e->getMessage());
         }
+    }
+    
+    /**
+     * Benzersiz dosya adı oluştur
+     * Eğer aynı isimde dosya varsa sonuna sayı ekler (örn: resim_1.jpg, resim_2.jpg)
+     *
+     * @param string $path Dizin yolu
+     * @param string $filename Dosya adı (uzantısız)
+     * @param string $extension Dosya uzantısı
+     * @return string Benzersiz dosya adı (uzantı dahil)
+     */
+    private function createUniqueFilename($path, $filename, $extension)
+    {
+        $fullFilename = $filename . '.' . $extension;
+        $fullPath = public_path($path . '/' . $fullFilename);
+        
+        if (!file_exists($fullPath)) {
+            return $fullFilename;
+        }
+        
+        $counter = 1;
+        while (file_exists($fullPath)) {
+            $fullFilename = $filename . '_' . $counter . '.' . $extension;
+            $fullPath = public_path($path . '/' . $fullFilename);
+            $counter++;
+        }
+        
+        return $fullFilename;
     }
 }

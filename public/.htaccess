@@ -14,19 +14,9 @@
     RewriteCond %{REQUEST_URI} (.+)/$
     RewriteRule ^ %1 [L,R=301]
 
-    # Storage klasörüne doğrudan erişime izin ver
-    RewriteCond %{REQUEST_URI} ^/storage/(.*)$
-    RewriteRule ^storage/(.*)$ storage/$1 [L,NC]
-
     # Send Requests To Front Controller...
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_URI} !^/storage/.*$
     RewriteRule ^ index.php [L]
-</IfModule>
-
-# Storage dosyalarına CORS ve erişim izni
-<IfModule mod_headers.c>
-    <FilesMatch "\.(jpg|jpeg|png|gif|svg)$">
-        Header set Access-Control-Allow-Origin "*"
-    </FilesMatch>
 </IfModule>
