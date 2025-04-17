@@ -406,10 +406,15 @@ Route::get('/events/{filename}', function($filename) {
 Route::post('/announcements/mark-viewed', [AnnouncementFrontController::class, 'markViewed'])->name('announcements.mark-viewed');
 
 // Storage görselleri için doğrudan erişim route'u
-Route::get('/storage/{path}', function($path){
+Route::get('/img/{path}', function($path){
     $storagePath = storage_path('app/public/' . $path);
     if (file_exists($storagePath)) {
-        return response()->file($storagePath);
+        $mimeType = mime_content_type($storagePath);
+        return response()->file($storagePath, [
+            'Content-Type' => $mimeType,
+            'Access-Control-Allow-Origin' => '*',
+            'Cache-Control' => 'public, max-age=31536000',
+        ]);
     }
     return response()->json(['error' => 'Dosya bulunamadı'], 404);
 })->where('path', '.*');
