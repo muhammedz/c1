@@ -1096,8 +1096,8 @@ Henüz veri yok
     // Sayfa yüklendiğinde mevcut galeri öğelerini yükle
     $(document).ready(function() {
         // Laravel File Manager butonları
-        $('#image-browser').filemanager('image');
-        $('#gallery-browser').filemanager('image');
+        $('#image-browser').filemanager('image', {prefix: '/admin/filemanager'});
+        $('#gallery-browser').filemanager('image', {prefix: '/admin/filemanager'});
         
         // Hata ayıklama için
         console.log('FileManager script yüklendi');

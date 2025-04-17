@@ -349,7 +349,7 @@
             });
             
             // Laravel FileManager
-            $('#lfm').filemanager('image');
+            $('#lfm').filemanager('image', {prefix: '/admin/filemanager'});
             
             // Galeri öğeleri sayacı
             let galleryItemCount = 0;
@@ -383,7 +383,7 @@
                 `;
                 
                 $('#gallery-items').append(galleryItem);
-                $(`#gallery-item-${index} .gallery-btn`).filemanager('image');
+                $(`#gallery-item-${index} .gallery-btn`).filemanager('image', {prefix: '/admin/filemanager'});
             });
             
             // Galeri öğesi kaldır

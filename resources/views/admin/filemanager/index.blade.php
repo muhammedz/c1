@@ -11,7 +11,7 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-body">
-                    <iframe src="{{ url('admin/file-manager') }}" style="width: 100%; height: 700px; overflow: hidden; border: none;"></iframe>
+                    <iframe src="{{ url('admin/filemanager?type=image') }}" style="width: 100%; height: 700px; overflow: hidden; border: none;"></iframe>
                 </div>
             </div>
         </div>

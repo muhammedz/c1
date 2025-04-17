@@ -396,8 +396,8 @@
                 }
             });
             
-            // Laravel File Manager
-            $('#lfm').filemanager('image');
+            // File Manager
+            $('#lfm').filemanager('image', {prefix: '/admin/filemanager'});
             
             // Silinecek resimleri izleme
             const deleteGalleryContainer = $('#delete-gallery-container');
@@ -438,7 +438,7 @@
                 `;
                 
                 $('#gallery-items').append(galleryItem);
-                $(`#lfm-gallery-${galleryCounter}`).filemanager('image');
+                $(`#lfm-gallery-${galleryCounter}`).filemanager('image', {prefix: '/admin/filemanager'});
                 
                 galleryCounter++;
             }

@@ -807,8 +807,8 @@
         });
         
         // Laravel File Manager butonları
-        $('#image-browser').filemanager('image');
-        $('#gallery-browser').filemanager('image');
+        $('#image-browser').filemanager('image', {prefix: '/admin/filemanager'});
+        $('#gallery-browser').filemanager('image', {prefix: '/admin/filemanager'});
         
         // Galeri filemanager değişikliğini dinleme
         $('#fake-gallery-input').on('change', function() {

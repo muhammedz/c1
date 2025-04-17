@@ -371,45 +371,38 @@
             });
             
             // Laravel File Manager
-            $('#lfm').filemanager('image');
+            $('#lfm').filemanager('image', {prefix: '/admin/filemanager'});
             
             // Galeri öğesi ekleme
             let galleryCounter = 0;
             
             function addGalleryItem() {
                 const galleryItem = `
-                    <div class="col-md-4 gallery-item" id="gallery-item-${galleryCounter}">
-                        <div class="card">
-                            <button type="button" class="btn btn-danger btn-sm rounded-circle remove-gallery-item"
-                                    data-id="${galleryCounter}">
-                                <i class="fas fa-times"></i>
-                            </button>
-                            <div class="card-body">
-                                <div class="form-group">
-                                    <div class="input-group">
-                                        <span class="input-group-prepend">
-                                            <a id="lfm-gallery-${galleryCounter}" 
-                                               data-input="gallery-image-${galleryCounter}" 
-                                               data-preview="gallery-preview-${galleryCounter}" 
-                                               class="btn btn-primary btn-sm">
-                                                <i class="fas fa-image"></i> Seç
-                                            </a>
-                                        </span>
-                                        <input type="text" class="form-control" 
-                                               id="gallery-image-${galleryCounter}" 
-                                               name="gallery_images[]">
-                                    </div>
-                                </div>
-                                <div id="gallery-preview-${galleryCounter}" class="img-preview">
-                                    <p class="text-muted">Önizleme için görsel seçin</p>
-                                </div>
+                    <div class="row mb-3 gallery-item" id="gallery-item-${galleryCounter}">
+                        <div class="col-md-10">
+                            <div class="input-group">
+                                <span class="input-group-prepend">
+                                    <a id="lfm-gallery-${galleryCounter}" 
+                                       data-input="gallery-${galleryCounter}" 
+                                       data-preview="holder-gallery-${galleryCounter}" 
+                                       class="btn btn-primary">
+                                        <i class="fa fa-picture-o"></i> Görsel Seç
+                                    </a>
+                                </span>
+                                <input id="gallery-${galleryCounter}" class="form-control" type="text" name="gallery[]">
                             </div>
+                            <div id="holder-gallery-${galleryCounter}" style="margin-top:15px;max-height:100px;"></div>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="button" class="btn btn-danger remove-gallery-item">
+                                <i class="fa fa-trash"></i>
+                            </button>
                         </div>
                     </div>
                 `;
                 
                 $('#gallery-items').append(galleryItem);
-                $(`#lfm-gallery-${galleryCounter}`).filemanager('image');
+                $(`#lfm-gallery-${galleryCounter}`).filemanager('image', {prefix: '/admin/filemanager'});
                 
                 galleryCounter++;
             }

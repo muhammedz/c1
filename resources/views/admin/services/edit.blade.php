@@ -754,7 +754,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/locales/bootstrap-datepicker.tr.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-<script src="/vendor/laravel-filemanager/js/stand-alone-button.js"></script>
+<script src="{{ asset('vendor/laravel-filemanager/js/stand-alone-button.js') }}"></script>
 
 <script>
     // TinyMCE'yi dinamik olarak yükle
@@ -787,7 +787,26 @@
             content_css: [
                 '{{ asset("vendor/adminlte/dist/css/adminlte.min.css") }}',
                 'https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700'
-            ]
+            ],
+            file_picker_callback: function (callback, value, meta) {
+                let x = window.innerWidth || document.documentElement.clientWidth || document.getElementsByTagName('body')[0].clientWidth;
+                let y = window.innerHeight || document.documentElement.clientHeight || document.getElementsByTagName('body')[0].clientHeight;
+
+                let type = meta.filetype;
+                let url = '/admin/filemanager?editor=tinymce5&type=' + type;
+
+                tinymce.activeEditor.windowManager.openUrl({
+                    url: url,
+                    title: 'Laravel File Manager',
+                    width: x * 0.8,
+                    height: y * 0.8,
+                    resizable: 'yes',
+                    close_previous: 'no',
+                    onMessage: (api, message) => {
+                        callback(message.content);
+                    }
+                });
+            }
         });
     };
     
@@ -811,8 +830,8 @@
         });
         
         // Laravel File Manager butonları
-        $('#image-browser').filemanager('image');
-        $('#gallery-browser').filemanager('image');
+        $('#image-browser').filemanager('image', {prefix: '/admin/filemanager'});
+        $('#gallery-browser').filemanager('image', {prefix: '/admin/filemanager'});
         
         // Galeri filemanager değişikliğini dinleme
         $('#fake-gallery-input').on('change', function() {

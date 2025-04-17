@@ -391,7 +391,7 @@
     <script>
         $(document).ready(function() {
             // FileManager butonunu başlat
-            $('#lfm_image').filemanager('image');
+            $('#lfm_image').filemanager('image', {prefix: '/admin/filemanager'});
             
             // Seçilen görsel değiştiğinde
             $('#selected_image').on('change', function() {
