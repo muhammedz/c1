@@ -7,11 +7,19 @@ use Illuminate\Http\Request;
 use App\Models\Slider;
 use App\Models\QuickMenuCategory;
 use App\Models\QuickMenuItem;
+use App\Services\MediaService;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 class HomepageController extends Controller
 {
+    protected $mediaService;
+
+    public function __construct(MediaService $mediaService)
+    {
+        $this->mediaService = $mediaService;
+    }
+
     /**
      * Anasayfa yönetimi dashboard
      */
@@ -52,7 +60,7 @@ class HomepageController extends Controller
     {
         $request->validate([
             'title' => 'nullable|string|max:255',
-            'image' => 'required|string', // Filemanager'dan gelen URL
+            'image' => 'required|string',
             'subtitle' => 'nullable|string|max:255',
             'button_text' => 'nullable|string|max:50',
             'button_url' => 'nullable|string|max:255',
@@ -63,9 +71,32 @@ class HomepageController extends Controller
         $data = $request->all();
         $data['is_active'] = $request->has('is_active');
         
-        // URL'deki yinelenen /storage/ yolunu düzelt
-        if (isset($data['image'])) {
-            $data['image'] = $this->fixStoragePath($data['image']);
+        // Eğer /storage/ ile başlıyorsa, değiştir
+        if (str_starts_with($data['image'], '/storage/')) {
+            $data['image'] = str_replace('/storage/', '/uploads/', $data['image']);
+        }
+        
+        // Eğer gelen URL bir base64 ise
+        if (strpos($data['image'], 'data:image') === 0) {
+            // Base64'ten dosyaya çevir ve yükle
+            $media = $this->mediaService->uploadBase64($data['image'], 'slider');
+            $data['image'] = $media->file_path;
+        } 
+        // Eğer storage'dan gelen bir dosya ise
+        else if (strpos($data['image'], '/storage/') !== false) {
+            // Dosyayı storage'dan public/uploads'a taşı
+            $sourcePath = storage_path('app/public/' . str_replace('/storage/', '', $data['image']));
+            if (file_exists($sourcePath)) {
+                $file = new \Illuminate\Http\UploadedFile(
+                    $sourcePath,
+                    basename($sourcePath),
+                    mime_content_type($sourcePath),
+                    null,
+                    true
+                );
+                $media = $this->mediaService->upload($file, 'slider');
+                $data['image'] = $media->file_path;
+            }
         }
         
         Slider::create($data);
@@ -92,7 +123,7 @@ class HomepageController extends Controller
         
         $request->validate([
             'title' => 'nullable|string|max:255',
-            'image' => 'required|string', // Filemanager'dan gelen URL
+            'image' => 'required|string',
             'subtitle' => 'nullable|string|max:255',
             'button_text' => 'nullable|string|max:50',
             'button_url' => 'nullable|string|max:255',
@@ -103,9 +134,51 @@ class HomepageController extends Controller
         $data = $request->all();
         $data['is_active'] = $request->has('is_active');
         
-        // URL'deki yinelenen /storage/ yolunu düzelt
-        if (isset($data['image'])) {
-            $data['image'] = $this->fixStoragePath($data['image']);
+        // Eğer /storage/ ile başlıyorsa, değiştir
+        if (str_starts_with($data['image'], '/storage/')) {
+            $data['image'] = str_replace('/storage/', '/uploads/', $data['image']);
+        }
+        
+        // Eğer yeni bir resim yüklendiyse
+        if ($data['image'] !== $slider->image) {
+            // Eğer gelen URL bir base64 ise
+            if (strpos($data['image'], 'data:image') === 0) {
+                // Eski dosyayı sil
+                if ($slider->image) {
+                    $oldPath = public_path($slider->image);
+                    if (file_exists($oldPath)) {
+                        unlink($oldPath);
+                    }
+                }
+                
+                // Base64'ten dosyaya çevir ve yükle
+                $media = $this->mediaService->uploadBase64($data['image'], 'slider');
+                $data['image'] = $media->file_path;
+            }
+            // Eğer storage'dan gelen bir dosya ise
+            else if (strpos($data['image'], '/storage/') !== false) {
+                // Eski dosyayı sil
+                if ($slider->image) {
+                    $oldPath = public_path($slider->image);
+                    if (file_exists($oldPath)) {
+                        unlink($oldPath);
+                    }
+                }
+                
+                // Dosyayı storage'dan public/uploads'a taşı
+                $sourcePath = storage_path('app/public/' . str_replace('/storage/', '', $data['image']));
+                if (file_exists($sourcePath)) {
+                    $file = new \Illuminate\Http\UploadedFile(
+                        $sourcePath,
+                        basename($sourcePath),
+                        mime_content_type($sourcePath),
+                        null,
+                        true
+                    );
+                    $media = $this->mediaService->upload($file, 'slider');
+                    $data['image'] = $media->file_path;
+                }
+            }
         }
         
         $slider->update($data);
@@ -121,7 +194,13 @@ class HomepageController extends Controller
     {
         $slider = Slider::findOrFail($id);
         
-        // Resim dosyasını silme işlemi buraya eklenebilir
+        // Dosyayı sil
+        if ($slider->image) {
+            $path = public_path($slider->image);
+            if (file_exists($path)) {
+                unlink($path);
+            }
+        }
         
         $slider->delete();
         
@@ -149,26 +228,13 @@ class HomepageController extends Controller
      */
     public function updateSliderOrder(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'orders' => 'required|array',
-            'orders.*' => 'required|integer|min:0'
-        ]);
+        $items = $request->get('items');
         
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Geçersiz veri formatı.'
-            ], 400);
+        foreach ($items as $item) {
+            Slider::where('id', $item['id'])->update(['order' => $item['order']]);
         }
         
-        foreach ($request->orders as $id => $order) {
-            Slider::where('id', $id)->update(['order' => $order]);
-        }
-        
-        return response()->json([
-            'success' => true,
-            'message' => 'Sıralama başarıyla güncellendi.'
-        ]);
+        return response()->json(['success' => true]);
     }
     
     /**
@@ -476,41 +542,38 @@ class HomepageController extends Controller
      */
     private function fixStoragePath($url)
     {
-        // Boş URL kontrolü
         if (empty($url)) {
             return $url;
         }
         
-        // Yinelenen /storage/ yolunu düzelt
-        if (strpos($url, '/storage//storage/') !== false) {
-            return str_replace('/storage//storage/', '/storage/', $url);
-        }
-        
-        if (strpos($url, '/storage/storage/') !== false) {
-            return str_replace('/storage/storage/', '/storage/', $url);
-        }
-        
-        // Eğer URL http:// veya https:// ile başlıyorsa
-        if (filter_var($url, FILTER_VALIDATE_URL)) {
-            try {
-                $parsed = parse_url($url);
-                $path = $parsed['path'] ?? '';
-                
-                // Path içinde yinelenen /storage/ yolunu düzelt
-                if (strpos($path, '/storage//storage/') !== false) {
-                    $path = str_replace('/storage//storage/', '/storage/', $path);
-                }
-                
-                if (strpos($path, '/storage/storage/') !== false) {
-                    $path = str_replace('/storage/storage/', '/storage/', $path);
-                }
-                
-                return $path;
-            } catch (\Exception $e) {
-                return $url;
+        // URL zaten rölatif ise ve doğru formatta ise değiştirme
+        if (strpos($url, '/') === 0 && strpos($url, '//') !== 0) {
+            // Yinelenen /storage/ yolunu düzelt
+            if (strpos($url, '/storage//storage/') !== false) {
+                return str_replace('/storage//storage/', '/storage/', $url);
             }
+            if (strpos($url, '/storage/storage/') !== false) {
+                return str_replace('/storage/storage/', '/storage/', $url);
+            }
+            return $url;
         }
         
-        return $url;
+        // URL tam ise (http veya https ile başlıyorsa), rölatif yap
+        try {
+            $urlObj = parse_url($url);
+            $path = $urlObj['path'] ?? '';
+            
+            // Yinelenen /storage/ yolunu düzelt
+            if (strpos($path, '/storage//storage/') !== false) {
+                $path = str_replace('/storage//storage/', '/storage/', $path);
+            }
+            if (strpos($path, '/storage/storage/') !== false) {
+                $path = str_replace('/storage/storage/', '/storage/', $path);
+            }
+            
+            return $path;
+        } catch (\Exception $e) {
+            return $url;
+        }
     }
 }

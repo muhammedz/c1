@@ -87,8 +87,7 @@ Route::middleware(['auth', 'role:admin'])->name('admin.')->prefix('admin')->grou
     
     // File Manager Routes
     Route::get('/file-manager-page', [App\Http\Controllers\Admin\FileManagerController::class, 'index'])->name('file-manager');
-    Route::group(['prefix' => 'file-manager'], function () {
-        Route::post('/upload', [App\Http\Controllers\FileManagerController::class, 'upload']);
+    Route::group(['prefix' => 'file-manager', 'middleware' => ['web', 'filemanager']], function () {
         \UniSharp\LaravelFilemanager\Lfm::routes();
     });
     

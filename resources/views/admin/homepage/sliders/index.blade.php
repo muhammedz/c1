@@ -56,7 +56,7 @@
                                         <span class="order-number">{{ $slider->order }}</span>
                                     </td>
                                     <td>
-                                        <img src="{{ asset($slider->image) }}" alt="{{ $slider->title }}" class="img-thumbnail" style="max-height: 80px;">
+                                        <img src="{{ $slider->image_url }}" alt="{{ $slider->title }}" class="img-thumbnail" style="max-height: 80px;">
                                     </td>
                                     <td>{{ $slider->title }}</td>
                                     <td>{{ $slider->subtitle ?? '-' }}</td>

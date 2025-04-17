@@ -90,7 +90,7 @@
                             
                             <div id="slider_image_preview" class="mt-3">
                                 @if(old('image', $slider->image))
-                                    <img src="{{ old('image', $slider->image) }}" alt="Preview" class="img-fluid" style="max-height: 300px">
+                                    <img src="{{ old('image', $slider->image_url) }}" alt="Preview" class="img-fluid" style="max-height: 300px">
                                 @endif
                             </div>
                         </div>
@@ -132,14 +132,45 @@
     <script src="/vendor/laravel-filemanager/js/stand-alone-button.js"></script>
     <script>
         $(document).ready(function() {
-            // Laravel File Manager butonu
-            $('#slider_image_button').filemanager('image');
+            // Temel URL'yi al
+            var baseUrl = window.location.protocol + '//' + window.location.host;
             
-            // Form doğrulama
+            // Görsel seçildikten sonra çalışacak callback
+            var onFileSelected = function(url, path) {
+                console.log('Original URL: ', url);
+                
+                // Görece yolları tam URL'ye çevir
+                if (url && url.indexOf('http') !== 0) {
+                    // URL'yi doğrudan değiştir (storage yerine uploads)
+                    if (url.indexOf('/storage/') !== -1) {
+                        url = url.replace('/storage/', '/uploads/');
+                    }
+                    
+                    // Eğer URL'de /images/ kısmı varsa /photos/ olarak değiştir
+                    if (url.indexOf('/images/') !== -1) {
+                        url = url.replace('/images/', '/photos/');
+                    }
+                }
+                
+                console.log('Converted URL: ', url);
+                
+                // Input değerini güncelle
+                $('#image').val(url);
+                
+                // Önizleme göster
+                var preview = $('#slider_image_preview');
+                preview.html('<img src="' + url + '" alt="Önizleme" class="img-fluid" style="max-height: 300px">');
+            };
+            
+            // File Manager butonunu özelleştir
+            $('#slider_image_button').filemanager('image', {onFileSelected: onFileSelected});
+            
+            // Form gönderiminden önce URL formatını kontrol et
             $('#slider-form').on('submit', function(e) {
                 if (!$('#image').val()) {
                     e.preventDefault();
                     alert('Lütfen bir slider görseli seçiniz.');
+                    return;
                 }
             });
         });

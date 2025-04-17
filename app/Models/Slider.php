@@ -42,4 +42,44 @@ class Slider extends Model
     {
         return self::where('is_active', true)->orderBy('order');
     }
+
+    /**
+     * Get the image URL
+     */
+    public function getImageUrlAttribute()
+    {
+        if (empty($this->image)) {
+            return null;
+        }
+
+        // Eğer tam URL ise
+        if (filter_var($this->image, FILTER_VALIDATE_URL)) {
+            return $this->image;
+        }
+
+        // Eğer /storage/ ile başlıyorsa, uploads'a çevir
+        if (strpos($this->image, '/storage/') === 0) {
+            $path = str_replace('/storage/', '/uploads/', $this->image);
+            return asset($path);
+        }
+        
+        // Eğer /images/ içeriyorsa, /photos/ ile değiştir
+        if (strpos($this->image, '/images/') !== false) {
+            $path = str_replace('/images/', '/photos/', $this->image);
+            return asset($path);
+        }
+
+        // Eğer /uploads/ ile başlıyorsa
+        if (strpos($this->image, '/uploads/') === 0) {
+            return asset($this->image);
+        }
+
+        // Eğer bir dosya yolu ise uploads/ ile birleştir
+        if (!str_starts_with($this->image, '/')) {
+            return asset('uploads/' . $this->image);
+        }
+
+        // Varsayılan olarak olduğu gibi döndür
+        return asset($this->image);
+    }
 }

@@ -102,22 +102,22 @@ return [
 
     'disk'                     => 'public',
 
-    'rename_file'              => false,
+    'rename_file'              => true,
 
     'rename_duplicates'        => true,
 
-    'alphanumeric_filename'    => false,
+    'alphanumeric_filename'    => true,
 
-    'alphanumeric_directory'   => false,
+    'alphanumeric_directory'   => true,
 
-    'should_validate_size'     => false,
+    'should_validate_size'     => true,
 
-    'should_validate_mime'     => false,
+    'should_validate_mime'     => true,
 
     // behavior on files with identical name
     // setting it to true cause old file replace with new one
     // setting it to false show `error-file-exist` error and stop upload
-    'over_write_on_duplicate'  => true,
+    'over_write_on_duplicate'  => false,
 
     // mimetypes of executables to prevent from uploading
     'disallowed_mimetypes' => ['text/x-php', 'text/html', 'text/plain'],
@@ -185,4 +185,11 @@ return [
     'php_ini_overrides'        => [
         'memory_limit' => '256M',
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Upload Directory
+    |--------------------------------------------------------------------------
+     */
+    'base_directory'           => 'uploads/photos',
 ];

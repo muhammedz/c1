@@ -154,6 +154,16 @@ class FileManagerController extends UploadController
      */
     protected function getFileUrl($path)
     {
+        // storage yollarını uploads olarak değiştir
+        if (strpos($path, '/storage/') === 0) {
+            $path = str_replace('/storage/', '/uploads/', $path);
+        }
+        
+        // images yollarını photos olarak değiştir
+        if (strpos($path, '/images/') !== false) {
+            $path = str_replace('/images/', '/photos/', $path);
+        }
+        
         return asset($path);
     }
     
