@@ -11,7 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use Intervention\Image\Facades\Image;
+use Intervention\Image\Laravel\Facades\Image;
 use App\Services\EventScraperService;
 
 class EventManagerController extends Controller
@@ -72,14 +72,16 @@ class EventManagerController extends Controller
             // Benzersiz dosya adı oluştur
             $filename = $this->createUniqueFilename($uploadPath, $originalFilename, $extension);
             
-            // Resimi boyutlandır ve kaydet
-            $img = Image::make($coverImage);
-            $img->fit(800, 600, function ($constraint) {
+            // Resimi boyutlandır ve kaydet - v3 uyumlu
+            $img = Image::read($coverImage);
+            $img->resize(1200, null, function ($constraint) {
+                $constraint->aspectRatio();
                 $constraint->upsize();
             });
             
-            // Public klasörüne kaydet
-            $img->save(public_path($uploadPath . '/' . $filename));
+            // encode ve kaydet
+            $encodedImage = $this->encodeByFormat($img, $extension);
+            file_put_contents(public_path($uploadPath . '/' . $filename), $encodedImage);
             $validated['cover_image'] = $uploadPath . '/' . $filename;
         }
         
@@ -96,14 +98,16 @@ class EventManagerController extends Controller
                 // Benzersiz dosya adı oluştur
                 $filename = $this->createUniqueFilename($uploadPath, $originalFilename, $extension);
                 
-                // Resim boyutlandır ve kaydet
-                $img = Image::make($image);
-                $img->fit(1200, 800, function ($constraint) {
+                // Resim boyutlandır ve kaydet - v3 uyumlu
+                $img = Image::read($image);
+                $img->resize(1200, null, function ($constraint) {
+                    $constraint->aspectRatio();
                     $constraint->upsize();
                 });
                 
-                // Public klasörüne kaydet
-                $img->save(public_path($uploadPath . '/' . $filename));
+                // encode ve kaydet
+                $encodedImage = $this->encodeByFormat($img, $extension);
+                file_put_contents(public_path($uploadPath . '/' . $filename), $encodedImage);
                 
                 // Galeri resmi oluştur
                 EventImage::create([
@@ -172,14 +176,16 @@ class EventManagerController extends Controller
             // Benzersiz dosya adı oluştur
             $filename = $this->createUniqueFilename($uploadPath, $originalFilename, $extension);
             
-            // Resimi boyutlandır ve kaydet
-            $img = Image::make($coverImage);
-            $img->fit(800, 600, function ($constraint) {
+            // Resimi boyutlandır ve kaydet - v3 uyumlu
+            $img = Image::read($coverImage);
+            $img->resize(1200, null, function ($constraint) {
+                $constraint->aspectRatio();
                 $constraint->upsize();
             });
             
-            // Public klasörüne kaydet
-            $img->save(public_path($uploadPath . '/' . $filename));
+            // encode ve kaydet
+            $encodedImage = $this->encodeByFormat($img, $extension);
+            file_put_contents(public_path($uploadPath . '/' . $filename), $encodedImage);
             $validated['cover_image'] = $uploadPath . '/' . $filename;
         }
         
@@ -196,14 +202,16 @@ class EventManagerController extends Controller
                 // Benzersiz dosya adı oluştur
                 $filename = $this->createUniqueFilename($uploadPath, $originalFilename, $extension);
                 
-                // Resim boyutlandır ve kaydet
-                $img = Image::make($image);
-                $img->fit(1200, 800, function ($constraint) {
+                // Resim boyutlandır ve kaydet - v3 uyumlu
+                $img = Image::read($image);
+                $img->resize(1200, null, function ($constraint) {
+                    $constraint->aspectRatio();
                     $constraint->upsize();
                 });
                 
-                // Public klasörüne kaydet
-                $img->save(public_path($uploadPath . '/' . $filename));
+                // encode ve kaydet
+                $encodedImage = $this->encodeByFormat($img, $extension);
+                file_put_contents(public_path($uploadPath . '/' . $filename), $encodedImage);
                 
                 // Galeri resmi oluştur
                 EventImage::create([
@@ -701,5 +709,27 @@ class EventManagerController extends Controller
         }
         
         return $fullFilename;
+    }
+    
+    /**
+     * Format türüne göre doğru encode metodunu kullanır
+     */
+    private function encodeByFormat($image, $extension, $quality = 80)
+    {
+        $extension = strtolower($extension);
+        
+        switch ($extension) {
+            case 'jpg':
+            case 'jpeg':
+                return $image->toJpeg($quality);
+            case 'png':
+                return $image->toPng();
+            case 'gif':
+                return $image->toGif();
+            case 'webp':
+                return $image->toWebp($quality);
+            default:
+                return $image->toJpeg($quality);
+        }
     }
 }

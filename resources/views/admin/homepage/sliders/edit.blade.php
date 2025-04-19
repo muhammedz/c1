@@ -163,6 +163,35 @@
                     // Değişken kontrol
                     let relativePath = path || url;
                     
+                    // Eğer WebP versiyonu varsa yolu ona göre düzenle
+                    // Picker'dan gelebilecek WebP yolu kontrolü
+                    if (url.endsWith('.webp') && path && path.endsWith('.webp')) {
+                        console.log("WebP dosyası seçildi: " + path);
+                    } 
+                    // Orijinal resim seçildiyse ve uploads/images/ içindeyse WebP'ye çevir
+                    else if ((path.includes('/images/') || url.includes('/images/')) && 
+                            (path.endsWith('.jpg') || path.endsWith('.jpeg') || path.endsWith('.png'))) {
+                        // WebP yolunu oluştur ve kontrol et
+                        let possibleWebpPath = path.replace(/\.(jpg|jpeg|png)$/i, '.webp');
+                        let webpUrl = url.replace(/\.(jpg|jpeg|png)$/i, '.webp');
+                        
+                        // Kontrol için ajax ile WebP dosyasının varlığını kontrol et
+                        $.ajax({
+                            url: webpUrl,
+                            type: 'HEAD',
+                            async: false,
+                            success: function() {
+                                console.log("WebP versiyonu bulundu: " + webpUrl);
+                                // WebP mevcut, yolları güncelle
+                                relativePath = possibleWebpPath;
+                                url = webpUrl;
+                            },
+                            error: function() {
+                                console.log("WebP versiyonu bulunamadı, orijinal kullanılacak: " + url);
+                            }
+                        });
+                    }
+                    
                     // Eğer path verilmediyse URL'den oluştur
                     if (!path && url.includes('/uploads/')) {
                         // URL'yi daha doğru parçala

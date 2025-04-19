@@ -100,13 +100,24 @@
                                 <div class="card file-item">
                                     <div class="card-body text-center">
                                         @if($file->isImage())
-                                            <img src="{{ asset($file->url) }}" alt="{{ $file->name }}" class="img-fluid mb-2" style="max-height: 120px;">
+                                            @if($file->has_webp)
+                                                <picture>
+                                                    <source srcset="{{ asset($file->webp_url) }}" type="image/webp">
+                                                    <source srcset="{{ asset($file->url) }}" type="{{ $file->mime_type }}">
+                                                    <img src="{{ asset($file->url) }}" alt="{{ $file->name }}" class="img-fluid mb-2" style="max-height: 120px;">
+                                                </picture>
+                                            @else
+                                                <img src="{{ asset($file->url) }}" alt="{{ $file->name }}" class="img-fluid mb-2" style="max-height: 120px;">
+                                            @endif
                                         @else
                                             <i class="fas {{ $file->getIconClassAttribute() }} fa-3x mb-2"></i>
                                         @endif
                                         <h6 class="card-title">{{ $file->original_name ?? $file->name }}</h6>
                                         <p class="card-text small text-muted">
                                             {{ $file->getHumanReadableSizeAttribute() }}
+                                            @if($file->isImage() && $file->has_webp)
+                                                <br><span class="badge badge-success">WebP: {{ $file->formattedWebpSize ?? round(filesize(public_path('uploads/' . $file->webp_path)) / 1024, 2) . ' KB' }}</span>
+                                            @endif
                                         </p>
                                         <div class="btn-group">
                                             <a href="{{ route('admin.filemanagersystem.preview', $file->id) }}" class="btn btn-sm btn-info">

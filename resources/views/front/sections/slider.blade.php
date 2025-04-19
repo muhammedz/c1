@@ -33,12 +33,55 @@
                 
                 <!-- Slide image - Placeholder görsel kullan -->
                 <div class="w-full h-full bg-gray-800">
-                    <div class="flex items-center justify-center h-full">
-                        <div class="text-gray-500 text-xl">
-                            <i class="fas fa-image fa-3x"></i>
-                            <p class="mt-2">Görsel eklenemedi</p>
+                    @if(!empty($slider->filemanagersystem_image))
+                        @php
+                            // Önce görsel URL'sini oluşturalım
+                            $imageUrl = $slider->filemanagersystemImageUrl;
+
+                            // WebP kontrolü için dosya yolunu alalım
+                            $imagePath = $slider->filemanagersystem_image;
+                            $imagePathInfo = pathinfo($imagePath);
+                            $extension = strtolower($imagePathInfo['extension'] ?? '');
+                            $hasWebp = false;
+                            $webpUrl = null;
+
+                            // Eğer görsel bir resim dosyasıysa ve webp desteği varsa
+                            if (in_array($extension, ['jpg', 'jpeg', 'png']) && 
+                                (strpos($imagePath, '/images/') !== false || 
+                                strpos($imageUrl, '/images/') !== false)) {
+                                // WebP dosya yolunu oluştur
+                                $webpPath = str_replace('.' . $extension, '.webp', $imagePath);
+                                $webpUrl = str_replace('.' . $extension, '.webp', $imageUrl);
+                                
+                                // WebP dosyasının varlığını kontrol et
+                                if (file_exists(public_path($webpPath)) || 
+                                    file_exists(public_path('uploads/' . $webpPath))) {
+                                    $hasWebp = true;
+                                }
+                            }
+                        @endphp
+
+                        @if($hasWebp)
+                            <picture>
+                                <source srcset="{{ $webpUrl }}" type="image/webp">
+                                <source srcset="{{ $imageUrl }}" type="image/{{ $extension }}">
+                                <img src="{{ $imageUrl }}" alt="{{ $slider->filemanagersystem_image_alt ?? $slider->title }}" 
+                                    title="{{ $slider->filemanagersystem_image_title ?? $slider->title }}" 
+                                    class="w-full h-full object-cover">
+                            </picture>
+                        @else
+                            <img src="{{ $imageUrl }}" alt="{{ $slider->filemanagersystem_image_alt ?? $slider->title }}" 
+                                title="{{ $slider->filemanagersystem_image_title ?? $slider->title }}" 
+                                class="w-full h-full object-cover">
+                        @endif
+                    @else
+                        <div class="flex items-center justify-center h-full">
+                            <div class="text-gray-500 text-xl">
+                                <i class="fas fa-image fa-3x"></i>
+                                <p class="mt-2">Görsel eklenemedi</p>
+                            </div>
                         </div>
-                    </div>
+                    @endif
                 </div>
                 
                 <!-- Content -->

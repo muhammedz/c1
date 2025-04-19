@@ -105,6 +105,32 @@
             border-radius: 4px;
             font-size: 24px;
         }
+        
+        .file-item .file-icon img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        /* Grid görünümü için resim stillemesi */
+        .grid-view .file-item .file-icon {
+            width: 100%;
+            height: 120px;
+            margin-bottom: 10px;
+        }
+        
+        .grid-view .file-item .file-icon img {
+            max-height: 120px;
+            border: none;
+            background: transparent;
+        }
+        
+        /* Liste görünümü için ek stiller */
+        .list-view .file-item .file-icon img {
+            width: 48px;
+            height: 48px;
+            object-fit: cover;
+        }
 
         .file-item .file-info {
             flex: 1;
@@ -130,16 +156,6 @@
         .grid-view .file-item {
             text-align: center;
             padding: 1rem;
-        }
-
-        .grid-view .file-item .file-icon {
-            width: 100%;
-            height: 100px;
-            margin-bottom: 0.5rem;
-        }
-
-        .grid-view .file-item .file-info {
-            padding-left: 0;
         }
     </style>
 @stop
@@ -206,20 +222,52 @@
                             `;
                         } else {
                             response.data.forEach(function(file) {
+                                // WebP URL'sini kontrol et
+                                var fileUrl = file.url;
+                                var hasWebp = typeof file.has_webp !== 'undefined' && file.has_webp === true;
+                                var webpUrl = typeof file.webp_url !== 'undefined' ? file.webp_url : null;
+                                
+                                // Eğer WebP varsa ve resim dosyasıysa WebP URL'sini kullan
+                                if (hasWebp && webpUrl && getFileTypeFromPath(file.name) === 'image') {
+                                    fileUrl = webpUrl;
+                                    console.log("WebP versiyonu kullanılıyor:", webpUrl);
+                                }
+                                
                                 html += `
                                     <div class="col-md-${currentView === 'grid' ? '3' : '12'}">
                                         <div class="file-item" 
                                             data-id="${file.id}" 
-                                            data-url="${file.url}" 
+                                            data-url="${fileUrl}" 
                                             data-path="${file.path}"
-                                            data-name="${file.file_name}">
-                                            <div class="file-icon">
-                                                <i class="fas fa-${getFileIcon(getFileTypeFromPath(file.name))}"></i>
+                                            data-webp-path="${file.webp_path || ''}"
+                                            data-name="${file.file_name}"
+                                            data-has-webp="${hasWebp ? 'true' : 'false'}"
+                                            data-original-url="${file.url}">
+                                            <div class="file-icon">`;
+                                
+                                // Eğer bu bir resim dosyasıysa, thumbnail görüntüle
+                                if (getFileTypeFromPath(file.name) === 'image') {
+                                    if (hasWebp && webpUrl) {
+                                        html += `
+                                            <picture>
+                                                <source srcset="${webpUrl}" type="image/webp">
+                                                <source srcset="${file.url}" type="image/*">
+                                                <img src="${fileUrl}" alt="${file.file_name}" class="img-thumbnail">
+                                            </picture>`;
+                                    } else {
+                                        html += `<img src="${fileUrl}" alt="${file.file_name}" class="img-thumbnail">`;
+                                    }
+                                } else {
+                                    html += `<i class="fas fa-${getFileIcon(getFileTypeFromPath(file.name))}"></i>`;
+                                }
+                                
+                                html += `
                                             </div>
                                             <div class="file-info">
                                                 <div class="file-name">${file.file_name}</div>
                                                 <div class="file-meta">
                                                     ${file.created_at ? file.created_at : ''}
+                                                    ${hasWebp ? '<span class="badge badge-success">WebP</span>' : ''}
                                                 </div>
                                             </div>
                                         </div>

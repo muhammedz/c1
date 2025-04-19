@@ -29,13 +29,13 @@ class FilemanagersystemUploadSecurity
                 return redirect()->back()->with('error', 'Bu dosya tipi desteklenmiyor');
             }
 
-            // Dosya boyutunu kontrol et
-            $maxSize = config('filemanagersystem.max_file_size', 0) * 1024 * 1024; // MB to bytes
+            // Dosya boyutunu kontrol et - 10MB olarak güncellendi
+            $maxSize = config('filemanagersystem.max_file_size', 10) * 1024 * 1024; // MB to bytes
             if ($file->getSize() > $maxSize) {
                 if ($request->expectsJson()) {
-                    return response()->json(['error' => 'Dosya boyutu çok büyük'], 422);
+                    return response()->json(['error' => 'Dosya boyutu çok büyük (max: 10MB)'], 422);
                 }
-                return redirect()->back()->with('error', 'Dosya boyutu çok büyük');
+                return redirect()->back()->with('error', 'Dosya boyutu çok büyük (max: 10MB)');
             }
         }
 

@@ -132,6 +132,11 @@ class FilemanagersystemController extends Controller
                 $file->url = asset('uploads/' . $path);
                 $file->file_name = $file->original_name ?? $file->name;
                 
+                // WebP bilgilerini ekle
+                if ($file->has_webp && $file->webp_path) {
+                    $file->webp_url = asset('uploads/' . $file->webp_path);
+                }
+                
                 return $file;
             });
 

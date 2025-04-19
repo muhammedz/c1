@@ -118,10 +118,18 @@
                                                 <div class="d-flex align-items-center">
                                                     <i class="fas {{ $media->iconClass }} fa-lg me-2 text-muted"></i>
                                                     <span>{{ $media->original_name }}</span>
+                                                    @if($media->isImage() && $media->hasWebpVersion)
+                                                        <span class="badge bg-success ms-2">WebP</span>
+                                                    @endif
                                                 </div>
                                             </td>
                                             <td>{{ $media->mime_type }}</td>
-                                            <td>{{ $media->formattedSize }}</td>
+                                            <td>
+                                                {{ $media->formattedSize }}
+                                                @if($media->isImage() && $media->hasWebpVersion)
+                                                    <br><small class="text-success">(WebP: {{ $media->formattedWebpSize }})</small>
+                                                @endif
+                                            </td>
                                             <td>{{ $media->user ? $media->user->name : 'Bilinmiyor' }}</td>
                                             <td>{{ $media->created_at->format('d.m.Y H:i') }}</td>
                                             <td>

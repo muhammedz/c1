@@ -108,7 +108,7 @@ class FilemanagersystemMediaService
     public function generateThumbnails(FilemanagersystemMedia $media)
     {
         $sizes = config('filemanagersystem.thumbnail_sizes', []);
-        $image = Image::make(Storage::disk('public')->path($media->file_path));
+        $image = Image::read(Storage::disk('public')->path($media->file_path));
 
         foreach ($sizes as $size) {
             $width = $size['width'] ?? null;
@@ -121,7 +121,52 @@ class FilemanagersystemMediaService
             });
 
             $thumbnailPath = 'thumbnails/' . $name . '/' . basename($media->file_path);
-            Storage::disk('public')->put($thumbnailPath, $thumbnail->encode());
+            
+            // Format belirleme ve kaydetme - V3 uyumlu
+            $format = $this->getFormatFromPath($media->file_path);
+            $encodedThumbnail = $this->encodeByFormat($thumbnail, $format);
+            Storage::disk('public')->put($thumbnailPath, $encodedThumbnail);
+        }
+    }
+    
+    /**
+     * Format türüne göre doğru encode metodunu kullanır
+     */
+    private function encodeByFormat($image, $format, $quality = 80)
+    {
+        switch ($format) {
+            case 'jpg':
+                return $image->toJpeg($quality);
+            case 'png':
+                return $image->toPng();
+            case 'gif':
+                return $image->toGif();
+            case 'webp':
+                return $image->toWebp($quality);
+            default:
+                return $image->toJpeg($quality);
+        }
+    }
+    
+    /**
+     * Dosya yolundan formatı belirler
+     */
+    private function getFormatFromPath($path)
+    {
+        $extension = strtolower(pathinfo($path, PATHINFO_EXTENSION));
+        
+        switch ($extension) {
+            case 'jpg':
+            case 'jpeg':
+                return 'jpg';
+            case 'png':
+                return 'png';
+            case 'gif':
+                return 'gif';
+            case 'webp':
+                return 'webp';
+            default:
+                return 'jpg'; // Varsayılan format
         }
     }
 

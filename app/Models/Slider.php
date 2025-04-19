@@ -40,9 +40,10 @@ class Slider extends Model
     /**
      * Slider'a ait medya ilişkilerini getir
      */
-    public function mediaRelations(): MorphMany
+    public function mediaRelations()
     {
-        return $this->morphMany(MediaRelation::class, 'relatable');
+        return MediaRelation::where('related_to', 'slider')
+            ->where('related_id', $this->id);
     }
 
     /**

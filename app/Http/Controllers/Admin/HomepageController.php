@@ -520,7 +520,9 @@ class HomepageController extends Controller
     private function updateMediaRelation(Slider $slider, string $filePath)
     {
         // Eski ilişkileri sil
-        $slider->mediaRelations()->delete();
+        MediaRelation::where('related_to', 'slider')
+            ->where('related_id', $slider->id)
+            ->delete();
         
         // Yeni ilişki oluştur
         $this->createMediaRelation($slider, $filePath);

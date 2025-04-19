@@ -79,7 +79,15 @@
                                 </div>
                                 <div class="card-body text-center">
                                     @if(Str::startsWith($media->mime_type, 'image/'))
-                                        <img src="{{ $media->url }}" alt="{{ $media->original_name }}" class="img-fluid mb-3 border">
+                                        @if($media->has_webp)
+                                            <picture>
+                                                <source srcset="{{ $media->webp_url }}" type="image/webp">
+                                                <source srcset="{{ $media->url }}" type="{{ $media->mime_type }}">
+                                                <img src="{{ $media->url }}" alt="{{ $media->original_name }}" class="img-fluid mb-3 border">
+                                            </picture>
+                                        @else
+                                            <img src="{{ $media->url }}" alt="{{ $media->original_name }}" class="img-fluid mb-3 border">
+                                        @endif
                                     @elseif(Str::startsWith($media->mime_type, 'video/'))
                                         <div class="embed-responsive embed-responsive-16by9 mb-3">
                                             <video class="embed-responsive-item" controls>
@@ -129,6 +137,41 @@
                                                 <th>Dosya Boyutu:</th>
                                                 <td>{{ $media->getFormattedSize() }}</td>
                                             </tr>
+                                            @if($media->isCompressed())
+                                            <tr>
+                                                <th>Orijinal Boyut:</th>
+                                                <td>{{ $media->getFormattedOriginalSizeAttribute() }}</td>
+                                            </tr>
+                                            <tr>
+                                                <th>Sıkıştırma:</th>
+                                                <td>
+                                                    <span class="badge badge-info">{{ number_format($media->getSavingsPercentageAttribute(), 1) }}% Tasarruf</span>
+                                                    @if($media->compression_quality)
+                                                    <span class="badge badge-secondary">Kalite: {{ $media->compression_quality }}</span>
+                                                    @endif
+                                                </td>
+                                            </tr>
+                                            @endif
+                                            @if($media->has_webp)
+                                            <tr>
+                                                <th>WebP:</th>
+                                                <td>
+                                                    <span class="badge badge-success">WebP Mevcut</span>
+                                                    <a href="{{ $media->webp_url }}" target="_blank" class="btn btn-xs btn-outline-secondary">
+                                                        <i class="fas fa-external-link-alt"></i>
+                                                    </a>
+                                                    @if(file_exists(public_path('uploads/' . $media->webp_path)))
+                                                    <br><small class="text-muted">Boyut: {{ round(filesize(public_path('uploads/' . $media->webp_path)) / 1024, 2) }} KB</small>
+                                                    @endif
+                                                </td>
+                                            </tr>
+                                            @endif
+                                            @if($media->width && $media->height)
+                                            <tr>
+                                                <th>Boyutlar:</th>
+                                                <td>{{ $media->width }} × {{ $media->height }} piksel</td>
+                                            </tr>
+                                            @endif
                                             <tr>
                                                 <th>Klasör:</th>
                                                 <td>
@@ -180,6 +223,21 @@
                                             </div>
                                         </div>
                                         <small class="form-text text-muted">Bu URL ile dosya kimlik doğrulama olmadan erişilebilir.</small>
+                                    </div>
+                                    @endif
+                                    
+                                    @if($media->has_webp && $media->is_public)
+                                    <div class="mt-2">
+                                        <label for="webp_url">WebP URL:</label>
+                                        <div class="input-group">
+                                            <input type="text" id="webp_url" class="form-control" value="{{ $media->webp_url }}" readonly>
+                                            <div class="input-group-append">
+                                                <button class="btn btn-outline-secondary" type="button" onclick="copyToClipboard('webp_url')">
+                                                    <i class="fas fa-copy"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <small class="form-text text-muted">WebP formatı daha küçük boyutlu ve modern tarayıcılarda çalışır.</small>
                                     </div>
                                     @endif
                                 </div>
