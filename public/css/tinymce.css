@@ -1,0 +1,134 @@
+/* TinyMCE Editör Stilleri */
+.tox-tinymce {
+    border: 1px solid #ddd !important;
+    border-radius: 4px !important;
+}
+
+.tox .tox-toolbar__group {
+    border-right: 1px solid #ddd !important;
+}
+
+.tox .tox-toolbar__primary {
+    background: #f8f9fa !important;
+    border-bottom: 1px solid #ddd !important;
+}
+
+.tox .tox-tbtn {
+    color: #495057 !important;
+}
+
+.tox .tox-tbtn:hover {
+    background-color: #e9ecef !important;
+}
+
+.tox .tox-tbtn--enabled {
+    background-color: #e9ecef !important;
+}
+
+.tox .tox-edit-area__iframe {
+    background-color: #fff !important;
+}
+
+.tox .tox-statusbar {
+    border-top: 1px solid #ddd !important;
+    background-color: #f8f9fa !important;
+}
+
+/* Dosya Seçici Modal Stilleri */
+#filePickerModal .modal-dialog {
+    max-width: 90%;
+}
+
+#filePickerModal .modal-body {
+    padding: 0;
+}
+
+#filePickerModal .card {
+    margin-bottom: 0;
+    height: 100%;
+}
+
+#filePickerModal .card-body {
+    padding: 0;
+}
+
+#folderTree {
+    padding: 10px;
+}
+
+#folderTree .jstree-node {
+    margin: 5px 0;
+}
+
+#folderTree .jstree-anchor {
+    padding: 5px 10px;
+}
+
+#folderTree .jstree-clicked {
+    background-color: #e9ecef;
+}
+
+/* Dosya Listesi Stilleri */
+#fileList {
+    padding: 15px;
+}
+
+#fileList.grid-view .file-item {
+    padding: 10px;
+}
+
+#fileList.list-view .file-item {
+    width: 100%;
+    margin-bottom: 0;
+}
+
+#fileList.list-view .file-item .card {
+    flex-direction: row;
+}
+
+#fileList.list-view .file-item .card-img-top {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+}
+
+#fileList.list-view .file-item .card-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+/* Dosya Yükleme Modal Stilleri */
+#fileUploadModal .modal-body {
+    padding: 20px;
+}
+
+#fileUploadModal .form-group {
+    margin-bottom: 15px;
+}
+
+#fileUploadModal .form-control-file {
+    padding: 5px;
+}
+
+/* Responsive Düzenlemeler */
+@media (max-width: 768px) {
+    #filePickerModal .modal-dialog {
+        max-width: 100%;
+        margin: 0;
+    }
+    
+    #filePickerModal .col-md-3 {
+        width: 100%;
+    }
+    
+    #filePickerModal .col-md-9 {
+        width: 100%;
+    }
+    
+    #fileList.list-view .file-item .card-img-top {
+        width: 50px;
+        height: 50px;
+    }
+} 

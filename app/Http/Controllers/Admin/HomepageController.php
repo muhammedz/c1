@@ -10,6 +10,7 @@ use App\Models\QuickMenuItem;
 use App\Services\MediaService;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use App\Models\MediaRelation;
 
 class HomepageController extends Controller
 {
@@ -46,7 +47,7 @@ class HomepageController extends Controller
     }
     
     /**
-     * Yeni slider oluşturma formu
+     * Slider oluşturma formunu göster
      */
     public function createSlider()
     {
@@ -54,59 +55,35 @@ class HomepageController extends Controller
     }
     
     /**
-     * Yeni slider kaydetme
+     * Yeni slider kaydet
      */
     public function storeSlider(Request $request)
     {
         $request->validate([
-            'title' => 'nullable|string|max:255',
-            'image' => 'required|string',
+            'title' => 'required|string|max:255',
             'subtitle' => 'nullable|string|max:255',
             'button_text' => 'nullable|string|max:50',
             'button_url' => 'nullable|string|max:255',
-            'order' => 'nullable|integer|min:0',
-            'is_active' => 'nullable|boolean',
+            'order' => 'required|integer|min:0',
+            'is_active' => 'boolean',
+            'filemanagersystem_image' => 'nullable|string',
+            'filemanagersystem_image_alt' => 'nullable|string|max:255',
+            'filemanagersystem_image_title' => 'nullable|string|max:255'
         ]);
-        
-        $data = $request->all();
-        $data['is_active'] = $request->has('is_active');
-        
-        // Eğer /storage/ ile başlıyorsa, değiştir
-        if (str_starts_with($data['image'], '/storage/')) {
-            $data['image'] = str_replace('/storage/', '/uploads/', $data['image']);
+
+        $slider = Slider::create($request->all());
+
+        // FileManagerSystem ile ilişki kur
+        if ($request->filled('filemanagersystem_image')) {
+            $this->createMediaRelation($slider, $request->filemanagersystem_image);
         }
-        
-        // Eğer gelen URL bir base64 ise
-        if (strpos($data['image'], 'data:image') === 0) {
-            // Base64'ten dosyaya çevir ve yükle
-            $media = $this->mediaService->uploadBase64($data['image'], 'slider');
-            $data['image'] = $media->file_path;
-        } 
-        // Eğer storage'dan gelen bir dosya ise
-        else if (strpos($data['image'], '/storage/') !== false) {
-            // Dosyayı storage'dan public/uploads'a taşı
-            $sourcePath = storage_path('app/public/' . str_replace('/storage/', '', $data['image']));
-            if (file_exists($sourcePath)) {
-                $file = new \Illuminate\Http\UploadedFile(
-                    $sourcePath,
-                    basename($sourcePath),
-                    mime_content_type($sourcePath),
-                    null,
-                    true
-                );
-                $media = $this->mediaService->upload($file, 'slider');
-                $data['image'] = $media->file_path;
-            }
-        }
-        
-        Slider::create($data);
-        
+
         return redirect()->route('admin.homepage.sliders')
             ->with('success', 'Slider başarıyla oluşturuldu.');
     }
     
     /**
-     * Slider düzenleme formu
+     * Slider düzenleme formunu göster
      */
     public function editSlider($id)
     {
@@ -115,74 +92,30 @@ class HomepageController extends Controller
     }
     
     /**
-     * Slider güncelleme
+     * Slider güncelle
      */
     public function updateSlider(Request $request, $id)
     {
-        $slider = Slider::findOrFail($id);
-        
         $request->validate([
-            'title' => 'nullable|string|max:255',
-            'image' => 'required|string',
+            'title' => 'required|string|max:255',
             'subtitle' => 'nullable|string|max:255',
             'button_text' => 'nullable|string|max:50',
             'button_url' => 'nullable|string|max:255',
-            'order' => 'nullable|integer|min:0',
-            'is_active' => 'nullable|boolean',
+            'order' => 'required|integer|min:0',
+            'is_active' => 'boolean',
+            'filemanagersystem_image' => 'nullable|string',
+            'filemanagersystem_image_alt' => 'nullable|string|max:255',
+            'filemanagersystem_image_title' => 'nullable|string|max:255'
         ]);
-        
-        $data = $request->all();
-        $data['is_active'] = $request->has('is_active');
-        
-        // Eğer /storage/ ile başlıyorsa, değiştir
-        if (str_starts_with($data['image'], '/storage/')) {
-            $data['image'] = str_replace('/storage/', '/uploads/', $data['image']);
+
+        $slider = Slider::findOrFail($id);
+        $slider->update($request->all());
+
+        // FileManagerSystem ilişkisini güncelle
+        if ($request->filled('filemanagersystem_image')) {
+            $this->updateMediaRelation($slider, $request->filemanagersystem_image);
         }
-        
-        // Eğer yeni bir resim yüklendiyse
-        if ($data['image'] !== $slider->image) {
-            // Eğer gelen URL bir base64 ise
-            if (strpos($data['image'], 'data:image') === 0) {
-                // Eski dosyayı sil
-                if ($slider->image) {
-                    $oldPath = public_path($slider->image);
-                    if (file_exists($oldPath)) {
-                        unlink($oldPath);
-                    }
-                }
-                
-                // Base64'ten dosyaya çevir ve yükle
-                $media = $this->mediaService->uploadBase64($data['image'], 'slider');
-                $data['image'] = $media->file_path;
-            }
-            // Eğer storage'dan gelen bir dosya ise
-            else if (strpos($data['image'], '/storage/') !== false) {
-                // Eski dosyayı sil
-                if ($slider->image) {
-                    $oldPath = public_path($slider->image);
-                    if (file_exists($oldPath)) {
-                        unlink($oldPath);
-                    }
-                }
-                
-                // Dosyayı storage'dan public/uploads'a taşı
-                $sourcePath = storage_path('app/public/' . str_replace('/storage/', '', $data['image']));
-                if (file_exists($sourcePath)) {
-                    $file = new \Illuminate\Http\UploadedFile(
-                        $sourcePath,
-                        basename($sourcePath),
-                        mime_content_type($sourcePath),
-                        null,
-                        true
-                    );
-                    $media = $this->mediaService->upload($file, 'slider');
-                    $data['image'] = $media->file_path;
-                }
-            }
-        }
-        
-        $slider->update($data);
-        
+
         return redirect()->route('admin.homepage.sliders')
             ->with('success', 'Slider başarıyla güncellendi.');
     }
@@ -193,14 +126,6 @@ class HomepageController extends Controller
     public function deleteSlider($id)
     {
         $slider = Slider::findOrFail($id);
-        
-        // Dosyayı sil
-        if ($slider->image) {
-            $path = public_path($slider->image);
-            if (file_exists($path)) {
-                unlink($path);
-            }
-        }
         
         $slider->delete();
         
@@ -575,5 +500,29 @@ class HomepageController extends Controller
         } catch (\Exception $e) {
             return $url;
         }
+    }
+
+    /**
+     * FileManagerSystem ile medya ilişkisi oluştur
+     */
+    private function createMediaRelation(Slider $slider, string $filePath)
+    {
+        MediaRelation::create([
+            'file_path' => $filePath,
+            'related_to' => 'slider',
+            'related_id' => $slider->id
+        ]);
+    }
+
+    /**
+     * FileManagerSystem medya ilişkisini güncelle
+     */
+    private function updateMediaRelation(Slider $slider, string $filePath)
+    {
+        // Eski ilişkileri sil
+        $slider->mediaRelations()->delete();
+        
+        // Yeni ilişki oluştur
+        $this->createMediaRelation($slider, $filePath);
     }
 }

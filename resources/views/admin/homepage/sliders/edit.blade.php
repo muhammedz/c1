@@ -38,7 +38,7 @@
                         <!-- Başlık -->
                         <div class="form-group">
                             <label for="title">Başlık</label>
-                            <input type="text" class="form-control @error('title') is-invalid @enderror" id="title" name="title" value="{{ old('title', $slider->title) }}">
+                            <input type="text" class="form-control @error('title') is-invalid @enderror" id="title" name="title" value="{{ old('title', $slider->title) }}" required>
                             @error('title')
                                 <span class="invalid-feedback">{{ $message }}</span>
                             @enderror
@@ -56,7 +56,7 @@
                         <!-- Sıralama -->
                         <div class="form-group">
                             <label for="order">Sıralama</label>
-                            <input type="number" class="form-control @error('order') is-invalid @enderror" id="order" name="order" value="{{ old('order', $slider->order) }}" min="0">
+                            <input type="number" class="form-control @error('order') is-invalid @enderror" id="order" name="order" value="{{ old('order', $slider->order) }}" min="0" required>
                             @error('order')
                                 <span class="invalid-feedback">{{ $message }}</span>
                             @enderror
@@ -72,29 +72,6 @@
                     </div>
                     
                     <div class="col-md-6">
-                        <!-- Slider Görseli -->
-                        <div class="form-group">
-                            <label for="image">Slider Görseli <span class="text-danger">*</span></label>
-                            <div class="input-group">
-                                <span class="input-group-prepend">
-                                    <a id="slider_image_button" data-input="image" data-preview="slider_image_preview" class="btn btn-primary">
-                                        <i class="fas fa-image"></i> Görsel Seç
-                                    </a>
-                                </span>
-                                <input type="text" class="form-control @error('image') is-invalid @enderror" id="image" name="image" value="{{ old('image', $slider->image) }}" required>
-                            </div>
-                            <small class="form-text text-muted">Önerilen boyut: 1920x800 piksel</small>
-                            @error('image')
-                                <span class="text-danger">{{ $message }}</span>
-                            @enderror
-                            
-                            <div id="slider_image_preview" class="mt-3">
-                                @if(old('image', $slider->image))
-                                    <img src="{{ old('image', $slider->image_url) }}" alt="Preview" class="img-fluid" style="max-height: 300px">
-                                @endif
-                            </div>
-                        </div>
-                        
                         <!-- Buton Metni -->
                         <div class="form-group">
                             <label for="button_text">Buton Metni</label>
@@ -109,6 +86,43 @@
                             <label for="button_url">Buton Linki</label>
                             <input type="text" class="form-control @error('button_url') is-invalid @enderror" id="button_url" name="button_url" value="{{ old('button_url', $slider->button_url) }}" placeholder="Örn: /projects/example">
                             @error('button_url')
+                                <span class="invalid-feedback">{{ $message }}</span>
+                            @enderror
+                        </div>
+
+                        <!-- FileManagerSystem Görsel -->
+                        <div class="form-group">
+                            <label for="filemanagersystem_image">Slider Görseli</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control @error('filemanagersystem_image') is-invalid @enderror" id="filemanagersystem_image" name="filemanagersystem_image" value="{{ old('filemanagersystem_image', $slider->filemanagersystem_image) }}" readonly>
+                                <div class="input-group-append">
+                                    <button type="button" class="btn btn-primary" id="filemanagersystem_image_button">
+                                        <i class="fas fa-image"></i> Görsel Seç
+                                    </button>
+                                </div>
+                            </div>
+                            @error('filemanagersystem_image')
+                                <span class="invalid-feedback">{{ $message }}</span>
+                            @enderror
+                            <div id="filemanagersystem_image_preview" class="mt-2" style="{{ $slider->filemanagersystem_image ? '' : 'display: none;' }}">
+                                <img src="{{ $slider->filemanagersystem_image_url ?? $slider->filemanagersystem_image }}" alt="Önizleme" class="img-thumbnail" style="max-height: 200px;">
+                            </div>
+                        </div>
+
+                        <!-- Görsel Alt Metni -->
+                        <div class="form-group">
+                            <label for="filemanagersystem_image_alt">Görsel Alt Metni</label>
+                            <input type="text" class="form-control @error('filemanagersystem_image_alt') is-invalid @enderror" id="filemanagersystem_image_alt" name="filemanagersystem_image_alt" value="{{ old('filemanagersystem_image_alt', $slider->filemanagersystem_image_alt) }}">
+                            @error('filemanagersystem_image_alt')
+                                <span class="invalid-feedback">{{ $message }}</span>
+                            @enderror
+                        </div>
+
+                        <!-- Görsel Başlığı -->
+                        <div class="form-group">
+                            <label for="filemanagersystem_image_title">Görsel Başlığı</label>
+                            <input type="text" class="form-control @error('filemanagersystem_image_title') is-invalid @enderror" id="filemanagersystem_image_title" name="filemanagersystem_image_title" value="{{ old('filemanagersystem_image_title', $slider->filemanagersystem_image_title) }}">
+                            @error('filemanagersystem_image_title')
                                 <span class="invalid-feedback">{{ $message }}</span>
                             @enderror
                         </div>
@@ -129,65 +143,52 @@
 @stop
 
 @section('js')
-    <script src="/vendor/laravel-filemanager/js/stand-alone-button.js"></script>
-    <script>
-        $(document).ready(function() {
-            // Temel URL'yi al
-            var baseUrl = window.location.protocol + '//' + window.location.host;
+<script>
+    $(document).ready(function() {
+        // FileManagerSystem entegrasyonu
+        $('#filemanagersystem_image_button').on('click', function() {
+            const input = $('#filemanagersystem_image');
+            const preview = $('#filemanagersystem_image_preview');
+            const previewImg = preview.find('img');
             
-            // Görsel seçildikten sonra çalışacak callback
-            var onFileSelected = function(url, path) {
-                console.log('Original URL: ', url);
-                
-                // URL'yi düzenle
+            // Özel FileManagerSystem'i açıyoruz
+            const popup = window.open('/admin/filemanagersystem/picker?type=image', 'FileManagerSystem', 'width=900,height=600');
+            
+            // Global fonksiyon tanımlıyoruz
+            window.setFileToElement = function(url, path) {
                 if (url) {
-                    // URL'yi tam yol olarak kullan
-                    url = url.replace('/storage/', '/uploads/');
+                    console.log("Seçilen dosya URL: " + url);
+                    console.log("Seçilen dosya yolu: " + path);
                     
-                    // Eğer URL'de /images/ kısmı varsa /photos/ olarak değiştir
-                    if (url.indexOf('/images/') !== -1) {
-                        url = url.replace('/images/', '/photos/');
+                    // Değişken kontrol
+                    let relativePath = path || url;
+                    
+                    // Eğer path verilmediyse URL'den oluştur
+                    if (!path && url.includes('/uploads/')) {
+                        // URL'yi daha doğru parçala
+                        const urlObj = new URL(url);
+                        const pathParts = urlObj.pathname.split('/');
+                        
+                        // '/uploads/' sonrası tüm yolu al
+                        const uploadsIndex = pathParts.indexOf('uploads');
+                        if (uploadsIndex !== -1) {
+                            relativePath = pathParts.slice(uploadsIndex).join('/');
+                        }
                     }
+                    
+                    console.log("Kaydedilecek yol: " + relativePath);
+                    input.val(relativePath);
+                    previewImg.attr('src', url);
+                    preview.show();
+                    popup.close();
                 }
-                
-                console.log('Converted URL: ', url);
-                
-                // Input değerini güncelle
-                $('#image').val(url);
-                
-                // Önizleme göster
-                var preview = $('#slider_image_preview');
-                preview.html('<img src="' + url + '" alt="Önizleme" class="img-fluid" style="max-height: 300px">');
             };
-            
-            // File Manager butonunu özelleştir - filemanager prefix'i ile kullan
-            $('#slider_image_button').filemanager('image', {
-                prefix: '/admin/filemanager',
-                base_path: '/',
-                onFileSelected: onFileSelected
-            });
-            
-            // Form gönderiminden önce URL formatını kontrol et
-            $('#slider-form').on('submit', function(e) {
-                if (!$('#image').val()) {
-                    e.preventDefault();
-                    alert('Lütfen bir slider görseli seçiniz.');
-                    return;
-                }
-            });
         });
-    </script>
-@stop
 
-@section('css')
-    <style>
-        #slider_image_preview img {
-            max-width: 100%;
-            max-height: 300px;
-            object-fit: contain;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            padding: 5px;
-        }
-    </style>
+        // Form gönderiminden önce kontrol
+        $('#slider-form').on('submit', function(e) {
+            // İlgili validasyon kontrolleri burada yapılabilir
+        });
+    });
+</script>
 @stop 

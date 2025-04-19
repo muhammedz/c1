@@ -26,6 +26,10 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\TinyMCEController;
 use App\Http\Controllers\Admin\ServiceSettingsController;
 use App\Http\Controllers\Admin\DepartmentController;
+use App\Http\Controllers\FileManagerSystem\FilemanagersystemController;
+use App\Http\Controllers\FileManagerSystem\FilemanagersystemFolderController;
+use App\Http\Controllers\FileManagerSystem\FilemanagersystemMediaController;
+use App\Http\Controllers\FileManagerSystem\FilemanagersystemCategoryController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 
@@ -88,8 +92,21 @@ Route::middleware(['auth', 'role:admin'])->name('admin.')->prefix('admin')->grou
     // File Manager Routes
     Route::get('/file-manager-page', [App\Http\Controllers\Admin\FileManagerController::class, 'index'])->name('file-manager');
     
+    // Özel File Manager Rotaları
+    Route::get('/custom-filemanager', [App\Http\Controllers\Admin\CustomFileManagerController::class, 'index'])->name('custom-filemanager');
+    Route::get('/api/content-files', [App\Http\Controllers\Admin\CustomFileManagerController::class, 'getContentFiles'])->name('api.content-files');
+    Route::post('/filemanager/relation', [App\Http\Controllers\Admin\CustomFileManagerController::class, 'saveMediaRelation'])->name('filemanager.relation');
+    
     // Laravel File Manager rotalarını filemanager prefix'i ile tanımla
     Route::group(['prefix' => 'filemanager', 'middleware' => ['web']], function () {
+        // Özel FileManager Controller'ımızı kullanmak için upload route'unu önce tanımlıyoruz
+        // ÖNEMLİ: Bu route, Laravel File Manager'ın kendi upload route'undan önce tanımlanmalı
+        Route::any('/upload', '\App\Http\Controllers\FileManagerController@upload')->name('unisharp.lfm.upload');
+        
+        // İçeriğe özel dosya yükleme için route
+        Route::post('/custom-upload', [App\Http\Controllers\Admin\CustomFileManagerController::class, 'upload'])->name('custom-filemanager.upload');
+        
+        // Diğer route'lar için Laravel File Manager'ın kendi route'larını kullan
         \UniSharp\LaravelFilemanager\Lfm::routes();
     });
     
@@ -405,4 +422,56 @@ Route::get('/events/{filename}', function($filename) {
 
 // Frontend Duyuru İşlemleri
 Route::post('/announcements/mark-viewed', [AnnouncementFrontController::class, 'markViewed'])->name('announcements.mark-viewed');
+
+/*
+|--------------------------------------------------------------------------
+| File Manager System Routes
+|--------------------------------------------------------------------------
+*/
+
+Route::prefix('admin/filemanagersystem')->name('admin.filemanagersystem.')->middleware(['auth'])->group(function () {
+    // Ana controller
+    Route::get('/', [FilemanagersystemController::class, 'index'])->name('index');
+    Route::get('/picker', [FilemanagersystemController::class, 'picker'])->name('picker');
+    Route::get('/search', [FilemanagersystemController::class, 'search'])->name('search');
+    Route::get('/preview/{id}', [FilemanagersystemController::class, 'preview'])->name('preview');
+    Route::post('/bulk-actions', [FilemanagersystemController::class, 'bulkActions'])->name('bulk-actions');
+    Route::get('/settings', [FilemanagersystemController::class, 'settings'])->name('settings');
+    Route::post('/settings', [FilemanagersystemController::class, 'updateSettings'])->name('settings.update');
+    Route::get('/dashboard', [FilemanagersystemController::class, 'dashboard'])->name('dashboard');
+
+    // Klasör işlemleri
+    Route::prefix('folders')->name('folders.')->group(function () {
+        Route::get('/', [FilemanagersystemFolderController::class, 'index'])->name('index');
+        Route::get('/create', [FilemanagersystemFolderController::class, 'create'])->name('create');
+        Route::post('/', [FilemanagersystemFolderController::class, 'store'])->name('store');
+        Route::get('/{id}', [FilemanagersystemFolderController::class, 'show'])->name('show');
+        Route::get('/{id}/edit', [FilemanagersystemFolderController::class, 'edit'])->name('edit');
+        Route::put('/{id}', [FilemanagersystemFolderController::class, 'update'])->name('update');
+        Route::delete('/{id}', [FilemanagersystemFolderController::class, 'destroy'])->name('destroy');
+    });
+
+    // Medya işlemleri
+    Route::prefix('media')->name('media.')->group(function () {
+        Route::get('/', [FilemanagersystemMediaController::class, 'index'])->name('index');
+        Route::get('/create', [FilemanagersystemMediaController::class, 'create'])->name('create');
+        Route::post('/', [FilemanagersystemMediaController::class, 'store'])->name('store');
+        Route::get('/{media}', [FilemanagersystemMediaController::class, 'show'])->name('show');
+        Route::get('/{media}/edit', [FilemanagersystemMediaController::class, 'edit'])->name('edit');
+        Route::put('/{media}', [FilemanagersystemMediaController::class, 'update'])->name('update');
+        Route::delete('/{media}', [FilemanagersystemMediaController::class, 'destroy'])->name('destroy');
+        Route::get('/{media}/download', [FilemanagersystemMediaController::class, 'download'])->name('download');
+    });
+
+    // Kategori işlemleri
+    Route::prefix('categories')->name('categories.')->group(function () {
+        Route::get('/', [FilemanagersystemCategoryController::class, 'index'])->name('index');
+        Route::get('/create', [FilemanagersystemCategoryController::class, 'create'])->name('create');
+        Route::post('/', [FilemanagersystemCategoryController::class, 'store'])->name('store');
+        Route::get('/{id}', [FilemanagersystemCategoryController::class, 'show'])->name('show');
+        Route::get('/{id}/edit', [FilemanagersystemCategoryController::class, 'edit'])->name('edit');
+        Route::put('/{id}', [FilemanagersystemCategoryController::class, 'update'])->name('update');
+        Route::delete('/{id}', [FilemanagersystemCategoryController::class, 'destroy'])->name('destroy');
+    });
+});
 

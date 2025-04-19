@@ -123,23 +123,27 @@ class FileManagerController extends UploadController
     protected function generateSafeFileName($filename, $extension, $directory)
     {
         // Dosya adını güvenli hale getir (Türkçe karakterler, boşluklar, özel karakterler)
-        $safeFileName = Str::slug($filename);
+        // Dosya adındaki (1), (2) gibi parantez içindeki sayıları temizle
+        $cleanName = preg_replace('/\s*\(\d+\)\s*/', '', $filename);
+        
+        // Türkçe karakterleri ve boşlukları temizle, tüm harfleri küçült
+        $safeFileName = Str::slug($cleanName);
         
         // Uzun dosya adlarını kısalt
         if (strlen($safeFileName) > 50) {
             $safeFileName = substr($safeFileName, 0, 50);
         }
         
-        // Unix timestamp ekle (aynı isimde dosya olasılığını azaltır)
-        $safeFileName = $safeFileName . '_' . time();
-        
-        // Tam dosya adı (uzantılı)
+        // İlk olarak orijinal adı dene
         $fullFileName = $safeFileName . '.' . $extension;
         
-        // Aynı isimde dosya var mı kontrol et
+        // Eğer dosya zaten varsa, sonuna numara ekleyerek benzersiz hale getir
         $counter = 1;
+        $originalFileName = $safeFileName;
+        
         while (file_exists($directory . '/' . $fullFileName)) {
-            $fullFileName = $safeFileName . '_' . $counter . '.' . $extension;
+            // Dosya adına doğrudan sayı ekle (boşluk veya parantez olmadan)
+            $fullFileName = $originalFileName . $counter . '.' . $extension;
             $counter++;
         }
         

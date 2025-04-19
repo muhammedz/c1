@@ -1,0 +1,99 @@
+.cursorrules
+# Resim URL Sistemi - Kullanım Referansı
+
+# 1. Dosya Klasör Yapısı
+# ----------------------
+# public/uploads/images/    -> Resimler (.jpg, .png, .gif, .webp, vb.)
+# public/uploads/documents/ -> Dokümanlar (.pdf, .doc, .txt, vb.)
+# public/uploads/videos/    -> Videolar (.mp4, .mov, .avi, vb.)
+# public/uploads/audios/    -> Ses dosyaları (.mp3, .wav, vb.)
+# public/uploads/archives/  -> Arşivler (.zip, .rar, vb.)
+
+# 2. Dosya Yükleme
+# ---------------
+# Dosyaları MIME türüne göre doğru klasöre kaydet
+function uploadFile($file) {
+  $extension = $file->getClientOriginalExtension();
+  $mimeType = $file->getMimeType();
+  $fileName = Str::random(40) . '.' . $extension;
+  
+  // MIME türüne göre klasör
+  $folderPath = getMainFolderByMimeType($mimeType);
+  
+  // Dosyayı 'uploads' diskine kaydet
+  $path = $file->storeAs($folderPath, $fileName, 'uploads');
+  
+  // URL oluştur
+  $url = asset('uploads/' . $path);
+  
+  return [
+    'path' => $path,
+    'url' => $url
+  ];
+}
+
+# 3. MIME Türü -> Klasör Yolu Dönüşümü
+# ----------------------------------
+function getMainFolderByMimeType($mimeType) {
+  if (strpos($mimeType, 'image/') === 0) {
+    return 'images';
+  } elseif (strpos($mimeType, 'video/') === 0) {
+    return 'videos';
+  } elseif (strpos($mimeType, 'audio/') === 0) {
+    return 'audios';
+  } elseif (in_array($mimeType, ['application/zip', 'application/x-rar-compressed', 'application/x-tar'])) {
+    return 'archives';
+  } else {
+    return 'documents';
+  }
+}
+
+# 4. URL'den Yol Oluşturma (JavaScript)
+# ----------------------------------
+function setFileToElement(url) {
+  if (url) {
+    let relativePath = url;
+    
+    if (url.includes('/uploads/')) {
+      // URL'yi parçala
+      const urlObj = new URL(url);
+      const pathParts = urlObj.pathname.split('/');
+      
+      // '/uploads/' sonrası tüm yolu al
+      const uploadsIndex = pathParts.indexOf('uploads');
+      if (uploadsIndex !== -1) {
+        relativePath = pathParts.slice(uploadsIndex).join('/');
+      }
+    }
+    
+    // relativePath formatı: uploads/images/dosya.jpg
+    return relativePath;
+  }
+}
+
+# 5. Veritabanında Saklama
+# ----------------------
+# Dosya yolunu veritabanında sakla (tam URL değil!)
+# Doğru: uploads/images/dosya.jpg
+# Yanlış: http://site.com/uploads/images/dosya.jpg
+
+# 6. Görüntüleme için URL Oluşturma
+# -------------------------------
+function getFileUrl($path) {
+  if (empty($path)) {
+    return null;
+  }
+  
+  // HTTP ile başlıyorsa tam URL döndür
+  if (strpos($path, 'http://') === 0 || strpos($path, 'https://') === 0) {
+    return $path;
+  }
+  
+  // Aksi halde asset() yardımcısı ile URL oluştur
+  return asset($path);
+}
+
+# 7. Slider gibi Modüllere Entegrasyon
+# ----------------------------------
+# Slider->filemanagersystem_image = "uploads/images/dosya.jpg"
+# Slider->filemanagersystem_image_url = asset("uploads/images/dosya.jpg")

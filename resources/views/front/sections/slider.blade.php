@@ -31,9 +31,15 @@
                 <!-- Gradient overlay -->
                 <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-black/20 z-10"></div>
                 
-                <!-- Slide image -->
-                <img src="{{ fixStoragePath($slider->image) }}" alt="{{ $slider->title }}" 
-                     class="w-full h-full object-cover scale-105 transform transition-transform duration-10000 swiper-lazy">
+                <!-- Slide image - Placeholder görsel kullan -->
+                <div class="w-full h-full bg-gray-800">
+                    <div class="flex items-center justify-center h-full">
+                        <div class="text-gray-500 text-xl">
+                            <i class="fas fa-image fa-3x"></i>
+                            <p class="mt-2">Görsel eklenemedi</p>
+                        </div>
+                    </div>
+                </div>
                 
                 <!-- Content -->
                 <div class="absolute inset-x-0 bottom-0 z-20 text-white p-8 md:p-16 lg:p-24">
@@ -70,9 +76,15 @@
                 <!-- Gradient overlay -->
                 <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-black/20 z-10"></div>
                 
-                <!-- Slide image -->
-                <img src="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=1200&h=800&fit=crop"
-                     alt="Varsayılan Slider" class="w-full h-full object-cover scale-105 transform transition-transform duration-10000">
+                <!-- Slide image - Placeholder görsel kullan -->
+                <div class="w-full h-full bg-gray-800">
+                    <div class="flex items-center justify-center h-full">
+                        <div class="text-gray-500 text-xl">
+                            <i class="fas fa-image fa-3x"></i>
+                            <p class="mt-2">Görsel eklenemedi</p>
+                        </div>
+                    </div>
+                </div>
                 
                 <!-- Content -->
                 <div class="absolute inset-x-0 bottom-0 z-20 text-white p-8 md:p-16 lg:p-24">

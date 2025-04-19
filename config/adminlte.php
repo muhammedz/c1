@@ -293,7 +293,7 @@ return [
     |
     | Here we can modify the sidebar/top navigation of the admin panel.
     |
-    | For detailed instructions you can look here:
+    | For detailed instructions you can look the menu section here:
     | https://github.com/jeroennoten/Laravel-AdminLTE/wiki/Menu-Configuration
     |
     */
@@ -438,10 +438,35 @@ return [
             ],
         ],
         [
-            'text'    => 'Medya',
-            'icon'    => 'fas fa-fw fa-photo-video',
-            'url'     => 'admin/file-manager-page',
-            'active'  => ['admin/file-manager-page', 'admin/file-manager/*']
+            'text'    => 'Dosya Yönetim Sistemi',
+            'icon'    => 'fas fa-fw fa-folder-open',
+            'active'  => ['admin/filemanagersystem', 'admin/filemanagersystem/*', 'admin/file-manager-page', 'admin/file-manager/*'],
+            'submenu' => [
+                [
+                    'text' => 'Dosya Yöneticisi',
+                    'url'  => 'admin/filemanagersystem',
+                    'icon' => 'fas fa-fw fa-folder',
+                    'active' => ['admin/filemanagersystem', 'admin/filemanagersystem/*']
+                ],
+                [
+                    'text' => 'Klasörler',
+                    'url'  => 'admin/filemanagersystem/folders',
+                    'icon' => 'fas fa-fw fa-folder-open',
+                    'active' => ['admin/filemanagersystem/folders', 'admin/filemanagersystem/folders/*']
+                ],
+                [
+                    'text' => 'Dosyalar',
+                    'url'  => 'admin/filemanagersystem/media',
+                    'icon' => 'fas fa-fw fa-file',
+                    'active' => ['admin/filemanagersystem/media', 'admin/filemanagersystem/media/*']
+                ],
+                [
+                    'text' => 'Kategoriler',
+                    'url' => 'admin/filemanagersystem/categories',
+                    'icon' => 'fas fa-fw fa-tags',
+                    'active' => ['admin/filemanagersystem/categories', 'admin/filemanagersystem/categories/*']
+                ],
+            ],
         ],
         ['header' => 'KULLANICI YÖNETİMİ'],
         [

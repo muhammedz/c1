@@ -39,7 +39,7 @@
                         <thead>
                             <tr>
                                 <th style="width: 60px">Sıra</th>
-                                <th style="width: 120px">Görsel</th>
+                                <th style="width: 150px">Görsel</th>
                                 <th>Başlık</th>
                                 <th>Alt Başlık</th>
                                 <th style="width: 100px">Durum</th>
@@ -56,7 +56,13 @@
                                         <span class="order-number">{{ $slider->order }}</span>
                                     </td>
                                     <td>
-                                        <img src="{{ $slider->image_url }}" alt="{{ $slider->title }}" class="img-thumbnail" style="max-height: 80px;">
+                                        @if($slider->filemanagersystem_image)
+                                            <img src="{{ $slider->filemanagersystem_image_url }}" alt="{{ $slider->filemanagersystem_image_alt }}" class="img-thumbnail" style="max-height: 50px;">
+                                        @else
+                                            <div class="text-center text-muted">
+                                                <i class="fas fa-image fa-2x"></i>
+                                            </div>
+                                        @endif
                                     </td>
                                     <td>{{ $slider->title }}</td>
                                     <td>{{ $slider->subtitle ?? '-' }}</td>

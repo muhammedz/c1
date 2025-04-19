@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class Slider extends Model
 {
@@ -17,11 +18,13 @@ class Slider extends Model
     protected $fillable = [
         'title',
         'subtitle',
-        'image',
         'button_text',
         'button_url',
         'order',
-        'is_active'
+        'is_active',
+        'filemanagersystem_image',
+        'filemanagersystem_image_alt',
+        'filemanagersystem_image_title'
     ];
     
     /**
@@ -31,55 +34,107 @@ class Slider extends Model
      */
     protected $casts = [
         'is_active' => 'boolean',
+        'order' => 'integer'
     ];
     
     /**
-     * Aktif slider'ları getir
-     *
-     * @return \Illuminate\Database\Eloquent\Builder
+     * Slider'a ait medya ilişkilerini getir
      */
-    public static function active()
+    public function mediaRelations(): MorphMany
     {
-        return self::where('is_active', true)->orderBy('order');
+        return $this->morphMany(MediaRelation::class, 'relatable');
     }
 
     /**
-     * Get the image URL
+     * Slider görselinin tam URL'ini döndürür
      */
-    public function getImageUrlAttribute()
+    public function getFilemanagersystemImageUrlAttribute(): ?string
     {
-        if (empty($this->image)) {
+        if (empty($this->filemanagersystem_image)) {
             return null;
         }
-
-        // Eğer tam URL ise
-        if (filter_var($this->image, FILTER_VALIDATE_URL)) {
-            return $this->image;
-        }
-
-        // Eğer /storage/ ile başlıyorsa, asset() ile çevir
-        if (strpos($this->image, '/storage/') === 0) {
-            return asset(str_replace('/storage/', 'storage/', $this->image));
+        
+        // Eğer URL zaten tam bir URL ise (http:// ile başlıyorsa) direkt döndür
+        if (strpos($this->filemanagersystem_image, 'http://') === 0 || strpos($this->filemanagersystem_image, 'https://') === 0) {
+            return $this->filemanagersystem_image;
         }
         
-        // Eğer /images/ içeriyorsa, /photos/ ile değiştir
-        if (strpos($this->image, '/images/') !== false) {
-            $path = str_replace('/images/', '/photos/', $this->image);
-            return asset($path);
+        // Dosya uzantısını kontrol et
+        $extension = pathinfo($this->filemanagersystem_image, PATHINFO_EXTENSION);
+        $filename = pathinfo($this->filemanagersystem_image, PATHINFO_BASENAME);
+        
+        // Klasör yapısı kontrolleri
+        
+        // 1. Eski yapı (uploads/dosyaadi.jpg) - Klasör yapısı olmayan
+        if (preg_match('#^uploads/([^/]+)$#', $this->filemanagersystem_image, $matches)) {
+            $dosyaAdi = $matches[1];
+            
+            // Dosya türünü belirle
+            $folderPath = $this->determineFileType($extension);
+            
+            // Düzeltilmiş yol
+            $fixedPath = "uploads/{$folderPath}/{$dosyaAdi}";
+            
+            // Dosya fiziksel olarak bu yolda var mı kontrol et
+            if (file_exists(public_path($fixedPath))) {
+                return asset($fixedPath);
+            }
         }
-
-        // Eğer /uploads/ ile başlıyorsa
-        if (strpos($this->image, '/uploads/') === 0) {
-            // Başındaki slash'ı kaldır
-            return asset(ltrim($this->image, '/'));
+        
+        // 2. Tam yol olması gereken format (uploads/images/dosya.jpg)
+        if (preg_match('#^uploads/(images|documents|videos|audios|archives)/[^/]+$#', $this->filemanagersystem_image)) {
+            // Doğru format, direkt asset olarak döndür
+            return asset($this->filemanagersystem_image);
         }
-
-        // Eğer bir dosya yolu ise uploads/ ile birleştir
-        if (!str_starts_with($this->image, '/')) {
-            return asset('uploads/' . $this->image);
+        
+        // 3. Klasör adı olmayan format (images/dosya.jpg)
+        if (preg_match('#^(images|documents|videos|audios|archives)/[^/]+$#', $this->filemanagersystem_image)) {
+            // 'uploads/' ekle
+            return asset('uploads/' . $this->filemanagersystem_image);
         }
+        
+        // Hiçbir kural uymaması durumunda en son çare olarak
+        return asset($this->filemanagersystem_image);
+    }
+    
+    /**
+     * Dosya uzantısına göre klasör türünü belirler
+     */
+    private function determineFileType($extension)
+    {
+        $extension = strtolower($extension);
+        
+        $imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp'];
+        $videoExtensions = ['mp4', 'mov', 'avi', 'webm', 'flv', 'mkv'];
+        $audioExtensions = ['mp3', 'wav', 'ogg', 'aac', 'flac'];
+        $archiveExtensions = ['zip', 'rar', 'tar', 'gz', '7z'];
+        
+        if (in_array($extension, $imageExtensions)) {
+            return 'images';
+        } elseif (in_array($extension, $videoExtensions)) {
+            return 'videos';
+        } elseif (in_array($extension, $audioExtensions)) {
+            return 'audios';
+        } elseif (in_array($extension, $archiveExtensions)) {
+            return 'archives';
+        } else {
+            return 'documents';
+        }
+    }
 
-        // Varsayılan olarak olduğu gibi döndür ama başındaki slash'ı kaldır
-        return asset(ltrim($this->image, '/'));
+    /**
+     * Aktif slider'ları filtrele
+     */
+    public function scopeActive($query)
+    {
+        return $query->where('is_active', true);
+    }
+
+    /**
+     * Sıralamaya göre slider'ları getir
+     */
+    public function scopeOrdered($query)
+    {
+        return $query->orderBy('order');
     }
 }
