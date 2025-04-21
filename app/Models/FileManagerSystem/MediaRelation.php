@@ -76,6 +76,7 @@ class MediaRelation extends Model
             'homepage_slider' => \App\Models\Slider::class,
             'corporate_category' => \App\Models\CorporateCategory::class,
             'corporate_member' => \App\Models\CorporateMember::class,
+            'news' => \App\Models\News::class,
             // Diğer ilişki tipleri burada tanımlanabilir
         ];
         

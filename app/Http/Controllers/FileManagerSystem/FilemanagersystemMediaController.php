@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Intervention\Image\Laravel\Facades\Image;
+use App\Helpers\FileManagerHelper;
 
 class FilemanagersystemMediaController extends Controller
 {
@@ -92,7 +93,7 @@ class FilemanagersystemMediaController extends Controller
                 // Dosyayı basitçe kaydet, önce sıkıştırma yapmadan direkt kaydet
                 $path = $file->storeAs($folderPath, $fileName, 'uploads');
                 $fullPath = public_path('uploads/' . $path);
-                $url = asset('uploads/' . $path);
+                $url = FileManagerHelper::getFileUrl('uploads/' . $path);
                 
                 // Resim dosyası ise sıkıştırma ve WebP dönüştürme işlemi yap
                 $compressionInfo = null;
@@ -523,7 +524,7 @@ class FilemanagersystemMediaController extends Controller
             // Ölçü ve sonuç bilgilerini doldur
             $result['success'] = true;
             $result['path'] = str_replace(public_path('uploads/'), '', $webpPath);
-            $result['url'] = asset('uploads/' . $result['path']);
+            $result['url'] = FileManagerHelper::getFileUrl('uploads/' . $result['path']);
             $result['size'] = filesize($webpPath);
             
             return $result;

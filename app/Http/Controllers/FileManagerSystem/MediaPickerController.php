@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Intervention\Image\ImageManager;
 use Intervention\Image\Drivers\Gd\Driver;
+use App\Helpers\FileManagerHelper;
 
 class MediaPickerController extends Controller
 {
@@ -473,7 +474,7 @@ class MediaPickerController extends Controller
                     if ($webpSize < $origSize) {
                         // WebP daha küçük, dosya bilgilerini WebP için güncelle
                         $path = $savePathWebp;
-                        $url = asset('uploads/' . $path);
+                        $url = FileManagerHelper::getFileUrl('uploads/' . $path);
                         $extension = 'webp';
                         $mimeType = 'image/webp';
                         $newSize = $webpSize;
@@ -495,7 +496,7 @@ class MediaPickerController extends Controller
                         }
                         
                         $path = $savePathOrig;
-                        $url = asset('uploads/' . $path);
+                        $url = FileManagerHelper::getFileUrl('uploads/' . $path);
                         $newSize = $origSize;
                         
                         \Log::debug('Orijinal format kullanılıyor (daha küçük)', [
@@ -515,7 +516,7 @@ class MediaPickerController extends Controller
                     $fileName = $fileName . '.' . $extension;
                     $path = $file->storeAs($folderPath, $fileName, 'uploads');
                     $fullPath = public_path('uploads/' . $path);
-                    $url = asset('uploads/' . $path);
+                    $url = FileManagerHelper::getFileUrl('uploads/' . $path);
                     
                     // Görüntü boyutlarını al
                     if ($isImage) {
@@ -533,7 +534,7 @@ class MediaPickerController extends Controller
                 $fileName = $fileName . '.' . $extension;
                 $path = $file->storeAs($folderPath, $fileName, 'uploads');
                 $fullPath = public_path('uploads/' . $path);
-                $url = asset('uploads/' . $path);
+                $url = FileManagerHelper::getFileUrl('uploads/' . $path);
                 $newSize = $originalSize;
                 
                 // Görüntü boyutlarını al (eğer görselse)

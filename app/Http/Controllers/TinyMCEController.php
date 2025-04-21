@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use App\Helpers\FileManagerHelper;
 
 class TinyMCEController extends Controller
 {
@@ -44,7 +45,7 @@ class TinyMCEController extends Controller
             $path = $uploadPath . '/' . $filename;
             
             // Asset fonksiyonu ile URL oluştur
-            $url = asset($path);
+            $url = FileManagerHelper::getFileUrl($path);
 
             Log::channel('daily')->debug('TinyMCE Upload Success:', [
                 'path' => $path,

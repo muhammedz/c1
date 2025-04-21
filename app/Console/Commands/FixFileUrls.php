@@ -6,6 +6,7 @@ use Illuminate\Console\Command;
 use App\Models\Slider;
 use App\Models\FileManagerSystem\Media;
 use Illuminate\Support\Facades\DB;
+use App\Helpers\FileManagerHelper;
 
 class FixFileUrls extends Command
 {
@@ -86,7 +87,7 @@ class FixFileUrls extends Command
                     
                     // Veritabanını güncelle
                     $media->path = $newRelativePath;
-                    $media->url = asset('uploads/' . $newRelativePath);
+                    $media->url = FileManagerHelper::getFileUrl('uploads/' . $newRelativePath);
                     $media->save();
                     
                     $count++;

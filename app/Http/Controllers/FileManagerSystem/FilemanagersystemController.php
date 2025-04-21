@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use ZipArchive;
+use App\Helpers\FileManagerHelper;
 
 class FilemanagersystemController extends Controller
 {
@@ -41,7 +42,7 @@ class FilemanagersystemController extends Controller
         foreach ($recentFiles as $file) {
             // Eğer URL zaten tam yol içeriyorsa, dokunma
             if (!$file->url || (strpos($file->url, 'http://') !== 0 && strpos($file->url, 'https://') !== 0)) {
-                $file->url = asset('uploads/' . $file->path);
+                $file->url = FileManagerHelper::getFileUrl('uploads/' . $file->path);
             }
         }
         
@@ -252,12 +253,12 @@ class FilemanagersystemController extends Controller
                 }
                 
                 // URL'yi oluştur
-                $file->url = asset('uploads/' . $path);
+                $file->url = FileManagerHelper::getFileUrl('uploads/' . $path);
                 $file->file_name = $file->original_name ?? $file->name;
                 
                 // WebP bilgilerini ekle
                 if ($file->has_webp && $file->webp_path) {
-                    $file->webp_url = asset('uploads/' . $file->webp_path);
+                    $file->webp_url = FileManagerHelper::getFileUrl('uploads/' . $file->webp_path);
                 }
                 
                 // İnsan tarafından okunabilir formatları ekle
