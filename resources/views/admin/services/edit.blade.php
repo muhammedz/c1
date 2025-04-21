@@ -754,64 +754,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/locales/bootstrap-datepicker.tr.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-<script src="{{ asset('vendor/laravel-filemanager/js/stand-alone-button.js') }}"></script>
-
-<script>
-    // TinyMCE'yi dinamik olarak yükle
-    var script = document.createElement('script');
-    script.type = 'text/javascript';
-    script.src = '{{ asset("vendor/tinymce/tinymce/js/tinymce/tinymce.min.js") }}';
-    
-    script.onload = function() {
-        console.log('TinyMCE yüklendi');
-        
-        // TinyMCE Editör
-        tinymce.init({
-            selector: '#content',
-            language: 'tr',
-            height: 500,
-            menubar: true,
-            plugins: [
-                'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
-                'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
-                'insertdatetime', 'media', 'table', 'help', 'wordcount'
-            ],
-            toolbar: 'undo redo | blocks | ' +
-                'bold italic backcolor | alignleft aligncenter ' +
-                'alignright alignjustify | bullist numlist outdent indent | ' +
-                'removeformat | image | help',
-            images_upload_url: '{{ route("admin.tinymce.upload") }}',
-            images_upload_credentials: true,
-            branding: false,
-            promotion: false,
-            content_css: [
-                '{{ asset("vendor/adminlte/dist/css/adminlte.min.css") }}',
-                'https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700'
-            ],
-            file_picker_callback: function (callback, value, meta) {
-                let x = window.innerWidth || document.documentElement.clientWidth || document.getElementsByTagName('body')[0].clientWidth;
-                let y = window.innerHeight || document.documentElement.clientHeight || document.getElementsByTagName('body')[0].clientHeight;
-
-                let type = meta.filetype;
-                let url = '/admin/filemanager?editor=tinymce5&type=' + type;
-
-                tinymce.activeEditor.windowManager.openUrl({
-                    url: url,
-                    title: 'Laravel File Manager',
-                    width: x * 0.8,
-                    height: y * 0.8,
-                    resizable: 'yes',
-                    close_previous: 'no',
-                    onMessage: (api, message) => {
-                        callback(message.content);
-                    }
-                });
-            }
-        });
-    };
-    
-    document.head.appendChild(script);
-</script>
+<script src="{{ asset('vendor/tinymce/tinymce.min.js') }}"></script>
 
 <script>
     $(document).ready(function() {
@@ -829,22 +772,6 @@
             language: 'tr'
         });
         
-        // Laravel File Manager butonları
-        $('#image-browser').filemanager('image', {prefix: '/admin/filemanager'});
-        $('#gallery-browser').filemanager('image', {prefix: '/admin/filemanager'});
-        
-        // Galeri filemanager değişikliğini dinleme
-        $('#fake-gallery-input').on('change', function() {
-            // Seçilen görseli al
-            var url = $(this).val();
-            if (url) {
-                // URL'yi rölatif yola dönüştür
-                url = makeRelativeUrl(url);
-                addGalleryItem(url);
-                $(this).val(''); // input'u temizle
-            }
-        });
-        
         // Clear Button for Main Image
         $('#image-clear').on('click', function() {
             $('#image').val('');
@@ -855,12 +782,11 @@
         $('#image').on('change', function() {
             const url = $(this).val();
             if (url) {
-                // URL'yi rölatif yola dönüştür
-                const cleanUrl = makeRelativeUrl(url);
-                $(this).val(cleanUrl);
+                // URL'yi rölatif hale getir
+                $(this).val(makeRelativeUrl(url));
                 
                 // Önizlemeyi göster
-                $('#image-preview').show().find('img').attr('src', cleanUrl);
+                $('#image-preview').show().find('img').attr('src', makeRelativeUrl(url));
             } else {
                 // Boş ise önizlemeyi gizle
                 $('#image-preview').hide();

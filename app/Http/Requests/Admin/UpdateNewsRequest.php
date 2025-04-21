@@ -22,7 +22,7 @@ class UpdateNewsRequest extends FormRequest
         return [
             'title' => 'required|string|max:255',
             'content' => 'required|string',
-            'image' => 'required|string',
+            'image' => 'nullable|string',
             'status' => 'required|in:published,draft',
             'categories' => 'required|array|min:1',
             'categories.*' => 'exists:news_categories,id',
@@ -47,7 +47,6 @@ class UpdateNewsRequest extends FormRequest
         return [
             'title.required' => 'Başlık alanı zorunludur.',
             'content.required' => 'İçerik alanı zorunludur.',
-            'image.required' => 'Ana görsel alanı zorunludur.',
             'status.required' => 'Durum alanı zorunludur.',
             'categories.required' => 'En az bir haber kategorisi seçmelisiniz.',
             'categories.min' => 'En az bir haber kategorisi seçmelisiniz.',

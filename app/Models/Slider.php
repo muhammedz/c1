@@ -5,6 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use App\Models\FileManagerSystem\MediaRelation;
+use App\Models\FileManagerSystem\Media;
 
 class Slider extends Model
 {
@@ -38,12 +40,26 @@ class Slider extends Model
     ];
     
     /**
-     * Slider'a ait medya ilişkilerini getir
+     * Slider'a ait medya ilişkilerini getir - MorphMany ilişkisi ile
      */
-    public function mediaRelations()
+    public function mediaRelations(): MorphMany
     {
-        return MediaRelation::where('related_to', 'slider')
-            ->where('related_id', $this->id);
+        return $this->morphMany(MediaRelation::class, 'related', 'related_type', 'related_id');
+    }
+
+    /**
+     * Slider'a bağlı medya dosyalarını getir
+     */
+    public function media()
+    {
+        return $this->hasManyThrough(
+            Media::class,
+            MediaRelation::class,
+            'related_id',
+            'id',
+            'id',
+            'media_id'
+        )->where('related_type', 'homepage_slider');
     }
 
     /**
@@ -58,6 +74,23 @@ class Slider extends Model
         // Eğer URL zaten tam bir URL ise (http:// ile başlıyorsa) direkt döndür
         if (strpos($this->filemanagersystem_image, 'http://') === 0 || strpos($this->filemanagersystem_image, 'https://') === 0) {
             return $this->filemanagersystem_image;
+        }
+        
+        // Media ID kontrolü - /uploads/media/ID formatı
+        if (preg_match('#^/uploads/media/(\d+)$#', $this->filemanagersystem_image, $matches)) {
+            $mediaId = $matches[1];
+            $media = Media::find($mediaId);
+            
+            if ($media) {
+                // Medya bulundu, URL'i döndür
+                return asset($media->url);
+            }
+            
+            // Medya bulunamadı, ilişkili medyaları kontrol et
+            $relatedMedia = $this->media()->first();
+            if ($relatedMedia) {
+                return asset($relatedMedia->url);
+            }
         }
         
         // Dosya uzantısını kontrol et

@@ -255,7 +255,14 @@
                                 <div class="bg-white rounded-lg shadow-lg p-6 mega-menu-content">
                                     <!-- İlgili Gruplar -->
                                     <div class="mb-4">
-                                        <h3 class="text-lg font-semibold mb-3 text-gray-700">İlgili Gruplar:</h3>
+                                        <div class="flex justify-between items-center mb-3">
+                                            <h3 class="text-lg font-semibold text-gray-700">İlgili Gruplar:</h3>
+                                            <a href="/hizmetler" class="bg-gradient-to-r from-[#007b32] to-[#00352b] text-white font-medium py-2 px-4 rounded-md shadow-sm transition duration-300 flex items-center gap-2 hover:shadow-md hover:translate-y-[-2px]">
+                                                <span class="material-icons text-sm">category</span>
+                                                <span>TÜM HİZMETLERİMİZ</span>
+                                                <span class="material-icons text-sm">arrow_forward</span>
+                                            </a>
+                                        </div>
                                         <div class="flex flex-wrap gap-2">
                                             <a href="#" class="py-1 px-3 text-sm bg-blue-100 hover:bg-blue-200 text-blue-800 rounded-full transition">Öğrenciler</a>
                                             <a href="#" class="py-1 px-3 text-sm bg-pink-100 hover:bg-pink-200 text-pink-800 rounded-full transition">Anneler</a>
@@ -269,281 +276,69 @@
                                     <div class="grid grid-cols-6 gap-3">
                                         <!-- İş Yerleri -->
                                         <a href="#" data-category="isyerleri" class="p-4 bg-white hover:bg-gray-50 rounded-lg border border-gray-200 flex flex-col items-center text-center transition transform hover:translate-y-[-5px] hover:shadow-md">
-                                            <span class="material-icons text-blue-600 text-2xl mb-2">store</span>
+                                            <span class="material-icons text-[#007b32] text-2xl mb-2">store</span>
                                             <span class="text-sm font-medium text-gray-700">İş Yerleri</span>
                                         </a>
                                         
                                         <!-- Kültür -->
                                         <a href="#" data-category="kultur" class="p-4 bg-white hover:bg-gray-50 rounded-lg border border-gray-200 flex flex-col items-center text-center transition transform hover:translate-y-[-5px] hover:shadow-md">
-                                            <span class="material-icons text-purple-600 text-2xl mb-2">theater_comedy</span>
+                                            <span class="material-icons text-[#007b32] text-2xl mb-2">theater_comedy</span>
                                             <span class="text-sm font-medium text-gray-700">Kültür</span>
                                         </a>
                                         
                                         <!-- Sağlık -->
                                         <a href="#" data-category="saglik" class="p-4 bg-white hover:bg-gray-50 rounded-lg border border-gray-200 flex flex-col items-center text-center transition transform hover:translate-y-[-5px] hover:shadow-md">
-                                            <span class="material-icons text-red-600 text-2xl mb-2">local_hospital</span>
+                                            <span class="material-icons text-[#007b32] text-2xl mb-2">local_hospital</span>
                                             <span class="text-sm font-medium text-gray-700">Sağlık</span>
                                         </a>
                                         
                                         <!-- İmar -->
                                         <a href="#" data-category="imar" class="p-4 bg-white hover:bg-gray-50 rounded-lg border border-gray-200 flex flex-col items-center text-center transition transform hover:translate-y-[-5px] hover:shadow-md">
-                                            <span class="material-icons text-amber-600 text-2xl mb-2">apartment</span>
+                                            <span class="material-icons text-[#007b32] text-2xl mb-2">apartment</span>
                                             <span class="text-sm font-medium text-gray-700">İmar</span>
                                         </a>
                                         
                                         <!-- Sosyal Yardım -->
                                         <a href="#" data-category="sosyalyardim" class="p-4 bg-white hover:bg-gray-50 rounded-lg border border-gray-200 flex flex-col items-center text-center transition transform hover:translate-y-[-5px] hover:shadow-md">
-                                            <span class="material-icons text-teal-600 text-2xl mb-2">volunteer_activism</span>
+                                            <span class="material-icons text-[#007b32] text-2xl mb-2">volunteer_activism</span>
                                             <span class="text-sm font-medium text-gray-700">Sosyal Yardım</span>
                                         </a>
                                         
                                         <!-- Çevre -->
                                         <a href="#" data-category="cevre" class="p-4 bg-white hover:bg-gray-50 rounded-lg border border-gray-200 flex flex-col items-center text-center transition transform hover:translate-y-[-5px] hover:shadow-md">
-                                            <span class="material-icons text-green-600 text-2xl mb-2">nature</span>
+                                            <span class="material-icons text-[#007b32] text-2xl mb-2">nature</span>
                                             <span class="text-sm font-medium text-gray-700">Çevre</span>
                                         </a>
                                         
                                         <!-- Veterinerlik -->
                                         <a href="#" data-category="veterinerlik" class="p-4 bg-white hover:bg-gray-50 rounded-lg border border-gray-200 flex flex-col items-center text-center transition transform hover:translate-y-[-5px] hover:shadow-md">
-                                            <span class="material-icons text-orange-600 text-2xl mb-2">pets</span>
+                                            <span class="material-icons text-[#007b32] text-2xl mb-2">pets</span>
                                             <span class="text-sm font-medium text-gray-700">Veterinerlik</span>
                                         </a>
                                         
                                         <!-- Temizlik -->
                                         <a href="#" data-category="temizlik" class="p-4 bg-white hover:bg-gray-50 rounded-lg border border-gray-200 flex flex-col items-center text-center transition transform hover:translate-y-[-5px] hover:shadow-md">
-                                            <span class="material-icons text-cyan-600 text-2xl mb-2">cleaning_services</span>
+                                            <span class="material-icons text-[#007b32] text-2xl mb-2">cleaning_services</span>
                                             <span class="text-sm font-medium text-gray-700">Temizlik</span>
                                         </a>
                                         
                                         <!-- Kamu Emlak ve İstimlak İşlemleri -->
                                         <a href="#" data-category="kamuEmlak" class="p-4 bg-white hover:bg-gray-50 rounded-lg border border-gray-200 flex flex-col items-center text-center transition transform hover:translate-y-[-5px] hover:shadow-md">
-                                            <span class="material-icons text-indigo-600 text-2xl mb-2">real_estate_agent</span>
+                                            <span class="material-icons text-[#007b32] text-2xl mb-2">real_estate_agent</span>
                                             <span class="text-sm font-medium text-gray-700">Kamu Emlak ve İstimlak</span>
                                         </a>
                                         
                                         <!-- Park -->
                                         <a href="#" data-category="park" class="p-4 bg-white hover:bg-gray-50 rounded-lg border border-gray-200 flex flex-col items-center text-center transition transform hover:translate-y-[-5px] hover:shadow-md">
-                                            <span class="material-icons text-lime-600 text-2xl mb-2">park</span>
+                                            <span class="material-icons text-[#007b32] text-2xl mb-2">park</span>
                                             <span class="text-sm font-medium text-gray-700">Park</span>
                                         </a>
                                         
                                         <!-- Fen İşleri -->
                                         <a href="#" data-category="fenisleri" class="p-4 bg-white hover:bg-gray-50 rounded-lg border border-gray-200 flex flex-col items-center text-center transition transform hover:translate-y-[-5px] hover:shadow-md">
-                                            <span class="material-icons text-gray-700 text-2xl mb-2">construction</span>
+                                            <span class="material-icons text-[#007b32] text-2xl mb-2">construction</span>
                                             <span class="text-sm font-medium text-gray-700">Fen İşleri</span>
                                         </a>
-                                    </div>
-                                    
-                                    <!-- Kategori İçerikleri (Başlangıçta gizli) -->
-                                    <div class="hidden">
-                                        <!-- İş Yerleri İçeriği -->
-                                        <div id="isyerleri" class="tab-pane hidden">
-                                            <h3 class="text-xl font-semibold mb-4 text-blue-600">İş Yerleri</h3>
-                                            <div class="grid grid-cols-4 gap-4">
-                                                <a href="{{ route('hizmet',['slug' => 'ruhsat-islemleri']) }}" class="flex items-center p-3 bg-white hover:bg-blue-50 rounded-lg border border-gray-200 transition">
-                                                    <span class="material-icons text-blue-500 mr-2">assignment</span>
-                                                    <span class="text-sm">Ruhsat İşlemleri</span>
-                                                </a>
-                                                <a href="{{ route('hizmet',['slug' => 'ruhsat-basvuru-takibi']) }}" class="flex items-center p-3 bg-white hover:bg-blue-50 rounded-lg border border-gray-200 transition">
-                                                    <span class="material-icons text-blue-500 mr-2">search</span>
-                                                    <span class="text-sm">Ruhsat Başvuru Takibi</span>
-                                                </a>
-                                                <a href="{{ route('hizmet',['slug' => 'is-yeri-acma-islemleri']) }}" class="flex items-center p-3 bg-white hover:bg-blue-50 rounded-lg border border-gray-200 transition">
-                                                    <span class="material-icons text-blue-500 mr-2">store</span>
-                                                    <span class="text-sm">İş Yeri Açma İşlemleri</span>
-                                                </a>
-                                            </div>
-                                        </div>
-                                        
-                                        <!-- Kültür İçeriği -->
-                                        <div id="kultur" class="tab-pane hidden">
-                                            <h3 class="text-xl font-semibold mb-4 text-purple-600">Kültür</h3>
-                                            <div class="grid grid-cols-4 gap-4">
-                                                <a href="{{ route('hizmet',['slug' => 'kutuphane-hizmetleri']) }}" class="flex items-center p-3 bg-white hover:bg-purple-50 rounded-lg border border-gray-200 transition">
-                                                    <span class="material-icons text-purple-500 mr-2">menu_book</span>
-                                                    <span class="text-sm">Kütüphane Hizmetleri</span>
-                                                </a>
-                                                <a href="{{ route('hizmet',['slug' => 'kultur-merkezleri']) }}" class="flex items-center p-3 bg-white hover:bg-purple-50 rounded-lg border border-gray-200 transition">
-                                                    <span class="material-icons text-purple-500 mr-2">festival</span>
-                                                    <span class="text-sm">Kültür Merkezleri</span>
-                                                </a>
-                                                <a href="{{ route('hizmet',['slug' => 'sanat-egitimi']) }}" class="flex items-center p-3 bg-white hover:bg-purple-50 rounded-lg border border-gray-200 transition">
-                                                    <span class="material-icons text-purple-500 mr-2">palette</span>
-                                                    <span class="text-sm">Sanat Eğitimi</span>
-                                                </a>
-                                            </div>
-                                        </div>
-                                        
-                                        <!-- Sağlık İçeriği -->
-                                        <div id="saglik" class="tab-pane hidden">
-                                            <h3 class="text-xl font-semibold mb-4 text-red-600">Sağlık</h3>
-                                            <div class="grid grid-cols-4 gap-4">
-                                                <a href="{{ route('hizmet',['slug' => 'saglik-taramalari']) }}" class="flex items-center p-3 bg-white hover:bg-red-50 rounded-lg border border-gray-200 transition">
-                                                    <span class="material-icons text-red-500 mr-2">monitor_heart</span>
-                                                    <span class="text-sm">Sağlık Taramaları</span>
-                                                </a>
-                                                <a href="{{ route('hizmet',['slug' => 'ambulans-hizmetleri']) }}" class="flex items-center p-3 bg-white hover:bg-red-50 rounded-lg border border-gray-200 transition">
-                                                    <span class="material-icons text-red-500 mr-2">emergency</span>
-                                                    <span class="text-sm">Ambulans Hizmetleri</span>
-                                                </a>
-                                                <a href="{{ route('hizmet',['slug' => 'cenaze-hizmetleri']) }}" class="flex items-center p-3 bg-white hover:bg-red-50 rounded-lg border border-gray-200 transition">
-                                                    <span class="material-icons text-red-500 mr-2">church</span>
-                                                    <span class="text-sm">Cenaze Hizmetleri</span>
-                                                </a>
-                                            </div>
-                                        </div>
-                                        
-                                        <!-- İmar İçeriği -->
-                                        <div id="imar" class="tab-pane hidden">
-                                            <h3 class="text-xl font-semibold mb-4 text-amber-600">İmar</h3>
-                                            <div class="grid grid-cols-4 gap-4">
-                                                <a href="{{ route('hizmet',['slug' => 'imar-durumu-sorgulama']) }}" class="flex items-center p-3 bg-white hover:bg-amber-50 rounded-lg border border-gray-200 transition">
-                                                    <span class="material-icons text-amber-500 mr-2">search</span>
-                                                    <span class="text-sm">İmar Durumu Sorgulama</span>
-                                                </a>
-                                                <a href="{{ route('hizmet',['slug' => 'yapi-ruhsati']) }}" class="flex items-center p-3 bg-white hover:bg-amber-50 rounded-lg border border-gray-200 transition">
-                                                    <span class="material-icons text-amber-500 mr-2">badge</span>
-                                                    <span class="text-sm">Yapı Ruhsatı</span>
-                                                </a>
-                                                <a href="{{ route('hizmet',['slug' => 'numarataj-islemleri']) }}" class="flex items-center p-3 bg-white hover:bg-amber-50 rounded-lg border border-gray-200 transition">
-                                                    <span class="material-icons text-amber-500 mr-2">tag</span>
-                                                    <span class="text-sm">Numarataj İşlemleri</span>
-                                                </a>
-                                            </div>
-                                        </div>
-                                        
-                                        <!-- Sosyal Yardım İçeriği -->
-                                        <div id="sosyalyardim" class="tab-pane hidden">
-                                            <h3 class="text-xl font-semibold mb-4 text-teal-600">Sosyal Yardım</h3>
-                                            <div class="grid grid-cols-4 gap-4">
-                                                <a href="{{ route('hizmet',['slug' => 'sosyal-yardim-basvurusu']) }}" class="flex items-center p-3 bg-white hover:bg-teal-50 rounded-lg border border-gray-200 transition">
-                                                    <span class="material-icons text-teal-500 mr-2">redeem</span>
-                                                    <span class="text-sm">Sosyal Yardım Başvurusu</span>
-                                                </a>
-                                                <a href="{{ route('hizmet',['slug' => 'engelli-hizmetleri']) }}" class="flex items-center p-3 bg-white hover:bg-teal-50 rounded-lg border border-gray-200 transition">
-                                                    <span class="material-icons text-teal-500 mr-2">accessible</span>
-                                                    <span class="text-sm">Engelli Hizmetleri</span>
-                                                </a>
-                                                <a href="{{ route('hizmet',['slug' => 'asevi-hizmetleri']) }}" class="flex items-center p-3 bg-white hover:bg-teal-50 rounded-lg border border-gray-200 transition">
-                                                    <span class="material-icons text-teal-500 mr-2">restaurant</span>
-                                                    <span class="text-sm">Aşevi Hizmetleri</span>
-                                                </a>
-                                            </div>
-                                        </div>
-                                        
-                                        <!-- Çevre İçeriği -->
-                                        <div id="cevre" class="tab-pane hidden">
-                                            <h3 class="text-xl font-semibold mb-4 text-green-600">Çevre</h3>
-                                            <div class="grid grid-cols-4 gap-4">
-                                                <a href="{{ route('hizmet',['slug' => 'geri-donusum']) }}" class="flex items-center p-3 bg-white hover:bg-green-50 rounded-lg border border-gray-200 transition">
-                                                    <span class="material-icons text-green-500 mr-2">recycling</span>
-                                                    <span class="text-sm">Geri Dönüşüm</span>
-                                                </a>
-                                                <a href="{{ route('hizmet',['slug' => 'cevre-denetimi']) }}" class="flex items-center p-3 bg-white hover:bg-green-50 rounded-lg border border-gray-200 transition">
-                                                    <span class="material-icons text-green-500 mr-2">eco</span>
-                                                    <span class="text-sm">Çevre Denetimi</span>
-                                                </a>
-                                                <a href="{{ route('hizmet',['slug' => 'hava-kalitesi']) }}" class="flex items-center p-3 bg-white hover:bg-green-50 rounded-lg border border-gray-200 transition">
-                                                    <span class="material-icons text-green-500 mr-2">air</span>
-                                                    <span class="text-sm">Hava Kalitesi</span>
-                                                </a>
-                                            </div>
-                                        </div>
-                                        
-                                        <!-- Veterinerlik İçeriği -->
-                                        <div id="veterinerlik" class="tab-pane hidden">
-                                            <h3 class="text-xl font-semibold mb-4 text-orange-600">Veterinerlik</h3>
-                                            <div class="grid grid-cols-4 gap-4">
-                                                <a href="{{ route('hizmet',['slug' => 'hayvan-rehabilitasyon']) }}" class="flex items-center p-3 bg-white hover:bg-orange-50 rounded-lg border border-gray-200 transition">
-                                                    <span class="material-icons text-orange-500 mr-2">healing</span>
-                                                    <span class="text-sm">Hayvan Rehabilitasyon</span>
-                                                </a>
-                                                <a href="{{ route('hizmet',['slug' => 'asi-kampanyalari']) }}" class="flex items-center p-3 bg-white hover:bg-orange-50 rounded-lg border border-gray-200 transition">
-                                                    <span class="material-icons text-orange-500 mr-2">vaccines</span>
-                                                    <span class="text-sm">Aşı Kampanyaları</span>
-                                                </a>
-                                                <a href="{{ route('hizmet',['slug' => 'hayvan-sahiplendirme']) }}" class="flex items-center p-3 bg-white hover:bg-orange-50 rounded-lg border border-gray-200 transition">
-                                                    <span class="material-icons text-orange-500 mr-2">pets</span>
-                                                    <span class="text-sm">Hayvan Sahiplendirme</span>
-                                                </a>
-                                            </div>
-                                        </div>
-                                        
-                                        <!-- Temizlik İçeriği -->
-                                        <div id="temizlik" class="tab-pane hidden">
-                                            <h3 class="text-xl font-semibold mb-4 text-cyan-600">Temizlik</h3>
-                                            <div class="grid grid-cols-4 gap-4">
-                                                <a href="{{ route('hizmet',['slug' => 'cop-toplama-saatleri']) }}" class="flex items-center p-3 bg-white hover:bg-cyan-50 rounded-lg border border-gray-200 transition">
-                                                    <span class="material-icons text-cyan-500 mr-2">schedule</span>
-                                                    <span class="text-sm">Çöp Toplama Saatleri</span>
-                                                </a>
-                                                <a href="{{ route('hizmet',['slug' => 'sokak-temizligi']) }}" class="flex items-center p-3 bg-white hover:bg-cyan-50 rounded-lg border border-gray-200 transition">
-                                                    <span class="material-icons text-cyan-500 mr-2">cleaning_services</span>
-                                                    <span class="text-sm">Sokak Temizliği</span>
-                                                </a>
-                                                <a href="{{ route('hizmet',['slug' => 'atik-bertarafi']) }}" class="flex items-center p-3 bg-white hover:bg-cyan-50 rounded-lg border border-gray-200 transition">
-                                                    <span class="material-icons text-cyan-500 mr-2">delete</span>
-                                                    <span class="text-sm">Atık Bertarafı</span>
-                                                </a>
-                                            </div>
-                                        </div>
-                                        
-                                        <!-- Kamu Emlak ve İstimlak İşlemleri İçeriği -->
-                                        <div id="kamuEmlak" class="tab-pane hidden">
-                                            <h3 class="text-xl font-semibold mb-4 text-indigo-600">Kamu Emlak ve İstimlak İşlemleri</h3>
-                                            <div class="grid grid-cols-4 gap-4">
-                                                <a href="{{ route('hizmet',['slug' => 'tasinmaz-mal-islemleri']) }}" class="flex items-center p-3 bg-white hover:bg-indigo-50 rounded-lg border border-gray-200 transition">
-                                                    <span class="material-icons text-indigo-500 mr-2">house</span>
-                                                    <span class="text-sm">Taşınmaz Mal İşlemleri</span>
-                                                </a>
-                                                <a href="{{ route('hizmet',['slug' => 'istimlak-islemleri']) }}" class="flex items-center p-3 bg-white hover:bg-indigo-50 rounded-lg border border-gray-200 transition">
-                                                    <span class="material-icons text-indigo-500 mr-2">real_estate_agent</span>
-                                                    <span class="text-sm">İstimlak İşlemleri</span>
-                                                </a>
-                                                <a href="{{ route('hizmet',['slug' => 'kira-islemleri']) }}" class="flex items-center p-3 bg-white hover:bg-indigo-50 rounded-lg border border-gray-200 transition">
-                                                    <span class="material-icons text-indigo-500 mr-2">payments</span>
-                                                    <span class="text-sm">Kira İşlemleri</span>
-                                                </a>
-                                            </div>
-                                        </div>
-                                        
-                                        <!-- Park İçeriği -->
-                                        <div id="park" class="tab-pane hidden">
-                                            <h3 class="text-xl font-semibold mb-4 text-lime-600">Park</h3>
-                                            <div class="grid grid-cols-4 gap-4">
-                                                <a href="{{ route('hizmet',['slug' => 'parklar-ve-bahceler']) }}" class="flex items-center p-3 bg-white hover:bg-lime-50 rounded-lg border border-gray-200 transition">
-                                                    <span class="material-icons text-lime-500 mr-2">park</span>
-                                                    <span class="text-sm">Parklar ve Bahçeler</span>
-                                                </a>
-                                                <a href="{{ route('hizmet',['slug' => 'cocuk-oyun-alanlari']) }}" class="flex items-center p-3 bg-white hover:bg-lime-50 rounded-lg border border-gray-200 transition">
-                                                    <span class="material-icons text-lime-500 mr-2">child_care</span>
-                                                    <span class="text-sm">Çocuk Oyun Alanları</span>
-                                                </a>
-                                                <a href="{{ route('hizmet',['slug' => 'spor-alanlari']) }}" class="flex items-center p-3 bg-white hover:bg-lime-50 rounded-lg border border-gray-200 transition">
-                                                    <span class="material-icons text-lime-500 mr-2">sports_soccer</span>
-                                                    <span class="text-sm">Spor Alanları</span>
-                                                </a>
-                                            </div>
-                                        </div>
-                                        
-                                        <!-- Fen İşleri İçeriği -->
-                                        <div id="fenisleri" class="tab-pane hidden">
-                                            <h3 class="text-xl font-semibold mb-4 text-gray-600">Fen İşleri</h3>
-                                            <div class="grid grid-cols-4 gap-4">
-                                                <a href="{{ route('hizmet',['slug' => 'altyapi-calismalari']) }}" class="flex items-center p-3 bg-white hover:bg-gray-50 rounded-lg border border-gray-200 transition">
-                                                    <span class="material-icons text-gray-500 mr-2">plumbing</span>
-                                                    <span class="text-sm">Altyapı Çalışmaları</span>
-                                                </a>
-                                                <a href="{{ route('hizmet',['slug' => 'asfalt-calismalari']) }}" class="flex items-center p-3 bg-white hover:bg-gray-50 rounded-lg border border-gray-200 transition">
-                                                    <span class="material-icons text-gray-500 mr-2">road</span>
-                                                    <span class="text-sm">Asfalt Çalışmaları</span>
-                                                </a>
-                                                <a href="{{ route('hizmet',['slug' => 'insaat-projeleri']) }}" class="flex items-center p-3 bg-white hover:bg-gray-50 rounded-lg border border-gray-200 transition">
-                                                    <span class="material-icons text-gray-500 mr-2">architecture</span>
-                                                    <span class="text-sm">İnşaat Projeleri</span>
-                                                </a>
-                                            </div>
-                                        </div>
                                     </div>
                                 </div>
                             </div>

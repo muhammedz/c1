@@ -17,18 +17,29 @@ class NewsCategory extends Model
         'description',
         'parent_id',
         'order',
-        'is_active'
+        'is_active',
+        'image',
+        'meta_title',
+        'meta_description',
+        'meta_keywords',
+        'status'
     ];
     
     protected $casts = [
         'is_active' => 'boolean',
+        'status' => 'boolean'
     ];
     
-    // Slug otomatik oluşturma
-    public function setNameAttribute($value)
+    // Otomatik slug oluşturma
+    protected static function boot()
     {
-        $this->attributes['name'] = $value;
-        $this->attributes['slug'] = Str::slug($value);
+        parent::boot();
+        
+        static::creating(function ($category) {
+            if (!$category->slug) {
+                $category->slug = Str::slug($category->name);
+            }
+        });
     }
     
     // İlişkiler
@@ -48,8 +59,7 @@ class NewsCategory extends Model
     // Kategorideki haberler
     public function news()
     {
-        return $this->belongsToMany(News::class, 'news_category', 'category_id', 'news_id')
-                    ->withTimestamps();
+        return $this->belongsToMany(News::class, 'news_category', 'category_id', 'news_id');
     }
     
     // Yardımcı metodlar
@@ -77,5 +87,20 @@ class NewsCategory extends Model
         return self::where('slug', $slug)
                    ->where('is_active', true)
                    ->first();
+    }
+
+    // Scopelar
+    public function scopeActive($query)
+    {
+        return $query->where('status', true);
+    }
+
+    // Aktif haber sayısını getir
+    public function getNewsCountAttribute()
+    {
+        return $this->news()
+            ->active()
+            ->published()
+            ->count();
     }
 } 

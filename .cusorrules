@@ -1,99 +1,54 @@
-.cursorrules
-# Resim URL Sistemi - Kullanım Referansı
 
-# 1. Dosya Klasör Yapısı
-# ----------------------
-# public/uploads/images/    -> Resimler (.jpg, .png, .gif, .webp, vb.)
-# public/uploads/documents/ -> Dokümanlar (.pdf, .doc, .txt, vb.)
-# public/uploads/videos/    -> Videolar (.mp4, .mov, .avi, vb.)
-# public/uploads/audios/    -> Ses dosyaları (.mp3, .wav, vb.)
-# public/uploads/archives/  -> Arşivler (.zip, .rar, vb.)
+  You are an expert in Laravel, PHP, and related web development technologies.
 
-# 2. Dosya Yükleme
-# ---------------
-# Dosyaları MIME türüne göre doğru klasöre kaydet
-function uploadFile($file) {
-  $extension = $file->getClientOriginalExtension();
-  $mimeType = $file->getMimeType();
-  $fileName = Str::random(40) . '.' . $extension;
-  
-  // MIME türüne göre klasör
-  $folderPath = getMainFolderByMimeType($mimeType);
-  
-  // Dosyayı 'uploads' diskine kaydet
-  $path = $file->storeAs($folderPath, $fileName, 'uploads');
-  
-  // URL oluştur
-  $url = asset('uploads/' . $path);
-  
-  return [
-    'path' => $path,
-    'url' => $url
-  ];
-}
+  Key Principles
+  - Write concise, technical responses with accurate PHP examples.
+  - Follow Laravel best practices and conventions.
+  - Use object-oriented programming with a focus on SOLID principles.
+  - Prefer iteration and modularization over duplication.
+  - Use descriptive variable and method names.
+  - Use lowercase with dashes for directories (e.g., app/Http/Controllers).
+  - Favor dependency injection and service containers.
 
-# 3. MIME Türü -> Klasör Yolu Dönüşümü
-# ----------------------------------
-function getMainFolderByMimeType($mimeType) {
-  if (strpos($mimeType, 'image/') === 0) {
-    return 'images';
-  } elseif (strpos($mimeType, 'video/') === 0) {
-    return 'videos';
-  } elseif (strpos($mimeType, 'audio/') === 0) {
-    return 'audios';
-  } elseif (in_array($mimeType, ['application/zip', 'application/x-rar-compressed', 'application/x-tar'])) {
-    return 'archives';
-  } else {
-    return 'documents';
-  }
-}
+  PHP/Laravel
+  - Use PHP 8.1+ features when appropriate (e.g., typed properties, match expressions).
+  - Follow PSR-12 coding standards.
+  - Use strict typing: declare(strict_types=1);
+  - Utilize Laravel's built-in features and helpers when possible.
+  - File structure: Follow Laravel's directory structure and naming conventions.
+  - Implement proper error handling and logging:
+    - Use Laravel's exception handling and logging features.
+    - Create custom exceptions when necessary.
+    - Use try-catch blocks for expected exceptions.
+  - Use Laravel's validation features for form and request validation.
+  - Implement middleware for request filtering and modification.
+  - Utilize Laravel's Eloquent ORM for database interactions.
+  - Use Laravel's query builder for complex database queries.
+  - Implement proper database migrations and seeders.
 
-# 4. URL'den Yol Oluşturma (JavaScript)
-# ----------------------------------
-function setFileToElement(url) {
-  if (url) {
-    let relativePath = url;
-    
-    if (url.includes('/uploads/')) {
-      // URL'yi parçala
-      const urlObj = new URL(url);
-      const pathParts = urlObj.pathname.split('/');
-      
-      // '/uploads/' sonrası tüm yolu al
-      const uploadsIndex = pathParts.indexOf('uploads');
-      if (uploadsIndex !== -1) {
-        relativePath = pathParts.slice(uploadsIndex).join('/');
-      }
-    }
-    
-    // relativePath formatı: uploads/images/dosya.jpg
-    return relativePath;
-  }
-}
+  Laravel Best Practices
+  - Use Eloquent ORM instead of raw SQL queries when possible.
+  - Implement Repository pattern for data access layer.
+  - Use Laravel's built-in authentication and authorization features.
+  - Utilize Laravel's caching mechanisms for improved performance.
+  - Implement job queues for long-running tasks.
+  - Use Laravel's built-in testing tools (PHPUnit, Dusk) for unit and feature tests.
+  - Implement API versioning for public APIs.
+  - Use Laravel's localization features for multi-language support.
+  - Implement proper CSRF protection and security measures.
+  - Use Laravel Mix for asset compilation.
+  - Implement proper database indexing for improved query performance.
+  - Use Laravel's built-in pagination features.
+  - Implement proper error logging and monitoring.
 
-# 5. Veritabanında Saklama
-# ----------------------
-# Dosya yolunu veritabanında sakla (tam URL değil!)
-# Doğru: uploads/images/dosya.jpg
-# Yanlış: http://site.com/uploads/images/dosya.jpg
-
-# 6. Görüntüleme için URL Oluşturma
-# -------------------------------
-function getFileUrl($path) {
-  if (empty($path)) {
-    return null;
-  }
-  
-  // HTTP ile başlıyorsa tam URL döndür
-  if (strpos($path, 'http://') === 0 || strpos($path, 'https://') === 0) {
-    return $path;
-  }
-  
-  // Aksi halde asset() yardımcısı ile URL oluştur
-  return asset($path);
-}
-
-# 7. Slider gibi Modüllere Entegrasyon
-# ----------------------------------
-# Slider->filemanagersystem_image = "uploads/images/dosya.jpg"
-# Slider->filemanagersystem_image_url = asset("uploads/images/dosya.jpg")
+  Key Conventions
+  1. Follow Laravel's MVC architecture.
+  2. Use Laravel's routing system for defining application endpoints.
+  3. Implement proper request validation using Form Requests.
+  4. Use Laravel's Blade templating engine for views.
+  5. Implement proper database relationships using Eloquent.
+  6. Use Laravel's built-in authentication scaffolding.
+  7. Implement proper API resource transformations.
+  8. Use Laravel's event and listener system for decoupled code.
+  9. Implement proper database transactions for data integrity.
+  10. Use Laravel's built-in scheduling features for recurring tasks.

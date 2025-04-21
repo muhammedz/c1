@@ -59,6 +59,20 @@ class FilemanagersystemController extends Controller
         $folders = Folder::all();
         $categories = Category::all();
         
+        // Tüm parametreleri al
+        $type = $request->input('type');
+        $relatedType = $request->input('related_type', 'general');
+        $relatedId = $request->input('related_id');
+        
+        // MediaPickerController'a yönlendir
+        if ($type) {
+            return redirect()->route('admin.filemanagersystem.mediapicker.index', [
+                'type' => $type,
+                'related_type' => $relatedType,
+                'related_id' => $relatedId
+            ]);
+        }
+        
         return view('filemanagersystem.picker', compact('folders', 'categories'));
     }
 
@@ -73,38 +87,147 @@ class FilemanagersystemController extends Controller
         try {
             $query = Media::query();
 
-            if ($request->has('q')) {
-                $query->where('name', 'like', '%' . $request->q . '%');
+            // Arama terimi
+            if ($request->has('search') && !empty($request->search)) {
+                $query->where(function($q) use ($request) {
+                    $q->where('name', 'like', '%' . $request->search . '%')
+                      ->orWhere('original_name', 'like', '%' . $request->search . '%');
+                });
             }
 
-            if ($request->has('type')) {
+            // Dosya tipine göre filtreleme
+            if ($request->has('type') && !empty($request->type)) {
                 if ($request->type === 'image') {
                     $imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp'];
                     $query->where(function($q) use ($imageExtensions) {
                         foreach ($imageExtensions as $ext) {
+                            $q->orWhere('name', 'like', '%.' . $ext)
+                              ->orWhere('mime_type', 'like', 'image/%');
+                        }
+                    });
+                } elseif ($request->type === 'document') {
+                    $docExtensions = ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'txt', 'rtf', 'odt', 'ods', 'odp'];
+                    $query->where(function($q) use ($docExtensions) {
+                        foreach ($docExtensions as $ext) {
                             $q->orWhere('name', 'like', '%.' . $ext);
                         }
+                        $q->orWhere('mime_type', 'like', 'application/%')
+                          ->orWhere('mime_type', 'like', 'text/%');
+                    });
+                } elseif ($request->type === 'video') {
+                    $videoExtensions = ['mp4', 'avi', 'mov', 'wmv', 'flv', 'mkv', 'webm'];
+                    $query->where(function($q) use ($videoExtensions) {
+                        foreach ($videoExtensions as $ext) {
+                            $q->orWhere('name', 'like', '%.' . $ext);
+                        }
+                        $q->orWhere('mime_type', 'like', 'video/%');
+                    });
+                } elseif ($request->type === 'audio') {
+                    $audioExtensions = ['mp3', 'wav', 'ogg', 'flac', 'aac', 'm4a', 'wma'];
+                    $query->where(function($q) use ($audioExtensions) {
+                        foreach ($audioExtensions as $ext) {
+                            $q->orWhere('name', 'like', '%.' . $ext);
+                        }
+                        $q->orWhere('mime_type', 'like', 'audio/%');
+                    });
+                } elseif ($request->type === 'archive') {
+                    $archiveExtensions = ['zip', 'rar', '7z', 'tar', 'gz', 'bz2'];
+                    $query->where(function($q) use ($archiveExtensions) {
+                        foreach ($archiveExtensions as $ext) {
+                            $q->orWhere('name', 'like', '%.' . $ext);
+                        }
+                        $q->orWhere('mime_type', 'like', 'application/zip')
+                          ->orWhere('mime_type', 'like', 'application/x-rar%')
+                          ->orWhere('mime_type', 'like', 'application/x-compressed%')
+                          ->orWhere('mime_type', 'like', 'application/x-tar%');
                     });
                 } else {
                     $query->where('file_type', 'like', $request->type . '%');
                 }
             }
 
+            // Klasöre göre filtreleme
             if ($request->has('folder_id') && $request->folder_id) {
                 $query->where('folder_id', $request->folder_id);
             }
 
+            // Kategoriye göre filtreleme
             if ($request->has('category_id') && $request->category_id) {
                 $query->whereHas('categories', function($q) use ($request) {
                     $q->where('id', $request->category_id);
                 });
             }
 
-            if ($request->has('search') && !empty($request->search)) {
-                $query->where('name', 'like', '%' . $request->search . '%');
+            // Tarihe göre filtreleme
+            if ($request->has('date_filter') && !empty($request->date_filter)) {
+                $today = now()->startOfDay();
+                
+                if ($request->date_filter === 'today') {
+                    $query->whereDate('created_at', '>=', $today);
+                } elseif ($request->date_filter === 'yesterday') {
+                    $query->whereDate('created_at', '=', $today->copy()->subDay());
+                } elseif ($request->date_filter === 'last_week') {
+                    $query->whereDate('created_at', '>=', $today->copy()->subDays(7));
+                } elseif ($request->date_filter === 'last_month') {
+                    $query->whereDate('created_at', '>=', $today->copy()->subDays(30));
+                } elseif ($request->date_filter === 'last_year') {
+                    $query->whereDate('created_at', '>=', $today->copy()->subDays(365));
+                }
+            }
+            
+            // Boyuta göre filtreleme
+            if ($request->has('size_filter') && !empty($request->size_filter)) {
+                switch ($request->size_filter) {
+                    case 'tiny':
+                        $query->where('size', '<', 100 * 1024); // < 100KB
+                        break;
+                    case 'small':
+                        $query->where('size', '>=', 100 * 1024)
+                              ->where('size', '<', 1024 * 1024); // 100KB - 1MB
+                        break;
+                    case 'medium':
+                        $query->where('size', '>=', 1024 * 1024)
+                              ->where('size', '<', 10 * 1024 * 1024); // 1MB - 10MB
+                        break;
+                    case 'large':
+                        $query->where('size', '>=', 10 * 1024 * 1024)
+                              ->where('size', '<', 100 * 1024 * 1024); // 10MB - 100MB
+                        break;
+                    case 'huge':
+                        $query->where('size', '>=', 100 * 1024 * 1024); // > 100MB
+                        break;
+                }
+            }
+            
+            // Sıralama
+            if ($request->has('sort') && !empty($request->sort)) {
+                switch ($request->sort) {
+                    case 'newest':
+                        $query->latest();
+                        break;
+                    case 'oldest':
+                        $query->oldest();
+                        break;
+                    case 'name_asc':
+                        $query->orderBy('name', 'asc');
+                        break;
+                    case 'name_desc':
+                        $query->orderBy('name', 'desc');
+                        break;
+                    case 'size_asc':
+                        $query->orderBy('size', 'asc');
+                        break;
+                    case 'size_desc':
+                        $query->orderBy('size', 'desc');
+                        break;
+                    default:
+                        $query->latest();
+                }
+            } else {
+                $query->latest();
             }
 
-            $files = $query->latest()->paginate(20);
+            $files = $query->paginate(20);
 
             // Dosya URL'lerini ekle ve doğru şekilde oluştur
             $files->getCollection()->transform(function ($file) {
@@ -136,6 +259,11 @@ class FilemanagersystemController extends Controller
                 if ($file->has_webp && $file->webp_path) {
                     $file->webp_url = asset('uploads/' . $file->webp_path);
                 }
+                
+                // İnsan tarafından okunabilir formatları ekle
+                $file->human_readable_size = $file->getHumanReadableSizeAttribute();
+                $file->formatted_webp_size = $file->getFormattedWebpSizeAttribute();
+                $file->formatted_date = $file->created_at ? $file->created_at->format('d.m.Y H:i') : '';
                 
                 return $file;
             });

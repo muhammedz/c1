@@ -37,7 +37,7 @@
                         <!-- Başlık -->
                         <div class="form-group">
                             <label for="title">Başlık</label>
-                            <input type="text" class="form-control @error('title') is-invalid @enderror" id="title" name="title" value="{{ old('title') }}" required>
+                            <input type="text" class="form-control @error('title') is-invalid @enderror" id="title" name="title" value="{{ old('title') }}">
                             @error('title')
                                 <span class="invalid-feedback">{{ $message }}</span>
                             @enderror
@@ -139,6 +139,23 @@
             </div>
         </form>
     </div>
+
+<!-- MediaPicker Modal -->
+<div class="modal fade" id="mediapickerModal" tabindex="-1" role="dialog" aria-labelledby="mediapickerModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document" style="max-width: 90%;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="mediapickerModalLabel">Medya Seçici</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Kapat">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body p-0">
+                <iframe id="mediapickerFrame" style="width: 100%; height: 80vh; border: none;"></iframe>
+            </div>
+        </div>
+    </div>
+</div>
 @stop
 
 @section('js')
@@ -150,19 +167,83 @@
             const preview = $('#filemanagersystem_image_preview');
             const previewImg = preview.find('img');
             
-            // Özel FileManagerSystem'i açıyoruz
-            const popup = window.open('/admin/filemanagersystem/picker?type=image', 'FileManagerSystem', 'width=900,height=600');
+            // Debug amacıyla hem ilişkili hem de ilişkisiz URL'yi deneyelim
+            console.log('MediaPicker açılıyor...');
             
-            // Global fonksiyon tanımlıyoruz
-            window.setFileToElement = function(url) {
-                if (url) {
-                    console.log("Seçilen dosya: " + url);
-                    input.val(url);
-                    previewImg.attr('src', url);
-                    preview.show();
-                    popup.close();
+            // Geçici bir ID oluştur - bu ID slider kaydedilene kadar kullanılacak
+            const tempId = 'temp_' + Date.now();
+            const relatedType = 'homepage_slider';
+            
+            // MediaPicker URL - mutlaka related_id ve related_type parametreleri ekleyelim
+            const mediapickerUrl = '/admin/filemanagersystem/mediapicker?type=image&filter=all&related_type=' + relatedType + '&related_id=' + tempId;
+            
+            console.log('MediaPicker URL:', mediapickerUrl);
+            
+            // iFrame'i güncelle ve modalı göster
+            $('#mediapickerFrame').attr('src', mediapickerUrl);
+            $('#mediapickerModal').modal('show');
+            
+            // iframe'den mesaj dinleme ve hata yakalama
+            function handleMediaSelection(event) {
+                try {
+                    if (event.data && event.data.type === 'mediaSelected') {
+                        console.log('Seçilen medya:', event.data);
+                        
+                        // event.data'dan doğrudan URL değerini al
+                        if (event.data.mediaUrl) {
+                            // Medya URL'sini temizle
+                            let mediaUrl = event.data.mediaUrl;
+                            
+                            // Eğer URL göreceli ise (/ ile başlıyorsa) tam URL'ye çevir
+                            if (mediaUrl && mediaUrl.startsWith('/')) {
+                                const baseUrl = window.location.protocol + '//' + window.location.host;
+                                mediaUrl = baseUrl + mediaUrl;
+                            }
+                            
+                            // Görsel URL'sini forma kaydet ve önizlemede göster
+                            input.val(mediaUrl);
+                            previewImg.attr('src', mediaUrl);
+                            preview.show();
+                            
+                            console.log('Medya URL kaydedildi:', mediaUrl);
+                        } else {
+                            console.error('Medya URL bulunamadı');
+                            
+                            // URL bulunamadıysa "uploads/" yolu ile dosya ID'sini kullan
+                            input.val('/uploads/media/' + event.data.mediaId);
+                            
+                            // Önizleme için ID ile resmi göster
+                            const previewUrl = '/admin/filemanagersystem/media/preview/' + event.data.mediaId;
+                            previewImg.attr('src', previewUrl);
+                            preview.show();
+                        }
+                        
+                        // Modalı kapat
+                        $('#mediapickerModal').modal('hide');
+                    } else if (event.data && event.data.type === 'mediapickerError') {
+                        // Medya seçicide bir hata oluştu
+                        console.error('Medya seçici hatası:', event.data.message);
+                        alert('Medya seçici hatası: ' + event.data.message);
+                        $('#mediapickerModal').modal('hide');
+                    }
+                } catch (error) {
+                    console.error('Medya seçimi işlenirken hata oluştu:', error);
+                    alert('Medya seçimi işlenirken bir hata oluştu.');
                 }
-            };
+            }
+            
+            // Mevcut event listener'ı kaldır ve yenisini ekle
+            window.removeEventListener('message', handleMediaSelection);
+            window.addEventListener('message', handleMediaSelection);
+            
+            // iframe yüklenmesini kontrol et
+            $('#mediapickerFrame').on('load', function() {
+                console.log('MediaPicker iframe yüklendi');
+            }).on('error', function() {
+                console.error('MediaPicker iframe yüklenirken hata oluştu');
+                alert('Medya seçici yüklenirken bir hata oluştu. Lütfen sayfayı yenileyip tekrar deneyin.');
+                $('#mediapickerModal').modal('hide');
+            });
         });
 
         // Form gönderiminden önce kontrol

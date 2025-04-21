@@ -283,6 +283,9 @@ $(document).ready(function () {
         $.ajax({
             url: url,
             type: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
             success: function(response) {
                 if (response.success) {
                     showSuccessAlert(response.message || 'Durum başarıyla değiştirildi.');
@@ -295,6 +298,90 @@ $(document).ready(function () {
             }
         });
     });
+
+    // Toplu işlem - Silme
+    $(document).on('click', '.bulk-delete', function() {
+        var selectedIds = getSelectedIds();
+        
+        if (selectedIds.length === 0) {
+            showErrorAlert('Lütfen en az bir haber seçin.');
+            return;
+        }
+        
+        if (confirm('Seçilen ' + selectedIds.length + ' haberi silmek istediğinize emin misiniz? Bu işlem geri alınamaz.')) {
+            processBulkAction(selectedIds, 'delete');
+        }
+    });
+    
+    // Toplu işlem - Yayınlama
+    $(document).on('click', '.bulk-publish', function() {
+        var selectedIds = getSelectedIds();
+        
+        if (selectedIds.length === 0) {
+            showErrorAlert('Lütfen en az bir haber seçin.');
+            return;
+        }
+        
+        processBulkAction(selectedIds, 'publish');
+    });
+    
+    // Toplu işlem - Taslak yapma
+    $(document).on('click', '.bulk-draft', function() {
+        var selectedIds = getSelectedIds();
+        
+        if (selectedIds.length === 0) {
+            showErrorAlert('Lütfen en az bir haber seçin.');
+            return;
+        }
+        
+        processBulkAction(selectedIds, 'draft');
+    });
+    
+    // Toplu işlem - Arşivleme
+    $(document).on('click', '.bulk-archive', function() {
+        var selectedIds = getSelectedIds();
+        
+        if (selectedIds.length === 0) {
+            showErrorAlert('Lütfen en az bir haber seçin.');
+            return;
+        }
+        
+        processBulkAction(selectedIds, 'archive');
+    });
+    
+    // Seçili haber ID'lerini al
+    function getSelectedIds() {
+        var ids = [];
+        $('.checkbox-select-row:checked').each(function() {
+            ids.push($(this).data('id'));
+        });
+        return ids;
+    }
+    
+    // Toplu işlemi gerçekleştir
+    function processBulkAction(ids, action) {
+        $.ajax({
+            url: '/admin/news/bulk-action',
+            type: 'POST',
+            data: {
+                ids: ids,
+                action: action
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            success: function(response) {
+                if (response.success) {
+                    showSuccessAlert(response.message);
+                } else {
+                    showErrorAlert(response.message || 'İşlem başarısız oldu.');
+                }
+            },
+            error: function() {
+                showErrorAlert('Bir hata oluştu.');
+            }
+        });
+    }
 
     // Manşet değiştirme
     $(document).on('click', '.headline-action', function() {

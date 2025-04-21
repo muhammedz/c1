@@ -60,22 +60,80 @@ class HomepageController extends Controller
     public function storeSlider(Request $request)
     {
         $request->validate([
-            'title' => 'required|string|max:255',
+            'title' => 'nullable|string|max:255',
             'subtitle' => 'nullable|string|max:255',
             'button_text' => 'nullable|string|max:50',
             'button_url' => 'nullable|string|max:255',
-            'order' => 'required|integer|min:0',
+            'order' => 'nullable|integer|min:0',
             'is_active' => 'boolean',
-            'filemanagersystem_image' => 'nullable|string',
+            'filemanagersystem_image' => 'required|string',
             'filemanagersystem_image_alt' => 'nullable|string|max:255',
             'filemanagersystem_image_title' => 'nullable|string|max:255'
         ]);
 
+        // Order değeri boş ise en sondaki değeri al ve bir ekle
+        if (empty($request->order)) {
+            $lastOrder = Slider::max('order') ?? 0;
+            $request->merge(['order' => $lastOrder + 1]);
+        }
+
+        // Görsel URL'si dosya yolu veya tam URL olabilir
+        $filemanagersystemImage = $request->filemanagersystem_image;
+
         $slider = Slider::create($request->all());
 
-        // FileManagerSystem ile ilişki kur
-        if ($request->filled('filemanagersystem_image')) {
-            $this->createMediaRelation($slider, $request->filemanagersystem_image);
+        try {
+            // FileManagerSystem ile ilişki kur
+            if ($request->filled('filemanagersystem_image')) {
+                // URL'den ID'yi çıkart (eğer varsa)
+                $mediaId = null;
+                
+                // 1. /uploads/media/123 formatı
+                if (preg_match('#^/uploads/media/(\d+)$#', $filemanagersystemImage, $matches)) {
+                    $mediaId = $matches[1];
+                }
+                // 2. /admin/filemanagersystem/media/preview/123 formatı
+                elseif (preg_match('#/media/preview/(\d+)#', $filemanagersystemImage, $matches)) {
+                    $mediaId = $matches[1];
+                }
+                
+                if ($mediaId) {
+                    // Medya ID'si ile ilişkilendirme
+                    \Log::debug('Slider oluşturma: Medya ID ile ilişkilendirme', [
+                        'slider_id' => $slider->id,
+                        'media_id' => $mediaId
+                    ]);
+                    
+                    $this->createMediaRelationById($slider, $mediaId);
+                } else {
+                    // URL veya dosya yolu ile medyayı bul ve ilişkilendir
+                    $media = \App\Models\FileManagerSystem\Media::where('url', $filemanagersystemImage)
+                        ->orWhere('path', $filemanagersystemImage)
+                        ->first();
+                        
+                    if ($media) {
+                        \Log::debug('Slider oluşturma: URL ile ilişkilendirme', [
+                            'slider_id' => $slider->id,
+                            'media_id' => $media->id,
+                            'url' => $filemanagersystemImage
+                        ]);
+                        
+                        $this->createMediaRelationById($slider, $media->id);
+                    } else {
+                        \Log::error('Slider oluşturma: Medya bulunamadı', [
+                            'slider_id' => $slider->id,
+                            'url' => $filemanagersystemImage
+                        ]);
+                    }
+                }
+            }
+        } catch (\Exception $e) {
+            \Log::error('Slider görsel ilişkilendirme hatası: ' . $e->getMessage(), [
+                'slider_id' => $slider->id,
+                'filemanagersystem_image' => $filemanagersystemImage,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
         }
 
         return redirect()->route('admin.homepage.sliders')
@@ -97,23 +155,81 @@ class HomepageController extends Controller
     public function updateSlider(Request $request, $id)
     {
         $request->validate([
-            'title' => 'required|string|max:255',
+            'title' => 'nullable|string|max:255',
             'subtitle' => 'nullable|string|max:255',
             'button_text' => 'nullable|string|max:50',
             'button_url' => 'nullable|string|max:255',
-            'order' => 'required|integer|min:0',
+            'order' => 'nullable|integer|min:0',
             'is_active' => 'boolean',
-            'filemanagersystem_image' => 'nullable|string',
+            'filemanagersystem_image' => 'required|string',
             'filemanagersystem_image_alt' => 'nullable|string|max:255',
             'filemanagersystem_image_title' => 'nullable|string|max:255'
         ]);
 
         $slider = Slider::findOrFail($id);
+        
+        // Order değeri boş ise mevcut değeri koru
+        if (empty($request->order)) {
+            $request->merge(['order' => $slider->order]);
+        }
+        
+        // Görsel URL'si dosya yolu veya tam URL olabilir
+        $filemanagersystemImage = $request->filemanagersystem_image;
+        
         $slider->update($request->all());
 
-        // FileManagerSystem ilişkisini güncelle
-        if ($request->filled('filemanagersystem_image')) {
-            $this->updateMediaRelation($slider, $request->filemanagersystem_image);
+        try {
+            // FileManagerSystem ilişkisini güncelle
+            if ($request->filled('filemanagersystem_image')) {
+                // URL'den ID'yi çıkart (eğer varsa)
+                $mediaId = null;
+                
+                // 1. /uploads/media/123 formatı
+                if (preg_match('#^/uploads/media/(\d+)$#', $filemanagersystemImage, $matches)) {
+                    $mediaId = $matches[1];
+                }
+                // 2. /admin/filemanagersystem/media/preview/123 formatı
+                elseif (preg_match('#/media/preview/(\d+)#', $filemanagersystemImage, $matches)) {
+                    $mediaId = $matches[1];
+                }
+                
+                if ($mediaId) {
+                    // Medya ID'si ile ilişkilendirme
+                    \Log::debug('Slider güncelleme: Medya ID ile ilişkilendirme', [
+                        'slider_id' => $slider->id,
+                        'media_id' => $mediaId
+                    ]);
+                    
+                    $this->updateMediaRelationById($slider, $mediaId);
+                } else {
+                    // URL veya dosya yolu ile medyayı bul ve ilişkilendir
+                    $media = \App\Models\FileManagerSystem\Media::where('url', $filemanagersystemImage)
+                        ->orWhere('path', $filemanagersystemImage)
+                        ->first();
+                        
+                    if ($media) {
+                        \Log::debug('Slider güncelleme: URL ile ilişkilendirme', [
+                            'slider_id' => $slider->id,
+                            'media_id' => $media->id,
+                            'url' => $filemanagersystemImage
+                        ]);
+                        
+                        $this->updateMediaRelationById($slider, $media->id);
+                    } else {
+                        \Log::error('Slider güncelleme: Medya bulunamadı', [
+                            'slider_id' => $slider->id,
+                            'url' => $filemanagersystemImage
+                        ]);
+                    }
+                }
+            }
+        } catch (\Exception $e) {
+            \Log::error('Slider görsel ilişkilendirme güncelleme hatası: ' . $e->getMessage(), [
+                'slider_id' => $slider->id,
+                'filemanagersystem_image' => $filemanagersystemImage,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
         }
 
         return redirect()->route('admin.homepage.sliders')
@@ -507,11 +623,36 @@ class HomepageController extends Controller
      */
     private function createMediaRelation(Slider $slider, string $filePath)
     {
-        MediaRelation::create([
-            'file_path' => $filePath,
-            'related_to' => 'slider',
-            'related_id' => $slider->id
-        ]);
+        // MediaRelation sınıfı
+        $mediaRelationClass = \App\Models\FileManagerSystem\MediaRelation::class;
+
+        $mediaRelation = new $mediaRelationClass();
+        $mediaRelation->related_type = 'homepage_slider';
+        $mediaRelation->related_id = $slider->id;
+        $mediaRelation->field_name = 'slider_image';
+        $mediaRelation->order = 0;
+        
+        // Dosya yolundan media bilgisini bulmaya çalış
+        $media = \App\Models\FileManagerSystem\Media::where('url', $filePath)
+            ->orWhere('path', $filePath)
+            ->first();
+            
+        if ($media) {
+            $mediaRelation->media_id = $media->id;
+            $mediaRelation->save();
+            
+            \Log::debug('Medya ilişkisi dosya yolu ile oluşturuldu', [
+                'media_id' => $media->id,
+                'file_path' => $filePath,
+                'related_type' => 'homepage_slider',
+                'related_id' => $slider->id
+            ]);
+        } else {
+            \Log::error('Medya bulunamadı, ilişki oluşturulamadı', [
+                'file_path' => $filePath,
+                'slider_id' => $slider->id
+            ]);
+        }
     }
 
     /**
@@ -519,12 +660,112 @@ class HomepageController extends Controller
      */
     private function updateMediaRelation(Slider $slider, string $filePath)
     {
+        // MediaRelation sınıfı
+        $mediaRelationClass = \App\Models\FileManagerSystem\MediaRelation::class;
+
         // Eski ilişkileri sil
-        MediaRelation::where('related_to', 'slider')
+        $mediaRelationClass::where('related_type', 'homepage_slider')
             ->where('related_id', $slider->id)
             ->delete();
         
-        // Yeni ilişki oluştur
-        $this->createMediaRelation($slider, $filePath);
+        // Dosya yolundan media bilgisini bulmaya çalış
+        $media = \App\Models\FileManagerSystem\Media::where('url', $filePath)
+            ->orWhere('path', $filePath)
+            ->first();
+            
+        if ($media) {
+            $mediaRelation = new $mediaRelationClass();
+            $mediaRelation->media_id = $media->id;
+            $mediaRelation->related_type = 'homepage_slider';
+            $mediaRelation->related_id = $slider->id;
+            $mediaRelation->field_name = 'slider_image';
+            $mediaRelation->order = 0;
+            $mediaRelation->save();
+            
+            \Log::debug('Medya ilişkisi dosya yolu ile güncellendi', [
+                'media_id' => $media->id,
+                'file_path' => $filePath,
+                'related_type' => 'homepage_slider',
+                'related_id' => $slider->id
+            ]);
+        } else {
+            \Log::error('Medya bulunamadı, ilişki güncellenemedi', [
+                'file_path' => $filePath,
+                'slider_id' => $slider->id
+            ]);
+        }
+    }
+
+    /**
+     * Yeni medya ilişkisini ID üzerinden oluşturur
+     */
+    private function createMediaRelationById(Slider $slider, int $mediaId)
+    {
+        try {
+            // MediaRelation sınıfı
+            $mediaRelationClass = \App\Models\FileManagerSystem\MediaRelation::class;
+            
+            // Mevcut ilişkiyi kontrol et
+            $existingRelation = $mediaRelationClass::where('media_id', $mediaId)
+                ->where('related_type', 'homepage_slider')
+                ->where('related_id', $slider->id)
+                ->first();
+            
+            // İlişki yoksa oluştur
+            if (!$existingRelation) {
+                $mediaRelation = new $mediaRelationClass();
+                $mediaRelation->media_id = $mediaId;
+                $mediaRelation->related_type = 'homepage_slider';
+                $mediaRelation->related_id = $slider->id;
+                $mediaRelation->save();
+                
+                \Log::debug('Medya ilişkisi ID ile oluşturuldu', [
+                    'media_id' => $mediaId,
+                    'related_type' => 'homepage_slider',
+                    'related_id' => $slider->id
+                ]);
+            }
+        } catch (\Exception $e) {
+            \Log::error('Medya ilişkisi oluşturma hatası (ID ile): ' . $e->getMessage(), [
+                'media_id' => $mediaId,
+                'slider_id' => $slider->id,
+                'error' => $e->getMessage()
+            ]);
+        }
+    }
+    
+    /**
+     * Medya ilişkisini ID üzerinden günceller
+     */
+    private function updateMediaRelationById(Slider $slider, int $mediaId)
+    {
+        try {
+            // MediaRelation sınıfı
+            $mediaRelationClass = \App\Models\FileManagerSystem\MediaRelation::class;
+            
+            // Önce eski tüm ilişkilerini sil
+            $mediaRelationClass::where('related_type', 'homepage_slider')
+                ->where('related_id', $slider->id)
+                ->delete();
+            
+            // Yeni ilişki oluştur
+            $mediaRelation = new $mediaRelationClass();
+            $mediaRelation->media_id = $mediaId;
+            $mediaRelation->related_type = 'homepage_slider';
+            $mediaRelation->related_id = $slider->id;
+            $mediaRelation->save();
+            
+            \Log::debug('Medya ilişkisi ID ile güncellendi', [
+                'media_id' => $mediaId,
+                'related_type' => 'homepage_slider',
+                'related_id' => $slider->id
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Medya ilişkisi güncelleme hatası (ID ile): ' . $e->getMessage(), [
+                'media_id' => $mediaId,
+                'slider_id' => $slider->id,
+                'error' => $e->getMessage()
+            ]);
+        }
     }
 }

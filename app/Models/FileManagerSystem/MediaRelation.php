@@ -4,12 +4,14 @@ namespace App\Models\FileManagerSystem;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class MediaRelation extends Model
 {
     use HasFactory;
 
-    protected $table = 'filemanagersystem_relations';
+    protected $table = 'filemanagersystem_media_relations';
 
     protected $fillable = [
         'media_id',
@@ -28,17 +30,25 @@ class MediaRelation extends Model
     /**
      * İlişkilendirilen medya dosyası
      */
-    public function media()
+    public function media(): BelongsTo
     {
+        \Log::debug('MediaRelation Model media() metodu çağrıldı', [
+            'media_id' => $this->media_id,
+            'tablo' => $this->getTable(),
+            'ilişki_değerleri' => [
+                'related_type' => $this->related_type,
+                'related_id' => $this->related_id
+            ]
+        ]);
         return $this->belongsTo(Media::class, 'media_id');
     }
 
     /**
      * Polymorphic ilişki - ilişkili model
      */
-    public function related()
+    public function related(): MorphTo
     {
-        return $this->morphTo();
+        return $this->morphTo('related', 'related_type', 'related_id');
     }
 
     /**
@@ -55,5 +65,20 @@ class MediaRelation extends Model
     public function scopeForRelatedType($query, $relatedType)
     {
         return $query->where('related_type', $relatedType);
+    }
+    
+    /**
+     * İlişki tipine göre sınıf adını döndürür
+     */
+    public static function getRelatedClass($relatedType)
+    {
+        $map = [
+            'homepage_slider' => \App\Models\Slider::class,
+            'corporate_category' => \App\Models\CorporateCategory::class,
+            'corporate_member' => \App\Models\CorporateMember::class,
+            // Diğer ilişki tipleri burada tanımlanabilir
+        ];
+        
+        return $map[$relatedType] ?? null;
     }
 }

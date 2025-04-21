@@ -90,6 +90,7 @@ class Media extends Model
      */
     public function relations()
     {
+        \Log::debug('Media Model Relations metodu çağrıldı', ['media_id' => $this->id]);
         return $this->hasMany(MediaRelation::class, 'media_id');
     }
 

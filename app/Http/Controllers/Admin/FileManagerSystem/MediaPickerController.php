@@ -1,0 +1,1 @@
+// Medya picker controller'ı bulunamadığı için örnek bir düzenleme yapamıyoruz, ancak ana hata düzeltmelerini JavaScript tarafında yapacağız. 

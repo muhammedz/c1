@@ -61,6 +61,16 @@ class NewsRepository extends BaseRepository
             });
         }
         
+        // Manşet filtresi
+        if (isset($filters['headline'])) {
+            if ($filters['headline'] === 'only') {
+                $query->where('is_headline', true);
+            } elseif ($filters['headline'] === 'exclude') {
+                $query->where('is_headline', false);
+            }
+            // 'all' değeri için filtreleme yapma, tüm haberleri getir
+        }
+        
         // Sıralama
         $sortField = $filters['sort'] ?? 'created_at';
         $sortDirection = $filters['direction'] ?? 'desc';
@@ -111,6 +121,15 @@ class NewsRepository extends BaseRepository
     public function updateNews(array $data, $id)
     {
         $news = $this->find($id);
+        
+        // Boolean alanları doğru formata çevir
+        if (isset($data['is_headline'])) {
+            $data['is_headline'] = filter_var($data['is_headline'], FILTER_VALIDATE_BOOLEAN);
+        }
+        
+        if (isset($data['is_featured'])) {
+            $data['is_featured'] = filter_var($data['is_featured'], FILTER_VALIDATE_BOOLEAN);
+        }
         
         // Temel verileri güncelle
         $updated = $news->update($data);

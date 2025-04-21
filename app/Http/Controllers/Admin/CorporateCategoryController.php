@@ -28,39 +28,6 @@ class CorporateCategoryController extends Controller
     }
 
     /**
-     * Handle image path processing to ensure correct storage format
-     * 
-     * @param string|null $imagePath
-     * @return string|null
-     */
-    protected function processImagePath(?string $imagePath): ?string
-    {
-        if (!$imagePath) {
-            return null;
-        }
-        
-        // URL'leri temizle - tam URL şeklinde gelmişse
-        if (Str::startsWith($imagePath, ['http://', 'https://'])) {
-            $parsedUrl = parse_url($imagePath);
-            $path = $parsedUrl['path'] ?? '';
-            
-            // /storage/ ile başlıyorsa storage/ olarak kaydet
-            if (Str::startsWith($path, '/storage/')) {
-                return Str::replaceFirst('/storage/', '', $path);
-            }
-            
-            return $path;
-        }
-        
-        // Storage ile başlıyorsa storagei sil
-        if (Str::startsWith($imagePath, '/storage/')) {
-            return Str::replaceFirst('/storage/', '', $imagePath);
-        }
-        
-        return $imagePath;
-    }
-
-    /**
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
@@ -69,11 +36,14 @@ class CorporateCategoryController extends Controller
             'name' => 'required|string|max:255',
             'slug' => 'nullable|string|max:255|unique:corporate_categories',
             'description' => 'nullable|string',
-            'selected_image' => 'nullable|string|max:255',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'filemanagersystem_image' => 'nullable|string',
+            'filemanagersystem_image_alt' => 'nullable|string|max:255',
+            'filemanagersystem_image_title' => 'nullable|string|max:255',
             'status' => 'required|boolean'
         ]);
 
-        $data = $request->except(['_token', 'selected_image']);
+        $data = $request->except(['_token', 'image']);
         
         // Slug oluştur
         if (empty($data['slug'])) {
@@ -81,11 +51,61 @@ class CorporateCategoryController extends Controller
         }
         
         // Görsel işleme
-        if ($request->filled('selected_image')) {
-            $data['image'] = $this->processImagePath($request->selected_image);
+        if ($request->hasFile('image')) {
+            $imagePath = $request->file('image')->store('corporate/categories', 'public');
+            $data['image'] = $imagePath;
         }
 
-        CorporateCategory::create($data);
+        // FileManagerSystem ile ilişki kurma
+        $filemanagersystemImage = $request->filemanagersystem_image;
+
+        if ($request->filled('filemanagersystem_image')) {
+            // URL formatını kontrol et
+            
+            // 1. /uploads/media/123 formatı
+            if (preg_match('#^/uploads/media/(\d+)$#', $filemanagersystemImage, $matches)) {
+                $mediaId = $matches[1];
+            }
+            // 2. /admin/filemanagersystem/media/preview/123 formatı
+            elseif (preg_match('#/media/preview/(\d+)#', $filemanagersystemImage, $matches)) {
+                $mediaId = $matches[1];
+            }
+            // Diğer URL formatlarını işleme
+            else {
+                // URL'yi olduğu gibi kullan ancak medya ilişkisi kurmayı dene
+                $mediaId = null;
+                
+                // Tam URL veya yol olup olmadığını kontrol et
+                $media = \App\Models\FileManagerSystem\Media::where('url', $filemanagersystemImage)
+                    ->orWhere('path', $filemanagersystemImage)
+                    ->first();
+                
+                if ($media) {
+                    $mediaId = $media->id;
+                } else {
+                    // Eğer medya bulunamazsa, yeni bir medya kaydı oluşturabilirsin
+                    $newMedia = \App\Models\FileManagerSystem\Media::create([
+                        'name' => 'Corporate Category Image',
+                        'url' => $filemanagersystemImage,
+                        'type' => 'image',
+                    ]);
+                    $mediaId = $newMedia->id;
+                }
+            }
+            
+            // filemanagersystem_image için URL'yi ayarla
+            $data['filemanagersystem_image'] = $filemanagersystemImage;
+        }
+
+        $category = CorporateCategory::create($data);
+
+        // MediaRelation ilişkisi kur
+        if (isset($mediaId) && $mediaId) {
+            $category->mediaRelations()->create([
+                'media_id' => $mediaId,
+                'field_name' => 'filemanagersystem_image',
+            ]);
+        }
 
         return redirect()->route('admin.corporate.categories.index')
             ->with('success', 'Kurumsal kadro kategorisi başarıyla oluşturuldu.');
@@ -120,11 +140,14 @@ class CorporateCategoryController extends Controller
             'name' => 'required|string|max:255',
             'slug' => 'nullable|string|max:255|unique:corporate_categories,slug,' . $id,
             'description' => 'nullable|string',
-            'selected_image' => 'nullable|string|max:255',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'filemanagersystem_image' => 'nullable|string',
+            'filemanagersystem_image_alt' => 'nullable|string|max:255',
+            'filemanagersystem_image_title' => 'nullable|string|max:255',
             'status' => 'required|boolean'
         ]);
 
-        $data = $request->except(['_token', '_method', 'selected_image']);
+        $data = $request->except(['_token', '_method', 'image']);
         
         // Slug oluştur
         if (empty($data['slug'])) {
@@ -132,11 +155,70 @@ class CorporateCategoryController extends Controller
         }
         
         // Görsel işleme
-        if ($request->filled('selected_image')) {
-            $data['image'] = $this->processImagePath($request->selected_image);
+        if ($request->hasFile('image')) {
+            // Eğer eski bir görsel varsa sil
+            if ($category->image) {
+                Storage::disk('public')->delete($category->image);
+            }
+            
+            $imagePath = $request->file('image')->store('corporate/categories', 'public');
+            $data['image'] = $imagePath;
+        }
+
+        // FileManagerSystem ilişkisini güncelle
+        $filemanagersystemImage = $request->filemanagersystem_image;
+
+        if ($request->filled('filemanagersystem_image')) {
+            // URL formatını kontrol et
+            
+            // 1. /uploads/media/123 formatı
+            if (preg_match('#^/uploads/media/(\d+)$#', $filemanagersystemImage, $matches)) {
+                $mediaId = $matches[1];
+            }
+            // 2. /admin/filemanagersystem/media/preview/123 formatı
+            elseif (preg_match('#/media/preview/(\d+)#', $filemanagersystemImage, $matches)) {
+                $mediaId = $matches[1];
+            }
+            // Diğer URL formatlarını işleme
+            else {
+                // URL'yi olduğu gibi kullan ancak medya ilişkisi kurmayı dene
+                $mediaId = null;
+                
+                // Tam URL veya yol olup olmadığını kontrol et
+                $media = \App\Models\FileManagerSystem\Media::where('url', $filemanagersystemImage)
+                    ->orWhere('path', $filemanagersystemImage)
+                    ->first();
+                
+                if ($media) {
+                    $mediaId = $media->id;
+                } else {
+                    // Eğer medya bulunamazsa, yeni bir medya kaydı oluşturabilirsin
+                    $newMedia = \App\Models\FileManagerSystem\Media::create([
+                        'name' => 'Corporate Category Image',
+                        'url' => $filemanagersystemImage,
+                        'type' => 'image',
+                    ]);
+                    $mediaId = $newMedia->id;
+                }
+            }
+            
+            // filemanagersystem_image için URL'yi ayarla
+            $data['filemanagersystem_image'] = $filemanagersystemImage;
         }
 
         $category->update($data);
+
+        // MediaRelation ilişkisini güncelle
+        if (isset($mediaId) && $mediaId) {
+            // Önceki ilişkiyi kaldır
+            $category->mediaRelations()->where('field_name', 'filemanagersystem_image')->delete();
+            
+            // Yeni ilişki oluştur
+            $category->mediaRelations()->create([
+                'media_id' => $mediaId,
+                'field_name' => 'filemanagersystem_image',
+            ]);
+        }
 
         return redirect()->route('admin.corporate.categories.index')
             ->with('success', 'Kurumsal kadro kategorisi başarıyla güncellendi.');
@@ -160,6 +242,9 @@ class CorporateCategoryController extends Controller
         if ($category->image) {
             Storage::disk('public')->delete($category->image);
         }
+
+        // FileManagerSystem ilişkisini sil
+        $category->mediaRelations()->delete();
 
         $category->delete();
 

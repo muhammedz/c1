@@ -34,23 +34,11 @@ class AppServiceProvider extends ServiceProvider
             return "<?php echo App\Helpers\ImageHelper::fixImageUrl($expression); ?>";
         });
 
-        // Laravel File Manager entegrasyonu için public disk URL'lerini düzelt
-        \Illuminate\Support\Facades\URL::forceRootUrl(config('app.url'));
+        // NOTE: Laravel File Manager kodları kaldırıldı
+        // \Illuminate\Support\Facades\URL::forceRootUrl(config('app.url'));
         
-        // Laravel File Manager'ın yanıt vermeden önce URL dönüşümü yapmasını sağla
-        \Event::listen('lfm.api.response', function ($response) {
-            if (isset($response['result'])) {
-                // URL'deki storage yollarını uploads olarak değiştir
-                if (isset($response['result']['result']) && !empty($response['result']['result'])) {
-                    $url = $response['result']['result'];
-                    if (is_string($url) && strpos($url, '/storage/') !== false) {
-                        $response['result']['result'] = str_replace('/storage/', '/uploads/', $url);
-                    }
-                }
-            }
-            return $response;
-        });
-
+        // Laravel File Manager lfm.api.response event listener kaldırıldı
+        
         // File Manager için yolları düzelt
         // Uploads klasörünün varlığını kontrol et ve yoksa oluştur
         $uploadsPaths = [

@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class News extends Model
 {
@@ -20,6 +21,10 @@ class News extends Model
         'content', 
         'image', 
         'gallery',
+        'filemanagersystem_image',
+        'filemanagersystem_image_alt',
+        'filemanagersystem_image_title',
+        'filemanagersystem_gallery',
         'is_headline', 
         'headline_order', 
         'is_featured',
@@ -28,6 +33,9 @@ class News extends Model
         'is_scheduled',
         'meta_title',
         'meta_description',
+        'meta_keywords',
+        'category_id',
+        'views',
         'published_at',
         'end_date'
     ];
@@ -38,16 +46,22 @@ class News extends Model
         'is_scheduled' => 'boolean',
         'published_at' => 'datetime',
         'end_date' => 'datetime',
-        'gallery' => 'array'
+        'gallery' => 'array',
+        'filemanagersystem_gallery' => 'array',
+        'status' => 'string'
     ];
     
     // İlişkiler
     
     // Kategoriler
+    public function category()
+    {
+        return $this->belongsTo(NewsCategory::class, 'category_id');
+    }
+    
     public function categories()
     {
-        return $this->belongsToMany(NewsCategory::class, 'news_category', 'news_id', 'category_id')
-                   ->withTimestamps();
+        return $this->belongsToMany(NewsCategory::class, 'news_category', 'news_id', 'category_id');
     }
     
     // Etiketler
@@ -100,6 +114,15 @@ class News extends Model
             ->get();
     }
     
+    // Admin için tüm manşet haberlerini getir (published olmayanlar dahil)
+    public static function getAllHeadlines()
+    {
+        return self::where('is_headline', true)
+            ->orderBy('headline_order', 'asc')
+            ->take(4)
+            ->get();
+    }
+    
     // Normal haberleri getir
     public static function getNormalNews($limit = 6)
     {
@@ -131,42 +154,111 @@ class News extends Model
     }
     
     // İlgili haberleri getir
-    public function getRelatedNews($limit = 4)
+    public function getRelatedNews($limit = 5)
     {
-        $categories = $this->categories->pluck('id')->toArray();
-        $tags = $this->tags->pluck('id')->toArray();
-        
-        if (empty($categories) && empty($tags)) {
-            return self::published()
-                      ->where('id', '!=', $this->id)
-                      ->orderBy('published_at', 'desc')
-                      ->limit($limit)
-                      ->get();
-        }
-        
-        return self::published()
-                  ->where('id', '!=', $this->id)
-                  ->where(function($query) use ($categories, $tags) {
-                      if (!empty($categories)) {
-                          $query->whereHas('categories', function($q) use ($categories) {
-                              $q->whereIn('id', $categories);
-                          });
-                      }
-                      
-                      if (!empty($tags)) {
-                          $query->orWhereHas('tags', function($q) use ($tags) {
-                              $q->whereIn('id', $tags);
-                          });
-                      }
-                  })
-                  ->orderBy('published_at', 'desc')
-                  ->limit($limit)
-                  ->get();
+        return self::active()
+            ->published()
+            ->where('id', '!=', $this->id)
+            ->where('category_id', $this->category_id)
+            ->latest('published_at')
+            ->limit($limit)
+            ->get();
     }
     
     // Görüntüleme sayısını artır
     public function incrementViews()
     {
-        $this->increment('view_count');
+        $this->increment('views');
+    }
+
+    /**
+     * Haber'e ait medya ilişkilerini getir - MorphMany ilişkisi ile
+     */
+    public function mediaRelations(): MorphMany
+    {
+        return $this->morphMany(\App\Models\FileManagerSystem\MediaRelation::class, 'related', 'related_type', 'related_id');
+    }
+
+    /**
+     * Haber'e bağlı medya dosyalarını getir
+     */
+    public function media()
+    {
+        return $this->hasManyThrough(
+            \App\Models\FileManagerSystem\Media::class,
+            \App\Models\FileManagerSystem\MediaRelation::class,
+            'related_id',
+            'id',
+            'id',
+            'media_id'
+        )->where('related_type', 'news');
+    }
+
+    /**
+     * Ana görsel için medya ilişkisi
+     */
+    public function featuredImage()
+    {
+        return $this->media()->where('field_name', 'featured_image')->first();
+    }
+
+    /**
+     * Galeri görselleri için medya ilişkileri
+     */
+    public function galleryImages()
+    {
+        return $this->media()->where('field_name', 'gallery')->orderBy('order')->get();
+    }
+
+    /**
+     * Haber ana görselinin tam URL'ini döndürür
+     */
+    public function getFilemanagersystemImageUrlAttribute(): ?string
+    {
+        if (empty($this->filemanagersystem_image)) {
+            return null;
+        }
+        
+        // Eğer URL zaten tam bir URL ise (http:// ile başlıyorsa) direkt döndür
+        if (strpos($this->filemanagersystem_image, 'http://') === 0 || strpos($this->filemanagersystem_image, 'https://') === 0) {
+            return $this->filemanagersystem_image;
+        }
+        
+        // Media ID kontrolü - /uploads/media/ID formatı
+        if (preg_match('#^/uploads/media/(\d+)$#', $this->filemanagersystem_image, $matches)) {
+            $mediaId = $matches[1];
+            $media = \App\Models\FileManagerSystem\Media::find($mediaId);
+            
+            if ($media) {
+                // Medya bulundu, URL'i döndür
+                return asset($media->url);
+            }
+            
+            // Medya bulunamadı, ilişkili medyaları kontrol et
+            $relatedMedia = $this->featuredImage();
+            if ($relatedMedia) {
+                return asset($relatedMedia->url);
+            }
+        }
+        
+        return asset($this->filemanagersystem_image);
+    }
+
+    // Otomatik slug oluşturma
+    protected static function boot()
+    {
+        parent::boot();
+        
+        static::creating(function ($news) {
+            if (!$news->slug) {
+                $news->slug = Str::slug($news->title);
+            }
+        });
+    }
+
+    // Scopelar
+    public function scopeActive($query)
+    {
+        return $query->where('status', 'published');
     }
 }

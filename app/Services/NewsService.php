@@ -6,6 +6,8 @@ use App\Models\News;
 use App\Repositories\NewsRepository;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
+use Illuminate\Http\UploadedFile;
 
 class NewsService
 {
@@ -78,13 +80,48 @@ class NewsService
                 $this->newsRepository->syncTags($news, $data['tags']);
             }
             
+            // İlişkili medya varsa ilişkiyi kur
+            if (!empty($data['filemanagersystem_image'])) {
+                $this->createMediaRelationForNews($news, $data['filemanagersystem_image']);
+            }
+            
+            // Galeri ilişkilerini kur
+            if (!empty($data['filemanagersystem_gallery']) && is_array($data['filemanagersystem_gallery'])) {
+                $this->createGalleryMediaRelations($news, $data['filemanagersystem_gallery']);
+            }
+            
             DB::commit();
             
             return $news;
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Haber oluşturma hatası: ' . $e->getMessage());
-            return null;
+            
+            // Daha detaylı loglama
+            $errorDetail = 'Haber oluşturma hatası: ' . $e->getMessage();
+            $errorContext = [
+                'error_class' => get_class($e),
+                'line' => $e->getLine(),
+                'file' => $e->getFile(),
+                'trace' => $e->getTraceAsString(),
+                'data' => json_encode($data, JSON_UNESCAPED_UNICODE)
+            ];
+            
+            Log::error($errorDetail, $errorContext);
+            
+            // Hata mesajını daha açıklayıcı hale getir
+            if (strpos($e->getMessage(), 'SQLSTATE[23000]') !== false && strpos($e->getMessage(), 'Duplicate entry') !== false) {
+                $errorDetail = 'Aynı başlık veya slug değeri ile bir haber zaten mevcut. Lütfen başlığı değiştirin.';
+            } elseif (strpos($e->getMessage(), 'SQLSTATE[23000]') !== false && strpos($e->getMessage(), 'foreign key constraint') !== false) {
+                $errorDetail = 'İlişkili bir kayıt bulunamadı. Lütfen seçtiğiniz değerleri kontrol edin.';
+            } elseif (strpos($e->getMessage(), 'SQLSTATE[HY000]') !== false && strpos($e->getMessage(), 'General error') !== false) {
+                $errorDetail = 'Veritabanı işlemi sırasında genel bir hata oluştu. Lütfen form verilerini kontrol edin.';
+            } elseif (strpos($e->getMessage(), 'Call to a member function') !== false) {
+                $errorDetail = 'Uygulama hatası: Geçersiz nesne referansı. Lütfen daha sonra tekrar deneyin.';
+            }
+            
+            Log::error('Kullanıcıya gösterilen hata: ' . $errorDetail);
+            
+            throw new \Exception($errorDetail, 0, $e);
         }
     }
     
@@ -102,6 +139,14 @@ class NewsService
             
             $news = $this->newsRepository->find($id);
             
+            // Hata ayıklama için gelen verileri loglama
+            Log::info('Güncelleme verileri: ', [
+                'id' => $id,
+                'is_headline_original' => $news->is_headline,
+                'is_headline_request' => isset($data['is_headline']) ? $data['is_headline'] : 'not_set',
+                'all_data' => $data
+            ]);
+            
             // Yayın tarihi
             if (isset($data['published_at']) && $data['published_at']) {
                 $data['is_scheduled'] = strtotime($data['published_at']) > time();
@@ -112,11 +157,14 @@ class NewsService
             
             // Manşet kontrolü
             if (isset($data['is_headline']) && $data['is_headline']) {
-                if (!$news->is_headline && News::maxHeadlinesReached()) {
+                // Boolean değere dönüştür
+                $data['is_headline'] = filter_var($data['is_headline'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ? true : false;
+                
+                if ($data['is_headline'] && !$news->is_headline && News::maxHeadlinesReached()) {
                     throw new \Exception('Maksimum manşet sayısına ulaşıldı (4).');
                 }
                 
-                if (!$news->is_headline) {
+                if ($data['is_headline'] && !$news->is_headline) {
                     $data['headline_order'] = News::where('is_headline', true)->count() + 1;
                 }
             } else {
@@ -143,13 +191,49 @@ class NewsService
                 $this->newsRepository->syncTags($news, $data['tags']);
             }
             
+            // İlişkili medya varsa ilişkiyi güncelle
+            if (!empty($data['filemanagersystem_image'])) {
+                $this->updateMediaRelationForNews($news, $data['filemanagersystem_image']);
+            }
+            
+            // Galeri ilişkilerini güncelle
+            if (!empty($data['filemanagersystem_gallery']) && is_array($data['filemanagersystem_gallery'])) {
+                $this->updateGalleryMediaRelations($news, $data['filemanagersystem_gallery']);
+            }
+            
             DB::commit();
             
             return $result;
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Haber güncelleme hatası: ' . $e->getMessage());
-            return false;
+            
+            // Daha detaylı loglama
+            $errorDetail = 'Haber güncelleme hatası: ' . $e->getMessage();
+            $errorContext = [
+                'error_class' => get_class($e),
+                'line' => $e->getLine(),
+                'file' => $e->getFile(),
+                'trace' => $e->getTraceAsString(),
+                'data' => json_encode($data, JSON_UNESCAPED_UNICODE),
+                'id' => $id
+            ];
+            
+            Log::error($errorDetail, $errorContext);
+            
+            // Hata mesajını daha açıklayıcı hale getir
+            if (strpos($e->getMessage(), 'SQLSTATE[23000]') !== false && strpos($e->getMessage(), 'Duplicate entry') !== false) {
+                $errorDetail = 'Aynı başlık veya slug değeri ile bir haber zaten mevcut. Lütfen başlığı değiştirin.';
+            } elseif (strpos($e->getMessage(), 'SQLSTATE[23000]') !== false && strpos($e->getMessage(), 'foreign key constraint') !== false) {
+                $errorDetail = 'İlişkili bir kayıt bulunamadı. Lütfen seçtiğiniz değerleri kontrol edin.';
+            } elseif (strpos($e->getMessage(), 'SQLSTATE[HY000]') !== false && strpos($e->getMessage(), 'General error') !== false) {
+                $errorDetail = 'Veritabanı işlemi sırasında genel bir hata oluştu. Lütfen form verilerini kontrol edin.';
+            } elseif (strpos($e->getMessage(), 'Call to a member function') !== false) {
+                $errorDetail = 'Uygulama hatası: Geçersiz nesne referansı. Lütfen daha sonra tekrar deneyin.';
+            }
+            
+            Log::error('Kullanıcıya gösterilen hata: ' . $errorDetail);
+            
+            throw new \Exception($errorDetail, 0, $e);
         }
     }
     
@@ -254,12 +338,7 @@ class NewsService
     public function toggleArchive(News $news)
     {
         try {
-            if ($news->end_date) {
-                $news->end_date = null;
-            } else {
-                $news->end_date = now();
-            }
-            
+            $news->is_archived = !$news->is_archived;
             return $news->save();
         } catch (\Exception $e) {
             Log::error('Arşiv durumu değiştirme hatası: ' . $e->getMessage());
@@ -281,6 +360,273 @@ class NewsService
         } catch (\Exception $e) {
             Log::error('Durum değiştirme hatası: ' . $e->getMessage());
             return false;
+        }
+    }
+
+    /**
+     * Ana görsel için medya ilişkisi oluşturur
+     */
+    private function createMediaRelationForNews(News $news, string $filemanagersystemImage)
+    {
+        try {
+            // Medya ID'sini bul
+            $mediaId = null;
+            
+            // 1. /uploads/media/123 formatı
+            if (preg_match('#^/uploads/media/(\d+)$#', $filemanagersystemImage, $matches)) {
+                $mediaId = $matches[1];
+            }
+            // 2. /admin/filemanagersystem/media/preview/123 formatı
+            elseif (preg_match('#/media/preview/(\d+)#', $filemanagersystemImage, $matches)) {
+                $mediaId = $matches[1];
+            }
+            
+            if ($mediaId) {
+                // Mevcut ilişkiyi kontrol et
+                $existingRelation = \App\Models\FileManagerSystem\MediaRelation::where('media_id', $mediaId)
+                    ->where('related_type', 'news')
+                    ->where('related_id', $news->id)
+                    ->where('field_name', 'featured_image')
+                    ->first();
+                
+                // İlişki yoksa oluştur
+                if (!$existingRelation) {
+                    $mediaRelation = new \App\Models\FileManagerSystem\MediaRelation();
+                    $mediaRelation->media_id = $mediaId;
+                    $mediaRelation->related_type = 'news';
+                    $mediaRelation->related_id = $news->id;
+                    $mediaRelation->field_name = 'featured_image';
+                    $mediaRelation->order = 0;
+                    $mediaRelation->save();
+                }
+            }
+        } catch (\Exception $e) {
+            \Log::error('Haber medya ilişkisi oluşturma hatası: ' . $e->getMessage(), [
+                'news_id' => $news->id,
+                'filemanagersystem_image' => $filemanagersystemImage,
+                'trace' => $e->getTraceAsString()
+            ]);
+        }
+    }
+
+    /**
+     * Galerisi ilişkilerini oluşturur
+     */
+    private function createGalleryMediaRelations(News $news, array $galleryItems)
+    {
+        try {
+            foreach ($galleryItems as $index => $item) {
+                // Medya ID'sini çıkart
+                $mediaId = null;
+                
+                if (is_array($item) && isset($item['id'])) {
+                    $mediaId = $item['id'];
+                } elseif (is_string($item)) {
+                    // URL'den ID'yi çıkart
+                    if (preg_match('#^/uploads/media/(\d+)$#', $item, $matches)) {
+                        $mediaId = $matches[1];
+                    } elseif (preg_match('#/media/preview/(\d+)#', $item, $matches)) {
+                        $mediaId = $matches[1];
+                    }
+                }
+                
+                if ($mediaId) {
+                    // Galeri için ilişki oluştur
+                    $mediaRelation = new \App\Models\FileManagerSystem\MediaRelation();
+                    $mediaRelation->media_id = $mediaId;
+                    $mediaRelation->related_type = 'news';
+                    $mediaRelation->related_id = $news->id;
+                    $mediaRelation->field_name = 'gallery';
+                    $mediaRelation->order = $index;
+                    $mediaRelation->save();
+                }
+            }
+        } catch (\Exception $e) {
+            \Log::error('Haber galeri ilişkisi oluşturma hatası: ' . $e->getMessage(), [
+                'news_id' => $news->id,
+                'trace' => $e->getTraceAsString()
+            ]);
+        }
+    }
+
+    /**
+     * Ana görsel ilişkisini günceller
+     */
+    private function updateMediaRelationForNews(News $news, string $filemanagersystemImage)
+    {
+        try {
+            // Önce mevcut ana görsel ilişkilerini sil
+            \App\Models\FileManagerSystem\MediaRelation::where('related_type', 'news')
+                ->where('related_id', $news->id)
+                ->where('field_name', 'featured_image')
+                ->delete();
+            
+            // Yeni ilişki oluştur
+            $this->createMediaRelationForNews($news, $filemanagersystemImage);
+            
+        } catch (\Exception $e) {
+            \Log::error('Haber medya ilişkisi güncelleme hatası: ' . $e->getMessage(), [
+                'news_id' => $news->id,
+                'filemanagersystem_image' => $filemanagersystemImage,
+                'trace' => $e->getTraceAsString()
+            ]);
+        }
+    }
+
+    /**
+     * Galeri ilişkilerini günceller
+     */
+    private function updateGalleryMediaRelations(News $news, array $galleryItems)
+    {
+        try {
+            // Önce mevcut galeri ilişkilerini sil
+            \App\Models\FileManagerSystem\MediaRelation::where('related_type', 'news')
+                ->where('related_id', $news->id)
+                ->where('field_name', 'gallery')
+                ->delete();
+            
+            // Yeni ilişkileri oluştur
+            $this->createGalleryMediaRelations($news, $galleryItems);
+            
+        } catch (\Exception $e) {
+            \Log::error('Haber galeri ilişkisi güncelleme hatası: ' . $e->getMessage(), [
+                'news_id' => $news->id,
+                'trace' => $e->getTraceAsString()
+            ]);
+        }
+    }
+
+    /**
+     * Galeri resmi yükle
+     * 
+     * @param UploadedFile $file
+     * @return string|bool
+     */
+    public function uploadGalleryImage($file)
+    {
+        try {
+            $originalFilename = time() . '_' . Str::random(10);
+            $extension = $file->getClientOriginalExtension();
+            $uploadPath = 'uploads/news/gallery';
+            
+            // Benzersiz dosya adı oluştur
+            $filename = $this->createUniqueFilename($uploadPath, $originalFilename, $extension);
+            
+            $file->move(public_path($uploadPath), $filename);
+            $path = $uploadPath . '/' . $filename;
+            
+            return asset($path);
+        } catch (\Exception $e) {
+            Log::error('Galeri resmi yükleme hatası: ' . $e->getMessage());
+            return false;
+        }
+    }
+    
+    /**
+     * Benzersiz dosya adı oluştur
+     * 
+     * @param string $path Dizin yolu
+     * @param string $filename Dosya adı (uzantısız)
+     * @param string $extension Dosya uzantısı
+     * @return string Benzersiz dosya adı (uzantı dahil)
+     */
+    private function createUniqueFilename($path, $filename, $extension)
+    {
+        $fullFilename = $filename . '.' . $extension;
+        $fullPath = public_path($path . '/' . $fullFilename);
+        
+        if (!file_exists($fullPath)) {
+            return $fullFilename;
+        }
+        
+        $counter = 1;
+        while (file_exists($fullPath)) {
+            $fullFilename = $filename . '_' . $counter . '.' . $extension;
+            $fullPath = public_path($path . '/' . $fullFilename);
+            $counter++;
+        }
+        
+        return $fullFilename;
+    }
+    
+    /**
+     * Toplu işlemleri gerçekleştir
+     * 
+     * @param array $ids Haber ID'leri
+     * @param string $action İşlem türü (delete, publish, draft, archive)
+     * @return array
+     */
+    public function handleBulkAction(array $ids, string $action)
+    {
+        try {
+            DB::beginTransaction();
+            
+            $successCount = 0;
+            $errorCount = 0;
+            
+            switch ($action) {
+                case 'delete':
+                    foreach ($ids as $id) {
+                        try {
+                            if ($this->deleteNews($id)) {
+                                $successCount++;
+                            } else {
+                                $errorCount++;
+                            }
+                        } catch (\Exception $e) {
+                            Log::error('Toplu silme hatası (ID: ' . $id . '): ' . $e->getMessage());
+                            $errorCount++;
+                        }
+                    }
+                    
+                    $message = $successCount . ' haber başarıyla silindi.';
+                    if ($errorCount > 0) {
+                        $message .= ' ' . $errorCount . ' haber silinirken hata oluştu.';
+                    }
+                    break;
+                    
+                case 'publish':
+                    $updated = News::whereIn('id', $ids)->update(['status' => 'published']);
+                    $message = $updated . ' haber başarıyla yayınlandı.';
+                    $successCount = $updated;
+                    break;
+                    
+                case 'draft':
+                    $updated = News::whereIn('id', $ids)->update(['status' => 'draft']);
+                    $message = $updated . ' haber başarıyla taslak durumuna alındı.';
+                    $successCount = $updated;
+                    break;
+                    
+                case 'archive':
+                    $updated = News::whereIn('id', $ids)->update(['is_archived' => true]);
+                    $message = $updated . ' haber başarıyla arşivlendi.';
+                    $successCount = $updated;
+                    break;
+                    
+                default:
+                    DB::rollBack();
+                    return [
+                        'success' => false,
+                        'message' => 'Geçersiz işlem türü.'
+                    ];
+            }
+            
+            DB::commit();
+            
+            return [
+                'success' => true,
+                'message' => $message,
+                'successCount' => $successCount,
+                'errorCount' => $errorCount
+            ];
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Toplu işlem hatası: ' . $e->getMessage());
+            
+            return [
+                'success' => false,
+                'message' => 'Toplu işlem sırasında bir hata oluştu: ' . $e->getMessage()
+            ];
         }
     }
 } 

@@ -1,0 +1,78 @@
+<?php
+
+namespace App\Http\Controllers\Front;
+
+use App\Http\Controllers\Controller;
+use App\Models\News;
+use App\Models\NewsCategory;
+use Illuminate\Http\Request;
+
+class NewsController extends Controller
+{
+    /**
+     * Haber listesi sayfasını göster
+     */
+    public function index(Request $request)
+    {
+        $categories = NewsCategory::whereHas('news', function($query) {
+            $query->where('status', true);
+        })->get();
+
+        $news = News::with(['category', 'categories'])
+            ->where('status', true)
+            ->when($request->category, function($query) use ($request) {
+                $query->whereHas('categories', function($q) use ($request) {
+                    $q->where('news_categories.id', $request->category);
+                });
+            })
+            ->when($request->search, function($query) use ($request) {
+                $query->where('title', 'like', '%' . $request->search . '%')
+                    ->orWhere('content', 'like', '%' . $request->search . '%');
+            })
+            ->orderBy('published_at', 'desc')
+            ->paginate(20);
+
+        // Yaklaşan etkinlikleri getir
+        $upcomingEvents = \App\Models\Event::with('category')
+            ->where('is_active', true)
+            ->where('start_date', '>=', now())
+            ->orderBy('start_date', 'asc')
+            ->take(10)
+            ->get();
+
+        return view('front.news.index', compact('news', 'categories', 'upcomingEvents'));
+    }
+
+    /**
+     * Kategori bazlı haber listesi
+     */
+    public function category($slug)
+    {
+        $category = NewsCategory::where('slug', $slug)->firstOrFail();
+        
+        $news = News::with(['category', 'categories'])
+            ->whereHas('categories', function($query) use ($category) {
+                $query->where('news_categories.id', $category->id);
+            })
+            ->where('status', true)
+            ->orderBy('published_at', 'desc')
+            ->paginate(12);
+
+        return view('front.news.category', compact('news', 'category'));
+    }
+
+    /**
+     * Tekil haber detay sayfası
+     */
+    public function show($slug)
+    {
+        $news = News::where('slug', $slug)
+            ->where('status', true)
+            ->firstOrFail();
+
+        // Görüntülenme sayısını artır
+        $news->increment('views');
+
+        return view('front.news.show', compact('news'));
+    }
+} 

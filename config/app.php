@@ -159,7 +159,10 @@ return [
         /*
          * Package Service Providers...
          */
-        UniSharp\LaravelFilemanager\LaravelFilemanagerServiceProvider::class,
+        Intervention\Image\Laravel\ServiceProvider::class,
+        JeroenNoten\LaravelAdminLte\AdminLteServiceProvider::class,
+        Spatie\Permission\PermissionServiceProvider::class,
+        // UniSharp\LaravelFilemanager\LaravelFilemanagerServiceProvider::class,
         /*
          * Application Service Providers...
          */
@@ -169,7 +172,7 @@ return [
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
         App\Providers\AnnouncementServiceProvider::class,
-        App\Providers\FileManagerServiceProvider::class,
+        // App\Providers\FileManagerServiceProvider::class,
     ])->toArray(),
 
     /*

@@ -10,6 +10,7 @@ use App\Models\NewsCategory;
 use App\Services\NewsService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Log;
 
 class NewsController extends Controller
 {
@@ -39,6 +40,12 @@ class NewsController extends Controller
     public function index(Request $request)
     {
         $filters = $request->all();
+        
+        // Varsayılan olarak manşet haberleri de getir
+        if (!isset($filters['headline'])) {
+            $filters['headline'] = 'all';
+        }
+        
         $news = $this->newsService->getNews($filters);
         $headlineCount = News::where('is_headline', true)->count();
         $newsCategories = NewsCategory::where('is_active', true)->orderBy('name')->get();
@@ -63,13 +70,48 @@ class NewsController extends Controller
      */
     public function store(StoreNewsRequest $request)
     {
-        $news = $this->newsService->createNews($request->validated());
-        
-        if ($news) {
+        try {
+            $news = $this->newsService->createNews($request->validated());
+            
             return redirect()->route('admin.news.index')->with('success', 'Haber başarıyla oluşturuldu.');
+        } catch (\Exception $e) {
+            // Hata detaylarını logla
+            Log::error('NewsController hata: ' . $e->getMessage());
+            
+            // Hata mesajını kullanıcıya göster
+            return redirect()
+                ->back()
+                ->withInput()
+                ->with('error', $e->getMessage());
         }
-        
-        return redirect()->back()->with('error', 'Haber oluşturulurken bir hata oluştu.');
+    }
+    
+    /**
+     * Son log kayıtlarından hata mesajını alır
+     */
+    private function getLatestErrorLog()
+    {
+        try {
+            $logPath = storage_path('logs/laravel-' . date('Y-m-d') . '.log');
+            if (file_exists($logPath)) {
+                $logs = file_get_contents($logPath);
+                $lines = explode("\n", $logs);
+                $lines = array_reverse($lines);
+                
+                foreach ($lines as $line) {
+                    if (strpos($line, 'Haber oluşturma hatası:') !== false) {
+                        // Hata mesajını ayıkla
+                        preg_match('/Haber oluşturma hatası: (.*?)(\[|$)/', $line, $matches);
+                        if (isset($matches[1])) {
+                            return trim($matches[1]);
+                        }
+                    }
+                }
+            }
+            return null;
+        } catch (\Exception $e) {
+            return null;
+        }
     }
 
     /**
@@ -98,15 +140,17 @@ class NewsController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateNewsRequest $request, News $news)
+    public function update(UpdateNewsRequest $request, $id)
     {
-        $result = $this->newsService->updateNews($request->validated(), $news->id);
-        
-        if ($result) {
+        try {
+            $result = $this->newsService->updateNews($request->validated(), $id);
+            
             return redirect()->route('admin.news.index')->with('success', 'Haber başarıyla güncellendi.');
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->withInput()
+                ->with('error', $e->getMessage());
         }
-        
-        return redirect()->back()->with('error', 'Haber güncellenirken bir hata oluştu.');
     }
 
     /**
@@ -195,7 +239,7 @@ class NewsController extends Controller
             return response()->json(['success' => true]);
         }
         
-        return response()->json(['success' => false, 'message' => 'Yayın durumu değiştirilirken bir hata oluştu.']);
+        return response()->json(['success' => false, 'message' => 'Durum değiştirilirken bir hata oluştu.']);
     }
     
     /**
@@ -204,52 +248,47 @@ class NewsController extends Controller
     public function uploadGalleryImage(Request $request)
     {
         $request->validate([
-            'file' => 'required|image|max:2048'
+            'image' => 'required|image|max:2048'
         ]);
         
-        try {
-            $file = $request->file('file');
-            $originalFilename = time() . '_' . Str::random(10);
-            $extension = $file->getClientOriginalExtension();
-            $uploadPath = 'uploads/news/gallery';
-            
-            // Benzersiz dosya adı oluştur
-            $filename = $this->createUniqueFilename($uploadPath, $originalFilename, $extension);
-            
-            $file->move(public_path($uploadPath), $filename);
-            $path = $uploadPath . '/' . $filename;
-            
-            return response()->json(['location' => asset($path)]);
-        } catch (\Exception $e) {
-            return response()->json(['error' => 'Resim yüklenirken bir hata oluştu: ' . $e->getMessage()], 500);
+        $result = $this->newsService->uploadGalleryImage($request->file('image'));
+        
+        if ($result) {
+            return response()->json([
+                'success' => true,
+                'url' => $result
+            ]);
         }
+        
+        return response()->json(['success' => false, 'message' => 'Görsel yüklenirken bir hata oluştu.']);
     }
     
     /**
-     * Benzersiz dosya adı oluştur
-     * Eğer aynı isimde dosya varsa sonuna sayı ekler (örn: resim_1.jpg, resim_2.jpg)
-     *
-     * @param string $path Dizin yolu
-     * @param string $filename Dosya adı (uzantısız)
-     * @param string $extension Dosya uzantısı
-     * @return string Benzersiz dosya adı (uzantı dahil)
+     * Handle bulk actions.
      */
-    private function createUniqueFilename($path, $filename, $extension)
+    public function bulkAction(Request $request)
     {
-        $fullFilename = $filename . '.' . $extension;
-        $fullPath = public_path($path . '/' . $fullFilename);
+        $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'integer',
+            'action' => 'required|string|in:delete,publish,draft,archive'
+        ]);
         
-        if (!file_exists($fullPath)) {
-            return $fullFilename;
+        $ids = $request->input('ids');
+        $action = $request->input('action');
+        
+        $result = $this->newsService->handleBulkAction($ids, $action);
+        
+        if ($result['success']) {
+            return response()->json([
+                'success' => true,
+                'message' => $result['message']
+            ]);
         }
         
-        $counter = 1;
-        while (file_exists($fullPath)) {
-            $fullFilename = $filename . '_' . $counter . '.' . $extension;
-            $fullPath = public_path($path . '/' . $fullFilename);
-            $counter++;
-        }
-        
-        return $fullFilename;
+        return response()->json([
+            'success' => false,
+            'message' => $result['message'] ?? 'İşlem sırasında bir hata oluştu.'
+        ]);
     }
 }

@@ -55,17 +55,7 @@ class FilemanagersystemMediaController extends Controller
             'keepOriginal' => config('filemanagersystem.webp_conversion.keep_original')
         ];
         
-        // PHP yükleme limitleri için debug bilgisi
-        $phpUploadLimits = [
-            'post_max_size' => ini_get('post_max_size'),
-            'upload_max_filesize' => ini_get('upload_max_filesize'),
-            'memory_limit' => ini_get('memory_limit'),
-            'max_file_uploads' => ini_get('max_file_uploads'),
-            'max_execution_time' => ini_get('max_execution_time'),
-            'php_version' => phpversion(),
-        ];
-        
-        return view('filemanagersystem.medias.create', compact('folders', 'folder', 'compressionSettings', 'phpUploadLimits'));
+        return view('filemanagersystem.medias.create', compact('folders', 'folder', 'compressionSettings'));
     }
 
     /**
@@ -73,9 +63,6 @@ class FilemanagersystemMediaController extends Controller
      */
     public function store(Request $request)
     {
-        // Debug başlangıcı
-        $debugLog = ['başlangıç' => date('H:i:s')];
-        
         $request->validate([
             'files' => 'required|array',
             'files.*' => 'required|file|max:10485760', // 10MB
@@ -83,26 +70,14 @@ class FilemanagersystemMediaController extends Controller
             'is_public' => 'boolean',
         ]);
         
-        $debugLog['validasyon_sonrası'] = date('H:i:s');
-        
         $uploadedFiles = [];
         
-        foreach ($request->file('files') as $fileIndex => $file) {
-            $fileDebug = ['index' => $fileIndex, 'başlangıç' => date('H:i:s')];
-            
+        foreach ($request->file('files') as $file) {
             $originalName = $file->getClientOriginalName();
             $extension = strtolower($file->getClientOriginalExtension());
             $mimeType = $file->getMimeType();
             $originalSize = $file->getSize();
             $fileName = Str::random(40) . '.' . $extension;
-            
-            $fileDebug['bilgiler'] = [
-                'originalName' => $originalName,
-                'extension' => $extension,
-                'mimeType' => $mimeType,
-                'originalSize' => $originalSize,
-                'fileName' => $fileName
-            ];
             
             // Dosya türüne göre klasör belirleme
             $folderPath = $this->getMainFolderByMimeType($mimeType);
@@ -113,24 +88,17 @@ class FilemanagersystemMediaController extends Controller
                 mkdir($fullPath, 0755, true);
             }
             
-            $fileDebug['klasör_oluşturma'] = date('H:i:s');
-            
             try {
                 // Dosyayı basitçe kaydet, önce sıkıştırma yapmadan direkt kaydet
                 $path = $file->storeAs($folderPath, $fileName, 'uploads');
                 $fullPath = public_path('uploads/' . $path);
                 $url = asset('uploads/' . $path);
                 
-                $fileDebug['dosya_kaydetme'] = date('H:i:s');
-                $fileDebug['dosya_yolu'] = $path;
-                
                 // Resim dosyası ise sıkıştırma ve WebP dönüştürme işlemi yap
                 $compressionInfo = null;
                 $isImage = strpos($mimeType, 'image/') === 0;
                 
                 if ($isImage) {
-                    $fileDebug['resim_sıkıştırma_başlangıç'] = date('H:i:s');
-                    
                     // Resmi sıkıştır
                     $compressionInfo = $this->compressImage(
                         $fullPath, 
@@ -140,9 +108,6 @@ class FilemanagersystemMediaController extends Controller
                             'size' => config('filemanagersystem.image_compression.default_size')
                         ]
                     );
-                    
-                    $fileDebug['resim_sıkıştırma_bitiş'] = date('H:i:s');
-                    $fileDebug['sıkıştırma_sonuçları'] = $compressionInfo;
                 }
                 
                 // Temel veritabanı kaydı oluştur
@@ -171,12 +136,10 @@ class FilemanagersystemMediaController extends Controller
                 
                 // Değişiklikleri kaydet
                 $media->save();
-                $fileDebug['veritabanı_kayıt'] = date('H:i:s');
                 
                 $uploadedFiles[] = $media;
                 
             } catch (\Exception $e) {
-                $fileDebug['hata'] = $e->getMessage();
                 Log::error('Dosya yükleme hatası: ' . $e->getMessage(), [
                     'file_name' => $originalName,
                     'mime_type' => $mimeType,
@@ -184,13 +147,7 @@ class FilemanagersystemMediaController extends Controller
                     'trace' => $e->getTraceAsString()
                 ]);
             }
-            
-            $fileDebug['bitiş'] = date('H:i:s');
-            $debugLog['dosyalar'][] = $fileDebug;
         }
-        
-        $debugLog['bitiş'] = date('H:i:s');
-        Log::channel('daily')->info('Debug: Dosya Yükleme İşlemi', $debugLog);
         
         // Eğer hiç dosya yüklenmediyse
         if (empty($uploadedFiles)) {
@@ -297,6 +254,45 @@ class FilemanagersystemMediaController extends Controller
         }
         
         return back()->withErrors(['error' => 'Dosya bulunamadı']);
+    }
+    
+    /**
+     * Media ID'sine göre gerçek dosya yolunu döndürür
+     */
+    public function getFilePath($id)
+    {
+        try {
+            $media = Media::findOrFail($id);
+            
+            // Gerçek dosya yolunu döndür
+            $filePath = '/uploads/' . $media->path;
+            
+            // WebP sürümü varsa ve kullanılabilirse onu tercih et
+            if ($media->has_webp && $media->webp_path) {
+                $filePath = '/uploads/' . $media->webp_path;
+            }
+            
+            return response()->json([
+                'success' => true,
+                'file_path' => $filePath,
+                'media_info' => [
+                    'id' => $media->id,
+                    'name' => $media->name,
+                    'original_name' => $media->original_name,
+                    'mime_type' => $media->mime_type,
+                    'extension' => $media->extension,
+                    'has_webp' => $media->has_webp,
+                    'url' => $media->url,
+                    'webp_url' => $media->webp_url
+                ]
+            ]);
+        } catch (\Exception $e) {
+            // Hata durumunda
+            return response()->json([
+                'success' => false,
+                'message' => 'Dosya yolu alınamadı: ' . $e->getMessage()
+            ], 404);
+        }
     }
     
     /**

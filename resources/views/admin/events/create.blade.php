@@ -316,7 +316,8 @@
 @stop
 
 @section('js')
-    <script src="/vendor/laravel-filemanager/js/stand-alone-button.js"></script>
+    <!-- Laravel FileManager kaldırıldı -->
+    <!-- <script src="/vendor/laravel-filemanager/js/stand-alone-button.js"></script> -->
     <script>
         // TinyMCE'yi dinamik olarak yükle
         var script = document.createElement('script');
@@ -348,7 +349,9 @@
                 content_css: [
                     '{{ asset("vendor/adminlte/dist/css/adminlte.min.css") }}',
                     'https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700'
-                ],
+                ]
+                // File Manager kaldırıldı
+                /*
                 file_picker_callback: function (callback, value, meta) {
                     let x = window.innerWidth || document.documentElement.clientWidth || document.getElementsByTagName('body')[0].clientWidth;
                     let y = window.innerHeight || document.documentElement.clientHeight || document.getElementsByTagName('body')[0].clientHeight;
@@ -368,10 +371,11 @@
                         }
                     });
                 }
+                */
             });
             
-            // Laravel File Manager
-            $('#lfm').filemanager('image', {prefix: '/admin/filemanager'});
+            // Laravel File Manager kaldırıldı
+            // $('#lfm').filemanager('image', {prefix: '/admin/filemanager'});
             
             // Galeri öğesi ekleme
             let galleryCounter = 0;
@@ -402,7 +406,8 @@
                 `;
                 
                 $('#gallery-items').append(galleryItem);
-                $(`#lfm-gallery-${galleryCounter}`).filemanager('image', {prefix: '/admin/filemanager'});
+                // FileManager kaldırıldı
+                // $(`#lfm-gallery-${galleryCounter}`).filemanager('image', {prefix: '/admin/filemanager'});
                 
                 galleryCounter++;
             }

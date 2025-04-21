@@ -1,6 +1,6 @@
 @extends('adminlte::page')
 
-@section('title', 'Sayfa Düzenle')
+@section('title', 'Sayfa Düzenle - ' . $page->title)
 
 @section('styles')
 <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css" rel="stylesheet">
@@ -384,6 +384,49 @@
         padding: 5px 10px;
         font-size: 0.8rem;
     }
+    
+    /* MediaPicker Modal Stilleri */
+    #mediapickerModal .modal-dialog {
+        max-width: 98%;
+        height: 90vh;
+        margin: 0 auto;
+    }
+    
+    #mediapickerModal .modal-content {
+        height: 90vh;
+        border-radius: 8px;
+        border: none;
+    }
+    
+    #mediapickerModal .modal-body {
+        padding: 0;
+        height: calc(100% - 56px);
+    }
+    
+    #mediapickerModal .modal-header {
+        border-radius: 8px 8px 0 0;
+        background-color: #f8f9fa;
+        border-bottom: 1px solid #dee2e6;
+    }
+    
+    #mediapickerFrame {
+        border: none;
+        width: 100%;
+        height: 100%;
+    }
+    
+    /* FileManagerSystem Görsel Alanı */
+    #filemanagersystem_image_preview {
+        max-width: 100%;
+        margin-top: 10px;
+    }
+    
+    #filemanagersystem_image_preview img {
+        max-width: 100%;
+        max-height: 200px;
+        border-radius: 5px;
+        box-shadow: 0 2px 4px rgba(0,0,0,.1);
+    }
 </style>
 @stop
 
@@ -500,132 +543,52 @@
                         </div>
                     </div>
                 </div>
-                        
-                <!-- Medya -->
+                
+                <!-- Sayfa Görseli -->
                 <div class="card mb-4">
-                    <div class="card-header bg-light d-flex align-items-center">
-                        <i class="fas fa-images me-2 text-primary"></i>
-                        <h5 class="mb-0">Medya</h5>
+                    <div class="card-header">
+                        <h5 class="mb-0">Sayfa Görseli</h5>
                     </div>
                     <div class="card-body">
-                        <div class="form-group">
-                            <label for="image" class="form-label">Ana Görsel</label>
+                        <!-- FileManagerSystem Görsel -->
+                        <div class="mb-4">
+                            <label for="filemanagersystem_image" class="form-label">Sayfa Görseli <span class="text-danger">*</span></label>
                             <div class="input-group">
-                                <input type="text" class="form-control @error('image') is-invalid @enderror" id="image" name="image" value="{{ old('image', $page->image) }}" readonly>
-                                <div class="input-group-append">
-                                    <button class="btn btn-primary" type="button" id="image-browser" data-input="image" data-preview="image-preview">
-                                        <i class="fas fa-folder-open"></i> Göz At
-                                    </button>
-                                    <button class="btn btn-danger" type="button" id="image-clear">
-                                        <i class="fas fa-times"></i> Temizle
-                                    </button>
-                                </div>
+                                <input type="text" class="form-control @error('image') is-invalid @enderror" id="filemanagersystem_image" name="image" value="{{ old('image', $page->image ?? '') }}">
+                                <button type="button" class="btn btn-primary" id="filemanagersystem_image_button">
+                                    <i class="fas fa-image"></i> Görsel Seç
+                                </button>
                             </div>
                             @error('image')
-                                <span class="text-danger">{{ $message }}</span>
+                                <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
-                            
-                            <div id="image-preview" class="mt-3" style="{{ old('image', $page->image) ? '' : 'display: none;' }}">
-                                <img src="{{ old('image', $page->image) }}" alt="Görsel Önizleme" class="img-fluid" style="max-height: 200px; border-radius: 8px;">
-                                <div class="mt-2 small text-muted">
-                                    <span id="image-dimensions">0 x 0</span> &bull; <span id="image-size">0 KB</span>
-                                </div>
+                            <div id="filemanagersystem_image_preview" class="mt-2" style="display: {{ old('image', $page->image) ? 'block' : 'none' }};">
+                                <img src="{{ old('image', $page->image) }}" alt="Önizleme" class="img-thumbnail">
+                            </div>
+                            <div class="alert alert-warning mt-2" id="image-warning" style="display: {{ old('image', $page->image) ? 'none' : 'block' }};">
+                                <i class="fas fa-exclamation-triangle me-1"></i>
+                                <strong>Not:</strong> Ana görsel alanı opsiyoneldir. İsterseniz bir görsel seçebilirsiniz.
                             </div>
                         </div>
-                                
-                        <div class="form-group">
-                            <label for="gallery">Galeri Görselleri <small class="text-muted">(En fazla 10 görsel)</small></label>
-                            <div class="d-flex">
-                                <button type="button" id="gallery-browser" class="btn btn-outline-primary" data-input="fake-gallery-input">
-                                    <i class="fas fa-images"></i> Görsel Ekle (<span id="gallery-count">{{ is_array($page->gallery) ? count($page->gallery) : 0 }}</span>/10)
-                                </button>
-                            </div>
-                            <input type="hidden" id="fake-gallery-input" class="fake-gallery-input">
-                            
-                            <div id="gallery-preview" class="mt-3" style="{{ is_array($page->gallery) && count($page->gallery) > 0 ? '' : 'display: none;' }}">
-                                <div id="gallery-items" class="d-flex flex-wrap gap-3">
-                                    @if(!empty($page->gallery))
-                                        @foreach($page->gallery as $index => $galleryItem)
-                                            <div class="gallery-item" id="gallery-existing-{{ $index }}">
-                                                <img src="{{ $galleryItem }}" alt="Galeri görseli" style="width: 100%; height: 100%; object-fit: cover;">
-                                                <button type="button" class="btn btn-sm btn-danger position-absolute" 
-                                                    style="top: 5px; right: 5px; border-radius: 50%; width: 25px; height: 25px; padding: 0; display: flex; align-items: center; justify-content: center;"
-                                                    data-id="gallery-existing-{{ $index }}">
-                                                    <i class="fas fa-times" style="font-size: 12px;"></i>
-                                                </button>
-                                            </div>
-                                        @endforeach
-                                    @endif
-                                </div>
-                                <div id="gallery-inputs">
-                                    <!-- Buradaki inputlar JavaScript tarafından oluşturulacak, boş bırakıyoruz -->
-                                </div>
-                            </div>
-                            @error('gallery')
-                                <span class="text-danger">{{ $message }}</span>
+
+                        <!-- Görsel Alt Metni -->
+                        <div class="mb-4">
+                            <label for="filemanagersystem_image_alt" class="form-label">Görsel Alt Metni</label>
+                            <input type="text" class="form-control @error('filemanagersystem_image_alt') is-invalid @enderror" id="filemanagersystem_image_alt" name="filemanagersystem_image_alt" value="{{ old('filemanagersystem_image_alt', $page->filemanagersystem_image_alt ?? '') }}">
+                            @error('filemanagersystem_image_alt')
+                                <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
-                            @error('gallery.*')
-                                <span class="text-danger">{{ $message }}</span>
+                            <small class="text-muted">Görselin HTML alt özelliği için kullanılır (SEO ve erişilebilirlik için önemlidir)</small>
+                        </div>
+
+                        <!-- Görsel Başlığı -->
+                        <div class="mb-4">
+                            <label for="filemanagersystem_image_title" class="form-label">Görsel Başlığı</label>
+                            <input type="text" class="form-control @error('filemanagersystem_image_title') is-invalid @enderror" id="filemanagersystem_image_title" name="filemanagersystem_image_title" value="{{ old('filemanagersystem_image_title', $page->filemanagersystem_image_title ?? '') }}">
+                            @error('filemanagersystem_image_title')
+                                <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
-                            
-                            <!-- Debug Bilgisi -->
-                            <div class="mt-3 p-3 bg-light border rounded" id="debug-info">
-                                <h6><i class="fas fa-bug text-warning"></i> Debug Bilgisi</h6>
-                                <div class="mb-2">
-                                    <strong>Sayfa Galerisi (PHP):</strong>
-                                    <pre class="bg-dark text-white p-2 mt-1 rounded" style="max-height: 100px; overflow-y: auto;">{{ var_export($page->gallery, true) }}</pre>
-                                </div>
-                                <div class="mb-2">
-                                    <strong>GalleryItems (JavaScript):</strong>
-                                    <pre class="bg-dark text-white p-2 mt-1 rounded" style="max-height: 100px; overflow-y: auto;" id="js-gallery-items">Yükleniyor...</pre>
-                                </div>
-                                <div class="mb-2">
-                                    <strong>Gallery Inputs:</strong>
-                                    <pre class="bg-dark text-white p-2 mt-1 rounded" style="max-height: 100px; overflow-y: auto;" id="js-gallery-inputs">Yükleniyor...</pre>
-                                </div>
-                                <div>
-                                    <strong>Request Data:</strong>
-                                    <pre class="bg-dark text-white p-2 mt-1 rounded" style="max-height: 100px; overflow-y: auto;">
-@if(session('debug_data'))
-{{ var_export(session('debug_data'), true) }}
-@else
-Henüz veri yok
-@endif
-                                    </pre>
-                                </div>
-                                <button type="button" class="btn btn-warning btn-sm mt-2" id="debug-submit" onclick="testFormSubmit()">
-                                    <i class="fas fa-vial"></i> Test Form Data
-                                </button>
-                                <script>
-                                    function testFormSubmit() {
-                                        // Form verilerini alıp debug-data div'inde göster
-                                        const formData = new FormData(document.getElementById('page-form'));
-                                        let output = '';
-                                        
-                                        for (let pair of formData.entries()) {
-                                            output += pair[0] + ': ' + pair[1] + '\n';
-                                        }
-                                        
-                                        // Gallery değerlerini özel olarak göster
-                                        output += '\n--- Gallery Values ---\n';
-                                        const galleryValues = formData.getAll('gallery[]');
-                                        if (galleryValues.length) {
-                                            galleryValues.forEach((val, index) => {
-                                                output += `gallery[${index}]: ${val}\n`;
-                                            });
-                                        } else {
-                                            output += 'Galeri değeri bulunamadı!';
-                                        }
-                                        
-                                        // Alert ile göster
-                                        alert('Form Verileri:\n\n' + output);
-                                        
-                                        // Konsola da yazdır
-                                        console.log('Form test verileri:', Object.fromEntries(formData));
-                                        console.log('Gallery değerleri:', galleryValues);
-                                    }
-                                </script>
-                            </div>
+                            <small class="text-muted">Görselin HTML title özelliği için kullanılır</small>
                         </div>
                     </div>
                 </div>
@@ -830,6 +793,21 @@ Henüz veri yok
         </div>
     </form>
 </div>
+
+<!-- MediaPicker Modal -->
+<div class="modal fade" id="mediapickerModal" tabindex="-1" role="dialog" aria-labelledby="mediapickerModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="mediapickerModalLabel">Medya Seçici</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+            </div>
+            <div class="modal-body p-0">
+                <iframe id="mediapickerFrame" style="width: 100%; height: 80vh; border: none;"></iframe>
+            </div>
+        </div>
+    </div>
+</div>
 @endsection
 
 @section('js')
@@ -838,41 +816,266 @@ Henüz veri yok
 <script src="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/js/tom-select.complete.min.js"></script>
 
 <!-- TinyMCE Editör -->
-<script src="{{ asset('js/tinymce/tinymce.min.js') }}" referrerpolicy="origin"></script>
-<script src="/vendor/laravel-filemanager/js/stand-alone-button.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/6.4.2/tinymce.min.js"></script>
+<!-- Laravel FileManager kaldırıldı -->
+<!-- <script src="/vendor/laravel-filemanager/js/stand-alone-button.js"></script> -->
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // TinyMCE için düzenleyici ayarları
+        // TinyMCE Editör
         tinymce.init({
             selector: '#content',
             plugins: 'preview importcss searchreplace autolink autosave save directionality code visualblocks visualchars fullscreen image link media template codesample table charmap pagebreak nonbreaking anchor insertdatetime advlist lists wordcount help charmap quickbars emoticons',
             menubar: 'file edit view insert format tools table help',
-            toolbar: 'undo redo | bold italic underline strikethrough | fontfamily fontsize blocks | alignleft aligncenter alignright alignjustify | outdent indent |  numlist bullist | forecolor backcolor removeformat | pagebreak | charmap emoticons | fullscreen  preview save print | insertfile image media template link anchor codesample | ltr rtl',
+            toolbar: 'undo redo | bold italic underline strikethrough | fontfamily image fontsize blocks | alignleft aligncenter alignright alignjustify | outdent indent |  numlist bullist | forecolor backcolor removeformat | pagebreak | charmap emoticons | fullscreen preview save print | insertfile media template link anchor codesample | ltr rtl',
             toolbar_sticky: true,
-            image_advtab: true,
+            image_advtab: false,
             height: 500,
             quickbars_selection_toolbar: 'bold italic | quicklink h2 h3 blockquote quickimage quicktable',
+            quickbars_insert_toolbar: 'quickimage | quicktable quicklink hr',
+            quickbars_insert_toolbar_hover: false,
+            quickbars_image_toolbar: false,
             noneditable_class: 'mceNonEditable',
+            language: 'tr',
+            language_url: '/js/tinymce/langs/tr.js', // Türkçe dil dosyası
             toolbar_mode: 'sliding',
-            contextmenu: 'link image table',
+            contextmenu: 'link table',  // image'i çıkardık
             skin: 'oxide',
             content_css: 'default',
             content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, San Francisco, Segoe UI, Roboto, Helvetica Neue, sans-serif; font-size: 16px; }',
-            language: 'tr',
-            language_url: '/js/tinymce/langs/tr.js', // Türkçe dil dosyası
             relative_urls: false,
             remove_script_host: false,
             convert_urls: true,
+            branding: false,
+            promotion: false,
+            paste_data_images: true, // Panodaki resimlerin yapıştırılmasını sağlar
+            automatic_uploads: false, // Otomatik yüklemeyi devre dışı bıraktık
+            object_resizing: 'img',
+            file_picker_types: 'file media', // image tipini de ekleyelim
+            
+            // Varsayılan resim dialogunu tamamen devre dışı bırak
+            images_upload_handler: function (blobInfo, success, failure) {
+                failure('Görsel yükleme devre dışı.');
+            },
+            
+            // Görsel dialogu tamamen devre dışı bırak
+            image_title: false,
+            image_description: false, 
+            image_advtab: false,
+            image_uploadtab: false,
+            
+            // Varsayılan dosya seçici fonksiyonu override
             file_picker_callback: function (callback, value, meta) {
-                // Dosya seçicisi için özel entegrasyon
-                if (meta.filetype === 'file' || meta.filetype === 'image') {
+                // Resim ekleme işlemleri için FileManagerSystem kullanılacak
+                if (meta.filetype === 'image') {
+                    // Geçici bir ID oluştur
+                    const tempId = Date.now();
+                    const relatedType = 'page_content';
+                    
+                    // MediaPicker URL
+                    const mediapickerUrl = '/admin/filemanagersystem/mediapicker?type=image&filter=all&related_type=' + relatedType + '&related_id=' + tempId;
+                    
+                    // iFrame'i güncelle
+                    $('#mediapickerFrame').attr('src', mediapickerUrl);
+                    
+                    // Modal'ı göster - Bootstrap 5 ile uyumlu
+                    var modal = new bootstrap.Modal(document.getElementById('mediapickerModal'));
+                    modal.show();
+                    
+                    // Mesaj dinleme işlevi
+                    function handleFilePickerSelection(event) {
+                        try {
+                            if (event.data && event.data.type === 'mediaSelected') {
+                                let mediaUrl = '';
+                                let altText = event.data.mediaAlt || '';
+                                
+                                // URL değerini al
+                                if (event.data.mediaUrl) {
+                                    mediaUrl = event.data.mediaUrl;
+                                    
+                                    // URL çevirme
+                                    if (mediaUrl && mediaUrl.startsWith('/')) {
+                                        const baseUrl = window.location.protocol + '//' + window.location.host;
+                                        mediaUrl = baseUrl + mediaUrl;
+                                    }
+                                } else if (event.data.mediaId) {
+                                    // ID ile kullan
+                                    const previewUrl = '/admin/filemanagersystem/media/preview/' + event.data.mediaId;
+                                    mediaUrl = previewUrl;
+                                }
+                                
+                                if (mediaUrl) {
+                                    // Callback'e URL'yi ve alt metni ilet
+                                    callback(mediaUrl, { alt: altText });
+                                    
+                                    // Modalı kapat
+                                    modal.hide();
+                                    
+                                    // Event listener'ı kaldır
+                                    window.removeEventListener('message', handleFilePickerSelection);
+                                }
+                            } else if (event.data && event.data.type === 'mediapickerError') {
+                                console.error('FileManagerSystem hatası:', event.data.message);
+                                alert('Medya seçici hatası: ' + event.data.message);
+                                modal.hide();
+                                
+                                window.removeEventListener('message', handleFilePickerSelection);
+                            }
+                        } catch (error) {
+                            console.error('Medya seçimi işlenirken hata oluştu:', error);
+                            alert('Medya seçimi işlenirken bir hata oluştu.');
+                            
+                            window.removeEventListener('message', handleFilePickerSelection);
+                        }
+                    }
+                    
+                    // Event listener ekle
+                    window.removeEventListener('message', handleFilePickerSelection);
+                    window.addEventListener('message', handleFilePickerSelection);
+                    
+                    return false;
+                }
+                
+                // Diğer dosya tipleri için standart dosya seçiciyi kullan
+                if (meta.filetype === 'file' || meta.filetype === 'media') {
                     window.open('/filemanager/dialog.php?type=' + meta.filetype + '&field_id=tinymce-file', 'filemanager', 'width=900,height=600');
                     window.SetUrl = function (url, width, height, alt) {
                         callback(url, {alt: alt});
                     };
                 }
+            },
+            
+            // FileManagerSystem entegrasyonu için özel buton
+            setup: function (editor) {
+                // TinyMCE başlatıldığında image plugininin davranışını değiştir
+                editor.on('PreInit', function() {
+                    // Image plugin komutlarını ele geçir ve engelle
+                    editor.on('BeforeExecCommand', function(e) {
+                        if (e.command === 'mceImage') {
+                            // FileManagerSystem'i aç
+                            openFileManagerSystemPicker(editor);
+                            e.preventDefault();
+                            return false;
+                        }
+                    });
+                    
+                    // Quickbars'ı özelleştir
+                    editor.contentStyles.push(`
+                        .tox-toolbar-overlord {
+                            font-size: 14px !important;
+                        }
+                        .tox-pop__dialog {
+                            background-color: #fff !important;
+                            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2) !important;
+                            border-radius: 6px !important;
+                        }
+                        .tox-toolbar__group {
+                            padding: 4px !important;
+                        }
+                        .tox-toolbar__primary {
+                            background-color: #fff !important;
+                        }
+                        .tox-tbtn {
+                            margin: 2px !important;
+                        }
+                        .tox-tbtn--enabled, .tox-tbtn:hover {
+                            background-color: #e9ecef !important;
+                        }
+                        .tox-icon.tox-tbtn__icon-wrap {
+                            font-size: 16px !important;
+                        }
+                    `);
+                });
+                
+                // TinyMCE başlatıldığında custom butonları ekle
+                editor.on('init', function() {
+                    // Özel toolbar butonu ekle
+                    editor.ui.registry.addButton('customimage', {
+                        icon: 'image',
+                        tooltip: 'Resim Ekle/Düzenle',
+                        onAction: function() {
+                            openFileManagerSystemPicker(editor);
+                        }
+                    });
+                    
+                    // QuickImage toolbarı için özel buton ekle
+                    editor.ui.registry.addButton('quickimage', {
+                        icon: 'image',
+                        tooltip: 'Hızlı Resim Ekle',
+                        onAction: function() {
+                            openFileManagerSystemPicker(editor);
+                        }
+                    });
+                });
             }
         });
+        
+        // FileManagerSystem Picker fonksiyonu
+        function openFileManagerSystemPicker(editor) {
+            // Geçici bir ID oluştur
+            const tempId = Date.now();
+            const relatedType = 'page_content';
+            
+            // MediaPicker URL
+            const mediapickerUrl = '/admin/filemanagersystem/mediapicker?type=image&filter=all&related_type=' + relatedType + '&related_id=' + tempId;
+            
+            // iFrame'i güncelle
+            $('#mediapickerFrame').attr('src', mediapickerUrl);
+            
+            // Modal'ı göster - Bootstrap 5 ile uyumlu
+            var modal = new bootstrap.Modal(document.getElementById('mediapickerModal'));
+            modal.show();
+            
+            // Mesaj dinleme işlevi
+            function handleFilePickerSelection(event) {
+                try {
+                    if (event.data && event.data.type === 'mediaSelected') {
+                        let mediaUrl = '';
+                        let altText = event.data.mediaAlt || '';
+                        
+                        // URL değerini al
+                        if (event.data.mediaUrl) {
+                            mediaUrl = event.data.mediaUrl;
+                            
+                            // URL çevirme
+                            if (mediaUrl && mediaUrl.startsWith('/')) {
+                                const baseUrl = window.location.protocol + '//' + window.location.host;
+                                mediaUrl = baseUrl + mediaUrl;
+                            }
+                        } else if (event.data.mediaId) {
+                            // ID ile kullan
+                            const previewUrl = '/admin/filemanagersystem/media/preview/' + event.data.mediaId;
+                            mediaUrl = previewUrl;
+                        }
+                        
+                        if (mediaUrl) {
+                            // Editöre ekle
+                            editor.insertContent(`<img src="${mediaUrl}" alt="${altText}" />`);
+                            
+                            // Modalı kapat
+                            modal.hide();
+                            
+                            // Event listener'ı kaldır
+                            window.removeEventListener('message', handleFilePickerSelection);
+                        }
+                    } else if (event.data && event.data.type === 'mediapickerError') {
+                        console.error('FileManagerSystem hatası:', event.data.message);
+                        alert('Medya seçici hatası: ' + event.data.message);
+                        modal.hide();
+                        
+                        window.removeEventListener('message', handleFilePickerSelection);
+                    }
+                } catch (error) {
+                    console.error('Medya seçimi işlenirken hata oluştu:', error);
+                    alert('Medya seçimi işlenirken bir hata oluştu.');
+                    
+                    window.removeEventListener('message', handleFilePickerSelection);
+                }
+            }
+            
+            // Event listener ekle
+            window.removeEventListener('message', handleFilePickerSelection);
+            window.addEventListener('message', handleFilePickerSelection);
+        }
         
         // Slug oluşturma fonksiyonu
         function createSlug(text) {
@@ -991,461 +1194,247 @@ Henüz veri yok
             closeAfterSelect: false
         });
         
-        // Medya yönetimi
-        document.getElementById('image-browser').addEventListener('click', function() {
-            window.currentFileInput = $('#image');
-            window.open('/admin/file-manager?type=image', 'FileManager', 'width=900,height=600');
-            return false;
-        });
+        // Kategori işlemleri
+        const categoryItems = $('.category-item input[type="checkbox"]');
+        const selectedCategoriesList = $('#selected-categories-list');
+        const categoryCount = $('.category-count');
         
-        document.getElementById('gallery-browser').addEventListener('click', function() {
-            if (galleryItems.length >= 10) {
-                alert('En fazla 10 görsel ekleyebilirsiniz.');
-                return false;
-            }
-            window.currentFileInput = $('#fake-gallery-input');
-            window.open('/admin/file-manager?type=image', 'FileManager', 'width=900,height=600');
-            return false;
-        });
-        
-        document.getElementById('image-clear').addEventListener('click', function() {
-            document.getElementById('image').value = '';
-            document.getElementById('image-preview').style.display = 'none';
-            document.querySelector('#image-preview img').src = '';
-            document.getElementById('image-dimensions').textContent = '0 x 0';
-            document.getElementById('image-size').textContent = '0 KB';
-        });
-        
-        // Ana görsel önizleme
-        const imageInput = document.getElementById('image');
-        imageInput.addEventListener('change', updateImagePreview);
-        
-        // Yüklü bir resim varsa önizleme göster
-        if (imageInput.value) {
-            updateImagePreview();
-        }
-    });
-    
-    // Bu fonksiyonlar global olarak tanımlanmış
-    function updateImagePreview() {
-        const imageValue = document.getElementById('image').value;
-        const preview = document.getElementById('image-preview');
-        const previewImg = preview.querySelector('img');
-        
-        if (imageValue) {
-            previewImg.src = imageValue;
-            preview.style.display = 'block';
-            
-            // Görsel boyutlarını ve dosya boyutunu hesapla
-            const img = new Image();
-            img.onload = function() {
-                const dimensionsEl = document.getElementById('image-dimensions');
-                const sizeEl = document.getElementById('image-size');
-                
-                // Null kontrolü ekleyerek hata oluşmasını engelle
-                if (dimensionsEl) {
-                    dimensionsEl.textContent = this.width + ' x ' + this.height;
-                }
-                
-                // Dosya boyutunu tahmin et (yaklaşık değer)
-                const size = Math.round((this.width * this.height * 4) / 1024);
-                
-                // Null kontrolü ekleyerek hata oluşmasını engelle
-                if (sizeEl) {
-                    sizeEl.textContent = size + ' KB';
-                }
-            };
-            img.src = imageValue;
-        } else {
-            preview.style.display = 'none';
-        }
-    }
-    
-    // FileManager callback işlevi - Laravel FileManager'ın pencereyi kapatırken çağıracağı işlev
-    window.SetUrl = function(items) {
-        console.log('FileManager SetUrl çağrıldı', items);
-        // Bu işlev filemanager tarafından otomatik olarak çağrılır
-        if (window.currentFileInput) {
-            if (items.length > 0) {
-                var url = items[0].url;
-                window.currentFileInput.val(url).trigger('change');
-                
-                // Debug için log
-                console.log('FileManager seçilen URL:', url);
-                console.log('currentFileInput ID:', window.currentFileInput.attr('id'));
-                
-                if (window.currentFileInput.attr('id') === 'fake-gallery-input') {
-                    addGalleryItem(url);
-                    window.currentFileInput.val(''); // Galeri input'unu temizle
-                }
-            }
-        } else {
-            console.log('currentFileInput null, galeri için varsayılan olarak işlenecek');
-            // İlk öğe varsa ve bir resimse, varsayılan olarak galeride işle
-            if (items.length > 0) {
-                var url = items[0].url;
-                addGalleryItem(url);
-            }
-        }
-        window.currentFileInput = null; // İşlem tamamlandığında referansı temizle
-    };
-    
-    // Galeri yönetimi
-    let galleryItems = [];
-    
-    // Sayfa yüklendiğinde mevcut galeri öğelerini yükle
-    $(document).ready(function() {
-        // Laravel File Manager butonları
-        $('#image-browser').filemanager('image', {prefix: '/admin/filemanager'});
-        $('#gallery-browser').filemanager('image', {prefix: '/admin/filemanager'});
-        
-        // Hata ayıklama için
-        console.log('FileManager script yüklendi');
-        
-        // Galeri filemanager değişikliğini dinleme
-        $('#fake-gallery-input').on('change', function() {
-            // Seçilen görseli al
-            var url = $(this).val();
-            console.log('Seçilen galeri görseli: ', url);
-            if (url) {
-                // URL'yi rölatif yola dönüştür (gerekirse)
-                url = makeRelativeUrl(url);
-                addGalleryItem(url);
-                $(this).val(''); // input'u temizle
-            }
-        });
-        
-        // Clear Button for Main Image
-        $('#image-clear').on('click', function() {
-            $('#image').val('');
-            $('#image-preview').hide().find('img').attr('src', '');
-            $('#image-dimensions').text('0 x 0');
-            $('#image-size').text('0 KB');
-        });
-        
-        // Ana görsel değişikliğini dinleme
-        $('#image').on('change', function() {
-            updateImagePreview();
-        });
-        
-        // Mevcut galeri öğelerini topla
-        galleryItems = []; // Önce dizimizi temizleyelim
-        @if(!empty($page->gallery))
-            @foreach($page->gallery as $index => $galleryItem)
-                galleryItems.push({
-                    id: 'gallery-existing-{{ $index }}',
-                    url: '{{ $galleryItem }}'
-                });
-            @endforeach
-            console.log('Mevcut galeri öğeleri yüklendi:', galleryItems);
-        @endif
-        
-        // Başlangıçta render et
-        renderGalleryItems();
-        
-        // Silme işlevini ekle
-        $(document).on('click', '#gallery-items button', function() {
-            const itemId = $(this).data('id');
-            console.log('Silme butonuna tıklandı, itemId:', itemId);
-            galleryItems = galleryItems.filter(item => item.id !== itemId);
-            renderGalleryItems();
-        });
-
-        // Debug bilgilerini ilk yüklenişte göster
-        $('#js-gallery-items').text(JSON.stringify(galleryItems, null, 2));
-        $('#js-gallery-inputs').text($('#gallery-inputs').html());
-    });
-    
-    // URL'yi rölatif yola dönüştür (gerekirse)
-    function makeRelativeUrl(url) {
-        // Aynı domain'e ait URL'leri rölatif hale getir
-        const origin = window.location.origin;
-        if (url.startsWith(origin)) {
-            url = url.replace(origin, '');
-        }
-        console.log('URL dönüştürüldü:', url);
-        return url;
-    }
-    
-    // Medya yöneticisinden seçilen görsel için callback (laravel-filemanager tarafından otomatik çağrılır)
-    function addGalleryItem(url) {
-        if (!url) {
-            console.error('Geçersiz URL: URL boş olamaz');
-            return;
+        // Başlangıçta kategori sayısını güncelle
+        function updateCategoryCount() {
+            const checkedCount = categoryItems.filter(':checked').length;
+            categoryCount.text(checkedCount);
         }
         
-        if (galleryItems.length >= 10) {
-            alert('En fazla 10 görsel ekleyebilirsiniz.');
-            return;
-        }
-        
-        const itemId = 'gallery-' + new Date().getTime() + Math.floor(Math.random() * 1000);
-        galleryItems.push({
-            id: itemId,
-            url: url
-        });
-        
-        console.log('Galeri öğesi eklendi - ID:', itemId);
-        console.log('Galeri öğesi eklendi - URL:', url);
-        console.log('Güncel galeri öğe sayısı:', galleryItems.length);
-        renderGalleryItems();
-    }
-    
-    function renderGalleryItems() {
-        try {
-            console.log('renderGalleryItems başladı, toplam:', galleryItems.length);
+        // Tümünü seç butonu
+        $('#select-all-categories').on('click', function() {
+            // Tüm checkboxlar seçili mi kontrol et
+            const allChecked = categoryItems.length === categoryItems.filter(':checked').length;
             
-            // Galeri görselleri görünürlüğünü ayarla
-            const galleryPreview = $('#gallery-preview');
-            if (!galleryPreview.length) {
-                console.error('gallery-preview elementi bulunamadı');
-                return;
-            }
-            
-            if (galleryItems.length > 0) {
-                galleryPreview.show();
-            } else {
-                galleryPreview.hide();
-            }
-            
-            // Sayacı güncelle
-            const countElement = $('#gallery-count');
-            if (countElement.length) {
-                countElement.text(galleryItems.length);
-            }
-            
-            // Galeri öğelerini temizle
-            const galleryItemsContainer = $('#gallery-items');
-            const galleryInputsContainer = $('#gallery-inputs');
-            
-            if (!galleryItemsContainer.length || !galleryInputsContainer.length) {
-                console.error('gallery-items veya gallery-inputs elementleri bulunamadı');
-                return;
-            }
-            
-            galleryItemsContainer.empty();
-            galleryInputsContainer.empty();
-            
-            // Galeri öğelerini oluştur
-            galleryItems.forEach(item => {
-                // Görsel öğesi
-                const galleryItem = $('<div class="gallery-item"></div>');
-                galleryItem.css({
-                    'position': 'relative',
-                    'width': '150px',
-                    'height': '150px',
-                    'overflow': 'hidden',
-                    'border-radius': '8px',
-                    'box-shadow': '0 2px 5px rgba(0,0,0,0.1)'
-                });
-                
-                galleryItem.html(`
-                    <img src="${item.url}" alt="Galeri görseli" style="width: 100%; height: 100%; object-fit: cover;">
-                    <button type="button" class="btn btn-sm btn-danger position-absolute" 
-                        style="top: 5px; right: 5px; border-radius: 50%; width: 25px; height: 25px; padding: 0; display: flex; align-items: center; justify-content: center;"
-                        data-id="${item.id}">
-                        <i class="fas fa-times" style="font-size: 12px;"></i>
-                    </button>
-                `);
-                
-                galleryItemsContainer.append(galleryItem);
-                
-                // Gizli input - URL'yi array olarak kaydet
-                const input = $('<input type="hidden" name="gallery[]" value="' + item.url + '">');
-                galleryInputsContainer.append(input);
+            // Eğer tümü seçiliyse, hepsini kaldır; değilse hepsini seç
+            categoryItems.each(function() {
+                $(this).prop('checked', !allChecked);
             });
             
-            // Debug bilgilerini güncelle
-            $('#js-gallery-items').text(JSON.stringify(galleryItems, null, 2));
-            $('#js-gallery-inputs').text($('#gallery-inputs').html());
-            
-            // Form submit işlemine galeri verilerini ekle
-            const pageForm = $('#page-form');
-            if (pageForm.length) {
-                pageForm.off('submit.gallery').on('submit.gallery', function() {
-                    // Form gönderilmeden önce tüm eski galeri inputlarını temizle
-                    galleryInputsContainer.empty();
-                    
-                    // Sonra galleryItems dizisindeki değerleri form'a ekle
-                    galleryItems.forEach(item => {
-                        const input = $('<input type="hidden" name="gallery[]" value="' + item.url + '">');
-                        galleryInputsContainer.append(input);
-                    });
-                    
-                    // Debug bilgisi güncelle
-                    $('#js-gallery-inputs').text($('#gallery-inputs').html());
-                    
-                    // Debug bilgilerini konsola yazdır
-                    console.log('Form gönderilirken gallery değerleri:', galleryItems.map(item => item.url));
-                    console.log('Form gönderilirken gallery inputları:', $('#gallery-inputs').html());
-                    
-                    // Form gönderimini engelleme - doğal form gönderimini izin ver
-                    return true;
-                });
-            } else {
-                console.error('page-form elementi bulunamadı');
-            }
-            
-            console.log('renderGalleryItems tamamlandı');
-        } catch (error) {
-            console.error('renderGalleryItems fonksiyonunda hata:', error);
-        }
-    }
-    
-    // Kategori işlemleri
-    const categoryItems = $('.category-item input[type="checkbox"]');
-    const selectedCategoriesList = $('#selected-categories-list');
-    const categoryCount = $('.category-count');
-    
-    // Başlangıçta kategori sayısını güncelle
-    function updateCategoryCount() {
-        const checkedCount = categoryItems.filter(':checked').length;
-        categoryCount.text(checkedCount);
-    }
-    
-    // Tümünü seç butonu
-    $('#select-all-categories').on('click', function() {
-        // Tüm checkboxlar seçili mi kontrol et
-        const allChecked = categoryItems.length === categoryItems.filter(':checked').length;
-        
-        // Eğer tümü seçiliyse, hepsini kaldır; değilse hepsini seç
-        categoryItems.each(function() {
-            $(this).prop('checked', !allChecked);
-        });
-        
-        // Seçili kategorileri güncelle
-        updateSelectedCategories();
-    });
-    
-    // Kategori checkbox'larını dinle
-    categoryItems.on('change', function() {
-        updateSelectedCategories();
-    });
-    
-    // Seçili kategorileri göster
-    function updateSelectedCategories() {
-        // Seçili kategorileri temizle
-        selectedCategoriesList.empty();
-        
-        // Seçili tüm kategorileri bul
-        const selectedCategories = categoryItems.filter(':checked');
-        
-        // Kategori sayacını güncelle
-        updateCategoryCount();
-        
-        // Her seçili kategori için rozet oluştur
-        selectedCategories.each(function() {
-            const categoryName = $(this).closest('.form-check').find('.category-name').text();
-            const categoryId = $(this).val();
-            
-            const categoryBadge = $('<div class="category-badge"></div>');
-            categoryBadge.html(`
-                <span>${categoryName}</span>
-                <i class="fas fa-times remove-category" data-id="${categoryId}"></i>
-            `);
-            selectedCategoriesList.append(categoryBadge);
-        });
-    }
-    
-    // Kategori rozetinden kategori kaldırma
-    selectedCategoriesList.on('click', '.remove-category', function() {
-        const categoryId = $(this).data('id');
-        const checkbox = categoryItems.filter(`[value="${categoryId}"]`);
-        if (checkbox.length > 0) {
-            checkbox.prop('checked', false);
+            // Seçili kategorileri güncelle
             updateSelectedCategories();
-        }
-    });
-
-    // Başlangıçta seçili kategorileri göster
-    updateSelectedCategories();
-    
-    // Etiket sistemi
-    const tagInput = $('#tag-input');
-    const addTagBtn = $('#add-tag-btn');
-    const selectedTagsList = $('#selected-tags-list');
-    const tagsInput = $('#tags');
-    const tagCount = $('.tag-count');
-    
-    // Mevcut etiketleri yükle (varsa)
-    let selectedTags = [];
-    if (tagsInput.val()) {
-        selectedTags = tagsInput.val().split(',').map(tag => tag.trim()).filter(tag => tag);
-        updateTagsDisplay();
-    }
-    
-    // Etiket ekle butonuna tıklandığında
-    addTagBtn.on('click', function() {
-        addTag();
-    });
-    
-    // Enter tuşuna basıldığında etiket ekle
-    tagInput.on('keydown', function(e) {
-        if (e.key === 'Enter') {
-            e.preventDefault();
-            addTag();
-        }
+        });
         
-        // Virgül tuşuna basıldığında da etiket ekle
-        if (e.key === ',') {
-            e.preventDefault();
-            addTag();
-        }
-    });
-    
-    // Etiket ekleme işlevi
-    function addTag() {
-        const tagValue = tagInput.val().trim();
+        // Kategori checkbox'larını dinle
+        categoryItems.on('change', function() {
+            updateSelectedCategories();
+        });
         
-        if (tagValue) {
-            // Virgülle ayrılmış birden fazla etiket olabilir
-            const tags = tagValue.split(',').map(tag => tag.trim()).filter(tag => tag);
+        // Seçili kategorileri göster
+        function updateSelectedCategories() {
+            // Seçili kategorileri temizle
+            selectedCategoriesList.empty();
             
-            tags.forEach(tag => {
-                // Eğer etiket zaten eklenmediyse ekle
-                if (!selectedTags.includes(tag)) {
-                    selectedTags.push(tag);
-                }
+            // Seçili tüm kategorileri bul
+            const selectedCategories = categoryItems.filter(':checked');
+            
+            // Kategori sayacını güncelle
+            updateCategoryCount();
+            
+            // Her seçili kategori için rozet oluştur
+            selectedCategories.each(function() {
+                const categoryName = $(this).closest('.form-check').find('.category-name').text();
+                const categoryId = $(this).val();
+                
+                const categoryBadge = $('<div class="category-badge"></div>');
+                categoryBadge.html(`
+                    <span>${categoryName}</span>
+                    <i class="fas fa-times remove-category" data-id="${categoryId}"></i>
+                `);
+                selectedCategoriesList.append(categoryBadge);
             });
-            
-            // Input alanını temizle
-            tagInput.val('');
-            
-            // Etiketleri güncelle
+        }
+        
+        // Kategori rozetinden kategori kaldırma
+        selectedCategoriesList.on('click', '.remove-category', function() {
+            const categoryId = $(this).data('id');
+            const checkbox = categoryItems.filter(`[value="${categoryId}"]`);
+            if (checkbox.length > 0) {
+                checkbox.prop('checked', false);
+                updateSelectedCategories();
+            }
+        });
+
+        // Başlangıçta seçili kategorileri göster
+        updateSelectedCategories();
+        
+        // Etiket sistemi
+        const tagInput = $('#tag-input');
+        const addTagBtn = $('#add-tag-btn');
+        const selectedTagsList = $('#selected-tags-list');
+        const tagsInput = $('#tags');
+        const tagCount = $('.tag-count');
+        
+        // Mevcut etiketleri yükle (varsa)
+        let selectedTags = [];
+        if (tagsInput.val()) {
+            selectedTags = tagsInput.val().split(',').map(tag => tag.trim()).filter(tag => tag);
             updateTagsDisplay();
         }
-    }
-    
-    // Etiketleri görüntüleme işlevi
-    function updateTagsDisplay() {
-        // Etiketleri hidden input'a ekle
-        tagsInput.val(selectedTags.join(','));
         
-        // Etiket sayacını güncelle
-        tagCount.text(selectedTags.length);
-        
-        // Etiket listesini temizle ve yeniden oluştur
-        selectedTagsList.empty();
-        
-        selectedTags.forEach(tag => {
-            const tagBadge = $('<div class="category-badge"></div>');
-            tagBadge.html(`
-                <span>#${tag}</span>
-                <i class="fas fa-times remove-tag" data-tag="${tag}"></i>
-            `);
-            selectedTagsList.append(tagBadge);
+        // Etiket ekle butonuna tıklandığında
+        addTagBtn.on('click', function() {
+            addTag();
         });
-    }
-    
-    // Etiket silme işlevi (Event delegation)
-    selectedTagsList.on('click', '.remove-tag', function() {
-        const tagToRemove = $(this).data('tag');
         
-        // Etiketi diziden kaldır
-        selectedTags = selectedTags.filter(tag => tag !== tagToRemove);
+        // Enter tuşuna basıldığında etiket ekle
+        tagInput.on('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                addTag();
+            }
+            
+            // Virgül tuşuna basıldığında da etiket ekle
+            if (e.key === ',') {
+                e.preventDefault();
+                addTag();
+            }
+        });
         
-        // Etiket görüntüsünü güncelle
-        updateTagsDisplay();
+        // Etiket ekleme işlevi
+        function addTag() {
+            const tagValue = tagInput.val().trim();
+            
+            if (tagValue) {
+                // Virgülle ayrılmış birden fazla etiket olabilir
+                const tags = tagValue.split(',').map(tag => tag.trim()).filter(tag => tag);
+                
+                tags.forEach(tag => {
+                    // Eğer etiket zaten eklenmediyse ekle
+                    if (!selectedTags.includes(tag)) {
+                        selectedTags.push(tag);
+                    }
+                });
+                
+                // Input alanını temizle
+                tagInput.val('');
+                
+                // Etiketleri güncelle
+                updateTagsDisplay();
+            }
+        }
+        
+        // Etiketleri görüntüleme işlevi
+        function updateTagsDisplay() {
+            // Etiketleri hidden input'a ekle
+            tagsInput.val(selectedTags.join(','));
+            
+            // Etiket sayacını güncelle
+            tagCount.text(selectedTags.length);
+            
+            // Etiket listesini temizle ve yeniden oluştur
+            selectedTagsList.empty();
+            
+            selectedTags.forEach(tag => {
+                const tagBadge = $('<div class="category-badge"></div>');
+                tagBadge.html(`
+                    <span>#${tag}</span>
+                    <i class="fas fa-times remove-tag" data-tag="${tag}"></i>
+                `);
+                selectedTagsList.append(tagBadge);
+            });
+        }
+        
+        // Etiket silme işlevi (Event delegation)
+        selectedTagsList.on('click', '.remove-tag', function() {
+            const tagToRemove = $(this).data('tag');
+            
+            // Etiketi diziden kaldır
+            selectedTags = selectedTags.filter(tag => tag !== tagToRemove);
+            
+            // Etiket görüntüsünü güncelle
+            updateTagsDisplay();
+        });
     });
+</script>
+
+<!-- FileManagerSystem görsel seçici script -->
+<script>
+$(document).ready(function() {
+    // FileManagerSystem entegrasyonu
+    $('#filemanagersystem_image_button').on('click', function() {
+        const input = $('#filemanagersystem_image');
+        const preview = $('#filemanagersystem_image_preview');
+        const previewImg = preview.find('img');
+        
+        // Geçici bir ID oluştur - sadece sayısal değer
+        const tempId = Date.now();
+        const relatedType = 'page';
+        
+        // MediaPicker URL - mutlaka related_id ve related_type parametreleri ekleyelim
+        const mediapickerUrl = '/admin/filemanagersystem/mediapicker?type=image&filter=all&related_type=' + relatedType + '&related_id=' + tempId;
+        
+        // iFrame'i güncelle
+        $('#mediapickerFrame').attr('src', mediapickerUrl);
+        
+        // Bootstrap 5 Modal oluştur ve aç
+        var modal = new bootstrap.Modal(document.getElementById('mediapickerModal'));
+        modal.show();
+        
+        // iframe'den mesaj dinleme ve hata yakalama
+        function handleMediaSelection(event) {
+            try {
+                if (event.data && event.data.type === 'mediaSelected') {
+                    // event.data'dan doğrudan URL değerini al
+                    if (event.data.mediaUrl) {
+                        // Medya URL'sini temizle
+                        let mediaUrl = event.data.mediaUrl;
+                        
+                        // Eğer URL göreceli ise (/ ile başlıyorsa) tam URL'ye çevir
+                        if (mediaUrl && mediaUrl.startsWith('/')) {
+                            const baseUrl = window.location.protocol + '//' + window.location.host;
+                            mediaUrl = baseUrl + mediaUrl;
+                        }
+                        
+                        // Görsel URL'sini forma kaydet ve önizlemede göster
+                        input.val(mediaUrl);
+                        previewImg.attr('src', mediaUrl);
+                        preview.show();
+                        
+                        // Uyarıyı gizle
+                        $('#image-warning').hide();
+                    } else if (event.data.mediaId) {
+                        // URL bulunamadıysa "uploads/" yolu ile dosya ID'sini kullan
+                        const previewUrl = '/uploads/media/' + event.data.mediaId;
+                        input.val(previewUrl);
+                        
+                        // Önizleme için ID ile resmi göster
+                        previewImg.attr('src', '/admin/filemanagersystem/media/preview/' + event.data.mediaId);
+                        preview.show();
+                        
+                        // Uyarıyı gizle
+                        $('#image-warning').hide();
+                    }
+                    
+                    // Modalı kapat
+                    modal.hide();
+                    
+                    // Event listener'ı kaldır
+                    window.removeEventListener('message', handleMediaSelection);
+                } else if (event.data && event.data.type === 'mediapickerError') {
+                    // Medya seçicide bir hata oluştu
+                    alert('Medya seçici hatası: ' + event.data.message);
+                    modal.hide();
+                    
+                    // Event listener'ı kaldır
+                    window.removeEventListener('message', handleMediaSelection);
+                }
+            } catch (error) {
+                alert('Medya seçimi işlenirken bir hata oluştu: ' + error.message);
+                
+                // Event listener'ı kaldır
+                window.removeEventListener('message', handleMediaSelection);
+            }
+        }
+        
+        // Mevcut event listener'ı kaldır ve yenisini ekle
+        window.removeEventListener('message', handleMediaSelection);
+        window.addEventListener('message', handleMediaSelection);
+    });
+});
 </script>
 @stop 

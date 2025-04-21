@@ -25,6 +25,7 @@ class Category extends Model
         'meta_title',
         'meta_description',
         'meta_keywords',
+        'status'
     ];
     
     /**
@@ -34,6 +35,7 @@ class Category extends Model
      */
     protected $casts = [
         'is_active' => 'boolean',
+        'status' => 'boolean'
     ];
     
     /**
@@ -81,5 +83,10 @@ class Category extends Model
     public function scopeActive($query)
     {
         return $query->where('is_active', true);
+    }
+
+    public function news()
+    {
+        return $this->hasMany(News::class);
     }
 }

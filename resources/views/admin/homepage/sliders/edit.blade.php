@@ -140,6 +140,23 @@
             </div>
         </form>
     </div>
+
+<!-- MediaPicker Modal -->
+<div class="modal fade" id="mediapickerModal" tabindex="-1" role="dialog" aria-labelledby="mediapickerModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document" style="max-width: 90%;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="mediapickerModalLabel">Medya Seçici</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Kapat">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body p-0">
+                <iframe id="mediapickerFrame" style="width: 100%; height: 80vh; border: none;"></iframe>
+            </div>
+        </div>
+    </div>
+</div>
 @stop
 
 @section('js')
@@ -151,67 +168,82 @@
             const preview = $('#filemanagersystem_image_preview');
             const previewImg = preview.find('img');
             
-            // Özel FileManagerSystem'i açıyoruz
-            const popup = window.open('/admin/filemanagersystem/picker?type=image', 'FileManagerSystem', 'width=900,height=600');
+            console.log('MediaPicker açılıyor...');
             
-            // Global fonksiyon tanımlıyoruz
-            window.setFileToElement = function(url, path) {
-                if (url) {
-                    console.log("Seçilen dosya URL: " + url);
-                    console.log("Seçilen dosya yolu: " + path);
-                    
-                    // Değişken kontrol
-                    let relativePath = path || url;
-                    
-                    // Eğer WebP versiyonu varsa yolu ona göre düzenle
-                    // Picker'dan gelebilecek WebP yolu kontrolü
-                    if (url.endsWith('.webp') && path && path.endsWith('.webp')) {
-                        console.log("WebP dosyası seçildi: " + path);
-                    } 
-                    // Orijinal resim seçildiyse ve uploads/images/ içindeyse WebP'ye çevir
-                    else if ((path.includes('/images/') || url.includes('/images/')) && 
-                            (path.endsWith('.jpg') || path.endsWith('.jpeg') || path.endsWith('.png'))) {
-                        // WebP yolunu oluştur ve kontrol et
-                        let possibleWebpPath = path.replace(/\.(jpg|jpeg|png)$/i, '.webp');
-                        let webpUrl = url.replace(/\.(jpg|jpeg|png)$/i, '.webp');
+            // Slider ID'sini ve ilişki tipini belirleyelim
+            const sliderId = {{ $slider->id }};
+            const relatedType = 'homepage_slider';
+            
+            // MediaPicker URL - ilişkili sliderın ID'sini ve tipini ekleyelim
+            const mediapickerUrl = '/admin/filemanagersystem/mediapicker?type=image&filter=all&related_type=' + relatedType + '&related_id=' + sliderId;
+            
+            console.log('MediaPicker URL:', mediapickerUrl);
+            
+            // iFrame'i güncelle ve modalı göster
+            $('#mediapickerFrame').attr('src', mediapickerUrl);
+            $('#mediapickerModal').modal('show');
+            
+            // iframe'den mesaj dinleme ve hata yakalama
+            function handleMediaSelection(event) {
+                try {
+                    if (event.data && event.data.type === 'mediaSelected') {
+                        console.log('Seçilen medya:', event.data);
                         
-                        // Kontrol için ajax ile WebP dosyasının varlığını kontrol et
-                        $.ajax({
-                            url: webpUrl,
-                            type: 'HEAD',
-                            async: false,
-                            success: function() {
-                                console.log("WebP versiyonu bulundu: " + webpUrl);
-                                // WebP mevcut, yolları güncelle
-                                relativePath = possibleWebpPath;
-                                url = webpUrl;
-                            },
-                            error: function() {
-                                console.log("WebP versiyonu bulunamadı, orijinal kullanılacak: " + url);
+                        // event.data'dan doğrudan URL değerini al
+                        if (event.data.mediaUrl) {
+                            // Medya URL'sini temizle
+                            let mediaUrl = event.data.mediaUrl;
+                            
+                            // Eğer URL göreceli ise (/ ile başlıyorsa) tam URL'ye çevir
+                            if (mediaUrl && mediaUrl.startsWith('/')) {
+                                const baseUrl = window.location.protocol + '//' + window.location.host;
+                                mediaUrl = baseUrl + mediaUrl;
                             }
-                        });
-                    }
-                    
-                    // Eğer path verilmediyse URL'den oluştur
-                    if (!path && url.includes('/uploads/')) {
-                        // URL'yi daha doğru parçala
-                        const urlObj = new URL(url);
-                        const pathParts = urlObj.pathname.split('/');
-                        
-                        // '/uploads/' sonrası tüm yolu al
-                        const uploadsIndex = pathParts.indexOf('uploads');
-                        if (uploadsIndex !== -1) {
-                            relativePath = pathParts.slice(uploadsIndex).join('/');
+                            
+                            // Görsel URL'sini forma kaydet ve önizlemede göster
+                            input.val(mediaUrl);
+                            previewImg.attr('src', mediaUrl);
+                            preview.show();
+                            
+                            console.log('Medya URL kaydedildi:', mediaUrl);
+                        } else {
+                            console.error('Medya URL bulunamadı');
+                            
+                            // URL bulunamadıysa "uploads/" yolu ile dosya ID'sini kullan
+                            input.val('/uploads/media/' + event.data.mediaId);
+                            
+                            // Önizleme için ID ile resmi göster
+                            const previewUrl = '/admin/filemanagersystem/media/preview/' + event.data.mediaId;
+                            previewImg.attr('src', previewUrl);
+                            preview.show();
                         }
+                        
+                        // Modalı kapat
+                        $('#mediapickerModal').modal('hide');
+                    } else if (event.data && event.data.type === 'mediapickerError') {
+                        // Medya seçicide bir hata oluştu
+                        console.error('Medya seçici hatası:', event.data.message);
+                        alert('Medya seçicide bir hata oluştu: ' + event.data.message);
+                        $('#mediapickerModal').modal('hide');
                     }
-                    
-                    console.log("Kaydedilecek yol: " + relativePath);
-                    input.val(relativePath);
-                    previewImg.attr('src', url);
-                    preview.show();
-                    popup.close();
+                } catch (error) {
+                    console.error('Medya seçimi işlenirken hata oluştu:', error);
+                    alert('Medya seçimi işlenirken bir hata oluştu.');
                 }
-            };
+            }
+            
+            // Mevcut event listener'ı kaldır ve yenisini ekle
+            window.removeEventListener('message', handleMediaSelection);
+            window.addEventListener('message', handleMediaSelection);
+            
+            // iframe yüklenmesini kontrol et
+            $('#mediapickerFrame').on('load', function() {
+                console.log('MediaPicker iframe yüklendi');
+            }).on('error', function() {
+                console.error('MediaPicker iframe yüklenirken hata oluştu');
+                alert('Medya seçici yüklenirken bir hata oluştu. Lütfen sayfayı yenileyip tekrar deneyin.');
+                $('#mediapickerModal').modal('hide');
+            });
         });
 
         // Form gönderiminden önce kontrol

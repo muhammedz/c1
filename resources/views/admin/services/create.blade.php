@@ -719,7 +719,6 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/locales/bootstrap-datepicker.tr.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/js/tom-select.complete.min.js"></script>
 <script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6.4.2/tinymce.min.js" referrerpolicy="origin"></script>
-<script src="{{ asset('vendor/laravel-filemanager/js/stand-alone-button.js') }}"></script>
 <script>
     // TinyMCE'yi dinamik olarak yükle
     var script = document.createElement('script');
@@ -751,36 +750,13 @@
             content_css: [
                 '{{ asset("vendor/adminlte/dist/css/adminlte.min.css") }}',
                 'https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700'
-            ],
-            file_picker_callback: function (callback, value, meta) {
-                let x = window.innerWidth || document.documentElement.clientWidth || document.getElementsByTagName('body')[0].clientWidth;
-                let y = window.innerHeight || document.documentElement.clientHeight || document.getElementsByTagName('body')[0].clientHeight;
-
-                let type = meta.filetype;
-                let url = '/admin/filemanager?editor=tinymce5&type=' + type;
-
-                tinymce.activeEditor.windowManager.openUrl({
-                    url: url,
-                    title: 'Laravel File Manager',
-                    width: x * 0.8,
-                    height: y * 0.8,
-                    resizable: 'yes',
-                    close_previous: 'no',
-                    onMessage: (api, message) => {
-                        callback(message.content);
-                    }
-                });
-            }
+            ]
         });
     };
     
     document.head.appendChild(script);
 
     $(function() {
-        // Laravel File Manager butonları
-        $('#image-browser').filemanager('image', {prefix: '/admin/filemanager'});
-        $('#gallery-browser').filemanager('image', {prefix: '/admin/filemanager'});
-        
         // Galeri filemanager değişikliğini dinleme
         $('#fake-gallery-input').on('change', function() {
             // Seçilen görseli al

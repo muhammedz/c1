@@ -89,7 +89,12 @@ class NewsObserver
         Cache::forget('latest_news');
         Cache::forget('popular_news');
         
-        // Tüm sayfaları etkileyen önbellekleri temizle
-        Cache::tags(['news', 'home'])->flush();
+        // News ile ilgili diğer önbellekleri temizle
+        Cache::forget('news_home');
+        Cache::forget('news_list');
+        Cache::forget('news_archive');
+        
+        // Tagging sistemini kullanmamak için şunları direkt temizliyoruz:
+        // Cache::tags(['news', 'home'])->flush();
     }
 }

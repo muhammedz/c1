@@ -69,26 +69,72 @@
                     </div>
                 </div>
                 <div class="card-body">
-                    <!-- Arama ve Filtreleme -->
+                    <!-- Gelişmiş Arama ve Filtreleme -->
                     <div class="row mb-3">
-                        <div class="col-md-6">
-                            <div class="input-group">
-                                <input type="text" class="form-control" placeholder="Dosya ara...">
+                        <div class="col-md-8">
+                            <div class="input-group mb-2">
+                                <input type="text" class="form-control" id="search-input" placeholder="Dosya ara...">
                                 <div class="input-group-append">
-                                    <button class="btn btn-outline-secondary" type="button">
+                                    <button class="btn btn-outline-secondary" type="button" id="search-button">
                                         <i class="fas fa-search"></i>
                                     </button>
                                 </div>
                             </div>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <select class="form-control form-control-sm" id="filter-type">
+                                        <option value="">Tüm Dosya Tipleri</option>
+                                        <option value="image">Resimler</option>
+                                        <option value="document">Dökümanlar</option>
+                                        <option value="video">Videolar</option>
+                                        <option value="audio">Ses Dosyaları</option>
+                                        <option value="archive">Arşivler</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <select class="form-control form-control-sm" id="filter-date">
+                                        <option value="">Tüm Tarihler</option>
+                                        <option value="today">Bugün</option>
+                                        <option value="yesterday">Dün</option>
+                                        <option value="last_week">Son Hafta</option>
+                                        <option value="last_month">Son Ay</option>
+                                        <option value="last_year">Son Yıl</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <select class="form-control form-control-sm" id="filter-size">
+                                        <option value="">Tüm Boyutlar</option>
+                                        <option value="tiny">Çok Küçük (<100KB)</option>
+                                        <option value="small">Küçük (<1MB)</option>
+                                        <option value="medium">Orta (1-10MB)</option>
+                                        <option value="large">Büyük (10-100MB)</option>
+                                        <option value="huge">Çok Büyük (>100MB)</option>
+                                    </select>
+                                </div>
+                            </div>
                         </div>
-                        <div class="col-md-6">
-                            <div class="btn-group float-right">
-                                <button type="button" class="btn btn-default">
-                                    <i class="fas fa-th-large"></i>
-                                </button>
-                                <button type="button" class="btn btn-default">
-                                    <i class="fas fa-list"></i>
-                                </button>
+                        <div class="col-md-4">
+                            <div class="row">
+                                <div class="col-md-7">
+                                    <select class="form-control form-control-sm" id="sort-by">
+                                        <option value="newest">En Yeni</option>
+                                        <option value="oldest">En Eski</option>
+                                        <option value="name_asc">A-Z</option>
+                                        <option value="name_desc">Z-A</option>
+                                        <option value="size_asc">En Küçük Boyut</option>
+                                        <option value="size_desc">En Büyük Boyut</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-5">
+                                    <div class="btn-group float-right">
+                                        <button type="button" class="btn btn-sm btn-default view-mode" data-mode="grid" title="Izgara Görünümü">
+                                            <i class="fas fa-th-large"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-sm btn-default view-mode" data-mode="list" title="Liste Görünümü">
+                                            <i class="fas fa-list"></i>
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -134,6 +180,18 @@
                                 </div>
                             </div>
                         @endforeach
+                    </div>
+                    
+                    <!-- Yükleniyor göstergesi -->
+                    <div id="loading-indicator" class="text-center d-none">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="sr-only">Yükleniyor...</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Sayfalama -->
+                    <div class="mt-3" id="pagination-container">
+                        <!-- AJAX ile doldurulacak -->
                     </div>
                 </div>
             </div>

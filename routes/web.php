@@ -30,6 +30,7 @@ use App\Http\Controllers\FileManagerSystem\FilemanagersystemController;
 use App\Http\Controllers\FileManagerSystem\FilemanagersystemFolderController;
 use App\Http\Controllers\FileManagerSystem\FilemanagersystemMediaController;
 use App\Http\Controllers\FileManagerSystem\FilemanagersystemCategoryController;
+use App\Http\Controllers\FileManagerSystem\MediaPickerController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 
@@ -45,6 +46,13 @@ use Illuminate\Support\Facades\Auth;
 */
 
 Route::get('/', [App\Http\Controllers\FrontController::class, 'index'])->name('front.home');
+
+// Ön Yüz Haber Rotaları
+Route::prefix('haberler')->name('news.')->group(function () {
+    Route::get('/', [App\Http\Controllers\Front\NewsController::class, 'index'])->name('index');
+    Route::get('/kategori/{slug}', [App\Http\Controllers\Front\NewsController::class, 'category'])->name('category');
+    Route::get('/{slug}', [App\Http\Controllers\Front\NewsController::class, 'show'])->name('show');
+});
 
 // Kurumsal Kadro Frontend Route'ları
 Route::get('/kurumsal-kadro', [App\Http\Controllers\CorporateController::class, 'index'])->name('corporate.index');
@@ -89,29 +97,8 @@ Route::middleware(['auth', 'role:admin'])->name('admin.')->prefix('admin')->grou
     Route::post('pages/update-featured-order', [App\Http\Controllers\Admin\PageController::class, 'updateFeaturedOrder'])->name('pages.update-featured-order');
     Route::post('pages/upload-gallery-image', [App\Http\Controllers\Admin\PageController::class, 'uploadGalleryImage'])->name('pages.upload-gallery-image');
     
-    // File Manager Routes
-    Route::get('/file-manager-page', [App\Http\Controllers\Admin\FileManagerController::class, 'index'])->name('file-manager');
-    
-    // Özel File Manager Rotaları
-    Route::get('/custom-filemanager', [App\Http\Controllers\Admin\CustomFileManagerController::class, 'index'])->name('custom-filemanager');
-    Route::get('/api/content-files', [App\Http\Controllers\Admin\CustomFileManagerController::class, 'getContentFiles'])->name('api.content-files');
-    Route::post('/filemanager/relation', [App\Http\Controllers\Admin\CustomFileManagerController::class, 'saveMediaRelation'])->name('filemanager.relation');
-    
-    // Laravel File Manager rotalarını filemanager prefix'i ile tanımla
-    Route::group(['prefix' => 'filemanager', 'middleware' => ['web']], function () {
-        // Özel FileManager Controller'ımızı kullanmak için upload route'unu önce tanımlıyoruz
-        // ÖNEMLİ: Bu route, Laravel File Manager'ın kendi upload route'undan önce tanımlanmalı
-        Route::any('/upload', '\App\Http\Controllers\FileManagerController@upload')->name('unisharp.lfm.upload');
-        
-        // İçeriğe özel dosya yükleme için route
-        Route::post('/custom-upload', [App\Http\Controllers\Admin\CustomFileManagerController::class, 'upload'])->name('custom-filemanager.upload');
-        
-        // Diğer route'lar için Laravel File Manager'ın kendi route'larını kullan
-        \UniSharp\LaravelFilemanager\Lfm::routes();
-    });
-    
     // TinyMCE için resim yükleme
-    Route::post('/tinymce/upload', [App\Http\Controllers\TinyMCEController::class, 'upload'])->name('tinymce.upload');
+    Route::post('tinymce/upload', [TinyMCEController::class, 'upload'])->name('tinymce.upload');
     
     // Haberler Yönetimi
     Route::resource('news', App\Http\Controllers\Admin\NewsController::class);
@@ -121,6 +108,7 @@ Route::middleware(['auth', 'role:admin'])->name('admin.')->prefix('admin')->grou
     Route::post('/news/update-headline-order', [App\Http\Controllers\Admin\NewsController::class, 'updateHeadlineOrder'])->name('news.update-headline-order');
     Route::get('/news/{news}/toggle-archive', [App\Http\Controllers\Admin\NewsController::class, 'toggleArchive'])->name('news.toggle-archive');
     Route::post('/news/upload-gallery-image', [App\Http\Controllers\Admin\NewsController::class, 'uploadGalleryImage'])->name('news.upload-gallery-image');
+    Route::post('/news/bulk-action', [App\Http\Controllers\Admin\NewsController::class, 'bulkAction'])->name('news.bulk-action');
     
     // Kategori Yönetimi
     Route::resource('news-categories', NewsCategoryController::class)->names('news-categories');
@@ -440,6 +428,14 @@ Route::prefix('admin/filemanagersystem')->name('admin.filemanagersystem.')->midd
     Route::post('/settings', [FilemanagersystemController::class, 'updateSettings'])->name('settings.update');
     Route::get('/dashboard', [FilemanagersystemController::class, 'dashboard'])->name('dashboard');
 
+    // MediaPicker Routes
+    Route::get('/mediapicker', [MediaPickerController::class, 'index'])->name('mediapicker.index');
+    Route::get('/mediapicker/list', [MediaPickerController::class, 'listMedia'])->name('mediapicker.list');
+    Route::post('/mediapicker/upload', [MediaPickerController::class, 'upload'])->name('mediapicker.upload');
+    Route::post('/mediapicker/relate', [MediaPickerController::class, 'relateMedia'])->name('mediapicker.relate');
+    Route::get('/mediapicker/get-media-url', [MediaPickerController::class, 'getMediaUrl'])->name('mediapicker.get-media-url');
+    Route::get('/media/preview/{id}', [MediaPickerController::class, 'mediaPreview'])->name('mediapicker.preview');
+
     // Klasör işlemleri
     Route::prefix('folders')->name('folders.')->group(function () {
         Route::get('/', [FilemanagersystemFolderController::class, 'index'])->name('index');
@@ -456,6 +452,7 @@ Route::prefix('admin/filemanagersystem')->name('admin.filemanagersystem.')->midd
         Route::get('/', [FilemanagersystemMediaController::class, 'index'])->name('index');
         Route::get('/create', [FilemanagersystemMediaController::class, 'create'])->name('create');
         Route::post('/', [FilemanagersystemMediaController::class, 'store'])->name('store');
+        Route::get('/get-file-path/{id}', [FilemanagersystemMediaController::class, 'getFilePath'])->name('get-file-path');
         Route::get('/{media}', [FilemanagersystemMediaController::class, 'show'])->name('show');
         Route::get('/{media}/edit', [FilemanagersystemMediaController::class, 'edit'])->name('edit');
         Route::put('/{media}', [FilemanagersystemMediaController::class, 'update'])->name('update');
