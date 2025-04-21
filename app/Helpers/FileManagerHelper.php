@@ -12,9 +12,8 @@ class FileManagerHelper
      */
     public static function getFileUrl($path)
     {
-        // URL protokolü ve domain bilgisini sunucudan al
-        $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http';
-        $host = $_SERVER['HTTP_HOST'] ?? request()->getHost();
+        // Doğrudan .env dosyasından APP_URL değerini kullanalım
+        $baseUrl = rtrim(env('APP_URL'), '/');
         
         // Başında / yoksa ekle
         if ($path && substr($path, 0, 1) !== '/') {
@@ -22,6 +21,6 @@ class FileManagerHelper
         }
         
         // Tam URL döndür
-        return $protocol . '://' . $host . $path;
+        return $baseUrl . $path;
     }
 } 

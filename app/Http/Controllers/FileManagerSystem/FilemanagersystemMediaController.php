@@ -100,13 +100,14 @@ class FilemanagersystemMediaController extends Controller
                 $isImage = strpos($mimeType, 'image/') === 0;
                 
                 if ($isImage) {
-                    // Resmi sıkıştır
+                    // Resmi sıkıştır - ÖNEMLİ: resize parametresi false olarak gönderiyoruz (çözünürlüğü korumak için)
                     $compressionInfo = $this->compressImage(
                         $fullPath, 
                         $mimeType, 
                         [
                             'quality' => config('filemanagersystem.image_compression.default_quality'),
-                            'size' => config('filemanagersystem.image_compression.default_size')
+                            'size' => config('filemanagersystem.image_compression.default_size'),
+                            'resize' => false // Çözünürlüğü korumak için
                         ]
                     );
                 }
@@ -369,6 +370,7 @@ class FilemanagersystemMediaController extends Controller
         // Seçenekleri belirle
         $qualityOption = $options['quality'] ?? $defaultQuality;
         $sizeOption = $options['size'] ?? $defaultSize;
+        $resizeEnabled = isset($options['resize']) ? $options['resize'] : false;
         
         // Kalite değerini seç
         $quality = is_string($qualityOption) ? ($qualityPresets[$qualityOption] ?? 80) : intval($qualityOption);
@@ -396,8 +398,9 @@ class FilemanagersystemMediaController extends Controller
             $result['width'] = $image->width();
             $result['height'] = $image->height();
             
-            // Eğer resim boyutu limiti aşıyorsa yeniden boyutlandır
-            if (is_array($sizeLimit) && count($sizeLimit) >= 2) {
+            // ÖNEMLİ: Eğer resize özellikle istenmemişse, boyutlandırma işlemini atla
+            // Çözünürlüğü koruyalım, sadece kalite düzenlemesi yapalım
+            if ($resizeEnabled && is_array($sizeLimit) && count($sizeLimit) >= 2) {
                 $maxWidth = $sizeLimit[0];
                 $maxHeight = $sizeLimit[1];
                 
@@ -517,7 +520,8 @@ class FilemanagersystemMediaController extends Controller
             $webpFileName = $pathInfo['filename'] . '.webp';
             $webpPath = $pathInfo['dirname'] . '/' . $webpFileName;
             
-            // WebP olarak kodla ve kaydet - V3 için doğru kullanım
+            // ÖNEMLİ: İmajı değiştirmeden/boyutlandırmadan WebP'ye çevir
+            // Sadece kalite değişikliği yaparak sıkıştırıyoruz
             $webpImage = $image->toWebp($quality);
             file_put_contents($webpPath, $webpImage);
             
