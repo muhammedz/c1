@@ -34,6 +34,7 @@ use App\Http\Controllers\FileManagerSystem\MediaPickerController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\PasswordProtectionController;
+use App\Http\Controllers\Auth\UpdatePasswordController;
 
 /*
 |--------------------------------------------------------------------------
@@ -476,4 +477,7 @@ Route::prefix('admin/filemanagersystem')->name('admin.filemanagersystem.')->midd
 // Şifre Koruması Route'ları
 Route::get('/password-protection', [App\Http\Controllers\PasswordProtectionController::class, 'show'])->name('password.protection');
 Route::post('/check-site-password', [App\Http\Controllers\PasswordProtectionController::class, 'check'])->name('check.site.password');
+
+// Şifre Değiştirme Route
+Route::post('/update-password', [App\Http\Controllers\Auth\UpdatePasswordController::class, 'update'])->name('profile.password.update');
 

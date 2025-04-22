@@ -123,7 +123,7 @@
                         </div>
                         
                         <div class="tab-pane" id="password">
-                            <form class="form-horizontal" method="POST" action="{{ route('password.update') }}">
+                            <form class="form-horizontal" method="POST" action="{{ route('profile.password.update') }}">
                                 @csrf
                                 
                                 <div class="form-group row">
