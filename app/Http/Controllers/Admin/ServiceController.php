@@ -91,7 +91,7 @@ class ServiceController extends Controller
             
             // Kategoriler ve etiketler ayrı tutulur
             $categories = $request->input('categories', []);
-            $tags = $request->input('tags', []);
+            $tags = $request->input('tags', '');
             
             // Tarih ayarlamaları
             if ($request->has('published_at') && !empty($request->published_at)) {
@@ -107,6 +107,15 @@ class ServiceController extends Controller
             // Eğer slug boş geldiyse title'dan oluştur
             if (empty($data['slug'])) {
                 $data['slug'] = Str::slug($data['title']);
+            }
+            
+            // Slug zaten kullanılmışsa oluşturulan slug sonuna rastgele sayı ekle
+            $baseSlug = $data['slug'];
+            $counter = 1;
+            
+            while (Service::where('slug', $data['slug'])->exists()) {
+                $data['slug'] = $baseSlug . '-' . $counter;
+                $counter++;
             }
             
             // Özellikler dizisini ekleyelim
@@ -127,6 +136,25 @@ class ServiceController extends Controller
             // Yeni service objesi oluştur
             $service = Service::create($data);
             
+            // Dokümanları ekle
+            $documents = $request->input('documents');
+            if (!empty($documents) && is_array($documents)) {
+                // Boş dosya alanlarını temizle
+                $filteredDocuments = [];
+                foreach ($documents as $document) {
+                    if (!empty($document['file']) && !empty($document['name'])) {
+                        // Dosya yolunu düzelt
+                        $document['file'] = $this->fixStoragePath($document['file']);
+                        $filteredDocuments[] = $document;
+                    }
+                }
+                
+                // Dokümanları özellikler içine ekle
+                $features = $service->features;
+                $features['documents'] = $filteredDocuments;
+                $service->update(['features' => $features]);
+            }
+            
             // Kategorileri ekle
             if (!empty($categories)) {
                 $service->categories()->sync($categories);
@@ -134,20 +162,30 @@ class ServiceController extends Controller
             
             // Etiketleri ekle
             if (!empty($tags)) {
+                // Eğer tags bir string ise, virgülle ayrılmış etiketleri diziye dönüştür
+                if (is_string($tags)) {
+                    $tags = array_filter(array_map('trim', explode(',', $tags)));
+                }
+                
                 // Önce etiketleri düzgün formatta hazırla
                 $tagIds = [];
                 foreach ($tags as $tag) {
-                    $tagModel = ServiceTag::findOrCreateByName($tag);
-                    $tagIds[] = $tagModel->id;
+                    if (!empty($tag)) {
+                        $tagModel = ServiceTag::findOrCreateByName($tag);
+                        $tagIds[] = $tagModel->id;
+                    }
                 }
                 
                 // Etiketleri service ile ilişkilendir
                 if (!empty($tagIds)) {
                     $service->tags()->sync($tagIds);
                 }
+            } else {
+                $service->tags()->detach();
             }
             
             return redirect()->route('admin.services.edit', $service->id)
+                             ->withInput()
                              ->with('success', 'Hizmet başarıyla oluşturuldu.');
         } catch (\Exception $e) {
             Log::error('Hizmet oluşturma hatası: ' . $e->getMessage());
@@ -225,7 +263,7 @@ class ServiceController extends Controller
             
             // Kategoriler ve etiketler ayrı tutulur
             $categories = $request->input('categories', []);
-            $tags = $request->input('tags', []);
+            $tags = $request->input('tags', '');
             
             // Tarih ayarlamaları
             if ($request->has('published_at') && !empty($request->published_at)) {
@@ -261,8 +299,8 @@ class ServiceController extends Controller
             $service->update($data);
             
             // Dokümanları güncelle
-            $documents = $request->input('documents', []);
-            if (!empty($documents)) {
+            $documents = $request->input('documents');
+            if (!empty($documents) && is_array($documents)) {
                 // Boş dosya alanlarını temizle
                 $filteredDocuments = [];
                 foreach ($documents as $document) {
@@ -284,20 +322,30 @@ class ServiceController extends Controller
             
             // Etiketleri güncelle
             if (!empty($tags)) {
+                // Eğer tags bir string ise, virgülle ayrılmış etiketleri diziye dönüştür
+                if (is_string($tags)) {
+                    $tags = array_filter(array_map('trim', explode(',', $tags)));
+                }
+                
                 // Önce etiketleri düzgün formatta hazırla
                 $tagIds = [];
                 foreach ($tags as $tag) {
-                    $tagModel = ServiceTag::findOrCreateByName($tag);
-                    $tagIds[] = $tagModel->id;
+                    if (!empty($tag)) {
+                        $tagModel = ServiceTag::findOrCreateByName($tag);
+                        $tagIds[] = $tagModel->id;
+                    }
                 }
                 
                 // Etiketleri service ile ilişkilendir
-                $service->tags()->sync($tagIds);
+                if (!empty($tagIds)) {
+                    $service->tags()->sync($tagIds);
+                }
             } else {
                 $service->tags()->detach();
             }
             
             return redirect()->route('admin.services.edit', $service->id)
+                             ->withInput()
                              ->with('success', 'Hizmet başarıyla güncellendi.');
         } catch (\Exception $e) {
             Log::error('Hizmet güncelleme hatası: ' . $e->getMessage());

@@ -55,6 +55,7 @@ class StoreServiceRequest extends FormRequest
         return [
             'title.required' => 'Başlık alanı zorunludur.',
             'content.required' => 'İçerik alanı zorunludur.',
+            'slug.unique' => 'Bu URL kodu (slug) zaten kullanılmaktadır. Lütfen başka bir URL kodu belirleyin veya otomatik oluşturmak için "Yenile" butonunu kullanın.',
             'image.image' => 'Ana görsel geçerli bir resim dosyası olmalıdır.',
             'image.mimes' => 'Ana görsel jpeg, png, jpg veya gif formatında olmalıdır.',
             'image.max' => 'Ana görsel en fazla 2MB olabilir.',
