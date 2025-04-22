@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>News (Haber) Modülü API Dokümantasyonu</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1, h2, h3, h4 {
+            color: #2c3e50;
+            margin-top: 1.5em;
+        }
+        code {
+            font-family: Consolas, Monaco, "Andale Mono", monospace;
+            background-color: #f7f7f7;
+            padding: 3px 5px;
+            border-radius: 4px;
+            font-size: 85%;
+        }
+        pre {
+            background-color: #f7f7f7;
+            padding: 15px;
+            border-radius: 6px;
+            overflow: auto;
+        }
+        pre code {
+            background-color: transparent;
+            padding: 0;
+        }
+        .endpoint {
+            margin-bottom: 30px;
+            border-left: 3px solid #3498db;
+            padding-left: 15px;
+        }
+        .method {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        .get {
+            background-color: #61affe;
+            color: white;
+        }
+        .post {
+            background-color: #49cc90;
+            color: white;
+        }
+        .put {
+            background-color: #fca130;
+            color: white;
+        }
+        .delete {
+            background-color: #f93e3e;
+            color: white;
+        }
+        .url {
+            font-family: Consolas, Monaco, "Andale Mono", monospace;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .parameter-required {
+            color: #f93e3e;
+            font-weight: bold;
+        }
+        .parameter-optional {
+            color: #999;
+        }
+        .response {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 6px;
+            border: 1px solid #eee;
+        }
+        .security-info {
+            background-color: #fffbea;
+            padding: 15px;
+            border-radius: 6px;
+            border: 1px solid #f5e8c1;
+            margin: 20px 0;
+        }
+        .warning {
+            background-color: #ffeaea;
+            padding: 15px;
+            border-radius: 6px;
+            border: 1px solid #f5c1c1;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>News (Haber) Modülü API Dokümantasyonu</h1>
+    
+    <p>Bu doküman, haber modülüne ait API endpointlerini ve kullanımlarını detaylandırır.</p>
+
+    <h2>İçindekiler</h2>
+    <ul>
+        <li><a href="#authentication">Kimlik Doğrulama</a></li>
+        <li><a href="#rate-limiting">Rate Limiting</a></li>
+        <li><a href="#endpoints">API Endpoint'leri</a>
+            <ul>
+                <li><a href="#get-all-news">Tüm Haberleri Listeleme</a></li>
+                <li><a href="#get-news-detail">Haber Detayını Görüntüleme</a></li>
+                <li><a href="#get-featured-news">Öne Çıkan Haberleri Görüntüleme</a></li>
+                <li><a href="#get-categories">Haber Kategorilerini Listeleme</a></li>
+                <li><a href="#get-by-category">Kategoriye Göre Haber Listeleme</a></li>
+                <li><a href="#search-news">Haber Arama</a></li>
+            </ul>
+        </li>
+        <li><a href="#error-codes">Hata Kodları</a></li>
+        <li><a href="#examples">Kullanım Örnekleri</a></li>
+    </ul>
+
+    <h2 id="authentication">Kimlik Doğrulama</h2>
+    <div class="security-info">
+        <p>Tüm API istekleri kimlik doğrulama gerektirir. API istekleri için iki yöntem desteklenmektedir:</p>
+        
+        <h4>1. API Anahtarı (API Key)</h4>
+        <p>API anahtarını istek başlığında (header) <code>X-API-KEY</code> olarak gönderebilirsiniz.</p>
+        <pre><code>X-API-KEY: your_api_key_here</code></pre>
+        
+        <h4>2. Bearer Token</h4>
+        <p>Bearer token'ı istek başlığında (header) <code>Authorization</code> olarak gönderebilirsiniz.</p>
+        <pre><code>Authorization: Bearer your_token_here</code></pre>
+        
+        <p><strong>Not:</strong> API anahtarınızı veya token'ınızı güvenli tutun ve paylaşmayın. Token'lar belirli bir süre sonra geçerliliğini yitirebilir.</p>
+    </div>
+
+    <h2 id="rate-limiting">Rate Limiting</h2>
+    <div class="warning">
+        <p>API istekleri için rate limiting uygulanmaktadır. Dakikada maksimum 60 istek yapabilirsiniz.</p>
+        <p>Her API yanıtı, kalan istek sayısını <code>X-RateLimit-Remaining</code> başlığında içerir.</p>
+    </div>
+
+    <h2 id="endpoints">API Endpoint'leri</h2>
+    
+    <div class="endpoint" id="get-all-news">
+        <h3><span class="method get">GET</span> <span class="url">/api/news</span></h3>
+        <p>Tüm haberleri listeler. Varsayılan olarak sayfalandırılmış ve en son yayınlanan haberler önce gelecek şekilde sıralanmıştır.</p>
+        
+        <h4>Query Parametreleri</h4>
+        <table>
+            <thead>
+                <tr>
+                    <th>Parametre</th>
+                    <th>Tip</th>
+                    <th>Gereklilik</th>
+                    <th>Açıklama</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>page</td>
+                    <td>integer</td>
+                    <td class="parameter-optional">Opsiyonel</td>
+                    <td>Sayfa numarası (varsayılan: 1)</td>
+                </tr>
+                <tr>
+                    <td>per_page</td>
+                    <td>integer</td>
+                    <td class="parameter-optional">Opsiyonel</td>
+                    <td>Sayfa başına gösterilecek haber sayısı (varsayılan: 15, maksimum: 50)</td>
+                </tr>
+                <tr>
+                    <td>sort</td>
+                    <td>string</td>
+                    <td class="parameter-optional">Opsiyonel</td>
+                    <td>Sıralama alanı (varsayılan: "published_at", seçenekler: "published_at", "views", "title")</td>
+                </tr>
+                <tr>
+                    <td>direction</td>
+                    <td>string</td>
+                    <td class="parameter-optional">Opsiyonel</td>
+                    <td>Sıralama yönü (varsayılan: "desc", seçenekler: "asc", "desc")</td>
+                </tr>
+                <tr>
+                    <td>status</td>
+                    <td>string</td>
+                    <td class="parameter-optional">Opsiyonel</td>
+                    <td>Yayın durumu (varsayılan: "published")</td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <h4>Örnek Yanıt</h4>
+        <pre class="response"><code>{
+  "data": [
+    {
+      "id": 1,
+      "title": "Örnek Haber Başlığı",
+      "slug": "ornek-haber-basligi",
+      "summary": "Haber özeti burada yer alacak",
+      "image": "https://example.com/images/news/1.jpg",
+      "is_featured": true,
+      "view_count": 1250,
+      "published_at": "2023-07-15T10:30:00.000000Z",
+      "category": {
+        "id": 3,
+        "name": "Teknoloji",
+        "slug": "teknoloji"
+      }
+    },
+    ...
+  ],
+  "links": {
+    "first": "https://example.com/api/news?page=1",
+    "last": "https://example.com/api/news?page=5",
+    "prev": null,
+    "next": "https://example.com/api/news?page=2"
+  },
+  "meta": {
+    "current_page": 1,
+    "from": 1,
+    "last_page": 5,
+    "links": [...],
+    "path": "https://example.com/api/news",
+    "per_page": 15,
+    "to": 15,
+    "total": 72
+  }
+}</code></pre>
+    </div>
+    
+    <div class="endpoint" id="get-news-detail">
+        <h3><span class="method get">GET</span> <span class="url">/api/news/{slug}</span></h3>
+        <p>Belirli bir haberin detaylarını gösterir.</p>
+        
+        <h4>Path Parametreleri</h4>
+        <table>
+            <thead>
+                <tr>
+                    <th>Parametre</th>
+                    <th>Tip</th>
+                    <th>Gereklilik</th>
+                    <th>Açıklama</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>slug</td>
+                    <td>string</td>
+                    <td class="parameter-required">Zorunlu</td>
+                    <td>Haberin URL dostu ismi (slug)</td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <h4>Örnek Yanıt</h4>
+        <pre class="response"><code>{
+  "data": {
+    "id": 1,
+    "title": "Örnek Haber Başlığı",
+    "slug": "ornek-haber-basligi",
+    "summary": "Haber özeti burada yer alacak",
+    "content": "<p>Haber içeriği burada yer alacak. HTML formatında olabilir.</p>",
+    "image": "https://example.com/images/news/1.jpg",
+    "gallery": [
+      {
+        "url": "https://example.com/images/news/gallery/1-1.jpg",
+        "title": "Galeri görsel başlığı 1",
+        "alt": "Galeri görsel açıklaması 1"
+      },
+      {
+        "url": "https://example.com/images/news/gallery/1-2.jpg",
+        "title": "Galeri görsel başlığı 2",
+        "alt": "Galeri görsel açıklaması 2"
+      }
+    ],
+    "is_featured": true,
+    "is_headline": false,
+    "view_count": 1250,
+    "published_at": "2023-07-15T10:30:00.000000Z",
+    "category": {
+      "id": 3,
+      "name": "Teknoloji",
+      "slug": "teknoloji"
+    },
+    "tags": [
+      {
+        "id": 1,
+        "name": "Yazılım",
+        "slug": "yazilim"
+      },
+      {
+        "id": 5,
+        "name": "Mobil",
+        "slug": "mobil"
+      }
+    ],
+    "meta": {
+      "title": "SEO Meta Başlık",
+      "description": "SEO Meta Açıklaması",
+      "keywords": "anahtar, kelime, seo"
+    }
+  }
+}</code></pre>
+    </div>
+    
+    <div class="endpoint" id="get-featured-news">
+        <h3><span class="method get">GET</span> <span class="url">/api/news/featured</span></h3>
+        <p>Öne çıkan haberleri listeler.</p>
+        
+        <h4>Query Parametreleri</h4>
+        <table>
+            <thead>
+                <tr>
+                    <th>Parametre</th>
+                    <th>Tip</th>
+                    <th>Gereklilik</th>
+                    <th>Açıklama</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>limit</td>
+                    <td>integer</td>
+                    <td class="parameter-optional">Opsiyonel</td>
+                    <td>Gösterilecek haber sayısı (varsayılan: 6, maksimum: 20)</td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <h4>Örnek Yanıt</h4>
+        <pre class="response"><code>{
+  "data": [
+    {
+      "id": 1,
+      "title": "Örnek Haber Başlığı 1",
+      "slug": "ornek-haber-basligi-1",
+      "summary": "Haber özeti burada yer alacak",
+      "image": "https://example.com/images/news/1.jpg",
+      "published_at": "2023-07-15T10:30:00.000000Z",
+      "category": {
+        "id": 3,
+        "name": "Teknoloji",
+        "slug": "teknoloji"
+      }
+    },
+    ...
+  ]
+}</code></pre>
+    </div>
+    
+    <div class="endpoint" id="get-categories">
+        <h3><span class="method get">GET</span> <span class="url">/api/news/categories</span></h3>
+        <p>Haber kategorilerini listeler.</p>
+        
+        <h4>Örnek Yanıt</h4>
+        <pre class="response"><code>{
+  "data": [
+    {
+      "id": 1,
+      "name": "Genel",
+      "slug": "genel",
+      "news_count": 15
+    },
+    {
+      "id": 2,
+      "name": "Ekonomi",
+      "slug": "ekonomi",
+      "news_count": 8
+    },
+    {
+      "id": 3,
+      "name": "Teknoloji",
+      "slug": "teknoloji",
+      "news_count": 12
+    },
+    ...
+  ]
+}</code></pre>
+    </div>
+    
+    <div class="endpoint" id="get-by-category">
+        <h3><span class="method get">GET</span> <span class="url">/api/news/category/{id}</span></h3>
+        <p>Belirli bir kategorideki haberleri listeler.</p>
+        
+        <h4>Path Parametreleri</h4>
+        <table>
+            <thead>
+                <tr>
+                    <th>Parametre</th>
+                    <th>Tip</th>
+                    <th>Gereklilik</th>
+                    <th>Açıklama</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>id</td>
+                    <td>integer</td>
+                    <td class="parameter-required">Zorunlu</td>
+                    <td>Kategori ID'si</td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <h4>Query Parametreleri</h4>
+        <table>
+            <thead>
+                <tr>
+                    <th>Parametre</th>
+                    <th>Tip</th>
+                    <th>Gereklilik</th>
+                    <th>Açıklama</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>page</td>
+                    <td>integer</td>
+                    <td class="parameter-optional">Opsiyonel</td>
+                    <td>Sayfa numarası (varsayılan: 1)</td>
+                </tr>
+                <tr>
+                    <td>per_page</td>
+                    <td>integer</td>
+                    <td class="parameter-optional">Opsiyonel</td>
+                    <td>Sayfa başına gösterilecek haber sayısı (varsayılan: 15, maksimum: 50)</td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <h4>Örnek Yanıt</h4>
+        <pre class="response"><code>{
+  "data": [
+    {
+      "id": 5,
+      "title": "Ekonomi Haberi Örnek",
+      "slug": "ekonomi-haberi-ornek",
+      "summary": "Ekonomi haberi özeti burada yer alacak",
+      "image": "https://example.com/images/news/5.jpg",
+      "is_featured": false,
+      "view_count": 850,
+      "published_at": "2023-07-10T14:20:00.000000Z",
+      "category": {
+        "id": 2,
+        "name": "Ekonomi",
+        "slug": "ekonomi"
+      }
+    },
+    ...
+  ],
+  "links": {...},
+  "meta": {...}
+}</code></pre>
+    </div>
+    
+    <div class="endpoint" id="search-news">
+        <h3><span class="method get">GET</span> <span class="url">/api/news/search</span></h3>
+        <p>Haberlerde arama yapar.</p>
+        
+        <h4>Query Parametreleri</h4>
+        <table>
+            <thead>
+                <tr>
+                    <th>Parametre</th>
+                    <th>Tip</th>
+                    <th>Gereklilik</th>
+                    <th>Açıklama</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>q</td>
+                    <td>string</td>
+                    <td class="parameter-required">Zorunlu</td>
+                    <td>Arama sorgusu (minimum 3 karakter)</td>
+                </tr>
+                <tr>
+                    <td>page</td>
+                    <td>integer</td>
+                    <td class="parameter-optional">Opsiyonel</td>
+                    <td>Sayfa numarası (varsayılan: 1)</td>
+                </tr>
+                <tr>
+                    <td>per_page</td>
+                    <td>integer</td>
+                    <td class="parameter-optional">Opsiyonel</td>
+                    <td>Sayfa başına gösterilecek haber sayısı (varsayılan: 15, maksimum: 50)</td>
+                </tr>
+                <tr>
+                    <td>category_id</td>
+                    <td>integer</td>
+                    <td class="parameter-optional">Opsiyonel</td>
+                    <td>Belirli bir kategoride arama yapmak için</td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <h4>Örnek Yanıt</h4>
+        <pre class="response"><code>{
+  "data": [
+    {
+      "id": 12,
+      "title": "Teknolojik Gelişmeler Hızla Devam Ediyor",
+      "slug": "teknolojik-gelismeler-hizla-devam-ediyor",
+      "summary": "Teknoloji dünyasındaki son gelişmeler ve yenilikler",
+      "image": "https://example.com/images/news/12.jpg",
+      "is_featured": true,
+      "view_count": 2150,
+      "published_at": "2023-06-25T09:45:00.000000Z",
+      "category": {
+        "id": 3,
+        "name": "Teknoloji",
+        "slug": "teknoloji"
+      }
+    },
+    ...
+  ],
+  "links": {...},
+  "meta": {...}
+}</code></pre>
+    </div>
+
+    <h2 id="error-codes">Hata Kodları</h2>
+    <p>API, aşağıdaki HTTP durum kodlarını kullanarak hataları bildirir:</p>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>Durum Kodu</th>
+                <th>Açıklama</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>400</td>
+                <td>Bad Request - İstek parametreleri hatalı veya eksik</td>
+            </tr>
+            <tr>
+                <td>401</td>
+                <td>Unauthorized - Kimlik doğrulama başarısız (geçersiz API anahtarı veya token)</td>
+            </tr>
+            <tr>
+                <td>403</td>
+                <td>Forbidden - İstenen kaynağa erişim yetkisi yok</td>
+            </tr>
+            <tr>
+                <td>404</td>
+                <td>Not Found - İstenen kaynak bulunamadı</td>
+            </tr>
+            <tr>
+                <td>422</td>
+                <td>Unprocessable Entity - Doğrulama hatası (giriş verileri geçersiz)</td>
+            </tr>
+            <tr>
+                <td>429</td>
+                <td>Too Many Requests - Rate limit aşıldı</td>
+            </tr>
+            <tr>
+                <td>500</td>
+                <td>Internal Server Error - Sunucu hatası</td>
+            </tr>
+        </tbody>
+    </table>
+    
+    <h4>Hata Yanıtı Örneği</h4>
+    <pre class="response"><code>{
+  "message": "Hata mesajı burada yer alacak",
+  "errors": {
+    "field_name": [
+      "Bu alan için doğrulama hatası 1",
+      "Bu alan için doğrulama hatası 2"
+    ]
+  }
+}</code></pre>
+
+    <h2 id="examples">Kullanım Örnekleri</h2>
+    
+    <h3>cURL ile API Kullanımı</h3>
+    <pre><code>curl -X GET \
+  'https://example.com/api/news?page=1&per_page=10' \
+  -H 'X-API-KEY: your_api_key_here'</code></pre>
+    
+    <h3>JavaScript (Fetch API) ile Kullanım</h3>
+    <pre><code>fetch('https://example.com/api/news', {
+  method: 'GET',
+  headers: {
+    'X-API-KEY': 'your_api_key_here'
+  }
+})
+.then(response => response.json())
+.then(data => console.log(data))
+.catch(error => console.error('Hata:', error));</code></pre>
+    
+    <h3>PHP ile Kullanım</h3>
+    <pre><code>$ch = curl_init();
+curl_setopt($ch, CURLOPT_URL, 'https://example.com/api/news');
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+  'X-API-KEY: your_api_key_here'
+));
+
+$response = curl_exec($ch);
+curl_close($ch);
+
+$data = json_decode($response, true);
+print_r($data);</code></pre>
+
+    <hr>
+    
+    <footer>
+        <p>Son Güncelleme: <?php echo date('d.m.Y'); ?></p>
+        <p>Bu API dokümantasyonu, yetkisiz kişilerce paylaşılmamalıdır. Tüm hakları saklıdır.</p>
+    </footer>
+</body>
+</html> 

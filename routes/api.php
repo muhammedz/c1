@@ -7,6 +7,8 @@ use App\Http\Controllers\FileManagerSystem\FilemanagersystemMediaController;
 use App\Http\Controllers\FileManagerSystem\FilemanagersystemFolderController;
 use App\Http\Controllers\FileManagerSystem\FilemanagersystemCategoryController;
 use App\Http\Controllers\FileManagerSystem\FilemanagersystemRelationController;
+use App\Http\Controllers\Api\NewsApiController;
+use App\Http\Controllers\Api\ApiTokenController;
 
 /*
 |--------------------------------------------------------------------------
@@ -21,6 +23,24 @@ use App\Http\Controllers\FileManagerSystem\FilemanagersystemRelationController;
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
+});
+
+// API Token Routes
+Route::post('/token', [ApiTokenController::class, 'createToken']);
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/tokens', [ApiTokenController::class, 'tokens']);
+    Route::delete('/tokens', [ApiTokenController::class, 'revokeTokens']);
+    Route::delete('/tokens/{id}', [ApiTokenController::class, 'revokeToken']);
+});
+
+// News API Routes - API Key ile korumalı
+Route::middleware('api.key')->prefix('news')->group(function () {
+    Route::get('/', [NewsApiController::class, 'index']);
+    Route::get('/featured', [NewsApiController::class, 'getFeatured']);
+    Route::get('/categories', [NewsApiController::class, 'getCategories']);
+    Route::get('/category/{category_id}', [NewsApiController::class, 'getByCategory']);
+    Route::get('/search', [NewsApiController::class, 'search']);
+    Route::get('/{slug}', [NewsApiController::class, 'show']);
 });
 
 // File Manager System API Routes

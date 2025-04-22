@@ -33,6 +33,7 @@ use App\Http\Controllers\FileManagerSystem\FilemanagersystemCategoryController;
 use App\Http\Controllers\FileManagerSystem\MediaPickerController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\PasswordProtectionController;
 
 /*
 |--------------------------------------------------------------------------
@@ -471,4 +472,8 @@ Route::prefix('admin/filemanagersystem')->name('admin.filemanagersystem.')->midd
         Route::delete('/{id}', [FilemanagersystemCategoryController::class, 'destroy'])->name('destroy');
     });
 });
+
+// Şifre Koruması Route'ları
+Route::get('/password-protection', [App\Http\Controllers\PasswordProtectionController::class, 'show'])->name('password.protection');
+Route::post('/check-site-password', [App\Http\Controllers\PasswordProtectionController::class, 'check'])->name('check.site.password');
 
