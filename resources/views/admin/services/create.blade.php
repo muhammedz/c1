@@ -2,10 +2,12 @@
 
 @section('title', 'Yeni Hizmet Ekle')
 
-@section('styles')
+@section('css')
 <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css" rel="stylesheet">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/min/dropzone.min.css" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/css/tom-select.bootstrap5.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet" />
 <style>
     .content-wrapper {
         background-color: #f4f6f9;
@@ -275,6 +277,13 @@
             </a>
         </div>
     </div>
+    
+    @if(session('success'))
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle mr-2"></i>{{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
     
     @if(session('error'))
         <div class="alert alert-danger alert-dismissible fade show" role="alert">
@@ -648,50 +657,38 @@
 @endsection
 
 @section('js')
-<script src="{{ asset('vendor/select2/js/select2.full.min.js') }}"></script>
-<script src="{{ asset('vendor/bs-custom-file-input/bs-custom-file-input.min.js') }}"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bs-custom-file-input@1.3.4/dist/bs-custom-file-input.min.js"></script>
+<script src="{{ asset('vendor/tinymce/tinymce.min.js') }}"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/locales/bootstrap-datepicker.tr.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/js/tom-select.complete.min.js"></script>
-<script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6.4.2/tinymce.min.js" referrerpolicy="origin"></script>
 <script>
-    // TinyMCE'yi dinamik olarak yükle
-    var script = document.createElement('script');
-    script.type = 'text/javascript';
-    script.src = '{{ asset("vendor/tinymce/tinymce/js/tinymce/tinymce.min.js") }}';
-    
-    script.onload = function() {
-        console.log('TinyMCE yüklendi');
-        
+    $(function() {
         // TinyMCE Editör
         tinymce.init({
             selector: '#content',
-            language: 'tr',
+            license_key: 'gpl',
             height: 500,
+            language: null, // Dil desteğini kaldırdık
             menubar: true,
-            plugins: [
-                'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
-                'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
-                'insertdatetime', 'media', 'table', 'help', 'wordcount'
-            ],
-            toolbar: 'undo redo | blocks | ' +
-                'bold italic backcolor | alignleft aligncenter ' +
-                'alignright alignjustify | bullist numlist outdent indent | ' +
-                'removeformat | image | help',
+            plugins: 'preview importcss searchreplace autolink autosave save directionality code visualblocks visualchars fullscreen image link media codesample table charmap pagebreak nonbreaking anchor insertdatetime advlist lists wordcount help charmap quickbars emoticons',
+            toolbar: 'undo redo | bold italic underline strikethrough | fontfamily image fontsize blocks | alignleft aligncenter alignright alignjustify | outdent indent | numlist bullist | forecolor backcolor removeformat | pagebreak | charmap emoticons | fullscreen preview save print | insertfile media link anchor codesample | ltr rtl',
             images_upload_url: '{{ route("admin.tinymce.upload") }}',
             images_upload_credentials: true,
             branding: false,
             promotion: false,
+            toolbar_sticky: true,
+            image_advtab: false,
+            relative_urls: false,
+            remove_script_host: false,
+            convert_urls: false,
             content_css: [
                 '{{ asset("vendor/adminlte/dist/css/adminlte.min.css") }}',
                 'https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700'
             ]
         });
-    };
-    
-    document.head.appendChild(script);
 
-    $(function() {
         // Galeri filemanager değişikliğini dinleme
         $('#fake-gallery-input').on('change', function() {
             // Seçilen görseli al
@@ -751,24 +748,6 @@
             }
         });
         
-        // CKEditor
-        ClassicEditor
-            .create(document.querySelector('#content'), {
-                toolbar: {
-                    items: [
-                        'heading', '|',
-                        'bold', 'italic', 'link', 'bulletedList', 'numberedList', '|',
-                        'blockQuote', 'insertTable', '|',
-                        'undo', 'redo', '|',
-                        'alignment'
-                    ]
-                },
-                language: 'tr'
-            })
-            .catch(error => {
-                console.error(error);
-            });
-
         // Datepicker
         $('.datepicker').datepicker({
             format: 'yyyy-mm-dd',
@@ -1153,4 +1132,4 @@ $(document).ready(function() {
     }
 });
 </script>
-@endsection 
+@stop 

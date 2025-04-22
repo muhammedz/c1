@@ -3,9 +3,9 @@
 @section('title', 'Hizmet Düzenle')
 
 @section('css')
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css">
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 <link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css" rel="stylesheet">
 
 <style>
     .validation-errors-summary {
@@ -126,6 +126,16 @@
 
 @section('content')
 <div class="container-fluid">
+    <!-- Başarı mesajı gösterimi -->
+    @if(session('success'))
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="fas fa-check-circle mr-2"></i>{{ session('success') }}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    @endif
+    
     <!-- Hata mesajları gösterimi -->
     @if ($errors->any())
     <div class="validation-errors-summary mb-4">
@@ -907,25 +917,48 @@
         </div>
 @stop
 
-@section('css')
-<link rel="stylesheet" href="{{ asset('vendor/select2/css/select2.min.css') }}">
-<link rel="stylesheet" href="{{ asset('vendor/select2-bootstrap4-theme/select2-bootstrap4.min.css') }}">
-@stop
-
 @section('js')
-<script src="{{ asset('vendor/select2/js/select2.full.min.js') }}"></script>
-<script src="{{ asset('vendor/bs-custom-file-input/bs-custom-file-input.min.js') }}"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bs-custom-file-input@1.3.4/dist/bs-custom-file-input.min.js"></script>
+<script src="{{ asset('vendor/tinymce/tinymce.min.js') }}"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/locales/bootstrap-datepicker.tr.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/6.4.2/tinymce.min.js"></script> -->
-<script src="{{ asset('vendor/tinymce/tinymce.min.js') }}"></script>
 
 <script>
     $(document).ready(function() {
-        // Select2 initialization
+        // TinyMCE editörü yükleme
+        tinymce.init({
+            selector: '.tinymce-full',
+            license_key: 'gpl',
+            height: 500,
+            language: null, // Dil desteğini kaldırdık
+            menubar: 'file edit view insert format tools table help',
+            plugins: 'preview importcss searchreplace autolink autosave save directionality code visualblocks visualchars fullscreen image link media codesample table charmap pagebreak nonbreaking anchor insertdatetime advlist lists wordcount help charmap quickbars emoticons',
+            toolbar: 'undo redo | bold italic underline strikethrough | fontfamily image fontsize blocks | alignleft aligncenter alignright alignjustify | outdent indent | numlist bullist | forecolor backcolor removeformat | pagebreak | charmap emoticons | fullscreen preview save print | insertfile media link anchor codesample | ltr rtl',
+            toolbar_sticky: true,
+            image_advtab: false,
+            branding: false,
+            promotion: false,
+            image_caption: true,
+            quickbars_selection_toolbar: 'bold italic | quicklink h2 h3 blockquote quickimage quicktable',
+            noneditable_noneditable_class: 'mceNonEditable',
+            toolbar_mode: 'sliding',
+            contextmenu: 'link image table',
+            browser_spellcheck: true,
+            skin: 'oxide',
+            content_css: 'default',
+            content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, San Francisco, Segoe UI, Roboto, Helvetica Neue, sans-serif; font-size: 16px; }',
+            relative_urls: false,
+            remove_script_host: false,
+            convert_urls: false,
+            file_picker_callback: function (callback, value, meta) {
+                openFileManagerSystemPicker(callback);
+            }
+        });
+        
+        // Select2 initalization
         $('.select2').select2({
-            theme: 'bootstrap4',
+            theme: 'bootstrap-5',
             width: '100%'
         });
         
@@ -936,621 +969,205 @@
             todayHighlight: true,
             language: 'tr'
         });
+
+        // Dinamik tablolar için script
+        console.log('Dinamik tablolar script yüklendi');
         
-        // Clear Button for Main Image
-        $('#image-clear').on('click', function() {
-            $('#image').val('');
-            $('#image-preview').hide().find('img').attr('src', '');
-        });
-        
-        // Ana görsel değişikliğini dinleme
-        $('#image').on('change', function() {
-            const url = $(this).val();
-            if (url) {
-                // URL'yi rölatif hale getir
-                $(this).val(makeRelativeUrl(url));
-                
-                // Önizlemeyi göster
-                $('#image-preview').show().find('img').attr('src', makeRelativeUrl(url));
-            } else {
-                // Boş ise önizlemeyi gizle
-                $('#image-preview').hide();
-            }
-        });
-        
-        // File Browser Button for Gallery
-        $('#gallery-browser').on('click', function() {
-            if ($('#gallery-preview').find('.gallery-item').length >= 10) {
-                alert('En fazla 10 görsel ekleyebilirsiniz.');
-                return;
-            }
-        });
-        
-        // Galeri görseli silme (delegate event)
-        $(document).on('click', '.gallery-item .remove-btn', function() {
-            const index = $(this).data('index');
-            $(this).closest('.gallery-item').remove();
-            $(`#gallery-inputs input[data-index="${index}"]`).remove();
-        });
-        
-        // Galeriye resim ekleme fonksiyonu
-        function addGalleryItem(url) {
-            // Benzersiz bir ID oluştur
-            var itemId = 'gallery-item-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
+        // TinyMCE basit editör yapılandırması (.tinymce sınıfı için)
+        tinymce.init({
+            selector: '.tinymce',
+            height: 200,
+            menubar: false,
+            plugins: 'lists link image table code',
+            toolbar: 'undo redo | formatselect | bold italic | alignleft aligncenter alignright | bullist numlist | link image | table | code',
+            content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, sans-serif; font-size: 14px; }',
+            language: 'tr',
+            language_url: '/js/tinymce/langs/tr.js',
+            branding: false,
+            promotion: false,
+            skin: 'oxide',
+            relative_urls: false,
+            remove_script_host: false,
+            convert_urls: true,
+            object_resizing: 'img',
+            paste_data_images: true,
+            automatic_uploads: false,
             
-            // Galeri öğesi HTML'i
-            var itemHtml = `
-                <div class="gallery-item" id="${itemId}">
-                    <img src="${url}" alt="Galeri Görseli" style="width: 100%; height: 100%; object-fit: cover;">
-                    <button type="button" class="remove-btn" data-index="${index}">
-                        <i class="fas fa-times"></i>
-                    </button>
-                    <input type="hidden" name="gallery[]" value="${url}">
-                </div>
+            // Varsayılan dosya seçici fonksiyonu override
+            file_picker_callback: function (callback, value, meta) {
+                // Resim ekleme işlemleri için FileManagerSystem kullanılacak
+                if (meta.filetype === 'image') {
+                    // Geçici bir ID oluştur
+                    const tempId = Date.now();
+                    const relatedType = 'service_details';
+                    
+                    // MediaPicker URL
+                    const mediapickerUrl = '/admin/filemanagersystem/mediapicker?type=image&filter=all&related_type=' + relatedType + '&related_id=' + tempId;
+                    
+                    // iFrame'i güncelle
+                    $('#mediapickerFrame').attr('src', mediapickerUrl);
+                    
+                    // Modal'ı göster - Bootstrap 5 ile uyumlu
+                    var modal = new bootstrap.Modal(document.getElementById('mediapickerModal'));
+                    modal.show();
+                    
+                    // Mesaj dinleme işlevi
+                    function handleFilePickerSelection(event) {
+                        try {
+                            if (event.data && event.data.type === 'mediaSelected') {
+                                let mediaUrl = '';
+                                let altText = event.data.mediaAlt || '';
+                                
+                                // URL değerini al
+                                if (event.data.mediaUrl) {
+                                    mediaUrl = event.data.mediaUrl;
+                                    
+                                    // URL çevirme
+                                    if (mediaUrl && mediaUrl.startsWith('/')) {
+                                        const baseUrl = window.location.protocol + '//' + window.location.host;
+                                        mediaUrl = baseUrl + mediaUrl;
+                                    }
+                                } else if (event.data.mediaId) {
+                                    // ID ile kullan
+                                    const previewUrl = '/admin/filemanagersystem/media/preview/' + event.data.mediaId;
+                                    mediaUrl = previewUrl;
+                                }
+                                
+                                if (mediaUrl) {
+                                    // Callback'e URL'yi ve alt metni ilet
+                                    callback(mediaUrl, { alt: altText });
+                                    
+                                    // Modalı kapat
+                                    modal.hide();
+                                    
+                                    // Event listener'ı kaldır
+                                    window.removeEventListener('message', handleFilePickerSelection);
+                                }
+                            } else if (event.data && event.data.type === 'mediapickerError') {
+                                console.error('FileManagerSystem hatası:', event.data.message);
+                                alert('Medya seçici hatası: ' + event.data.message);
+                                modal.hide();
+                                
+                                window.removeEventListener('message', handleFilePickerSelection);
+                            }
+                        } catch (error) {
+                            console.error('Medya seçimi işlenirken hata oluştu:', error);
+                            alert('Medya seçimi işlenirken bir hata oluştu.');
+                            
+                            window.removeEventListener('message', handleFilePickerSelection);
+                        }
+                    }
+                    
+                    // Event listener ekle
+                    window.removeEventListener('message', handleFilePickerSelection);
+                    window.addEventListener('message', handleFilePickerSelection);
+                    
+                    return false;
+                }
+                
+                // Diğer dosya tipleri için standart dosya seçiciyi kullan
+                if (meta.filetype === 'file' || meta.filetype === 'media') {
+                    window.open('/filemanager/dialog.php?type=' + meta.filetype + '&field_id=tinymce-file', 'filemanager', 'width=900,height=600');
+                    window.SetUrl = function (url, width, height, alt) {
+                        callback(url, {alt: alt});
+                    };
+                }
+            }
+        });
+        
+        // İşlem Süresi dinamik tablo
+        $('#add-processing-time-row').on('click', function() {
+            const tableBody = $('#processing-time-table tbody');
+            const rowCount = tableBody.find('tr').length;
+            
+            const newRow = `
+                <tr>
+                    <td>
+                        <input type="text" class="form-control" name="details[processing_times][${rowCount}][title]" placeholder="Başlık">
+                    </td>
+                    <td>
+                        <input type="text" class="form-control" name="details[processing_times][${rowCount}][time]" placeholder="İşlem süresi">
+                    </td>
+                    <td>
+                        <input type="text" class="form-control" name="details[processing_times][${rowCount}][description]" placeholder="Açıklama">
+                    </td>
+                    <td>
+                        <button type="button" class="btn btn-sm btn-danger remove-row">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
             `;
-                
-            // Galeriye ekle
-            $('#gallery-preview').append(itemHtml);
-        }
-        
-        // Kategori sayacını güncelle
-        function updateCategoryCount() {
-            const checkedCategories = document.querySelectorAll('input[name="categories[]"]:checked');
-            const categoryCount = document.querySelector('.category-count');
-            categoryCount.textContent = checkedCategories.length;
             
-            // Seçili kategoriler listesini güncelle
-            updateSelectedCategoriesList();
-        }
-        
-        // Seçili kategoriler listesini güncelle
-        function updateSelectedCategoriesList() {
-            const selectedCategoriesList = document.getElementById('selected-categories-list');
-            selectedCategoriesList.innerHTML = '';
-            
-            const checkedCategories = document.querySelectorAll('input[name="categories[]"]:checked');
-            
-            checkedCategories.forEach(checkbox => {
-                const categoryName = checkbox.closest('label').querySelector('.category-name').textContent;
-                const categoryBadge = document.createElement('div');
-                categoryBadge.className = 'category-badge';
-                categoryBadge.innerHTML = `
-                    <span>${categoryName}</span>
-                    <i class="fas fa-times remove-category" data-id="${checkbox.value}"></i>
-                `;
-                selectedCategoriesList.appendChild(categoryBadge);
-            });
-        }
-        
-        // Kategori seçimi değişince sayacı güncelle
-        document.querySelectorAll('input[name="categories[]"]').forEach(checkbox => {
-            checkbox.addEventListener('change', updateCategoryCount);
+            tableBody.append(newRow);
         });
         
-        // Tümünü seç butonu
-        document.getElementById('select-all-categories').addEventListener('click', function() {
-            const checkboxes = document.querySelectorAll('input[name="categories[]"]');
-            const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+        // Ücretler dinamik tablo
+        $('#add-fee-row').on('click', function() {
+            const tableBody = $('#fees-table tbody');
+            const rowCount = tableBody.find('tr').length;
             
-            checkboxes.forEach(cb => {
-                cb.checked = !allChecked;
-            });
+            const newRow = `
+                <tr>
+                    <td>
+                        <input type="text" class="form-control" name="details[fees][${rowCount}][package]" placeholder="Paket adı">
+                    </td>
+                    <td>
+                        <input type="text" class="form-control" name="details[fees][${rowCount}][description]" placeholder="Açıklama">
+                    </td>
+                    <td>
+                        <input type="text" class="form-control" name="details[fees][${rowCount}][price]" placeholder="Fiyat">
+                    </td>
+                    <td>
+                        <button type="button" class="btn btn-sm btn-danger remove-row">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `;
             
-            updateCategoryCount();
+            tableBody.append(newRow);
         });
         
-        // Seçili kategorileri kaldırma (Event delegation)
-        document.getElementById('selected-categories-list').addEventListener('click', function(e) {
-            if (e.target.classList.contains('remove-category')) {
-                const categoryId = e.target.dataset.id;
-                const checkbox = document.querySelector(`input[name="categories[]"][value="${categoryId}"]`);
-                if (checkbox) {
-                    checkbox.checked = false;
-                    updateCategoryCount();
-                }
+        // Ödeme Seçenekleri dinamik tablo
+        $('#add-payment-option-row').on('click', function() {
+            const tableBody = $('#payment-options-table tbody');
+            const rowCount = tableBody.find('tr').length;
+            
+            const newRow = `
+                <tr>
+                    <td>
+                        <input type="text" class="form-control" name="details[payment_options][${rowCount}][method]" placeholder="Ödeme yöntemi">
+                    </td>
+                    <td>
+                        <input type="text" class="form-control" name="details[payment_options][${rowCount}][term]" placeholder="Vade">
+                    </td>
+                    <td>
+                        <input type="text" class="form-control" name="details[payment_options][${rowCount}][description]" placeholder="Açıklama">
+                    </td>
+                    <td>
+                        <button type="button" class="btn btn-sm btn-danger remove-row">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `;
+            
+            tableBody.append(newRow);
+        });
+        
+        // Satır silme işlemi (tüm tablolar için)
+        $(document).on('click', '.remove-row', function() {
+            // Eğer tabloda sadece bir satır kaldıysa silmeyi engelle
+            const tableBody = $(this).closest('tbody');
+            if (tableBody.find('tr').length > 1) {
+                $(this).closest('tr').remove();
+            } else {
+                // Tabloyu boşalt
+                tableBody.find('input').val('');
             }
-        });
-        
-        // Etiket işlemleri
-        const tagInput = document.getElementById('tag-input');
-        const addTagBtn = document.getElementById('add-tag-btn');
-        const selectedTagsList = document.getElementById('selected-tags-list');
-        const tagsInput = document.getElementById('tags-input');
-        const tagCount = document.querySelector('.tag-count');
-        
-        // Mevcut etiketleri diziye çevir
-        let selectedTags = tagsInput.value ? tagsInput.value.split(',').map(tag => tag.trim()) : [];
-        
-        // İlk yüklemede etiket görüntüsünü güncelle
-        updateTagsDisplay();
-        
-        // Etiket ekleme butonu
-        addTagBtn.addEventListener('click', function() {
-            addTag();
-        });
-        
-        // Enter tuşu ile etiket ekleme
-        tagInput.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                addTag();
-            }
-        });
-        
-        // Virgül ile etiket ekleme
-        tagInput.addEventListener('input', function(e) {
-            const value = e.target.value;
-            if (value.includes(',')) {
-                const tags = value.split(',');
-                const lastTag = tags.pop().trim();
-                
-                tags.forEach(tag => {
-                    if (tag.trim()) {
-                        addTagToList(tag.trim());
-                    }
-                });
-                
-                e.target.value = lastTag;
-            }
-        });
-        
-        // Etiket ekleme fonksiyonu
-        function addTag() {
-            const tagValue = tagInput.value.trim();
-            if (tagValue) {
-                addTagToList(tagValue);
-                tagInput.value = '';
-                tagInput.focus();
-            }
-        }
-        
-        // Listeye etiket ekleme
-        function addTagToList(tag) {
-            // Aynı etiket varsa ekleme
-            if (!selectedTags.includes(tag)) {
-                selectedTags.push(tag);
-                updateTagsDisplay();
-            }
-        }
-        
-        // Etiket görüntüsünü güncelle
-        function updateTagsDisplay() {
-            // Etiketleri hidden input'a ekle
-            tagsInput.value = selectedTags.join(',');
-            
-            // Etiket sayacını güncelle
-            tagCount.textContent = selectedTags.length;
-            
-            // Etiket listesini temizle ve yeniden oluştur
-            selectedTagsList.innerHTML = '';
-            
-            selectedTags.forEach(tag => {
-                const tagBadge = document.createElement('div');
-                tagBadge.className = 'category-badge';
-                tagBadge.innerHTML = `
-                    <span>#${tag}</span>
-                    <i class="fas fa-times remove-tag" data-tag="${tag}"></i>
-                `;
-                selectedTagsList.appendChild(tagBadge);
-            });
-        }
-        
-        // Etiket silme işlevi (Event delegation)
-        selectedTagsList.addEventListener('click', function(e) {
-            if (e.target.classList.contains('remove-tag')) {
-                const tagToRemove = e.target.dataset.tag;
-                
-                // Etiketi diziden kaldır
-                selectedTags = selectedTags.filter(tag => tag !== tagToRemove);
-                
-                // Etiket görüntüsünü güncelle
-                updateTagsDisplay();
-            }
-        });
-        
-        // Sayfanın ilk yüklenmesinde başlangıç URL'lerini düzelt
-        $(document).ready(function() {
-            // Ana görsel URL'sini düzelt
-            if ($('#image').val()) {
-                const cleanUrl = makeRelativeUrl($('#image').val());
-                $('#image').val(cleanUrl);
-                $('#image-preview').find('img').attr('src', cleanUrl);
-            }
-            
-            // Galeri görsel URL'lerini düzelt
-            $('#gallery-preview input[name="gallery[]"]').each(function() {
-                const cleanUrl = makeRelativeUrl($(this).val());
-                $(this).val(cleanUrl);
-                $(this).closest('.gallery-item').find('img').attr('src', cleanUrl);
-            });
-            
-            // Kategori sayacını güncelle
-            updateCategoryCount();
-            
-            // TinyMCE editörünü tüm .tinymce sınıfına sahip textarea'lara uygula
-            tinymce.init({
-                selector: '.tinymce-full',
-                height: 500,
-                menubar: 'file edit view insert format tools table help',
-                plugins: 'preview importcss searchreplace autolink autosave save directionality code visualblocks visualchars fullscreen image link media template codesample table charmap pagebreak nonbreaking anchor insertdatetime advlist lists wordcount help charmap quickbars emoticons',
-                toolbar: 'undo redo | bold italic underline strikethrough | fontfamily image fontsize blocks | alignleft aligncenter alignright alignjustify | outdent indent | numlist bullist | forecolor backcolor removeformat | pagebreak | charmap emoticons | fullscreen preview save print | insertfile media template link anchor codesample | ltr rtl',
-                toolbar_sticky: true,
-                image_advtab: false,
-                quickbars_selection_toolbar: 'bold italic | quicklink h2 h3 blockquote quickimage quicktable',
-                quickbars_insert_toolbar: 'quickimage | quicktable quicklink hr',
-                quickbars_insert_toolbar_hover: false,
-                quickbars_image_toolbar: false,
-                noneditable_class: 'mceNonEditable',
-                language: 'tr',
-                language_url: '/js/tinymce/langs/tr.js', // Türkçe dil dosyası
-                toolbar_mode: 'sliding',
-                contextmenu: 'link table',
-                skin: 'oxide',
-                content_css: 'default',
-                content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, San Francisco, Segoe UI, Roboto, Helvetica Neue, sans-serif; font-size: 16px; }',
-                relative_urls: false,
-                remove_script_host: false,
-                convert_urls: true,
-                branding: false,
-                promotion: false,
-                paste_data_images: true, // Panodaki resimlerin yapıştırılmasını sağlar
-                automatic_uploads: false, // Otomatik yüklemeyi devre dışı bıraktık
-                object_resizing: 'img',
-                file_picker_types: 'file media', // image tipini de ekleyelim
-                
-                // Varsayılan resim dialogunu tamamen devre dışı bırak
-                images_upload_handler: function (blobInfo, success, failure) {
-                    failure('Görsel yükleme devre dışı.');
-                },
-                
-                // Görsel dialogu tamamen devre dışı bırak
-                image_title: false,
-                image_description: false, 
-                image_advtab: false,
-                image_uploadtab: false,
-                
-                // Varsayılan dosya seçici fonksiyonu override
-                file_picker_callback: function (callback, value, meta) {
-                    // Resim ekleme işlemleri için FileManagerSystem kullanılacak
-                    if (meta.filetype === 'image') {
-                        // Geçici bir ID oluştur
-                        const tempId = Date.now();
-                        const relatedType = 'service_content';
-                        
-                        // MediaPicker URL
-                        const mediapickerUrl = '/admin/filemanagersystem/mediapicker?type=image&filter=all&related_type=' + relatedType + '&related_id=' + tempId;
-                        
-                        // iFrame'i güncelle
-                        $('#mediapickerFrame').attr('src', mediapickerUrl);
-                        
-                        // Modal'ı göster - Bootstrap 5 ile uyumlu
-                        var modal = new bootstrap.Modal(document.getElementById('mediapickerModal'));
-                        modal.show();
-                        
-                        // Mesaj dinleme işlevi
-                        function handleFilePickerSelection(event) {
-                            try {
-                                if (event.data && event.data.type === 'mediaSelected') {
-                                    let mediaUrl = '';
-                                    let altText = event.data.mediaAlt || '';
-                                    
-                                    // URL değerini al
-                                    if (event.data.mediaUrl) {
-                                        mediaUrl = event.data.mediaUrl;
-                                        
-                                        // URL çevirme
-                                        if (mediaUrl && mediaUrl.startsWith('/')) {
-                                            const baseUrl = window.location.protocol + '//' + window.location.host;
-                                            mediaUrl = baseUrl + mediaUrl;
-                                        }
-                                    } else if (event.data.mediaId) {
-                                        // ID ile kullan
-                                        const previewUrl = '/admin/filemanagersystem/media/preview/' + event.data.mediaId;
-                                        mediaUrl = previewUrl;
-                                    }
-                                    
-                                    if (mediaUrl) {
-                                        // Callback'e URL'yi ve alt metni ilet
-                                        callback(mediaUrl, { alt: altText });
-                                        
-                                        // Modalı kapat
-                                        modal.hide();
-                                        
-                                        // Event listener'ı kaldır
-                                        window.removeEventListener('message', handleFilePickerSelection);
-                                    }
-                                } else if (event.data && event.data.type === 'mediapickerError') {
-                                    console.error('FileManagerSystem hatası:', event.data.message);
-                                    alert('Medya seçici hatası: ' + event.data.message);
-                                    modal.hide();
-                                    
-                                    window.removeEventListener('message', handleFilePickerSelection);
-                                }
-                            } catch (error) {
-                                console.error('Medya seçimi işlenirken hata oluştu:', error);
-                                alert('Medya seçimi işlenirken bir hata oluştu.');
-                                
-                                window.removeEventListener('message', handleFilePickerSelection);
-                            }
-                        }
-                        
-                        // Event listener ekle
-                        window.removeEventListener('message', handleFilePickerSelection);
-                        window.addEventListener('message', handleFilePickerSelection);
-                        
-                        return false;
-                    }
-                    
-                    // Diğer dosya tipleri için standart dosya seçiciyi kullan
-                    if (meta.filetype === 'file' || meta.filetype === 'media') {
-                        window.open('/filemanager/dialog.php?type=' + meta.filetype + '&field_id=tinymce-file', 'filemanager', 'width=900,height=600');
-                        window.SetUrl = function (url, width, height, alt) {
-                            callback(url, {alt: alt});
-                        };
-                    }
-                },
-                
-                // FileManagerSystem entegrasyonu için özel buton
-                setup: function (editor) {
-                    // TinyMCE başlatıldığında image plugininin davranışını değiştir
-                    editor.on('PreInit', function() {
-                        // Image plugin komutlarını ele geçir ve engelle
-                        editor.on('BeforeExecCommand', function(e) {
-                            if (e.command === 'mceImage') {
-                                // FileManagerSystem'i aç
-                                openFileManagerSystemPicker(editor);
-                                e.preventDefault();
-                                return false;
-                            }
-                        });
-                        
-                        // Quickbars'ı özelleştir
-                        editor.contentStyles.push(`
-                            .tox-toolbar-overlord {
-                                font-size: 14px !important;
-                            }
-                            .tox-pop__dialog {
-                                background-color: #fff !important;
-                                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2) !important;
-                                border-radius: 6px !important;
-                            }
-                            .tox-toolbar__group {
-                                padding: 4px !important;
-                            }
-                            .tox-toolbar__primary {
-                                background-color: #fff !important;
-                            }
-                            .tox-tbtn {
-                                margin: 2px !important;
-                            }
-                            .tox-tbtn--enabled, .tox-tbtn:hover {
-                                background-color: #e9ecef !important;
-                            }
-                            .tox-icon.tox-tbtn__icon-wrap {
-                                font-size: 16px !important;
-                            }
-                        `);
-                    });
-                    
-                    // TinyMCE başlatıldığında custom butonları ekle
-                    editor.on('init', function() {
-                        // Özel toolbar butonu ekle
-                        editor.ui.registry.addButton('customimage', {
-                            icon: 'image',
-                            tooltip: 'Resim Ekle/Düzenle',
-                            onAction: function() {
-                                openFileManagerSystemPicker(editor);
-                            }
-                        });
-                        
-                        // QuickImage toolbarı için özel buton ekle
-                        editor.ui.registry.addButton('quickimage', {
-                            icon: 'image',
-                            tooltip: 'Hızlı Resim Ekle',
-                            onAction: function() {
-                                openFileManagerSystemPicker(editor);
-                            }
-                        });
-                    });
-                }
-            });
-            
-            // TinyMCE basit editör yapılandırması (.tinymce sınıfı için)
-            tinymce.init({
-                selector: '.tinymce',
-                height: 200,
-                menubar: false,
-                plugins: 'lists link image table code',
-                toolbar: 'undo redo | formatselect | bold italic | alignleft aligncenter alignright | bullist numlist | link image | table | code',
-                content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, sans-serif; font-size: 14px; }',
-                language: 'tr',
-                language_url: '/js/tinymce/langs/tr.js',
-                branding: false,
-                promotion: false,
-                skin: 'oxide',
-                relative_urls: false,
-                remove_script_host: false,
-                convert_urls: true,
-                object_resizing: 'img',
-                paste_data_images: true,
-                automatic_uploads: false,
-                
-                // Varsayılan dosya seçici fonksiyonu override
-                file_picker_callback: function (callback, value, meta) {
-                    // Resim ekleme işlemleri için FileManagerSystem kullanılacak
-                    if (meta.filetype === 'image') {
-                        // Geçici bir ID oluştur
-                        const tempId = Date.now();
-                        const relatedType = 'service_details';
-                        
-                        // MediaPicker URL
-                        const mediapickerUrl = '/admin/filemanagersystem/mediapicker?type=image&filter=all&related_type=' + relatedType + '&related_id=' + tempId;
-                        
-                        // iFrame'i güncelle
-                        $('#mediapickerFrame').attr('src', mediapickerUrl);
-                        
-                        // Modal'ı göster - Bootstrap 5 ile uyumlu
-                        var modal = new bootstrap.Modal(document.getElementById('mediapickerModal'));
-                        modal.show();
-                        
-                        // Mesaj dinleme işlevi
-                        function handleFilePickerSelection(event) {
-                            try {
-                                if (event.data && event.data.type === 'mediaSelected') {
-                                    let mediaUrl = '';
-                                    let altText = event.data.mediaAlt || '';
-                                    
-                                    // URL değerini al
-                                    if (event.data.mediaUrl) {
-                                        mediaUrl = event.data.mediaUrl;
-                                        
-                                        // URL çevirme
-                                        if (mediaUrl && mediaUrl.startsWith('/')) {
-                                            const baseUrl = window.location.protocol + '//' + window.location.host;
-                                            mediaUrl = baseUrl + mediaUrl;
-                                        }
-                                    } else if (event.data.mediaId) {
-                                        // ID ile kullan
-                                        const previewUrl = '/admin/filemanagersystem/media/preview/' + event.data.mediaId;
-                                        mediaUrl = previewUrl;
-                                    }
-                                    
-                                    if (mediaUrl) {
-                                        // Callback'e URL'yi ve alt metni ilet
-                                        callback(mediaUrl, { alt: altText });
-                                        
-                                        // Modalı kapat
-                                        modal.hide();
-                                        
-                                        // Event listener'ı kaldır
-                                        window.removeEventListener('message', handleFilePickerSelection);
-                                    }
-                                } else if (event.data && event.data.type === 'mediapickerError') {
-                                    console.error('FileManagerSystem hatası:', event.data.message);
-                                    alert('Medya seçici hatası: ' + event.data.message);
-                                    modal.hide();
-                                    
-                                    window.removeEventListener('message', handleFilePickerSelection);
-                                }
-                            } catch (error) {
-                                console.error('Medya seçimi işlenirken hata oluştu:', error);
-                                alert('Medya seçimi işlenirken bir hata oluştu.');
-                                
-                                window.removeEventListener('message', handleFilePickerSelection);
-                            }
-                        }
-                        
-                        // Event listener ekle
-                        window.removeEventListener('message', handleFilePickerSelection);
-                        window.addEventListener('message', handleFilePickerSelection);
-                        
-                        return false;
-                    }
-                    
-                    // Diğer dosya tipleri için standart dosya seçiciyi kullan
-                    if (meta.filetype === 'file' || meta.filetype === 'media') {
-                        window.open('/filemanager/dialog.php?type=' + meta.filetype + '&field_id=tinymce-file', 'filemanager', 'width=900,height=600');
-                        window.SetUrl = function (url, width, height, alt) {
-                            callback(url, {alt: alt});
-                        };
-                    }
-                }
-            });
-            
-            // İşlem Süresi dinamik tablo
-            $('#add-processing-time-row').on('click', function() {
-                const tableBody = $('#processing-time-table tbody');
-                const rowCount = tableBody.find('tr').length;
-                
-                const newRow = `
-                    <tr>
-                        <td>
-                            <input type="text" class="form-control" name="details[processing_times][${rowCount}][title]" placeholder="Başlık">
-                        </td>
-                        <td>
-                            <input type="text" class="form-control" name="details[processing_times][${rowCount}][time]" placeholder="İşlem süresi">
-                        </td>
-                        <td>
-                            <input type="text" class="form-control" name="details[processing_times][${rowCount}][description]" placeholder="Açıklama">
-                        </td>
-                        <td>
-                            <button type="button" class="btn btn-sm btn-danger remove-row">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </td>
-                    </tr>
-                `;
-                
-                tableBody.append(newRow);
-            });
-            
-            // Ücretler dinamik tablo
-            $('#add-fee-row').on('click', function() {
-                const tableBody = $('#fees-table tbody');
-                const rowCount = tableBody.find('tr').length;
-                
-                const newRow = `
-                    <tr>
-                        <td>
-                            <input type="text" class="form-control" name="details[fees][${rowCount}][package]" placeholder="Paket adı">
-                        </td>
-                        <td>
-                            <input type="text" class="form-control" name="details[fees][${rowCount}][description]" placeholder="Açıklama">
-                        </td>
-                        <td>
-                            <input type="text" class="form-control" name="details[fees][${rowCount}][price]" placeholder="Fiyat">
-                        </td>
-                        <td>
-                            <button type="button" class="btn btn-sm btn-danger remove-row">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </td>
-                    </tr>
-                `;
-                
-                tableBody.append(newRow);
-            });
-            
-            // Ödeme Seçenekleri dinamik tablo
-            $('#add-payment-option-row').on('click', function() {
-                const tableBody = $('#payment-options-table tbody');
-                const rowCount = tableBody.find('tr').length;
-                
-                const newRow = `
-                    <tr>
-                        <td>
-                            <input type="text" class="form-control" name="details[payment_options][${rowCount}][method]" placeholder="Ödeme yöntemi">
-                        </td>
-                        <td>
-                            <input type="text" class="form-control" name="details[payment_options][${rowCount}][term]" placeholder="Vade">
-                        </td>
-                        <td>
-                            <input type="text" class="form-control" name="details[payment_options][${rowCount}][description]" placeholder="Açıklama">
-                        </td>
-                        <td>
-                            <button type="button" class="btn btn-sm btn-danger remove-row">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </td>
-                    </tr>
-                `;
-                
-                tableBody.append(newRow);
-            });
-            
-            // Satır silme işlemi (tüm tablolar için)
-            $(document).on('click', '.remove-row', function() {
-                // Eğer tabloda sadece bir satır kaldıysa silmeyi engelle
-                const tableBody = $(this).closest('tbody');
-                if (tableBody.find('tr').length > 1) {
-                    $(this).closest('tr').remove();
-                } else {
-                    // Tabloyu boşalt
-                    tableBody.find('input').val('');
-                }
-            });
-        });
     });
+});
 </script>
 
 <script>
@@ -2058,332 +1675,72 @@ document.addEventListener('DOMContentLoaded', function() {
 </div>
 
 <script>
-    $(document).ready(function() {
-        // Dosya seçme modalı ve işlevselliği
-        let currentDocumentIndex = 0;
-        
-        // Dosya Ekle butonu
-        $('#add-document-row').on('click', function() {
-            const tableBody = $('#documents-table tbody');
-            const rowCount = tableBody.find('tr').length;
-            
-            const newRow = `
-                <tr>
-                    <td>
-                        <input type="text" class="form-control" name="documents[${rowCount}][name]" placeholder="Dosya adı">
-                    </td>
-                    <td>
-                        <input type="text" class="form-control" name="documents[${rowCount}][description]" placeholder="Açıklama">
-                    </td>
-                    <td>
-                        <div class="input-group">
-                            <input type="text" class="form-control document-file-input" name="documents[${rowCount}][file]" readonly>
-                            <button type="button" class="btn btn-primary file-browser" data-index="${rowCount}">
-                                <i class="fas fa-file"></i>
-                            </button>
-                        </div>
-                    </td>
-                    <td>
-                        <button type="button" class="btn btn-sm btn-danger remove-row">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </td>
-                </tr>
-            `;
-            
-            tableBody.append(newRow);
-        });
-        
-        // Dosya seçme butonu tıklama olayı
-        $(document).on('click', '.file-browser', function() {
-            currentDocumentIndex = $(this).data('index');
-            console.log('Dosya seçici açılıyor. Aktif dokuman index:', currentDocumentIndex);
-            
-            // MediaPicker URL - sadece dosya türleri için filtre ekle
-            const serviceId = {{ $service->id }};
-            const mediapickerUrl = `/admin/filemanagersystem/mediapicker?type=document&filter=all&related_type=service&related_id=${serviceId}`;
-            console.log('MediaPicker URL:', mediapickerUrl);
-            
-            // iFrame'i güncelle
-            $('#mediapickerFrame').attr('src', mediapickerUrl);
-            
-            // Bootstrap 5 Modal oluştur ve aç
-            try {
-                const modalElement = document.getElementById('mediapickerModal');
-                let modal;
-                
-                // Mevcut modal instance'ı var mı kontrol et
-                try {
-                    modal = bootstrap.Modal.getInstance(modalElement);
-                    if (!modal) {
-                        modal = new bootstrap.Modal(modalElement);
-                    }
-                } catch (e) {
-                    console.log('Modal instance bulunamadı, yeni oluşturuluyor');
-                    modal = new bootstrap.Modal(modalElement);
-                }
-                
-                // Modalı aç
-                modal.show();
-                console.log('Modal açıldı');
-            } catch (error) {
-                console.error('Modal açılırken hata oluştu:', error);
-                // Alternatif yöntem
-                try {
-                    $('#mediapickerModal').modal('show');
-                    console.log('Modal jQuery ile açıldı');
-                } catch (jqError) {
-                    console.error('Modal açılamadı:', jqError);
-                    alert('Dosya seçici açılamadı! Lütfen sayfayı yenileyip tekrar deneyin.');
-                }
-            }
-        });
-        
-        // iframe'den medya seçim mesajını dinle
-        window.addEventListener('message', function(event) {
-            let fileUrl = null;
-            let modalClosed = false;
-            
-            // Gelen mesajı analiz et
-            console.group('MediaPicker - Gelen Mesaj');
-            console.log('Event data:', event.data);
-            console.log('Event origin:', event.origin);
-            console.log('Event source:', event.source ? 'Mevcut' : 'Yok');
-            console.groupEnd();
-            
-            try {
-                if (event.data && event.data.type === 'mediaSelected') {
-                    console.group('MediaPicker - Seçilen Dosya');
-                    console.log('Seçilen dosya tam veri:', event.data);
-                    console.log('Dosya URL:', event.data.mediaUrl);
-                    console.log('Dosya adı:', event.data.mediaName);
-                    console.log('Dosya tipi:', event.data.mediaType);
-                    console.log('Dosya ID:', event.data.mediaId);
-                    console.groupEnd();
-                    
-                    // event.data'dan doğrudan URL değerini al
-                    if (event.data.mediaUrl) {
-                        // Dosya URL'sini temizle
-                        fileUrl = event.data.mediaUrl;
-                        
-                        // Eğer URL göreceli ise (/ ile başlıyorsa) tam URL'ye çevir
-                        if (fileUrl && fileUrl.startsWith('/')) {
-                            const baseUrl = window.location.protocol + '//' + window.location.host;
-                            fileUrl = baseUrl + fileUrl;
-                        }
-                        
-                        // Seçilen dosyanın URL'sini input alanına ekle
-                        $(`input[name="documents[${currentDocumentIndex}][file]"]`).val(fileUrl);
-                        
-                        // Dosya adı otomatik doldurma (boşsa)
-                        const nameInput = $(`input[name="documents[${currentDocumentIndex}][name]"]`);
-                        if (!nameInput.val() && event.data.mediaName) {
-                            nameInput.val(event.data.mediaName);
-                        }
-                    }
-                }
-            } catch (error) {
-                console.error('Dosya seçimi işlenirken hata oluştu:', error);
-                alert('Dosya seçimi işlenirken bir hata oluştu.');
-            } finally {
-                // Modalı kapat - hata olsa da olmasa da çalışacak
-                try {
-                    modalClosed = closeModal();
-                } catch (modalError) {
-                    console.error('Modal kapatılırken hata oluştu:', modalError);
-                }
-                
-                // Hiçbir yöntemle kapatılamadıysa
-                if (!modalClosed && fileUrl) {
-                    console.log('Modal kapatılamadı ama dosya başarıyla seçildi:', fileUrl);
-                }
-            }
-        });
-    });
-</script>
-
-<script>
-    $(document).ready(function() {
-        // Dosya seçme modalı ve işlevselliği
-        let currentDocumentIndex = 0;
-        
-        // Modal kapatma yardımcı fonksiyonu
+// Modal kapatma fonksiyonu
         function closeModal() {
             try {
-                var modalElement = document.getElementById('mediapickerModal');
+        const modalElement = document.getElementById('mediapickerModal');
                 if (modalElement) {
-                    var modalInstance = bootstrap.Modal.getInstance(modalElement);
+            // Bootstrap 5 yöntemi ile kapatmayı dene
+            const modalInstance = bootstrap.Modal.getOrCreateInstance(modalElement);
                     if (modalInstance) {
                         modalInstance.hide();
                         console.log('Modal resmi yöntemle kapatıldı');
                         return true;
                     }
                 }
-            } catch (modalError) {
-                console.error('Modal resmi yöntemle kapatılırken hata oluştu:', modalError);
+    } catch (error) {
+        console.error('Modal resmi yöntemle kapatılırken hata oluştu:', error);
             }
             
-            // JQuery ile kapamayı dene
+    // jQuery yöntemiyle kapatmayı dene
             try {
                 $('#mediapickerModal').modal('hide');
                 console.log('Modal jQuery ile kapatıldı');
                 return true;
-            } catch (jqError) {
-                console.error('JQuery ile modal kapatılırken hata oluştu:', jqError);
-            }
-            
-            // Elle içeriği temizle
-            try {
-                $('#mediapickerFrame').attr('src', 'about:blank');
-                console.log('Modal iframe kaynağı temizlendi');
             } catch (error) {
-                console.error('Modal iframe temizlenirken hata oluştu:', error);
+        console.error('Modal jQuery yöntemiyle kapatılırken hata oluştu:', error);
             }
             
             return false;
         }
         
-        // Modal kapatma butonu
-        $(document).on('click', '.btn-close', function() {
-            closeModal();
-        });
-        
-        // Dosya Ekle butonu
-        $('#add-document-row').on('click', function() {
-            const tableBody = $('#documents-table tbody');
-            const rowCount = tableBody.find('tr').length;
-            
-            const newRow = `
-                <tr>
-                    <td>
-                        <input type="text" class="form-control" name="documents[${rowCount}][name]" placeholder="Dosya adı">
-                    </td>
-                    <td>
-                        <input type="text" class="form-control" name="documents[${rowCount}][description]" placeholder="Açıklama">
-                    </td>
-                    <td>
-                        <div class="input-group">
-                            <input type="text" class="form-control document-file-input" name="documents[${rowCount}][file]" readonly>
-                            <button type="button" class="btn btn-primary file-browser" data-index="${rowCount}">
-                                <i class="fas fa-file"></i>
-                            </button>
-                        </div>
-                    </td>
-                    <td>
-                        <button type="button" class="btn btn-sm btn-danger remove-row">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </td>
-                </tr>
-            `;
-            
-            tableBody.append(newRow);
-        });
-        
-        // Dosya seçme butonu tıklama olayı
-        $(document).on('click', '.file-browser', function() {
-            currentDocumentIndex = $(this).data('index');
-            console.log('Dosya seçici açılıyor. Aktif dokuman index:', currentDocumentIndex);
-            
-            // MediaPicker URL - sadece dosya türleri için filtre ekle
-            const serviceId = {{ $service->id }};
-            const mediapickerUrl = `/admin/filemanagersystem/mediapicker?type=document&filter=all&related_type=service&related_id=${serviceId}`;
-            console.log('MediaPicker URL:', mediapickerUrl);
-            
-            // iFrame'i güncelle
-            $('#mediapickerFrame').attr('src', mediapickerUrl);
-            
-            // Bootstrap 5 Modal oluştur ve aç
-            try {
-                const modalElement = document.getElementById('mediapickerModal');
-                let modal;
-                
-                // Mevcut modal instance'ı var mı kontrol et
-                try {
-                    modal = bootstrap.Modal.getInstance(modalElement);
-                    if (!modal) {
-                        modal = new bootstrap.Modal(modalElement);
-                    }
-                } catch (e) {
-                    console.log('Modal instance bulunamadı, yeni oluşturuluyor');
-                    modal = new bootstrap.Modal(modalElement);
-                }
-                
-                // Modalı aç
-                modal.show();
-                console.log('Modal açıldı');
-            } catch (error) {
-                console.error('Modal açılırken hata oluştu:', error);
-                // Alternatif yöntem
-                try {
-                    $('#mediapickerModal').modal('show');
-                    console.log('Modal jQuery ile açıldı');
-                } catch (jqError) {
-                    console.error('Modal açılamadı:', jqError);
-                    alert('Dosya seçici açılamadı! Lütfen sayfayı yenileyip tekrar deneyin.');
-                }
-            }
-        });
-        
-        // iframe'den medya seçim mesajını dinle
-        window.addEventListener('message', function(event) {
-            let fileUrl = null;
-            let modalClosed = false;
-            
-            // Gelen mesajı analiz et
-            console.group('MediaPicker - Gelen Mesaj');
-            console.log('Event data:', event.data);
-            console.log('Event origin:', event.origin);
-            console.log('Event source:', event.source ? 'Mevcut' : 'Yok');
-            console.groupEnd();
-            
-            try {
-                if (event.data && event.data.type === 'mediaSelected') {
-                    console.group('MediaPicker - Seçilen Dosya');
-                    console.log('Seçilen dosya tam veri:', event.data);
-                    console.log('Dosya URL:', event.data.mediaUrl);
-                    console.log('Dosya adı:', event.data.mediaName);
-                    console.log('Dosya tipi:', event.data.mediaType);
-                    console.log('Dosya ID:', event.data.mediaId);
-                    console.groupEnd();
-                    
-                    // event.data'dan doğrudan URL değerini al
-                    if (event.data.mediaUrl) {
-                        // Dosya URL'sini temizle
-                        fileUrl = event.data.mediaUrl;
-                        
-                        // Eğer URL göreceli ise (/ ile başlıyorsa) tam URL'ye çevir
-                        if (fileUrl && fileUrl.startsWith('/')) {
-                            const baseUrl = window.location.protocol + '//' + window.location.host;
-                            fileUrl = baseUrl + fileUrl;
-                        }
-                        
-                        // Seçilen dosyanın URL'sini input alanına ekle
-                        $(`input[name="documents[${currentDocumentIndex}][file]"]`).val(fileUrl);
-                        
-                        // Dosya adı otomatik doldurma (boşsa)
-                        const nameInput = $(`input[name="documents[${currentDocumentIndex}][name]"]`);
-                        if (!nameInput.val() && event.data.mediaName) {
-                            nameInput.val(event.data.mediaName);
-                        }
-                    }
-                }
-            } catch (error) {
-                console.error('Dosya seçimi işlenirken hata oluştu:', error);
-                alert('Dosya seçimi işlenirken bir hata oluştu.');
-            } finally {
-                // Modalı kapat - hata olsa da olmasa da çalışacak
-                try {
-                    modalClosed = closeModal();
-                } catch (modalError) {
-                    console.error('Modal kapatılırken hata oluştu:', modalError);
-                }
-                
-                // Hiçbir yöntemle kapatılamadıysa
-                if (!modalClosed && fileUrl) {
-                    console.log('Modal kapatılamadı ama dosya başarıyla seçildi:', fileUrl);
-                }
-            }
+// Dosya işleme scriptleri
+$(document).ready(function() {
+    console.log('Dosya işlemleri script yüklendi');
+    
+    // Galeri filemanager değişikliğini dinleme
+    $('#fake-gallery-input').on('change', function() {
+        // Seçilen görseli al
+        var url = $(this).val();
+        if (url) {
+            // URL'yi rölatif yola dönüştür
+            url = makeRelativeUrl(url);
+            addGalleryItem(url);
+            $(this).val(''); // input'u temizle
+        }
+    });
+    
+    // Image inputu değiştiğinde rölatif yola dönüştür
+    $('#image').on('change', function() {
+        const url = $(this).val();
+        if (url) {
+            // URL'yi rölatif hale getir
+            $(this).val(makeRelativeUrl(url));
+        }
+    });
+    
+    // Ana görsel URL'sini düzelt
+    if ($('#image').val()) {
+        const cleanUrl = makeRelativeUrl($('#image').val());
+        $('#image').val(cleanUrl);
+        $('#image-preview').find('img').attr('src', cleanUrl);
+    }
+    
+    // Galeri görsel URL'lerini düzelt
+    $('#gallery-preview input[name="gallery[]"]').each(function() {
+        const cleanUrl = makeRelativeUrl($(this).val());
+        $(this).val(cleanUrl);
+        $(this).closest('.gallery-item').find('img').attr('src', cleanUrl);
         });
     });
 </script>
@@ -2463,10 +1820,12 @@ document.addEventListener('DOMContentLoaded', function() {
 <script>
 $(document).ready(function() {
     // FileManagerSystem entegrasyonu - Ana Görsel Seçimi
-    $('#filemanagersystem_image_button').on('click', function() {
-        const input = $('#filemanagersystem_image');
-        const preview = $('#filemanagersystem_image_preview');
-        const previewImg = preview.find('img');
+    $('#filemanagersystem_image_button, #filemanagersystem_gallery_button').on('click', function() {
+        const buttonId = $(this).attr('id');
+        const isGallery = buttonId === 'filemanagersystem_gallery_button';
+        
+        const input = isGallery ? $('#filemanagersystem_gallery') : $('#filemanagersystem_image');
+        const preview = isGallery ? $('#filemanagersystem_gallery_preview') : $('#filemanagersystem_image_preview');
         
         // Geçici bir ID oluştur
         const tempId = Date.now();
@@ -2479,7 +1838,8 @@ $(document).ready(function() {
         $('#mediapickerFrame').attr('src', mediapickerUrl);
         
         // Modal'ı göster - Bootstrap 5 ile uyumlu
-        var modal = new bootstrap.Modal(document.getElementById('mediapickerModal'));
+        var modalEl = document.getElementById('mediapickerModal');
+        var modal = new bootstrap.Modal(modalEl);
         modal.show();
         
         // Medya seçimi mesaj dinleyicisi
@@ -2500,12 +1860,13 @@ $(document).ready(function() {
                         // Input'a URL'yi ekle
                         input.val(mediaUrl);
                         
-                        // Önizlemeyi göster
-                        previewImg.attr('src', mediaUrl);
-                        preview.show();
-                        
-                        // Uyarıyı gizle
-                        $('#image-warning').hide();
+                        if (isGallery) {
+                            // Galeri önizlemesine ekle
+                            addGalleryItem(mediaUrl);
+                        } else {
+                            // Önizlemeyi göster (ana görsel için)
+                            preview.show().find('img').attr('src', mediaUrl);
+                        }
                         
                         // Modalı kapat
                         modal.hide();
@@ -2536,7 +1897,26 @@ $(document).ready(function() {
     if (initialImageValue) {
         $('#filemanagersystem_image_preview').show();
         $('#filemanagersystem_image_preview img').attr('src', initialImageValue);
-        $('#image-warning').hide(); // Görsel varsa uyarıyı gizle
+    }
+    
+    // Galeri görselini silme
+    $(document).on('click', '.gallery-item .remove-btn', function() {
+        $(this).closest('.gallery-item').remove();
+    });
+    
+    // Galeriye öğe ekleme
+    function addGalleryItem(url) {
+        const itemId = 'gallery-item-' + Date.now();
+        const html = `
+            <div class="gallery-item" id="${itemId}">
+                <img src="${url}" alt="Galeri görseli" class="img-fluid">
+                <button type="button" class="remove-btn" data-id="${itemId}">
+                    <i class="fas fa-times"></i>
+                </button>
+                <input type="hidden" name="gallery[]" value="${url}">
+            </div>
+        `;
+        $('#gallery-preview').append(html);
     }
 });
 </script>
