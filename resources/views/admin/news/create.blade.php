@@ -846,7 +846,7 @@
                                 </div>
                                 
                         <div class="form-check">
-                                    <input type="checkbox" class="form-check-input" id="is_headline" name="is_headline" {{ old('is_headline') ? 'checked' : '' }} {{ $maxHeadlinesReached ? 'disabled' : '' }}>
+                                    <input type="checkbox" class="form-check-input" id="is_headline" name="is_headline" value="1" {{ old('is_headline') ? 'checked' : '' }} {{ $maxHeadlinesReached ? 'disabled' : '' }}>
                             <label class="form-check-label" for="is_headline">
                                 <strong>Manşet</strong>
                                 <small class="d-block text-muted">Haber manşet bölümünde gösterilecektir.</small>
