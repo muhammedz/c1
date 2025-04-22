@@ -22,7 +22,7 @@ class NewsResource extends JsonResource
             'slug' => $this->slug,
             'summary' => $this->summary,
             'content' => $this->formatContent($this->content),
-            'image' => $this->filemanagersystem_image_url ?? null,
+            'image' => $this->filemanagersystem_image_url ?? $this->image ?? null,
             'image_alt' => $this->filemanagersystem_image_alt,
             'image_title' => $this->filemanagersystem_image_title,
             'is_headline' => $this->is_headline,

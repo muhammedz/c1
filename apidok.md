@@ -1,4 +1,4 @@
-# API News Dokümantasyonu
+# Haber API Dokümantasyonu
 
 Bu döküman, sistemdeki haber (news) API entegrasyonunu açıklamaktadır.
 
@@ -31,7 +31,9 @@ GET /api/news
             "slug": "haber-basligi",
             "summary": "Haber özeti",
             "content": "Haber içeriği...",
-            "image": "/uploads/media/123",
+            "image": "https://cankaya.epoxsoft.net.tr",
+            "image_alt": "Görsel alt metni",
+            "image_title": "Görsel başlığı",
             "is_headline": true,
             "is_featured": true,
             "view_count": 150,
@@ -50,7 +52,6 @@ GET /api/news
                 }
             ]
         }
-        // Diğer haberler...
     ],
     "pagination": {
         "total": 50,
@@ -59,10 +60,10 @@ GET /api/news
         "current_page": 1,
         "total_pages": 5,
         "links": {
-            "first": "http://example.com/api/news?page=1",
-            "last": "http://example.com/api/news?page=5",
+            "first": "https://cankaya.epoxsoft.net.tr/api/news?page=1",
+            "last": "https://cankaya.epoxsoft.net.tr/api/news?page=5",
             "prev": null,
-            "next": "http://example.com/api/news?page=2"
+            "next": "https://cankaya.epoxsoft.net.tr/api/news?page=2"
         }
     }
 }
@@ -82,11 +83,10 @@ GET /api/news/{slug}
     "slug": "haber-basligi",
     "summary": "Haber özeti",
     "content": "Haber içeriği...",
-    "image": "/uploads/media/123",
-    "image_alt": "Görsel açıklaması",
+    "image": "https://cankaya.epoxsoft.net.tr",
+    "image_alt": "Görsel alt metni",
     "image_title": "Görsel başlığı",
     "is_headline": true,
-    "headline_order": 1,
     "is_featured": true,
     "view_count": 150,
     "status": true,
@@ -106,14 +106,14 @@ GET /api/news/{slug}
     "gallery": [
         {
             "id": 10,
-            "url": "/storage/uploads/gallery/image1.jpg",
-            "alt": "Galeri görseli 1",
-            "title": "Galeri başlığı 1"
+            "url": "https://cankaya.epoxsoft.net.tr",
+            "alt": "Galeri görsel açıklaması",
+            "title": "Galeri görsel başlığı"
         }
     ],
     "meta": {
-        "title": "Meta başlık",
-        "description": "Meta açıklama",
+        "title": "Haber meta başlığı",
+        "description": "Haber meta açıklaması",
         "keywords": "anahtar, kelimeler"
     },
     "created_at": "2023-09-30 10:15:00",
@@ -130,38 +130,10 @@ GET /api/news/featured
 **Parametreler:**
 - `limit` (opsiyonel): Getirilecek haber sayısı, varsayılan 6
 
-**Cevap Örneği:** Tüm haberler listesi formatında döner (limit kadar kayıt içerir).
-
 ### 4. Haber Kategorileri
 
 ```
 GET /api/news/categories
-```
-
-**Cevap Örneği:**
-```json
-[
-    {
-        "id": 1,
-        "name": "Teknoloji",
-        "slug": "teknoloji",
-        "description": "Teknoloji haberleri",
-        "icon": "fa-laptop",
-        "image": "/storage/categories/teknoloji.jpg",
-        "parent_id": null,
-        "order": 1,
-        "is_active": true,
-        "news_count": 25,
-        "meta": {
-            "title": "Teknoloji Haberleri",
-            "description": "En güncel teknoloji haberleri",
-            "keywords": "teknoloji, yazılım, donanım"
-        },
-        "created_at": "2023-01-01 00:00:00",
-        "updated_at": "2023-10-01 10:00:00"
-    }
-    // Diğer kategoriler...
-]
 ```
 
 ### 5. Kategoriye Göre Haberler
@@ -175,8 +147,6 @@ GET /api/news/category/{category_id}
 - `sort_direction` (opsiyonel): Sıralama yönü, varsayılan "desc"
 - `per_page` (opsiyonel): Sayfa başına haber sayısı, varsayılan 10
 
-**Cevap Örneği:** Tüm haberler listesi formatında döner (yalnızca belirtilen kategorideki haberler).
-
 ### 6. Haberlerde Arama
 
 ```
@@ -187,7 +157,28 @@ GET /api/news/search
 - `query` (zorunlu): Arama sorgusu
 - `per_page` (opsiyonel): Sayfa başına haber sayısı, varsayılan 10
 
-**Cevap Örneği:** Tüm haberler listesi formatında döner (arama sorgusuna uyan haberler).
+## Cevap Alanları Açıklamaları
+
+### Haber Nesnesi Alanları
+- `id`: Haber ID'si
+- `title`: Haber başlığı
+- `slug`: Haber URL slug'ı
+- `summary`: Haber özeti
+- `content`: Haber içeriği (HTML formatında)
+- `image`: Haber ana görseli URL'i (https://cankaya.epoxsoft.net.tr)
+- `image_alt`: Haber ana görseli alt metni (SEO için)
+- `image_title`: Haber ana görseli başlığı
+- `is_headline`: Manşet haberi olup olmadığı (true ise ⭐ Manşet Haber)
+- `is_featured`: Öne çıkan haber olup olmadığı
+- `view_count`: Görüntülenme sayısı
+- `status`: Haber durumu (published, draft vs.)
+- `published_at`: Yayınlanma tarihi
+- `category`: Haber kategorisi
+- `tags`: Habere ait etiketler
+- `gallery`: Haber galerisi (varsa)
+- `meta`: SEO meta alanları
+- `created_at`: Oluşturulma tarihi
+- `updated_at`: Güncellenme tarihi
 
 ## Hata Durumları
 
@@ -204,5 +195,8 @@ API'den gelebilecek genel hata durumları:
 - Tüm tarihler "Y-m-d H:i:s" formatında döner
 - Sayfalama bilgileri "pagination" anahtarı altında yer alır
 - API anahtarı için yetkili kişilere başvurunuz
-- Resim alanları, filemanagersystem tarafından yönetilen "/uploads/media/{id}" formatında döner
-- Görsel URL'leri doğrudan kullanılabilir veya asset() fonksiyonu ile birleştirilebilir 
+- Resim alanları, filemanagersystem tarafından yönetilen "https://cankaya.epoxsoft.net.tr" formatında döner
+- Haber görsel URL'i (`image`) iki farklı kaynaktan gelebilir:
+  - Öncelikle `filemanagersystem_image_url` değeri kontrol edilir
+  - Bu değer yoksa normal `image` alanı kullanılır
+  - Her iki alan da boşsa null değeri döner 
