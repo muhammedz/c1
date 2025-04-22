@@ -427,6 +427,11 @@ $(document).ready(function () {
                         </td>
                         <td>
                             <div class="btn-group">
+                                @if($page->status == 'published')
+                                    <a href="{{ route('pages.show', $page->slug) }}" target="_blank" class="btn btn-sm btn-outline-info">
+                                        <i class="fas fa-eye"></i> Önizle
+                                    </a>
+                                @endif
                                 <a href="{{ route('admin.pages.edit', $page->id) }}" class="btn btn-sm btn-info">
                                     <i class="fas fa-edit"></i> Düzenle
                                 </a>
