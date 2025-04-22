@@ -52,7 +52,7 @@
                                 <td>{{ $service->id }}</td>
                                 <td>
                                     @if($service->image)
-                                        <img src="{{ asset('storage/' . $service->image) }}" alt="{{ $service->title }}" width="50" height="50" class="img-thumbnail">
+                                        <img src="{{ asset(str_replace('/storage/', '', $service->image)) }}" alt="{{ $service->title }}" width="50" height="50" class="img-thumbnail">
                                     @else
                                         <span class="badge badge-secondary">Görsel Yok</span>
                                     @endif

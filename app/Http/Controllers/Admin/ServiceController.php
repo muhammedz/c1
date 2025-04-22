@@ -129,9 +129,12 @@ class ServiceController extends Controller
                 }
             }
             
-            // Diğer alanlar
-            $data['view_count'] = 0;
+            // Yayınlanma durumu ile ilgili özel ayarlar
             $data['is_scheduled'] = !empty($request->end_date);
+            
+            // Varsayılan değerleri ata
+            $data['view_count'] = 0;
+            $data['status'] = $data['status'] ?? 'published'; // Varsayılan olarak yayında
             
             // Yeni service objesi oluştur
             $service = Service::create($data);
@@ -509,13 +512,18 @@ class ServiceController extends Controller
             return $url;
         }
         
+        // Başındaki /storage/ yolunu temizle
+        if (strpos($url, '/storage/') === 0) {
+            $url = substr($url, 9); // '/storage/' uzunluğu 9 karakter
+        }
+        
         // Yinelenen /storage/ yolunu düzelt
         if (strpos($url, '/storage//storage/') !== false) {
-            return str_replace('/storage//storage/', '/storage/', $url);
+            $url = str_replace('/storage//storage/', '', $url);
         }
         
         if (strpos($url, '/storage/storage/') !== false) {
-            return str_replace('/storage/storage/', '/storage/', $url);
+            $url = str_replace('/storage/storage/', '', $url);
         }
         
         // Eğer URL http:// veya https:// ile başlıyorsa
@@ -524,13 +532,17 @@ class ServiceController extends Controller
                 $parsed = parse_url($url);
                 $path = $parsed['path'] ?? '';
                 
-                // Path içinde yinelenen /storage/ yolunu düzelt
+                // Path içindeki storage yollarını temizle
+                if (strpos($path, '/storage/') === 0) {
+                    $path = substr($path, 9);
+                }
+                
                 if (strpos($path, '/storage//storage/') !== false) {
-                    $path = str_replace('/storage//storage/', '/storage/', $path);
+                    $path = str_replace('/storage//storage/', '', $path);
                 }
                 
                 if (strpos($path, '/storage/storage/') !== false) {
-                    $path = str_replace('/storage/storage/', '/storage/', $path);
+                    $path = str_replace('/storage/storage/', '', $path);
                 }
                 
                 return $path;

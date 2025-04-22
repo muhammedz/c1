@@ -20,6 +20,26 @@
 @push('js')
 <script>
 $(document).ready(function () {
+    // Toastr için global ayarlar
+    toastr.options = {
+        "closeButton": true,
+        "debug": false,
+        "newestOnTop": true,
+        "progressBar": true,
+        "positionClass": "toast-top-right",
+        "preventDuplicates": false,
+        "onclick": null,
+        "showDuration": "300",
+        "hideDuration": "1000",
+        "timeOut": "5000",
+        "extendedTimeOut": "1000",
+        "showEasing": "swing",
+        "hideEasing": "linear",
+        "showMethod": "fadeIn",
+        "hideMethod": "fadeOut",
+        "closeHtml": '<button><i class="fa fa-times"></i></button>'
+    };
+    
     // CSRF token ayarı
     $.ajaxSetup({
         headers: {
@@ -473,13 +493,15 @@ $(document).ready(function () {
 
     // Başarılı alert
     function showSuccessAlert(message) {
-        alert(message);
-        location.reload();
+        toastr.success(message);
+        setTimeout(function() {
+            location.reload();
+        }, 1000);
     }
 
     // Hata alert
     function showErrorAlert(message) {
-        alert(message);
+        toastr.error(message);
     }
 });
 </script>
@@ -487,6 +509,32 @@ $(document).ready(function () {
 
 @push('css')
 <style>
+    /* Alert kapatma butonu için CSS düzeltmesi */
+    .close, .toast-close-button {
+        float: right;
+        font-size: 1.5rem;
+        font-weight: 700;
+        line-height: 1;
+        color: #000;
+        text-shadow: 0 1px 0 #fff;
+        opacity: .5;
+    }
+    
+    .close span, .toast-close-button {
+        display: block;
+        font-family: sans-serif; /* Web-safe font */
+    }
+    
+    .toast-close-button:after {
+        content: "×"; /* Unicode karakter × */
+        font-size: 20px;
+    }
+    
+    /* Toastr mesajları için ek stiller */
+    #toast-container .toast {
+        opacity: 1 !important;
+    }
+    
     .news-dashboard {
         background-color: #f8f9fa;
         padding: 20px;

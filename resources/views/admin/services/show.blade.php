@@ -160,7 +160,7 @@
                         <h3 class="card-title">Ana Görsel</h3>
                     </div>
                     <div class="card-body">
-                        <img src="{{ asset($service->image) }}" alt="{{ $service->title }}" class="img-fluid">
+                        <img src="{{ asset(str_replace('/storage/', '', $service->image)) }}" alt="{{ $service->title }}" class="img-fluid">
                     </div>
                 </div>
             @endif
@@ -174,7 +174,7 @@
                         <div class="row">
                             @foreach($service->gallery as $galleryItem)
                                 <div class="col-md-6 mb-2">
-                                    <img src="{{ asset($galleryItem) }}" class="img-fluid img-thumbnail">
+                                    <img src="{{ asset(str_replace('/storage/', '', $galleryItem)) }}" class="img-fluid img-thumbnail">
                                 </div>
                             @endforeach
                         </div>

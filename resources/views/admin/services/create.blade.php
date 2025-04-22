@@ -326,8 +326,8 @@
                                     <i class="fas fa-link me-1"></i> Oluşturulacak URL:
                                 </div>
                                 <div class="d-flex align-items-center">
-                                    <span class="text-secondary">{{ url('/') }}/hizmet/</span>
-                                    <span class="text-primary fw-bold" id="slug-preview">-</span>
+                                    <span class="text-secondary">{{ url('/') }}/hizmetler/</span>
+                                    <span class="text-primary fw-bold" id="slug-preview">{{ old('slug') ?: '-' }}</span>
                                 </div>
                                 <div class="small text-muted mt-1">
                                     <i class="fas fa-info-circle me-1"></i> Slug:
@@ -337,12 +337,15 @@
                                     <button class="btn btn-sm btn-outline-secondary" type="button" id="slug-regenerate">
                                         <i class="fas fa-sync-alt"></i> Yenile
                                     </button>
+                                    <a href="{{ url('/hizmetler/' . (old('slug') ?: '-')) }}" target="_blank" class="btn btn-sm btn-outline-info">
+                                        <i class="fas fa-external-link-alt"></i> Önizle
+                                    </a>
                                 </div>
                                 @error('slug')
                                     <div class="text-danger small mt-1">{{ $message }}</div>
                                 @enderror
                                 <small class="form-text text-muted mt-1">
-                                    <i class="fas fa-info-circle me-1"></i> Otomatik oluşturulan slug'ı düzenleyebilirsiniz. Boş bırakırsanız otomatik oluşturulacaktır. Çakışmalar olursa sistem otomatik çözüm üretir.
+                                    Otomatik oluşturulan slug'ı düzenleyebilirsiniz. Boş bırakırsanız başlıktan otomatik oluşturulacaktır.
                                 </small>
                             </div>
                         </div>
@@ -386,7 +389,7 @@
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                             <div id="filemanagersystem_image_preview" class="mt-2" style="display: {{ old('image') ? 'block' : 'none' }};">
-                                <img src="{{ old('image') ? asset(old('image')) : '' }}" alt="Önizleme" class="img-thumbnail">
+                                <img src="{{ old('image') ? asset(str_replace('/storage/', '', old('image'))) : '' }}" alt="Önizleme" class="img-thumbnail">
                             </div>
                             <div class="alert alert-info mt-2" id="image-warning">
                                 <i class="fas fa-info-circle me-1"></i>
@@ -418,7 +421,7 @@
                             @if(old('gallery') && is_array(old('gallery')))
                                 @foreach(old('gallery') as $galleryImage)
                                 <div class="gallery-item" id="gallery-item-{{ rand(1000, 9999) }}">
-                                    <img src="{{ asset($galleryImage) }}" alt="Galeri Görseli" style="width: 100%; height: 100%; object-fit: cover;">
+                                    <img src="{{ asset(str_replace('/storage/', '', $galleryImage)) }}" alt="Galeri Görseli" style="width: 100%; height: 100%; object-fit: cover;">
                                     <button type="button" class="remove-btn" data-id="gallery-item-{{ rand(1000, 9999) }}">
                                         <i class="fas fa-times"></i>
                                     </button>
@@ -534,6 +537,9 @@
                                     </div>
                                 </div>
                             </div>
+                            
+                            <!-- Gizli input ile status değerini saklayalım -->
+                            <input type="hidden" name="status" id="status" value="{{ old('status', 'published') }}">
                         </div>
 
                         <div class="mb-4">
@@ -702,7 +708,7 @@
                     <label for="service_purpose" class="form-label">Hizmetin Amacı</label>
                     <div class="d-flex justify-content-end mb-2">
                         <div class="form-check form-switch">
-                            <input class="form-check-input" type="checkbox" role="switch" id="is_purpose_visible" name="details[is_purpose_visible]" value="1" {{ old('details.is_purpose_visible') ? 'checked' : '' }}>
+                            <input class="form-check-input" type="checkbox" role="switch" id="is_purpose_visible" name="details[is_purpose_visible]" value="1" {{ old('details.is_purpose_visible', '1') ? 'checked' : '' }}>
                             <label class="form-check-label" for="is_purpose_visible">
                                 <span class="text-success" id="purpose_visible_text">Görünür</span>
                                 <span class="text-danger d-none" id="purpose_hidden_text">Gizli</span>
@@ -718,7 +724,7 @@
                     <label for="who_can_apply" class="form-label">Kimler Başvurabilir</label>
                     <div class="d-flex justify-content-end mb-2">
                         <div class="form-check form-switch">
-                            <input class="form-check-input" type="checkbox" role="switch" id="is_who_can_apply_visible" name="details[is_who_can_apply_visible]" value="1" {{ old('details.is_who_can_apply_visible') ? 'checked' : '' }}>
+                            <input class="form-check-input" type="checkbox" role="switch" id="is_who_can_apply_visible" name="details[is_who_can_apply_visible]" value="1" {{ old('details.is_who_can_apply_visible', '1') ? 'checked' : '' }}>
                             <label class="form-check-label" for="is_who_can_apply_visible">
                                 <span class="text-success" id="who_can_apply_visible_text">Görünür</span>
                                 <span class="text-danger d-none" id="who_can_apply_hidden_text">Gizli</span>
@@ -734,7 +740,7 @@
                     <label for="requirements" class="form-label">Başvuru Şartları</label>
                     <div class="d-flex justify-content-end mb-2">
                         <div class="form-check form-switch">
-                            <input class="form-check-input" type="checkbox" role="switch" id="is_requirements_visible" name="details[is_requirements_visible]" value="1" {{ old('details.is_requirements_visible') ? 'checked' : '' }}>
+                            <input class="form-check-input" type="checkbox" role="switch" id="is_requirements_visible" name="details[is_requirements_visible]" value="1" {{ old('details.is_requirements_visible', '1') ? 'checked' : '' }}>
                             <label class="form-check-label" for="is_requirements_visible">
                                 <span class="text-success" id="requirements_visible_text">Görünür</span>
                                 <span class="text-danger d-none" id="requirements_hidden_text">Gizli</span>
@@ -750,7 +756,7 @@
                     <label for="application_process" class="form-label">Başvuru Süreci</label>
                     <div class="d-flex justify-content-end mb-2">
                         <div class="form-check form-switch">
-                            <input class="form-check-input" type="checkbox" role="switch" id="is_application_process_visible" name="details[is_application_process_visible]" value="1" {{ old('details.is_application_process_visible') ? 'checked' : '' }}>
+                            <input class="form-check-input" type="checkbox" role="switch" id="is_application_process_visible" name="details[is_application_process_visible]" value="1" {{ old('details.is_application_process_visible', '1') ? 'checked' : '' }}>
                             <label class="form-check-label" for="is_application_process_visible">
                                 <span class="text-success" id="application_process_visible_text">Görünür</span>
                                 <span class="text-danger d-none" id="application_process_hidden_text">Gizli</span>
@@ -767,7 +773,7 @@
                         <span>İşlem Süresi Tablosu</span>
                         <div class="d-flex align-items-center">
                             <div class="form-check form-switch me-3">
-                                <input class="form-check-input" type="checkbox" role="switch" id="is_processing_times_visible" name="details[is_processing_times_visible]" value="1" {{ old('details.is_processing_times_visible') ? 'checked' : '' }}>
+                                <input class="form-check-input" type="checkbox" role="switch" id="is_processing_times_visible" name="details[is_processing_times_visible]" value="1" {{ old('details.is_processing_times_visible', '1') ? 'checked' : '' }}>
                                 <label class="form-check-label" for="is_processing_times_visible">
                                     <span class="text-success" id="processing_times_visible_text">Görünür</span>
                                     <span class="text-danger d-none" id="processing_times_hidden_text">Gizli</span>
@@ -839,7 +845,7 @@
                         <span>Ücretler Tablosu</span>
                         <div class="d-flex align-items-center">
                             <div class="form-check form-switch me-3">
-                                <input class="form-check-input" type="checkbox" role="switch" id="is_fees_visible" name="details[is_fees_visible]" value="1" {{ old('details.is_fees_visible') ? 'checked' : '' }}>
+                                <input class="form-check-input" type="checkbox" role="switch" id="is_fees_visible" name="details[is_fees_visible]" value="1" {{ old('details.is_fees_visible', '1') ? 'checked' : '' }}>
                                 <label class="form-check-label" for="is_fees_visible">
                                     <span class="text-success" id="fees_visible_text">Görünür</span>
                                     <span class="text-danger d-none" id="fees_hidden_text">Gizli</span>
@@ -911,7 +917,7 @@
                         <span>Ödeme Seçenekleri Tablosu</span>
                         <div class="d-flex align-items-center">
                             <div class="form-check form-switch me-3">
-                                <input class="form-check-input" type="checkbox" role="switch" id="is_payment_options_visible" name="details[is_payment_options_visible]" value="1" {{ old('details.is_payment_options_visible') ? 'checked' : '' }}>
+                                <input class="form-check-input" type="checkbox" role="switch" id="is_payment_options_visible" name="details[is_payment_options_visible]" value="1" {{ old('details.is_payment_options_visible', '1') ? 'checked' : '' }}>
                                 <label class="form-check-label" for="is_payment_options_visible">
                                     <span class="text-success" id="payment_options_visible_text">Görünür</span>
                                     <span class="text-danger d-none" id="payment_options_hidden_text">Gizli</span>
@@ -982,7 +988,7 @@
                     <label for="additional_info" class="form-label">Diğer Bilgiler</label>
                     <div class="d-flex justify-content-end mb-2">
                         <div class="form-check form-switch">
-                            <input class="form-check-input" type="checkbox" role="switch" id="is_additional_info_visible" name="details[is_additional_info_visible]" value="1" {{ old('details.is_additional_info_visible') ? 'checked' : '' }}>
+                            <input class="form-check-input" type="checkbox" role="switch" id="is_additional_info_visible" name="details[is_additional_info_visible]" value="1" {{ old('details.is_additional_info_visible', '1') ? 'checked' : '' }}>
                             <label class="form-check-label" for="is_additional_info_visible">
                                 <span class="text-success" id="additional_info_visible_text">Görünür</span>
                                 <span class="text-danger d-none" id="additional_info_hidden_text">Gizli</span>
@@ -998,7 +1004,7 @@
                     <label for="standard_forms" class="form-label">Standart Formlar</label>
                     <div class="d-flex justify-content-end mb-2">
                         <div class="form-check form-switch">
-                            <input class="form-check-input" type="checkbox" role="switch" id="is_standard_forms_visible" name="details[is_standard_forms_visible]" value="1" {{ old('details.is_standard_forms_visible') ? 'checked' : '' }}>
+                            <input class="form-check-input" type="checkbox" role="switch" id="is_standard_forms_visible" name="details[is_standard_forms_visible]" value="1" {{ old('details.is_standard_forms_visible', '1') ? 'checked' : '' }}>
                             <label class="form-check-label" for="is_standard_forms_visible">
                                 <span class="text-success" id="standard_forms_visible_text">Görünür</span>
                                 <span class="text-danger d-none" id="standard_forms_hidden_text">Gizli</span>

@@ -1,0 +1,57 @@
+/**
+ * Özel CSS düzeltmeleri - Alert kapatma butonları için
+ */
+
+/* Alert kapatma butonu için genel düzeltme */
+.close, .toast-close-button {
+    float: right;
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1;
+    color: #000;
+    text-shadow: 0 1px 0 #fff;
+    opacity: .5;
+    font-family: sans-serif !important; /* Web-safe font */
+}
+
+/* Arial font için düzeltme */
+button.close span {
+    font-family: Arial, sans-serif !important;
+}
+
+/* HTML entities ve Unicode karakter için düzeltme */
+.close span:after, .close:after {
+    content: "×";
+    display: inline-block;
+}
+
+/* Toastr kapatma butonu düzeltmesi */
+.toast-close-button:after {
+    content: "×" !important;
+    font-size: 20px;
+}
+
+/* Bootstrap alert kapatma butonu düzeltmesi */
+.alert-dismissible .close {
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 0.75rem 1.25rem;
+    color: inherit;
+}
+
+/* Kapatma butonunun hover durumu */
+.close:hover, .toast-close-button:hover {
+    color: #000;
+    text-decoration: none;
+    opacity: .75;
+}
+
+/* Buton iç içe olduğunda içindeki span'ı düzelt */
+button.close span[aria-hidden="true"]:after {
+    content: "" !important;
+}
+
+button.close span[aria-hidden="true"] {
+    font-family: sans-serif !important;
+} 

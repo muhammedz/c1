@@ -175,7 +175,7 @@
                                 <i class="fas fa-link me-1"></i> Oluşturulacak URL:
                             </div>
                             <div class="d-flex align-items-center">
-                                <span class="text-secondary">{{ url('/') }}/hizmet/</span>
+                                <span class="text-secondary">{{ url('/') }}/hizmetler/</span>
                                 <span class="text-primary fw-bold" id="slug-preview">{{ old('slug', $service->slug) ?: '-' }}</span>
                             </div>
                             <div class="small text-muted mt-1">
@@ -186,7 +186,10 @@
                                 <button class="btn btn-sm btn-outline-secondary" type="button" id="slug-regenerate">
                                     <i class="fas fa-sync-alt"></i> Yenile
                                 </button>
-                                </div>
+                                <a href="{{ url('/hizmetler/' . (old('slug', $service->slug) ?: '-')) }}" target="_blank" class="btn btn-sm btn-outline-info">
+                                    <i class="fas fa-external-link-alt"></i> Önizle
+                                </a>
+                            </div>
                             <small class="form-text text-muted mt-1">
                                 Otomatik oluşturulan slug'ı düzenleyebilirsiniz. Boş bırakırsanız otomatik oluşturulacaktır.
                             </small>
@@ -231,7 +234,7 @@
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                         <div id="filemanagersystem_image_preview" class="mt-2" style="display: {{ old('image', $service->image) ? 'block' : 'none' }};">
-                            <img src="{{ old('image', $service->image) ? asset(old('image', $service->image)) : '' }}" alt="Önizleme" class="img-thumbnail">
+                            <img src="{{ old('image', $service->image) ? asset(str_replace('/storage/', '', old('image', $service->image))) : '' }}" alt="Önizleme" class="img-thumbnail">
                         </div>
                         <div class="alert alert-warning mt-2" id="image-warning">
                             <i class="fas fa-exclamation-triangle me-1"></i>

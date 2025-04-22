@@ -626,6 +626,16 @@ return [
     */
 
     'plugins' => [
+        'CustomCssFixAlert' => [
+            'active' => true,
+            'files' => [
+                [
+                    'type' => 'css',
+                    'asset' => true,
+                    'location' => 'css/custom-fixes.css',
+                ],
+            ],
+        ],
         'Datatables' => [
             'active' => true,
             'files' => [
