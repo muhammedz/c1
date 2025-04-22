@@ -21,7 +21,7 @@ class NewsApiController extends Controller
      */
     public function index(Request $request)
     {
-        $query = News::published()->with(['category', 'tags']);
+        $query = News::published()->with(['category', 'tags', 'media']);
         
         // Sıralama
         $sortField = $request->input('sort_by', 'published_at');
@@ -32,7 +32,9 @@ class NewsApiController extends Controller
         $perPage = $request->input('per_page', 10);
         $news = $query->paginate($perPage);
         
-        return new NewsCollection($news);
+        // Özel JSON kodlama seçenekleri ile dönüştürme
+        $collection = new NewsCollection($news);
+        return response()->json($collection, 200, [], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
     }
     
     /**
@@ -45,13 +47,14 @@ class NewsApiController extends Controller
     {
         $news = News::where('slug', $slug)
             ->published()
-            ->with(['category', 'tags', 'galleryImages'])
+            ->with(['category', 'tags', 'media'])
             ->firstOrFail();
         
         // Görüntüleme sayısını artır
         $news->incrementViews();
         
-        return new NewsResource($news);
+        $resource = new NewsResource($news);
+        return response()->json($resource, 200, [], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
     }
     
     /**
@@ -65,12 +68,13 @@ class NewsApiController extends Controller
         $limit = $request->input('limit', 6);
         $news = News::featured()
             ->published()
-            ->with(['category', 'tags'])
+            ->with(['category', 'tags', 'media'])
             ->orderBy('published_at', 'desc')
             ->take($limit)
             ->get();
         
-        return new NewsCollection($news);
+        $collection = new NewsCollection($news);
+        return response()->json($collection, 200, [], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
     }
     
     /**
@@ -84,7 +88,8 @@ class NewsApiController extends Controller
             ->orderBy('order', 'asc')
             ->get();
         
-        return NewsCategoryResource::collection($categories);
+        $collection = NewsCategoryResource::collection($categories);
+        return response()->json($collection, 200, [], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
     }
     
     /**
@@ -100,7 +105,7 @@ class NewsApiController extends Controller
         
         $query = $category->news()
             ->published()
-            ->with(['category', 'tags']);
+            ->with(['category', 'tags', 'media']);
         
         // Sıralama
         $sortField = $request->input('sort_by', 'published_at');
@@ -111,7 +116,8 @@ class NewsApiController extends Controller
         $perPage = $request->input('per_page', 10);
         $news = $query->paginate($perPage);
         
-        return new NewsCollection($news);
+        $collection = new NewsCollection($news);
+        return response()->json($collection, 200, [], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
     }
     
     /**
@@ -137,12 +143,13 @@ class NewsApiController extends Controller
                   ->orWhere('content', 'like', "%{$query}%")
                   ->orWhere('summary', 'like', "%{$query}%");
             })
-            ->with(['category', 'tags']);
+            ->with(['category', 'tags', 'media']);
         
         // Sayfalama
         $perPage = $request->input('per_page', 10);
         $news = $newsQuery->paginate($perPage);
         
-        return new NewsCollection($news);
+        $collection = new NewsCollection($news);
+        return response()->json($collection, 200, [], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
     }
 } 

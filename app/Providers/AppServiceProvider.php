@@ -8,6 +8,7 @@ use App\Models\News;
 use App\Observers\NewsObserver;
 use Illuminate\Support\Facades\Blade;
 use App\Helpers\ImageHelper;
+use Illuminate\Http\Resources\Json\JsonResource;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -55,5 +56,11 @@ class AppServiceProvider extends ServiceProvider
                 chmod($path, 0777);
             }
         }
+
+        // JSON_UNESCAPED_UNICODE ekle - Türkçe karakterlerin düzgün görüntülenmesi için
+        JsonResource::withoutWrapping();
+        
+        // JSON kodlama ayarlarını düzenle
+        config(['app.json_encoding_options' => JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES]);
     }
 }

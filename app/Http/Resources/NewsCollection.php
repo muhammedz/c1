@@ -5,6 +5,7 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 use Illuminate\Pagination\AbstractPaginator;
+use Illuminate\Http\JsonResponse;
 
 class NewsCollection extends ResourceCollection
 {
@@ -37,5 +38,19 @@ class NewsCollection extends ResourceCollection
         }
         
         return $data;
+    }
+    
+    /**
+     * Customize the outgoing response for the resource.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Illuminate\Http\Response  $response
+     * @return void
+     */
+    public function withResponse($request, $response)
+    {
+        if ($response instanceof JsonResponse) {
+            $response->setEncodingOptions(JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | $response->getEncodingOptions());
+        }
     }
 } 
