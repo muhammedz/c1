@@ -177,10 +177,12 @@
                         <span class="material-icons mr-2 text-sm">edit_document</span>
                         Başvuru Yap
                     </a>
+                    @if(isset($service->features['is_standard_forms_visible']) && $service->features['is_standard_forms_visible'])
                     <a href="#standart-formlar" class="inline-flex items-center px-5 py-2.5 bg-white/10 text-white border border-white/20 rounded-md hover:bg-white/20 transition-colors shadow-lg shadow-black/5">
                         <span class="material-icons mr-2 text-sm">download</span>
                         Formları İndir
                     </a>
+                    @endif
                 </div>
             </div>
             <div class="hidden md:flex justify-end">
@@ -210,38 +212,54 @@
             <div class="sticky-container bg-white rounded-lg border-t-4 border-[#00352b]">
                 <h3 class="text-2xl font-bold mb-4 text-[#00352b] pb-4 border-b border-gray-200">İçindekiler</h3>
                 <nav class="flex flex-col space-y-2">
+                    @if(isset($service->features['is_purpose_visible']) && $service->features['is_purpose_visible'])
                     <a href="#hizmetin-amaci" class="flex items-center px-4 py-2 rounded-lg text-gray-600 hover:bg-[#00352b]/10 hover:text-[#00352b] font-medium transition-colors">
                         <i class="material-icons mr-3 text-lg">lightbulb</i>
                         Hizmetin Amacı
                     </a>
+                    @endif
+                    @if(isset($service->features['is_who_can_apply_visible']) && $service->features['is_who_can_apply_visible'])
                     <a href="#kimler-basvurabilir" class="flex items-center px-4 py-2 rounded-lg text-gray-600 hover:bg-[#00352b]/10 hover:text-[#00352b] font-medium transition-colors">
                         <i class="material-icons mr-3 text-lg">people</i>
                         Kimler Başvurabilir
                     </a>
+                    @endif
+                    @if(isset($service->features['is_requirements_visible']) && $service->features['is_requirements_visible'])
                     <a href="#basvuru-sartlari" class="flex items-center px-4 py-2 rounded-lg text-gray-600 hover:bg-[#00352b]/10 hover:text-[#00352b] font-medium transition-colors">
                         <i class="material-icons mr-3 text-lg">assignment</i>
                         Başvuru Şartları
                     </a>
+                    @endif
+                    @if(isset($service->features['is_application_process_visible']) && $service->features['is_application_process_visible'])
                     <a href="#basvuru-sureci" class="flex items-center px-4 py-2 rounded-lg text-gray-600 hover:bg-[#00352b]/10 hover:text-[#00352b] font-medium transition-colors">
                         <i class="material-icons mr-3 text-lg">timeline</i>
                         Başvuru Süreci
                     </a>
+                    @endif
+                    @if(isset($service->features['is_standard_forms_visible']) && $service->features['is_standard_forms_visible'])
                     <a href="#standart-formlar" class="flex items-center px-4 py-2 rounded-lg text-gray-600 hover:bg-[#00352b]/10 hover:text-[#00352b] font-medium transition-colors">
                         <i class="material-icons mr-3 text-lg">description</i>
                         Standart Formlar
                     </a>
+                    @endif
+                    @if(isset($service->features['is_processing_times_visible']) && $service->features['is_processing_times_visible'])
                     <a href="#islem-suresi" class="flex items-center px-4 py-2 rounded-lg text-gray-600 hover:bg-[#00352b]/10 hover:text-[#00352b] font-medium transition-colors">
                         <i class="material-icons mr-3 text-lg">schedule</i>
                         İşlem Süresi
                     </a>
+                    @endif
+                    @if(isset($service->features['is_fees_visible']) && $service->features['is_fees_visible'])
                     <a href="#ucretler" class="flex items-center px-4 py-2 rounded-lg text-gray-600 hover:bg-[#00352b]/10 hover:text-[#00352b] font-medium transition-colors">
                         <i class="material-icons mr-3 text-lg">payment</i>
                         Ücretler
                     </a>
+                    @endif
+                    @if(isset($service->features['is_additional_info_visible']) && $service->features['is_additional_info_visible'])
                     <a href="#diger-bilgiler" class="flex items-center px-4 py-2 rounded-lg text-gray-600 hover:bg-[#00352b]/10 hover:text-[#00352b] font-medium transition-colors">
                         <i class="material-icons mr-3 text-lg">info</i>
                         Diğer Bilgiler
                     </a>
+                    @endif
                     <a href="#ilgili-haberler" class="flex items-center px-4 py-2 rounded-lg text-gray-600 hover:bg-[#00352b]/10 hover:text-[#00352b] font-medium transition-colors">
                         <i class="material-icons mr-3 text-lg">article</i>
                         İlgili Haberler
@@ -253,8 +271,12 @@
         <!-- Sağ İçerik Alanı -->
         <div class="service-content-area">
             <!-- Hizmetin Amacı -->
+            @if(isset($service->features['is_purpose_visible']) && $service->features['is_purpose_visible'])
             <section id="hizmetin-amaci" class="service-content-section">
                 <h2>Hizmetin Amacı</h2>
+                @if(isset($service->features['service_purpose']) && !empty($service->features['service_purpose']))
+                    {!! $service->features['service_purpose'] !!}
+                @else
                 <p class="mb-4">{{ $service->title }} hizmetimiz, vatandaşlarımızın belediye kaynaklarından en hızlı ve verimli şekilde faydalanabilmesini amaçlamaktadır. Bu hizmet kapsamında, yaşam kalitenizi artıracak çözümler sunmak ve kent yaşamını daha konforlu hale getirmek için çalışmaktayız.</p>
                 <p class="mb-4">Belediyemiz tarafından sunulan bu hizmet, toplumsal ihtiyaçları karşılarken çevreye duyarlı, sürdürülebilir ve teknolojik yenilikleri içeren bir yaklaşımla tasarlanmıştır.</p>
                 
@@ -286,11 +308,17 @@
                         <p class="text-sm text-gray-600">Sorularınız için her zaman yanınızdayız.</p>
                     </div>
                 </div>
+                @endif
             </section>
+            @endif
             
             <!-- Kimler Başvurabilir -->
+            @if(isset($service->features['is_who_can_apply_visible']) && $service->features['is_who_can_apply_visible'])
             <section id="kimler-basvurabilir" class="service-content-section">
                 <h2>Kimler Başvurabilir</h2>
+                @if(isset($service->features['who_can_apply']) && !empty($service->features['who_can_apply']))
+                    {!! $service->features['who_can_apply'] !!}
+                @else
                 <p class="mb-5">{{ $service->title }} hizmetimizden aşağıdaki koşulları sağlayan vatandaşlarımız faydalanabilir:</p>
                 
                 <div class="space-y-4 mb-6">
@@ -342,11 +370,17 @@
                     </div>
                     <p class="text-sm text-[#e6a23c]/80 mt-1">Belediye sınırları dışında ikamet eden vatandaşlarımız için özel durum değerlendirmesi yapılabilmektedir. Detaylı bilgi için lütfen belediyemizle iletişime geçiniz.</p>
                 </div>
+                @endif
             </section>
+            @endif
             
             <!-- Başvuru Şartları -->
+            @if(isset($service->features['is_requirements_visible']) && $service->features['is_requirements_visible'])
             <section id="basvuru-sartlari" class="service-content-section">
                 <h2>Başvuru Şartları</h2>
+                @if(isset($service->features['requirements']) && !empty($service->features['requirements']))
+                    {!! $service->features['requirements'] !!}
+                @else
                 <p class="mb-4">{{ $service->title }} hizmetimize başvurabilmek için aşağıdaki şartları sağlamanız gerekmektedir:</p>
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
@@ -402,11 +436,17 @@
                     </div>
                     <p class="text-sm text-red-600 mt-1">Eksik belge ile yapılan başvurular değerlendirmeye alınmamaktadır. Lütfen başvuru öncesi tüm belgelerin eksiksiz olduğundan emin olunuz.</p>
                 </div>
+                @endif
             </section>
+            @endif
             
             <!-- Başvuru Süreci -->
+            @if(isset($service->features['is_application_process_visible']) && $service->features['is_application_process_visible'])
             <section id="basvuru-sureci" class="service-content-section">
                 <h2>Başvuru Süreci</h2>
+                @if(isset($service->features['application_process']) && !empty($service->features['application_process']))
+                    {!! $service->features['application_process'] !!}
+                @else
                 <p class="mb-5">{{ $service->title }} hizmetimiz için başvuru sürecinde izlemeniz gereken adımlar aşağıda belirtilmiştir:</p>
                 
                 <div class="relative border-l-2 border-gray-200 ml-3 pl-8 pb-1">
@@ -451,100 +491,39 @@
                         <h3 class="font-semibold text-gray-800 mb-2">Sonuç Bildirimi</h3>
                         <p class="text-gray-600">Başvurunuzun sonucu size SMS, e-posta veya telefon yoluyla bildirilecektir.</p>
                     </div>
-                    
-                    <div class="relative">
-                        <div class="absolute -left-10 top-0 bg-[#20846c] text-white rounded-full w-6 h-6 flex items-center justify-center">
-                            <span>5</span>
-                        </div>
-                        <h3 class="font-semibold text-gray-800 mb-2">Hizmet Sunumu</h3>
-                        <p class="text-gray-600">Başvurunuz onaylandığı takdirde, hizmetiniz planlanacak ve tarafınıza bildirilecek tarihte sunulacaktır.</p>
-                    </div>
                 </div>
+                @endif
             </section>
-            
-            <!-- Standart Formlar -->
-            <section id="standart-formlar" class="service-content-section">
-                <h2>Standart Formlar</h2>
-                <p class="mb-5">{{ $service->title }} hizmetimiz için kullanmanız gereken standart formlar aşağıda listelenmiştir. Formları indirebilir veya belediye binamızdan temin edebilirsiniz.</p>
-                
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                    <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow bg-white">
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center">
-                                <span class="material-icons text-red-500 mr-3">picture_as_pdf</span>
-                                <div>
-                                    <h3 class="font-medium text-gray-800">Başvuru Formu</h3>
-                                    <p class="text-xs text-gray-500 mt-1">PDF, 2 sayfa, 245KB</p>
-                                </div>
-                            </div>
-                            <a href="#" class="text-[#00352b] hover:text-[#20846c] transition-colors">
-                                <span class="material-icons">download</span>
-                            </a>
-                        </div>
-                    </div>
-                    
-                    <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow bg-white">
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center">
-                                <span class="material-icons text-red-500 mr-3">picture_as_pdf</span>
-                                <div>
-                                    <h3 class="font-medium text-gray-800">Taahhütname</h3>
-                                    <p class="text-xs text-gray-500 mt-1">PDF, 1 sayfa, 120KB</p>
-                                </div>
-                            </div>
-                            <a href="#" class="text-[#00352b] hover:text-[#20846c] transition-colors">
-                                <span class="material-icons">download</span>
-                            </a>
-                        </div>
-                    </div>
-                    
-                    <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow bg-white">
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center">
-                                <span class="material-icons text-green-500 mr-3">table_rows</span>
-                                <div>
-                                    <h3 class="font-medium text-gray-800">Bilgi Formu</h3>
-                                    <p class="text-xs text-gray-500 mt-1">Excel, 1 sayfa, 180KB</p>
-                                </div>
-                        </div>
-                            <a href="#" class="text-[#00352b] hover:text-[#20846c] transition-colors">
-                                <span class="material-icons">download</span>
-                            </a>
-                        </div>
-                    </div>
-                    
-                    <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow bg-white">
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center">
-                                <span class="material-icons text-[#00352b] mr-3">description</span>
-                                <div>
-                                    <h3 class="font-medium text-gray-800">Kontrol Listesi</h3>
-                                    <p class="text-xs text-gray-500 mt-1">Word, 1 sayfa, 150KB</p>
-                                </div>
-                        </div>
-                            <a href="#" class="text-[#00352b] hover:text-[#20846c] transition-colors">
-                                <span class="material-icons">download</span>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="bg-[#00352b]/5 p-4 rounded-lg border border-[#00352b]/20">
-                    <div class="flex items-center mb-2">
-                        <span class="material-icons text-[#00352b] mr-2">help</span>
-                        <h3 class="font-medium text-[#00352b]">Formları Doldurmakta Zorlanıyor musunuz?</h3>
-                    </div>
-                    <p class="text-sm text-gray-600 mb-3">Formları doldururken yardıma ihtiyacınız olursa, belediyemizin danışma hizmetinden faydalanabilirsiniz.</p>
-                    <div class="flex items-center">
-                        <span class="material-icons text-[#20846c] mr-2">phone</span>
-                        <span class="text-[#20846c] font-medium">444 1 234</span>
-                    </div>
-                </div>
-            </section>
+            @endif
             
             <!-- İşlem Süresi -->
+            @if(isset($service->features['is_processing_times_visible']) && $service->features['is_processing_times_visible'])
             <section id="islem-suresi" class="service-content-section">
                 <h2>İşlem Süresi</h2>
+                @if(isset($service->features['processing_times']) && is_array($service->features['processing_times']) && !empty($service->features['processing_times']))
+                    <p class="mb-5">{{ $service->title }} hizmetimizin işlem süreleri aşağıda detaylandırılmıştır:</p>
+                    
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full bg-white border border-gray-200 rounded-lg">
+                            <thead>
+                                <tr>
+                                    <th class="px-6 py-3 bg-[#00352b]/5 text-left text-xs font-semibold text-gray-700 uppercase border-b">İşlem Adı</th>
+                                    <th class="px-6 py-3 bg-[#00352b]/5 text-left text-xs font-semibold text-gray-700 uppercase border-b">Süre</th>
+                                    <th class="px-6 py-3 bg-[#00352b]/5 text-left text-xs font-semibold text-gray-700 uppercase border-b">Açıklama</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($service->features['processing_times'] as $item)
+                                <tr class="hover:bg-gray-50">
+                                    <td class="px-6 py-4 border-b text-sm">{{ $item['title'] ?? '' }}</td>
+                                    <td class="px-6 py-4 border-b text-sm">{{ $item['time'] ?? '' }}</td>
+                                    <td class="px-6 py-4 border-b text-sm">{{ $item['description'] ?? '' }}</td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                @else
                 <p class="mb-5">{{ $service->title }} hizmetimizin işlem süreleri aşağıda detaylandırılmıştır:</p>
                 
                 <div class="overflow-x-auto">
@@ -558,202 +537,379 @@
                         </thead>
                         <tbody>
                             <tr class="hover:bg-gray-50">
-                                <td class="px-6 py-4 border-b text-sm font-medium text-gray-800">Başvuru Değerlendirmesi</td>
-                                <td class="px-6 py-4 border-b text-sm">5-7 İş Günü</td>
-                                <td class="px-6 py-4 border-b text-sm text-gray-600">Belgelerin kontrolü ve başvurunun ön değerlendirmesi</td>
-                            </tr>
-                            <tr class="hover:bg-gray-50">
-                                <td class="px-6 py-4 border-b text-sm font-medium text-gray-800">Yerinde İnceleme</td>
+                                <td class="px-6 py-4 border-b text-sm">Başvuru Değerlendirme</td>
                                 <td class="px-6 py-4 border-b text-sm">3-5 İş Günü</td>
-                                <td class="px-6 py-4 border-b text-sm text-gray-600">Gerekli ise adresinizde yapılacak yerinde inceleme</td>
+                                <td class="px-6 py-4 border-b text-sm">Başvurunuzun ilk değerlendirmesi</td>
                             </tr>
                             <tr class="hover:bg-gray-50">
-                                <td class="px-6 py-4 border-b text-sm font-medium text-gray-800">Hizmet Planlaması</td>
+                                <td class="px-6 py-4 border-b text-sm">Evrak Kontrolü</td>
+                                <td class="px-6 py-4 border-b text-sm">1-2 İş Günü</td>
+                                <td class="px-6 py-4 border-b text-sm">Gerekli belgelerin kontrol edilmesi</td>
+                            </tr>
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-4 border-b text-sm">Onay Süreci</td>
                                 <td class="px-6 py-4 border-b text-sm">2-3 İş Günü</td>
-                                <td class="px-6 py-4 border-b text-sm text-gray-600">Onaylanan başvurular için hizmet takviminin oluşturulması</td>
+                                <td class="px-6 py-4 border-b text-sm">Yetkili birimlerden onay alınması</td>
                             </tr>
                             <tr class="hover:bg-gray-50">
-                                <td class="px-6 py-4 text-sm font-medium text-gray-800">Hizmet Sunumu</td>
-                                <td class="px-6 py-4 text-sm">1-14 Gün</td>
-                                <td class="px-6 py-4 text-sm text-gray-600">Hizmetin gerçekleştirilmesi (hizmet türüne göre değişiklik gösterebilir)</td>
+                                <td class="px-6 py-4 border-b text-sm">Hizmet Sunumu</td>
+                                <td class="px-6 py-4 border-b text-sm">5-7 İş Günü</td>
+                                <td class="px-6 py-4 border-b text-sm">Hizmetin gerçekleştirilmesi ve tamamlanması</td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
+                @endif
                 
-                <div class="bg-[#20846c]/10 border border-[#20846c]/20 rounded-lg p-4 mt-6">
-                    <div class="flex items-center mb-2">
-                        <span class="material-icons text-[#20846c] mr-2">timer</span>
-                        <h3 class="font-medium text-[#20846c]">Toplam Ortalama Süre</h3>
+                <div class="mt-4 bg-blue-50 border-l-4 border-blue-400 p-4 rounded-r">
+                    <div class="flex items-center">
+                        <span class="material-icons text-blue-500 mr-2">info</span>
+                        <p class="text-blue-700 font-medium">Bilgilendirme</p>
                     </div>
-                    <p class="text-sm text-[#20846c]/90">Başvurunuzun onaylanmasından hizmetin tamamlanmasına kadar geçen süre ortalama <strong>15-30 gün</strong> arasındadır.</p>
+                    <p class="text-sm text-blue-600 mt-1">Belirtilen süreler ortalama değerlerdir. İşlem yoğunluğu, başvuru sayısı veya özel durumlar nedeniyle değişiklik gösterebilir.</p>
                 </div>
             </section>
+            @endif
             
             <!-- Ücretler -->
+            @if(isset($service->features['is_fees_visible']) && $service->features['is_fees_visible'])
             <section id="ucretler" class="service-content-section">
                 <h2>Ücretler</h2>
-                <p class="mb-5">{{ $service->title }} hizmetimizin ücretlendirme bilgileri aşağıda belirtilmiştir:</p>
+                @if(isset($service->features['fees']) && is_array($service->features['fees']) && !empty($service->features['fees']))
+                    <p class="mb-5">{{ $service->title }} hizmetimiz için ücret tarifesi aşağıda belirtilmiştir:</p>
+                    
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full bg-white border border-gray-200 rounded-lg">
+                            <thead>
+                                <tr>
+                                    <th class="px-6 py-4 bg-[#00352b]/5 text-left text-sm font-semibold text-gray-700 border-b">Hizmet Paketi</th>
+                                    <th class="px-6 py-4 bg-[#00352b]/5 text-left text-sm font-semibold text-gray-700 border-b">Açıklama</th>
+                                    <th class="px-6 py-4 bg-[#00352b]/5 text-left text-sm font-semibold text-gray-700 border-b">Fiyat</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($service->features['fees'] as $fee)
+                                <tr class="hover:bg-gray-50 transition-colors">
+                                    <td class="px-6 py-4 border-b text-sm font-medium text-gray-800">{{ $fee['package'] ?? '' }}</td>
+                                    <td class="px-6 py-4 border-b text-sm text-gray-700">{{ $fee['description'] ?? '' }}</td>
+                                    <td class="px-6 py-4 border-b text-sm">
+                                        <span class="inline-block bg-blue-50 text-blue-700 px-3 py-1 rounded-full font-medium">{{ $fee['price'] ?? '' }}</span>
+                                    </td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                @else
+                <p class="mb-5">{{ $service->title }} hizmetimiz için ücret tarifesi aşağıda belirtilmiştir:</p>
                 
                 <div class="overflow-x-auto">
                     <table class="min-w-full bg-white border border-gray-200 rounded-lg">
                         <thead>
                             <tr>
-                                <th class="px-6 py-3 bg-[#00352b]/5 text-left text-xs font-semibold text-gray-700 uppercase border-b">Hizmet Paketi</th>
-                                <th class="px-6 py-3 bg-[#00352b]/5 text-left text-xs font-semibold text-gray-700 uppercase border-b">Açıklama</th>
-                                <th class="px-6 py-3 bg-[#00352b]/5 text-left text-xs font-semibold text-gray-700 uppercase border-b">Ücret</th>
+                                <th class="px-6 py-4 bg-[#00352b]/5 text-left text-sm font-semibold text-gray-700 border-b">Hizmet Paketi</th>
+                                <th class="px-6 py-4 bg-[#00352b]/5 text-left text-sm font-semibold text-gray-700 border-b">Açıklama</th>
+                                <th class="px-6 py-4 bg-[#00352b]/5 text-left text-sm font-semibold text-gray-700 border-b">Fiyat</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr class="hover:bg-gray-50">
-                                <td class="px-6 py-4 border-b text-sm font-medium text-gray-800">Standart Hizmet</td>
-                                <td class="px-6 py-4 border-b text-sm text-gray-600">Temel hizmet paketi</td>
-                                <td class="px-6 py-4 border-b text-sm">₺250,00</td>
+                            <tr class="hover:bg-gray-50 transition-colors">
+                                <td class="px-6 py-4 border-b text-sm font-medium text-gray-800">Standart Paket</td>
+                                <td class="px-6 py-4 border-b text-sm text-gray-700">Temel hizmetler ve destek içerir</td>
+                                <td class="px-6 py-4 border-b text-sm">
+                                    <span class="inline-block bg-blue-50 text-blue-700 px-3 py-1 rounded-full font-medium">Ücretsiz</span>
+                                </td>
                             </tr>
-                            <tr class="hover:bg-gray-50">
-                                <td class="px-6 py-4 border-b text-sm font-medium text-gray-800">Premium Hizmet</td>
-                                <td class="px-6 py-4 border-b text-sm text-gray-600">Standart hizmet + öncelikli işlem</td>
-                                <td class="px-6 py-4 border-b text-sm">₺400,00</td>
+                            <tr class="hover:bg-gray-50 transition-colors">
+                                <td class="px-6 py-4 border-b text-sm font-medium text-gray-800">Gelişmiş Paket</td>
+                                <td class="px-6 py-4 border-b text-sm text-gray-700">Standart hizmetler + öncelikli destek</td>
+                                <td class="px-6 py-4 border-b text-sm">
+                                    <span class="inline-block bg-blue-50 text-blue-700 px-3 py-1 rounded-full font-medium">150 ₺</span>
+                                </td>
                             </tr>
-                            <tr class="hover:bg-gray-50">
-                                <td class="px-6 py-4 border-b text-sm font-medium text-gray-800">Kurumsal Paket</td>
-                                <td class="px-6 py-4 border-b text-sm text-gray-600">İşletmeler için özel hizmet paketi</td>
-                                <td class="px-6 py-4 border-b text-sm">₺750,00</td>
-                            </tr>
-                            <tr class="hover:bg-gray-50">
-                                <td class="px-6 py-4 text-sm font-medium text-gray-800">Özel Durum İncelemesi</td>
-                                <td class="px-6 py-4 text-sm text-gray-600">Standart kriterlere uymayan özel durumlar için ek inceleme</td>
-                                <td class="px-6 py-4 text-sm">₺150,00</td>
+                            <tr class="hover:bg-gray-50 transition-colors">
+                                <td class="px-6 py-4 border-b text-sm font-medium text-gray-800">Premium Paket</td>
+                                <td class="px-6 py-4 border-b text-sm text-gray-700">Tüm hizmetler + özel hizmet danışmanı</td>
+                                <td class="px-6 py-4 border-b text-sm">
+                                    <span class="inline-block bg-blue-50 text-blue-700 px-3 py-1 rounded-full font-medium">300 ₺</span>
+                                </td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
+                @endif
                 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
-                    <div class="bg-[#e6a23c]/10 border border-[#e6a23c]/20 rounded-lg p-4">
-                        <div class="flex items-center mb-2">
-                            <span class="material-icons text-[#e6a23c] mr-2">credit_card</span>
-                            <h3 class="font-medium text-[#e6a23c]/90">Ödeme Yöntemleri</h3>
-                        </div>
-                        <ul class="text-sm text-[#e6a23c]/80 space-y-2">
-                            <li class="flex items-center">
-                                <span class="material-icons text-[#e6a23c]/90 mr-2 text-sm">check_circle</span>
-                                Nakit ödeme (belediye veznesi)
-                            </li>
-                            <li class="flex items-center">
-                                <span class="material-icons text-[#e6a23c]/90 mr-2 text-sm">check_circle</span>
-                                Kredi kartı (belediye veznesi ve online)
-                            </li>
-                            <li class="flex items-center">
-                                <span class="material-icons text-[#e6a23c]/90 mr-2 text-sm">check_circle</span>
-                                Banka havalesi / EFT
-                            </li>
-                        </ul>
+                <div class="mt-6 bg-[#00352b]/10 p-5 rounded-lg flex items-start">
+                    <div class="flex-shrink-0 mr-4">
+                        <span class="material-icons text-[#00352b] text-3xl">payments</span>
                     </div>
-                    
-                    <div class="bg-[#00352b]/10 border border-[#00352b]/20 rounded-lg p-4">
-                        <div class="flex items-center mb-2">
-                            <span class="material-icons text-[#00352b] mr-2">groups</span>
-                            <h3 class="font-medium text-[#00352b]">İndirimli Gruplar</h3>
-                        </div>
-                        <ul class="text-sm text-[#00352b]/80 space-y-2">
-                            <li class="flex items-center">
-                                <span class="material-icons text-[#00352b]/90 mr-2 text-sm">check_circle</span>
-                                65 yaş üzeri vatandaşlar (%50)
-                            </li>
-                            <li class="flex items-center">
-                                <span class="material-icons text-[#00352b]/90 mr-2 text-sm">check_circle</span>
-                                Engelli vatandaşlar (%50)
-                            </li>
-                            <li class="flex items-center">
-                                <span class="material-icons text-[#00352b]/90 mr-2 text-sm">check_circle</span>
-                                Öğrenciler (%25)
-                            </li>
-                            <li class="flex items-center">
-                                <span class="material-icons text-[#00352b]/90 mr-2 text-sm">check_circle</span>
-                                Şehit yakınları ve gaziler (Ücretsiz)
-                            </li>
-                        </ul>
+                    <div>
+                        <h3 class="font-semibold text-lg text-[#00352b] mb-2">Ödeme Seçenekleri</h3>
+                        <p class="text-gray-700 text-sm mb-4">Belediyemiz hizmet ücretlerinizi aşağıdaki yöntemlerle ödeyebilirsiniz:</p>
+                        
+                        @if(isset($service->features['payment_options']) && is_array($service->features['payment_options']) && !empty($service->features['payment_options']))
+                            <div class="grid grid-cols-1 sm:grid-cols-1 gap-3">
+                                @foreach($service->features['payment_options'] as $option)
+                                <div class="flex items-center">
+                                    <span class="material-icons text-gray-500 mr-2 text-sm">payment</span>
+                                    <div>
+                                        <span class="text-sm font-medium text-gray-700">{{ $option['method'] ?? '' }}</span>
+                                        @if(isset($option['term']) && !empty($option['term']))
+                                        <span class="text-sm text-gray-500 ml-2">({{ $option['term'] }})</span>
+                                        @endif
+                                        @if(isset($option['description']) && !empty($option['description']))
+                                        <p class="text-xs text-gray-600 mt-1">{{ $option['description'] }}</p>
+                                        @endif
+                                    </div>
+                                </div>
+                                @endforeach
+                            </div>
+                        @else
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <div class="flex items-center">
+                                    <span class="material-icons text-gray-500 mr-2 text-sm">credit_card</span>
+                                    <span class="text-sm text-gray-700">Kredi/Banka Kartı</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <span class="material-icons text-gray-500 mr-2 text-sm">account_balance</span>
+                                    <span class="text-sm text-gray-700">Havale/EFT</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <span class="material-icons text-gray-500 mr-2 text-sm">apps</span>
+                                    <span class="text-sm text-gray-700">Online Ödeme</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <span class="material-icons text-gray-500 mr-2 text-sm">local_atm</span>
+                                    <span class="text-sm text-gray-700">Belediye Vezneleri</span>
+                                </div>
+                            </div>
+                        @endif
                     </div>
                 </div>
             </section>
+            @endif
             
             <!-- Diğer Bilgiler -->
+            @if(isset($service->features['is_additional_info_visible']) && $service->features['is_additional_info_visible'])
             <section id="diger-bilgiler" class="service-content-section">
                 <h2>Diğer Bilgiler</h2>
+                @if(isset($service->features['additional_info']) && !empty($service->features['additional_info']))
+                    {!! $service->features['additional_info'] !!}
+                @else
+                <p class="mb-4">{{ $service->title }} hizmetimiz ile ilgili bilmeniz gereken diğer önemli bilgiler:</p>
                 
-                <div class="space-y-5">
-                    <div class="border border-gray-200 rounded-lg overflow-hidden">
-                        <details class="group">
-                            <summary class="flex items-center justify-between cursor-pointer bg-white p-4 font-medium text-gray-800 hover:bg-[#00352b]/5 transition-colors">
-                                <span>Hizmet kapsamı değiştirilebilir mi?</span>
-                                <span class="material-icons text-[#00352b] transition-transform group-open:rotate-180">expand_more</span>
-                            </summary>
-                            <div class="p-4 bg-[#00352b]/5 border-t border-gray-200">
-                                <p class="text-gray-700">Evet, hizmet kapsamı ihtiyaçlarınıza göre özelleştirilebilir. Başvuru sırasında özel taleplerinizi belirtebilirsiniz. Uzman ekibimiz size en uygun çözümü sunacaktır.</p>
+                <div class="space-y-6 mb-6">
+                    <div class="bg-white border border-gray-200 rounded-lg p-5">
+                        <h3 class="font-semibold text-lg text-[#00352b] mb-3 border-b pb-2">Sık Sorulan Sorular</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <h4 class="font-medium text-gray-800 mb-1">Başvuru durumumu nasıl öğrenebilirim?</h4>
+                                <p class="text-gray-600 text-sm">Başvuru durumunuzu online sistem üzerinden takip edebilir veya çağrı merkezimizi arayabilirsiniz.</p>
                             </div>
-                        </details>
+                            <div>
+                                <h4 class="font-medium text-gray-800 mb-1">Eksik belge tamamlama süresi var mı?</h4>
+                                <p class="text-gray-600 text-sm">Eksik belge tamamlama için başvuru tarihinden itibaren 15 gün süreniz bulunmaktadır.</p>
+                            </div>
+                            <div>
+                                <h4 class="font-medium text-gray-800 mb-1">Bu hizmeti yılda kaç kez kullanabilirim?</h4>
+                                <p class="text-gray-600 text-sm">Bu hizmet, yılda bir kez kullanılabilmektedir. Özel durumlar için belediyemizle iletişime geçebilirsiniz.</p>
+                            </div>
+                        </div>
                     </div>
-                    <div class="border border-gray-200 rounded-lg overflow-hidden">
-                        <details class="group">
-                            <summary class="flex items-center justify-between cursor-pointer bg-white p-4 font-medium text-gray-800 hover:bg-[#00352b]/5 transition-colors">
-                                <span>Hizmet süresi uzatılabilir mi?</span>
-                                <span class="material-icons text-[#00352b] transition-transform group-open:rotate-180">expand_more</span>
-                            </summary>
-                            <div class="p-4 bg-[#00352b]/5 border-t border-gray-200">
-                                <p class="text-gray-700">Evet, ihtiyaçlarınıza göre hizmet süresi uzatılabilir. Hizmet süresi dolmadan önce talebinizi iletmeniz durumunda ek süre planlaması yapılabilir.</p>
-                            </div>
-                        </details>
-                    </div>
-                    <div class="border border-gray-200 rounded-lg overflow-hidden">
-                        <details class="group">
-                            <summary class="flex items-center justify-between cursor-pointer bg-white p-4 font-medium text-gray-800 hover:bg-[#00352b]/5 transition-colors">
-                                <span>Başvurum ne zaman sonuçlanır?</span>
-                                <span class="material-icons text-[#00352b] transition-transform group-open:rotate-180">expand_more</span>
-                            </summary>
-                            <div class="p-4 bg-[#00352b]/5 border-t border-gray-200">
-                                <p class="text-gray-700">Başvurunuz, belgelerin eksiksiz olması durumunda ortalama 5-7 iş günü içerisinde değerlendirilir. Sonuç size SMS, e-posta veya telefon yoluyla bildirilir.</p>
-                            </div>
-                        </details>
-                    </div>
-                    <div class="border border-gray-200 rounded-lg overflow-hidden">
-                        <details class="group">
-                            <summary class="flex items-center justify-between cursor-pointer bg-white p-4 font-medium text-gray-800 hover:bg-[#00352b]/5 transition-colors">
-                                <span>Başvurum reddedilirse ne yapmalıyım?</span>
-                                <span class="material-icons text-[#00352b] transition-transform group-open:rotate-180">expand_more</span>
-                            </summary>
-                            <div class="p-4 bg-[#00352b]/5 border-t border-gray-200">
-                                <p class="text-gray-700">Başvurunuzun reddedilmesi durumunda, ret gerekçesi size bildirilecektir. Bu gerekçeye göre eksiklikleri tamamlayarak yeniden başvuru yapabilirsiniz. Ayrıca itiraz hakkınızı da kullanabilirsiniz.</p>
-                            </div>
-                        </details>
+                    
+                    <div class="bg-white border border-gray-200 rounded-lg p-5">
+                        <h3 class="font-semibold text-lg text-[#00352b] mb-3 border-b pb-2">İlgili Mevzuat</h3>
+                        <ul class="space-y-2">
+                            <li class="flex items-start">
+                                <span class="material-icons text-gray-500 mr-2 text-sm mt-0.5">description</span>
+                                <span class="text-gray-700 text-sm">5393 Sayılı Belediye Kanunu</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="material-icons text-gray-500 mr-2 text-sm mt-0.5">description</span>
+                                <span class="text-gray-700 text-sm">2464 Sayılı Belediye Gelirleri Kanunu</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="material-icons text-gray-500 mr-2 text-sm mt-0.5">description</span>
+                                <span class="text-gray-700 text-sm">Belediye Hizmetleri Uygulama Yönetmeliği</span>
+                            </li>
+                        </ul>
                     </div>
                 </div>
                 
-                <h3 class="text-xl font-bold text-[#00352b] mt-8 mb-4">İlgili Mevzuat</h3>
-                <ul class="space-y-3">
-                    <li class="flex items-start">
-                        <span class="material-icons text-[#00352b] mr-2 text-sm mt-1">gavel</span>
-                        <div>
-                            <p class="text-gray-800 font-medium">5393 Sayılı Belediye Kanunu</p>
-                            <p class="text-sm text-gray-600">Madde 14-15: Belediye Hizmetleri</p>
+                <div class="bg-[#e6a23c]/10 border-l-4 border-[#e6a23c] p-4 rounded-r mb-6">
+                    <div class="flex items-center">
+                        <span class="material-icons text-[#e6a23c] mr-2">tips_and_updates</span>
+                        <p class="text-[#e6a23c]/90 font-medium">Yararlı İpucu</p>
+                    </div>
+                    <p class="text-sm text-[#e6a23c]/80 mt-1">Başvuru formunu online olarak doldurarak işlemlerinizi daha hızlı gerçekleştirebilirsiniz.</p>
+                </div>
+                
+                <div class="bg-gray-50 rounded-lg p-5">
+                    <h3 class="font-semibold text-lg text-gray-800 mb-4">İletişim Bilgileri</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <div class="flex items-start">
+                            <span class="material-icons text-[#00352b] mr-3 mt-1">phone</span>
+                            <div>
+                                <p class="font-medium text-gray-700 mb-1">Telefon</p>
+                                <p class="text-gray-600 text-sm">444 1 234</p>
+                            </div>
                         </div>
-                    </li>
-                    <li class="flex items-start">
-                        <span class="material-icons text-[#00352b] mr-2 text-sm mt-1">gavel</span>
-                        <div>
-                            <p class="text-gray-800 font-medium">Belediye Hizmetlerine İlişkin Yönetmelik</p>
-                            <p class="text-sm text-gray-600">Madde 8-12: Hizmet Standartları</p>
+                        <div class="flex items-start">
+                            <span class="material-icons text-[#00352b] mr-3 mt-1">email</span>
+                            <div>
+                                <p class="font-medium text-gray-700 mb-1">E-posta</p>
+                                <p class="text-gray-600 text-sm">hizmet@belediye.gov.tr</p>
+                            </div>
                         </div>
-                    </li>
-                    <li class="flex items-start">
-                        <span class="material-icons text-[#00352b] mr-2 text-sm mt-1">gavel</span>
-                        <div>
-                            <p class="text-gray-800 font-medium">2464 Sayılı Belediye Gelirleri Kanunu</p>
-                            <p class="text-sm text-gray-600">Madde 70-80: Ücretlendirme Esasları</p>
+                        <div class="flex items-start">
+                            <span class="material-icons text-[#00352b] mr-3 mt-1">location_on</span>
+                            <div>
+                                <p class="font-medium text-gray-700 mb-1">Adres</p>
+                                <p class="text-gray-600 text-sm">Belediye Hizmet Binası, Merkez Mah. Belediye Cad. No:1</p>
+                            </div>
                         </div>
-                    </li>
-                </ul>
+                        <div class="flex items-start">
+                            <span class="material-icons text-[#00352b] mr-3 mt-1">schedule</span>
+                            <div>
+                                <p class="font-medium text-gray-700 mb-1">Çalışma Saatleri</p>
+                                <p class="text-gray-600 text-sm">Pazartesi - Cuma: 08:30 - 17:00</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                @endif
             </section>
+            @endif
+            
+            <!-- Standart Formlar -->
+            @if(isset($service->features['is_standard_forms_visible']) && $service->features['is_standard_forms_visible'])
+            <section id="standart-formlar" class="service-content-section">
+                <h2>Standart Formlar</h2>
+                @if(isset($service->features['standard_forms']) && !empty($service->features['standard_forms']))
+                    {!! $service->features['standard_forms'] !!}
+                    
+                    @if(isset($service->features['documents']) && is_array($service->features['documents']) && !empty($service->features['documents']))
+                    <div class="mt-6">
+                        <h3 class="font-semibold text-lg text-gray-800 mb-4">İndirilebilir Dosyalar</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                            @foreach($service->features['documents'] as $document)
+                            <div class="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-all">
+                                <div class="p-5 flex flex-col h-full">
+                                    <div class="flex items-center mb-3">
+                                        <span class="material-icons text-[#00352b] mr-2">description</span>
+                                        <h3 class="font-semibold text-gray-800">{{ $document['name'] }}</h3>
+                                    </div>
+                                    @if(isset($document['description']) && !empty($document['description']))
+                                    <p class="text-sm text-gray-600 mb-4">{{ $document['description'] }}</p>
+                                    @endif
+                                    <div class="mt-auto flex items-center">
+                                        <a href="{{ $document['file'] }}" target="_blank" class="inline-flex items-center text-[#00352b] hover:text-[#20846c] transition-colors">
+                                            <span class="material-icons mr-1 text-sm">file_download</span>
+                                            <span class="text-sm font-medium">İndir</span>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            @endforeach
+                        </div>
+                    </div>
+                    @endif
+                @else
+                <p class="mb-5">{{ $service->title }} hizmetimiz için gerekli olan tüm formları aşağıda bulabilirsiniz:</p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div class="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-all">
+                        <div class="p-5 flex flex-col h-full">
+                            <div class="flex items-center mb-3">
+                                <span class="material-icons text-[#00352b] mr-2">description</span>
+                                <h3 class="font-semibold text-gray-800">Başvuru Formu</h3>
+                            </div>
+                            <p class="text-sm text-gray-600 mb-4">Hizmet başvurusu için doldurulması gereken temel form. Eksiksiz doldurulmalıdır.</p>
+                            <div class="mt-auto flex items-center">
+                                <a href="/uploads/forms/basvuru-formu.pdf" class="inline-flex items-center text-[#00352b] hover:text-[#20846c] transition-colors">
+                                    <span class="material-icons mr-1 text-sm">file_download</span>
+                                    <span class="text-sm font-medium">İndir (PDF)</span>
+                                </a>
+                                <span class="mx-2 text-gray-300">|</span>
+                                <a href="/online-formlar/basvuru" class="inline-flex items-center text-[#00352b] hover:text-[#20846c] transition-colors">
+                                    <span class="material-icons mr-1 text-sm">edit</span>
+                                    <span class="text-sm font-medium">Online Doldur</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-all">
+                        <div class="p-5 flex flex-col h-full">
+                            <div class="flex items-center mb-3">
+                                <span class="material-icons text-[#00352b] mr-2">description</span>
+                                <h3 class="font-semibold text-gray-800">Taahhütname</h3>
+                            </div>
+                            <p class="text-sm text-gray-600 mb-4">Hizmet sürecinde uyulması gereken kuralları içeren taahhütname formu.</p>
+                            <div class="mt-auto flex items-center">
+                                <a href="/uploads/forms/taahhutname.pdf" class="inline-flex items-center text-[#00352b] hover:text-[#20846c] transition-colors">
+                                    <span class="material-icons mr-1 text-sm">file_download</span>
+                                    <span class="text-sm font-medium">İndir (PDF)</span>
+                                </a>
+                                <span class="mx-2 text-gray-300">|</span>
+                                <a href="/online-formlar/taahhutname" class="inline-flex items-center text-[#00352b] hover:text-[#20846c] transition-colors">
+                                    <span class="material-icons mr-1 text-sm">edit</span>
+                                    <span class="text-sm font-medium">Online Doldur</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-all">
+                        <div class="p-5 flex flex-col h-full">
+                            <div class="flex items-center mb-3">
+                                <span class="material-icons text-[#00352b] mr-2">description</span>
+                                <h3 class="font-semibold text-gray-800">Bilgilendirme Formu</h3>
+                            </div>
+                            <p class="text-sm text-gray-600 mb-4">Hizmet hakkında detaylı bilgileri içeren formudur.</p>
+                            <div class="mt-auto flex items-center">
+                                <a href="/uploads/forms/bilgilendirme-formu.pdf" class="inline-flex items-center text-[#00352b] hover:text-[#20846c] transition-colors">
+                                    <span class="material-icons mr-1 text-sm">file_download</span>
+                                    <span class="text-sm font-medium">İndir (PDF)</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-all">
+                        <div class="p-5 flex flex-col h-full">
+                            <div class="flex items-center mb-3">
+                                <span class="material-icons text-[#00352b] mr-2">description</span>
+                                <h3 class="font-semibold text-gray-800">İtiraz Formu</h3>
+                            </div>
+                            <p class="text-sm text-gray-600 mb-4">Hizmet sürecinde itiraz etmek istediğiniz durumlar için doldurulması gereken formdur.</p>
+                            <div class="mt-auto flex items-center">
+                                <a href="/uploads/forms/itiraz-formu.pdf" class="inline-flex items-center text-[#00352b] hover:text-[#20846c] transition-colors">
+                                    <span class="material-icons mr-1 text-sm">file_download</span>
+                                    <span class="text-sm font-medium">İndir (PDF)</span>
+                                </a>
+                                <span class="mx-2 text-gray-300">|</span>
+                                <a href="/online-formlar/itiraz" class="inline-flex items-center text-[#00352b] hover:text-[#20846c] transition-colors">
+                                    <span class="material-icons mr-1 text-sm">edit</span>
+                                    <span class="text-sm font-medium">Online Doldur</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-[#00352b]/5 p-5 rounded-lg border-l-4 border-[#00352b]">
+                    <div class="flex items-start">
+                        <span class="material-icons text-[#00352b] mt-1 mr-3">help</span>
+                        <div>
+                            <h3 class="font-semibold text-[#00352b] mb-2">Formlara Erişimde Sorun mu Yaşıyorsunuz?</h3>
+                            <p class="text-sm text-gray-700">Formların basılı nüshalarını belediye binasında Vatandaş İlişkileri Masası'ndan temin edebilirsiniz. Dilerseniz <a href="/iletisim" class="text-blue-600 hover:underline">bizimle iletişime geçin</a>, formları posta yoluyla tarafınıza ulaştıralım.</p>
+                        </div>
+                    </div>
+                </div>
+                @endif
+            </section>
+            @endif
             
             <!-- İlgili Haberler -->
             <section id="ilgili-haberler" class="service-content-section">

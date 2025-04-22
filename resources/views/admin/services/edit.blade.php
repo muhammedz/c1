@@ -1,227 +1,85 @@
 @extends('adminlte::page')
 
-@section('title', 'Hizmet Düzenle: ' . $service->title)
+@section('title', 'Hizmet Düzenle')
 
-@section('styles')
-<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css" rel="stylesheet">
-<link href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/min/dropzone.min.css" rel="stylesheet">
-<link href="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/css/tom-select.bootstrap5.min.css" rel="stylesheet">
+@section('css')
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css">
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet" />
+
 <style>
-    .content-wrapper {
-        background-color: #f4f6f9;
-    }
-    
-    .form-label {
-        font-weight: 600;
-        margin-bottom: 0.5rem;
-        color: #2c3e50;
-    }
-    
-    .card {
-        border: none;
-        box-shadow: 0 0 20px rgba(0,0,0,.08);
-        margin-bottom: 1.5rem;
-    }
-    
-    .card-header {
-        background-color: #fff;
-        border-bottom: 1px solid #edf2f7;
-        padding: 1rem 1.25rem;
-    }
-    
-    .card-header h5 {
-        margin: 0;
-        font-size: 1rem;
-        font-weight: 600;
-    }
-    
-    .card-body {
-        padding: 1.5rem;
-    }
-    
-    .form-control, .form-select {
-        border-color: #e2e8f0;
-        padding: 0.6rem 1rem;
-    }
-    
-    .form-control:focus, .form-select:focus {
-        border-color: #3490dc;
-        box-shadow: 0 0 0 0.2rem rgba(52,144,220,.25);
-    }
-    
-    .dropzone {
-        border: 2px dashed #3490dc;
-        border-radius: 8px;
-        background: #f8fafc;
-        min-height: 150px;
-        padding: 20px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        transition: all 0.3s ease;
-    }
-    
-    .dropzone:hover {
-        border-color: #2779bd;
-        background: #f1f7fe;
-    }
-    
-    .gallery-container {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-        gap: 15px;
-        margin-top: 1rem;
-    }
-    
-    .gallery-item {
-        position: relative;
-        aspect-ratio: 1;
-        border-radius: 8px;
-        overflow: hidden;
-        box-shadow: 0 2px 4px rgba(0,0,0,.1);
-        background-color: #f8f9fa;
-        border: 1px solid #dee2e6;
-    }
-    
-    .gallery-item img {
-        width: 100% !important;
-        height: 100% !important;
-        object-fit: cover !important;
-        max-height: none !important;
-    }
-    
-    .gallery-item .remove-btn {
-        position: absolute;
-        top: 8px;
-        right: 8px;
-        background: rgba(255,255,255,.9);
-        border-radius: 50%;
-        width: 28px;
-        height: 28px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        border: none;
-        color: #e3342f;
-    }
-    
-    .gallery-item .remove-btn:hover {
-        background: #fff;
-        transform: scale(1.1);
-    }
-    
-    .ts-wrapper {
-        border: 1px solid #dee2e6;
-        border-radius: 0.375rem;
-        box-shadow: none;
-    }
-    
-    .ts-wrapper.focus {
-        border-color: #86b7fe;
-        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
-    }
-    
-    .ts-control {
-        border: none !important;
-        padding: 0.375rem 0.75rem;
-    }
-    
-    /* Ana görsel için stil */
-    #image-preview {
-        background: #f8fafc;
-        border-radius: 8px;
-        text-align: center;
-        max-width: 100%;
-        margin-top: 15px;
-        box-shadow: 0 1px 3px rgba(0,0,0,.1);
-        padding: 10px;
-        border: 1px solid #e9ecef;
-    }
-    
-    #image-preview img {
-        max-height: 200px !important;
-        max-width: 100% !important;
-        width: auto !important;
-        height: auto !important;
-        object-fit: contain !important;
-    }
-    
-    /* Durum seçim kartları için */
-    .status-option {
-        cursor: pointer;
-        transition: all 0.25s ease;
-        border-width: 2px !important;
-        border-radius: 10px !important;
-        height: 100%;
-        position: relative;
-        overflow: hidden;
-    }
-    
-    .status-option:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 5px 15px rgba(0,0,0,0.15);
-        border-color: #b8daff !important;
-    }
-    
-    .status-option.active {
-        border-color: #3490dc !important;
-        background-color: #e6f2ff !important;
-        box-shadow: 0 0 0 3px rgba(52,144,220,0.25);
-    }
-    
     .validation-errors-summary {
         background-color: #f8d7da;
         border: 1px solid #f5c6cb;
         border-radius: 0.25rem;
-        padding: 1rem;
-        margin-bottom: 20px;
         color: #721c24;
+        padding: 0.75rem 1.25rem;
     }
-    
-    .validation-errors-summary ul {
-        margin-bottom: 0;
-        padding-left: 20px;
-    }
-    
+
     .validation-errors-summary h5 {
+        font-size: 1.25rem;
+        margin-bottom: 0.5rem;
         display: flex;
         align-items: center;
-        margin-bottom: 10px;
-        font-size: 1rem;
     }
-    
+
     .validation-errors-summary h5 i {
         margin-right: 0.5rem;
     }
-    
-    /* Kategori ve Etiket Kartları İçin Stiller */
-    .category-card, .tag-card {
-        background-color: #f8f9fa;
-        border: 1px solid #e9ecef;
-        border-radius: 0.5rem;
-        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+
+    .validation-errors-summary ul {
+        margin-bottom: 0;
+        padding-left: 1rem;
     }
     
-    .category-card .card-header, .tag-card .card-header {
-        background-color: #fff;
-        border-bottom: 1px solid #e9ecef;
-        padding: 0.75rem 1rem;
-        font-weight: 600;
+    .status-option {
+        position: relative;
+        transition: all 0.2s ease;
     }
     
-    .category-card .card-body, .tag-card .card-body {
-        padding: 1rem;
+    .status-option.active {
+        border-color: #3490dc !important;
+        box-shadow: 0 0 0 0.2rem rgba(52, 144, 220, 0.25);
+    }
+    
+    .status-option:hover {
+        transform: translateY(-2px);
+    }
+    
+    .status-card {
+        flex: 1;
+        max-width: 200px;
+    }
+    
+    .compact .status-option {
+        padding: 10px;
+    }
+    
+    .compact .status-option .card-body {
+        padding: 0.5rem;
+    }
+    
+    .compact .status-option .card-title {
+        font-size: 0.9rem;
+        margin-bottom: 0.25rem;
+    }
+    
+    .compact .status-option .card-text {
+        font-size: 0.8rem;
+    }
+    
+    .tox-tinymce {
+        border-radius: 0.25rem !important;
     }
     
     .category-badge {
         display: inline-flex;
         align-items: center;
-        background: #e9ecef;
+        background-color: #e9ecef;
         border-radius: 0.25rem;
         padding: 0.25rem 0.5rem;
-        margin: 0.125rem;
+        margin-right: 0.5rem;
+        margin-bottom: 0.5rem;
         font-size: 0.875rem;
     }
     
@@ -336,126 +194,43 @@
                                 
                     <div class="mb-4">
                         <label for="content" class="form-label">İçerik <span class="text-danger">*</span></label>
-                                    <textarea class="form-control @error('content') is-invalid @enderror" id="content" name="content" rows="10">{{ old('content', $service->content) }}</textarea>
-                                    @error('content')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
+                        <textarea class="form-control tinymce-full @error('content') is-invalid @enderror" id="content" name="content" rows="10">{{ old('content', $service->content) }}</textarea>
+                        @error('content')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
                     </div>
                                 </div>
                             </div>
 
-            <!-- Medya -->
+            <!-- Hizmet Görseli -->
             <div class="card mb-4">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">Medya</h5>
+                <div class="card-header">
+                    <h5 class="mb-0">Hizmet Görseli</h5>
                 </div>
                 <div class="card-body">
+                    <!-- FileManagerSystem Görsel -->
                     <div class="mb-4">
-                        <label for="image" class="form-label">Ana Görsel <span class="text-danger">*</span></label>
+                        <label for="filemanagersystem_image" class="form-label">Hizmet Görseli <span class="text-danger">*</span></label>
                         <div class="input-group">
-                            <input type="text" class="form-control @error('image') is-invalid @enderror" id="image" name="image" value="{{ old('image', $service->image) }}" readonly>
-                            <button class="btn btn-primary" type="button" id="image-browser" data-input="image" data-preview="image-preview">
-                                <i class="fas fa-folder-open"></i> Göz At
-                            </button>
-                            <button class="btn btn-danger" type="button" id="image-clear">
-                                <i class="fas fa-times"></i>
+                            <input type="text" class="form-control @error('image') is-invalid @enderror" id="filemanagersystem_image" name="image" value="{{ old('image', $service->image) }}">
+                            <button type="button" class="btn btn-primary" id="filemanagersystem_image_button">
+                                <i class="fas fa-image"></i> Görsel Seç
                             </button>
                         </div>
-                        <div id="image-preview" class="mt-3" style="display: {{ old('image', $service->image) ? 'block' : 'none' }};">
-                            <div class="position-relative d-inline-block">
-                                <img src="{{ old('image', $service->image) ? asset('storage/' . str_replace('/storage/', '', old('image', $service->image))) : '' }}" class="img-fluid" alt="Seçilen görsel" style="max-height: 200px; max-width: 100%; width: auto; height: auto; object-fit: contain;">
-                                </div>
-                                    </div>
-                                    @error('image')
-                                        <div class="invalid-feedback d-block">{{ $message }}</div>
-                                    @enderror
-                        <small class="text-muted mt-2 d-block">
-                            <i class="fas fa-info-circle"></i> Önerilen görsel boyutu: 1200x630 piksel
-                        </small>
-                                </div>
-                                
-                    <div class="mb-4">
-                        <label class="form-label d-flex justify-content-between align-items-center">
-                            <span>Galeri</span>
-                            <small class="text-muted">En fazla 10 görsel ekleyebilirsiniz</small>
-                        </label>
-                        <div class="d-flex mb-3">
-                            <button type="button" id="gallery-browser" class="btn btn-outline-primary" data-input="fake-gallery-input">
-                                <i class="fas fa-images me-1"></i> Görsel Ekle
-                            </button>
-                        </div>
-                        <input type="hidden" id="fake-gallery-input" class="fake-gallery-input">
-                        <div class="gallery-container" id="gallery-preview">
-                            @if(is_array($service->gallery))
-                                @foreach($service->gallery as $index => $image)
-                                <div class="gallery-item">
-                                    <img src="{{ asset('storage/' . str_replace('/storage/', '', $image)) }}" alt="Galeri görseli">
-                                    <button type="button" class="remove-btn" data-index="{{ $index }}">
-                                        <i class="fas fa-times"></i>
-                                    </button>
-                                    <input type="hidden" name="gallery[]" value="{{ $image }}">
-                                </div>
-                                @endforeach
-                            @endif
-                        </div>
-                        <div id="gallery-inputs">
-                            @if(is_array($service->gallery))
-                                @foreach($service->gallery as $index => $image)
-                                <input type="hidden" data-index="{{ $index }}" value="{{ $image }}">
-                                @endforeach
-                            @endif
-                        </div>
-                        @error('gallery')
-                            <div class="invalid-feedback d-block">{{ $message }}</div>
+                        @error('image')
+                            <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
-                        @error('gallery.*')
-                            <div class="invalid-feedback d-block">{{ $message }}</div>
-                        @enderror
-                    </div>
-                    
-                    <!-- Hero Özellikleri -->
-                    <div class="mb-4">
-                        <label class="form-label d-flex justify-content-between align-items-center">
-                            <span>Hero Özellikleri</span>
-                            <small class="text-muted">Hizmet detay sayfasında gösterilecek özellikler</small>
-                        </label>
-                        
-                        <div class="card">
-                            <div class="card-body">
-                                <p class="text-muted small mb-3">Bu özellikler hizmet detay sayfasında ana görsel üzerinde listelenecektir.</p>
-                                
-                                <div id="features-container">
-                                    @if(old('features', $service->features))
-                                        @foreach(old('features', $service->features) as $index => $feature)
-                                            <div class="feature-item mb-2 d-flex align-items-center">
-                                                <input type="text" class="form-control" name="features[]" value="{{ $feature }}" placeholder="Özellik ekleyin">
-                                                <button type="button" class="btn btn-sm btn-danger ms-2 remove-feature"><i class="fas fa-times"></i></button>
-                                            </div>
-                                        @endforeach
-                                    @else
-                                        <div class="feature-item mb-2 d-flex align-items-center">
-                                            <input type="text" class="form-control" name="features[]" placeholder="Özellik ekleyin">
-                                            <button type="button" class="btn btn-sm btn-danger ms-2 remove-feature"><i class="fas fa-times"></i></button>
-                                        </div>
-                                    @endif
-                                </div>
-                                
-                                <button type="button" id="add-feature" class="btn btn-sm btn-outline-primary mt-2">
-                                    <i class="fas fa-plus me-1"></i> Özellik Ekle
-                                </button>
-                            </div>
+                        <div id="filemanagersystem_image_preview" class="mt-2" style="display: {{ old('image', $service->image) ? 'block' : 'none' }};">
+                            <img src="{{ old('image', $service->image) ? asset(old('image', $service->image)) : '' }}" alt="Önizleme" class="img-thumbnail">
                         </div>
-                        
-                        @error('features')
-                            <div class="invalid-feedback d-block">{{ $message }}</div>
-                        @enderror
-                        @error('features.*')
-                            <div class="invalid-feedback d-block">{{ $message }}</div>
-                        @enderror
+                        <div class="alert alert-warning mt-2" id="image-warning">
+                            <i class="fas fa-exclamation-triangle me-1"></i>
+                            <strong>Not:</strong> Hizmet görsel alanı opsiyoneldir. İsterseniz bir görsel seçebilirsiniz.
+                        </div>
                     </div>
                 </div>
-                                </div>
-                                
+            </div>
+
             <!-- CTA Ayarları -->
             <div class="card mb-4">
                 <div class="card-header">
@@ -722,6 +497,395 @@
                 </a>
             </div>
         </div>
+        
+        <!-- Detay Sayfası İçeriği -->
+        <div class="card">
+            <div class="card-header">
+                <h5>Detay Sayfası İçeriği</h5>
+                <small class="text-muted">Hizmet detay sayfasında gösterilecek özel içerik bölümleri.</small>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i> Bu bölümdeki içerikler, hizmet detay sayfasında bulunan özel bölümlerde gösterilecektir. İçerikler zengin metin editörü ile düzenlenebilir.
+                </div>
+                
+                <!-- Hizmetin Amacı -->
+                <div class="mb-4">
+                    <label for="service_purpose" class="form-label">Hizmetin Amacı</label>
+                    <div class="d-flex justify-content-end mb-2">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" role="switch" id="is_purpose_visible" name="details[is_purpose_visible]" value="1" {{ old('details.is_purpose_visible', isset($service->features['is_purpose_visible']) && $service->features['is_purpose_visible']) ? 'checked' : '' }}>
+                            <label class="form-check-label" for="is_purpose_visible">
+                                <span class="text-success" id="purpose_visible_text">Görünür</span>
+                                <span class="text-danger d-none" id="purpose_hidden_text">Gizli</span>
+                            </label>
+                        </div>
+                    </div>
+                    <textarea class="form-control tinymce" id="service_purpose" name="details[service_purpose]" rows="5">{{ old('details.service_purpose', isset($service->features['service_purpose']) ? $service->features['service_purpose'] : '') }}</textarea>
+                    <small class="form-text text-muted">Bu bölüm, hizmet detay sayfasındaki "Hizmetin Amacı" bölümünde gösterilecektir.</small>
+                </div>
+                
+                <!-- Kimler Başvurabilir -->
+                <div class="mb-4">
+                    <label for="who_can_apply" class="form-label">Kimler Başvurabilir</label>
+                    <div class="d-flex justify-content-end mb-2">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" role="switch" id="is_who_can_apply_visible" name="details[is_who_can_apply_visible]" value="1" {{ old('details.is_who_can_apply_visible', isset($service->features['is_who_can_apply_visible']) && $service->features['is_who_can_apply_visible']) ? 'checked' : '' }}>
+                            <label class="form-check-label" for="is_who_can_apply_visible">
+                                <span class="text-success" id="who_can_apply_visible_text">Görünür</span>
+                                <span class="text-danger d-none" id="who_can_apply_hidden_text">Gizli</span>
+                            </label>
+                        </div>
+                    </div>
+                    <textarea class="form-control tinymce" id="who_can_apply" name="details[who_can_apply]" rows="5">{{ old('details.who_can_apply', isset($service->features['who_can_apply']) ? $service->features['who_can_apply'] : '') }}</textarea>
+                    <small class="form-text text-muted">Bu bölüm, hizmet detay sayfasındaki "Kimler Başvurabilir" bölümünde gösterilecektir.</small>
+                </div>
+                
+                <!-- Başvuru Şartları -->
+                <div class="mb-4">
+                    <label for="requirements" class="form-label">Başvuru Şartları</label>
+                    <div class="d-flex justify-content-end mb-2">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" role="switch" id="is_requirements_visible" name="details[is_requirements_visible]" value="1" {{ old('details.is_requirements_visible', isset($service->features['is_requirements_visible']) && $service->features['is_requirements_visible']) ? 'checked' : '' }}>
+                            <label class="form-check-label" for="is_requirements_visible">
+                                <span class="text-success" id="requirements_visible_text">Görünür</span>
+                                <span class="text-danger d-none" id="requirements_hidden_text">Gizli</span>
+                            </label>
+                        </div>
+                    </div>
+                    <textarea class="form-control tinymce" id="requirements" name="details[requirements]" rows="5">{{ old('details.requirements', isset($service->features['requirements']) ? $service->features['requirements'] : '') }}</textarea>
+                    <small class="form-text text-muted">Bu bölüm, hizmet detay sayfasındaki "Başvuru Şartları" bölümünde gösterilecektir.</small>
+                </div>
+                
+                <!-- Başvuru Süreci -->
+                <div class="mb-4">
+                    <label for="application_process" class="form-label">Başvuru Süreci</label>
+                    <div class="d-flex justify-content-end mb-2">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" role="switch" id="is_application_process_visible" name="details[is_application_process_visible]" value="1" {{ old('details.is_application_process_visible', isset($service->features['is_application_process_visible']) && $service->features['is_application_process_visible']) ? 'checked' : '' }}>
+                            <label class="form-check-label" for="is_application_process_visible">
+                                <span class="text-success" id="application_process_visible_text">Görünür</span>
+                                <span class="text-danger d-none" id="application_process_hidden_text">Gizli</span>
+                            </label>
+                        </div>
+                    </div>
+                    <textarea class="form-control tinymce" id="application_process" name="details[application_process]" rows="5">{{ old('details.application_process', isset($service->features['application_process']) ? $service->features['application_process'] : '') }}</textarea>
+                    <small class="form-text text-muted">Bu bölüm, hizmet detay sayfasındaki "Başvuru Süreci" bölümünde gösterilecektir.</small>
+                </div>
+                
+                <!-- İşlem Süresi (Tablo) -->
+                <div class="mb-4">
+                    <label class="form-label d-flex justify-content-between align-items-center">
+                        <span>İşlem Süresi Tablosu</span>
+                        <div class="d-flex align-items-center">
+                            <div class="form-check form-switch me-3">
+                                <input class="form-check-input" type="checkbox" role="switch" id="is_processing_times_visible" name="details[is_processing_times_visible]" value="1" {{ old('details.is_processing_times_visible', isset($service->features['is_processing_times_visible']) && $service->features['is_processing_times_visible']) ? 'checked' : '' }}>
+                                <label class="form-check-label" for="is_processing_times_visible">
+                                    <span class="text-success" id="processing_times_visible_text">Görünür</span>
+                                    <span class="text-danger d-none" id="processing_times_hidden_text">Gizli</span>
+                                </label>
+                            </div>
+                            <button type="button" class="btn btn-sm btn-primary" id="add-processing-time-row">
+                                <i class="fas fa-plus"></i> Satır Ekle
+                            </button>
+                        </div>
+                    </label>
+                    
+                    <div class="table-responsive">
+                        <table class="table table-bordered" id="processing-time-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 30%">İşlem Adı</th>
+                                    <th style="width: 20%">Süre</th>
+                                    <th>Açıklama</th>
+                                    <th style="width: 50px">İşlem</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if(old('details.processing_times', isset($service->features['processing_times']) ? $service->features['processing_times'] : []))
+                                    @foreach(old('details.processing_times', isset($service->features['processing_times']) ? $service->features['processing_times'] : []) as $index => $time)
+                                    <tr>
+                                        <td>
+                                            <input type="text" class="form-control" name="details[processing_times][{{ $index }}][title]" value="{{ is_array($time) && isset($time['title']) ? $time['title'] : '' }}" placeholder="Başlık">
+                                        </td>
+                                        <td>
+                                            <input type="text" class="form-control" name="details[processing_times][{{ $index }}][time]" value="{{ is_array($time) && isset($time['time']) ? $time['time'] : '' }}" placeholder="İşlem süresi">
+                                        </td>
+                                        <td>
+                                            <input type="text" class="form-control" name="details[processing_times][{{ $index }}][description]" value="{{ is_array($time) && isset($time['description']) ? $time['description'] : '' }}" placeholder="Açıklama">
+                                        </td>
+                                        <td>
+                                            <button type="button" class="btn btn-sm btn-danger remove-row">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    @endforeach
+                                @else
+                                <tr>
+                                    <td>
+                                        <input type="text" class="form-control" name="details[processing_times][0][title]" placeholder="Başlık">
+                                    </td>
+                                    <td>
+                                        <input type="text" class="form-control" name="details[processing_times][0][time]" placeholder="İşlem süresi">
+                                    </td>
+                                    <td>
+                                        <input type="text" class="form-control" name="details[processing_times][0][description]" placeholder="Açıklama">
+                                    </td>
+                                    <td>
+                                        <button type="button" class="btn btn-sm btn-danger remove-row">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                @endif
+                            </tbody>
+                        </table>
+                    </div>
+                    <small class="form-text text-muted">Bu tablo, hizmet detay sayfasındaki "İşlem Süresi" bölümünde gösterilecektir.</small>
+                </div>
+                
+                <!-- Ücretler (Tablo) -->
+                <div class="mb-4">
+                    <label class="form-label d-flex justify-content-between align-items-center">
+                        <span>Ücretler Tablosu</span>
+                        <div class="d-flex align-items-center">
+                            <div class="form-check form-switch me-3">
+                                <input class="form-check-input" type="checkbox" role="switch" id="is_fees_visible" name="details[is_fees_visible]" value="1" {{ old('details.is_fees_visible', isset($service->features['is_fees_visible']) && $service->features['is_fees_visible']) ? 'checked' : '' }}>
+                                <label class="form-check-label" for="is_fees_visible">
+                                    <span class="text-success" id="fees_visible_text">Görünür</span>
+                                    <span class="text-danger d-none" id="fees_hidden_text">Gizli</span>
+                                </label>
+                            </div>
+                            <button type="button" class="btn btn-sm btn-primary" id="add-fee-row">
+                                <i class="fas fa-plus"></i> Satır Ekle
+                            </button>
+                        </div>
+                    </label>
+                    
+                    <div class="table-responsive">
+                        <table class="table table-bordered" id="fees-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 35%">Hizmet Paketi</th>
+                                    <th>Açıklama</th>
+                                    <th style="width: 20%">Fiyat</th>
+                                    <th style="width: 50px">İşlem</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if(old('details.fees', isset($service->features['fees']) ? $service->features['fees'] : []))
+                                    @foreach(old('details.fees', $service->features['fees']) as $index => $fee)
+                                    <tr>
+                                        <td>
+                                            <input type="text" class="form-control" name="details[fees][{{ $index }}][package]" value="{{ is_array($fee) && array_key_exists('package', $fee) ? $fee['package'] : '' }}" placeholder="Paket adı">
+                                        </td>
+                                        <td>
+                                            <input type="text" class="form-control" name="details[fees][{{ $index }}][description]" value="{{ is_array($fee) && array_key_exists('description', $fee) ? $fee['description'] : '' }}" placeholder="Açıklama">
+                                        </td>
+                                        <td>
+                                            <input type="text" class="form-control" name="details[fees][{{ $index }}][price]" value="{{ is_array($fee) && array_key_exists('price', $fee) ? $fee['price'] : '' }}" placeholder="Fiyat">
+                                        </td>
+                                        <td>
+                                            <button type="button" class="btn btn-sm btn-danger remove-row">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    @endforeach
+                                @else
+                                <tr>
+                                    <td>
+                                        <input type="text" class="form-control" name="details[fees][0][package]" placeholder="Paket adı">
+                                    </td>
+                                    <td>
+                                        <input type="text" class="form-control" name="details[fees][0][description]" placeholder="Açıklama">
+                                    </td>
+                                    <td>
+                                        <input type="text" class="form-control" name="details[fees][0][price]" placeholder="Fiyat">
+                                    </td>
+                                    <td>
+                                        <button type="button" class="btn btn-sm btn-danger remove-row">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                @endif
+                            </tbody>
+                        </table>
+                    </div>
+                    <small class="form-text text-muted">Bu tablo, hizmet detay sayfasındaki "Ücretler" bölümünde gösterilecektir.</small>
+                </div>
+                
+                <!-- Ödeme Seçenekleri (Tablo) -->
+                <div class="mb-4">
+                    <label class="form-label d-flex justify-content-between align-items-center">
+                        <span>Ödeme Seçenekleri Tablosu</span>
+                        <button type="button" class="btn btn-sm btn-primary" id="add-payment-option-row">
+                            <i class="fas fa-plus"></i> Seçenek Ekle
+                        </button>
+                    </label>
+                    
+                    <div class="table-responsive">
+                        <table class="table table-bordered" id="payment-options-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 25%">Ödeme Yöntemi</th>
+                                    <th style="width: 20%">Vade</th>
+                                    <th>Açıklama</th>
+                                    <th style="width: 50px">İşlem</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if(old('details.payment_options', isset($service->features['payment_options']) ? $service->features['payment_options'] : []))
+                                    @foreach(old('details.payment_options', isset($service->features['payment_options']) ? $service->features['payment_options'] : []) as $index => $option)
+                                    <tr>
+                                        <td>
+                                            <input type="text" class="form-control" name="details[payment_options][{{ $index }}][method]" value="{{ is_array($option) && array_key_exists('method', $option) ? $option['method'] : '' }}" placeholder="Ödeme yöntemi">
+                                        </td>
+                                        <td>
+                                            <input type="text" class="form-control" name="details[payment_options][{{ $index }}][term]" value="{{ is_array($option) && array_key_exists('term', $option) ? $option['term'] : '' }}" placeholder="Vade">
+                                        </td>
+                                        <td>
+                                            <input type="text" class="form-control" name="details[payment_options][{{ $index }}][description]" value="{{ is_array($option) && array_key_exists('description', $option) ? $option['description'] : '' }}" placeholder="Açıklama">
+                                        </td>
+                                        <td>
+                                            <button type="button" class="btn btn-sm btn-danger remove-row">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    @endforeach
+                                @else
+                                <tr>
+                                    <td>
+                                        <input type="text" class="form-control" name="details[payment_options][0][method]" placeholder="Ödeme yöntemi">
+                                    </td>
+                                    <td>
+                                        <input type="text" class="form-control" name="details[payment_options][0][term]" placeholder="Vade">
+                                    </td>
+                                    <td>
+                                        <input type="text" class="form-control" name="details[payment_options][0][description]" placeholder="Açıklama">
+                                    </td>
+                                    <td>
+                                        <button type="button" class="btn btn-sm btn-danger remove-row">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                @endif
+                            </tbody>
+                        </table>
+                    </div>
+                    <small class="form-text text-muted">Bu tablo, hizmet detay sayfasındaki "Ödeme Seçenekleri" bölümünde gösterilecektir.</small>
+                </div>
+                
+                <!-- Diğer Bilgiler -->
+                <div class="mb-4">
+                    <label for="additional_info" class="form-label">Diğer Bilgiler</label>
+                    <div class="d-flex justify-content-end mb-2">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" role="switch" id="is_additional_info_visible" name="details[is_additional_info_visible]" value="1" {{ old('details.is_additional_info_visible', isset($service->features['is_additional_info_visible']) && $service->features['is_additional_info_visible']) ? 'checked' : '' }}>
+                            <label class="form-check-label" for="is_additional_info_visible">
+                                <span class="text-success" id="additional_info_visible_text">Görünür</span>
+                                <span class="text-danger d-none" id="additional_info_hidden_text">Gizli</span>
+                            </label>
+                        </div>
+                    </div>
+                    <textarea class="form-control tinymce" id="additional_info" name="details[additional_info]" rows="5">{{ old('details.additional_info', isset($service->features['additional_info']) ? $service->features['additional_info'] : '') }}</textarea>
+                    <small class="form-text text-muted">Bu bölüm, hizmet detay sayfasındaki "Diğer Bilgiler" bölümünde gösterilecektir.</small>
+                </div>
+                
+                <!-- Standart Formlar -->
+                <div class="mb-4">
+                    <label for="standard_forms" class="form-label">Standart Formlar</label>
+                    <div class="d-flex justify-content-end mb-2">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" role="switch" id="is_standard_forms_visible" name="details[is_standard_forms_visible]" value="1" {{ old('details.is_standard_forms_visible', isset($service->features['is_standard_forms_visible']) && $service->features['is_standard_forms_visible']) ? 'checked' : '' }}>
+                            <label class="form-check-label" for="is_standard_forms_visible">
+                                <span class="text-success" id="standard_forms_visible_text">Görünür</span>
+                                <span class="text-danger d-none" id="standard_forms_hidden_text">Gizli</span>
+                            </label>
+                        </div>
+                    </div>
+                    <textarea class="form-control tinymce" id="standard_forms" name="details[standard_forms]" rows="5">{{ old('details.standard_forms', isset($service->features['standard_forms']) ? $service->features['standard_forms'] : '') }}</textarea>
+                    <small class="form-text text-muted">Bu bölüm, hizmet detay sayfasındaki "Standart Formlar" bölümünde gösterilecektir.</small>
+                    
+                    <!-- Dosya Yükleme Bölümü -->
+                    <div class="mt-4">
+                        <label class="form-label d-flex justify-content-between align-items-center">
+                            <span>Dosyalar</span>
+                            <button type="button" class="btn btn-sm btn-primary" id="add-document-row">
+                                <i class="fas fa-plus"></i> Dosya Ekle
+                            </button>
+                        </label>
+                        
+                        <div class="table-responsive">
+                            <table class="table table-bordered" id="documents-table">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 25%">Dosya Adı</th>
+                                        <th>Açıklama</th>
+                                        <th style="width: 20%">Dosya</th>
+                                        <th style="width: 50px">İşlem</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if(old('documents', isset($service->features['documents']) ? $service->features['documents'] : []))
+                                        @foreach(old('documents', $service->features['documents']) as $index => $document)
+                                        <tr>
+                                            <td>
+                                                <input type="text" class="form-control" name="documents[{{ $index }}][name]" value="{{ is_array($document) && array_key_exists('name', $document) ? $document['name'] : '' }}" placeholder="Dosya adı">
+                                            </td>
+                                            <td>
+                                                <input type="text" class="form-control" name="documents[{{ $index }}][description]" value="{{ is_array($document) && array_key_exists('description', $document) ? $document['description'] : '' }}" placeholder="Açıklama">
+                                            </td>
+                                            <td>
+                                                <div class="input-group">
+                                                    <input type="text" class="form-control document-file-input" name="documents[{{ $index }}][file]" value="{{ is_array($document) && array_key_exists('file', $document) ? $document['file'] : '' }}" readonly>
+                                                    <button type="button" class="btn btn-primary file-browser" data-index="{{ $index }}">
+                                                        <i class="fas fa-file"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <button type="button" class="btn btn-sm btn-danger remove-row">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        @endforeach
+                                    @else
+                                    <tr>
+                                        <td>
+                                            <input type="text" class="form-control" name="documents[0][name]" placeholder="Dosya adı">
+                                        </td>
+                                        <td>
+                                            <input type="text" class="form-control" name="documents[0][description]" placeholder="Açıklama">
+                                        </td>
+                                        <td>
+                                            <div class="input-group">
+                                                <input type="text" class="form-control document-file-input" name="documents[0][file]" readonly>
+                                                <button type="button" class="btn btn-primary file-browser" data-index="0">
+                                                    <i class="fas fa-file"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <button type="button" class="btn btn-sm btn-danger remove-row">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    @endif
+                                </tbody>
+                            </table>
+                        </div>
+                        <small class="form-text text-muted">Buraya ekleyeceğiniz dosyalar, hizmet detay sayfasındaki "Standart Formlar" bölümünde indirilebilir olarak gösterilecektir.</small>
+                    </div>
+                </div>
+            </div>
+        </div>
     </form>
 </div>
 
@@ -754,6 +918,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/locales/bootstrap-datepicker.tr.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/6.4.2/tinymce.min.js"></script> -->
 <script src="{{ asset('vendor/tinymce/tinymce.min.js') }}"></script>
 
 <script>
@@ -817,7 +982,7 @@
             var itemHtml = `
                 <div class="gallery-item" id="${itemId}">
                     <img src="${url}" alt="Galeri Görseli" style="width: 100%; height: 100%; object-fit: cover;">
-                    <button type="button" class="remove-btn" data-id="${itemId}">
+                    <button type="button" class="remove-btn" data-index="${index}">
                         <i class="fas fa-times"></i>
                     </button>
                     <input type="hidden" name="gallery[]" value="${url}">
@@ -983,8 +1148,408 @@
             }
         });
         
-        // Sayfanın ilk yüklenmesinde kategori sayacını güncelle
-        updateCategoryCount();
+        // Sayfanın ilk yüklenmesinde başlangıç URL'lerini düzelt
+        $(document).ready(function() {
+            // Ana görsel URL'sini düzelt
+            if ($('#image').val()) {
+                const cleanUrl = makeRelativeUrl($('#image').val());
+                $('#image').val(cleanUrl);
+                $('#image-preview').find('img').attr('src', cleanUrl);
+            }
+            
+            // Galeri görsel URL'lerini düzelt
+            $('#gallery-preview input[name="gallery[]"]').each(function() {
+                const cleanUrl = makeRelativeUrl($(this).val());
+                $(this).val(cleanUrl);
+                $(this).closest('.gallery-item').find('img').attr('src', cleanUrl);
+            });
+            
+            // Kategori sayacını güncelle
+            updateCategoryCount();
+            
+            // TinyMCE editörünü tüm .tinymce sınıfına sahip textarea'lara uygula
+            tinymce.init({
+                selector: '.tinymce-full',
+                height: 500,
+                menubar: 'file edit view insert format tools table help',
+                plugins: 'preview importcss searchreplace autolink autosave save directionality code visualblocks visualchars fullscreen image link media template codesample table charmap pagebreak nonbreaking anchor insertdatetime advlist lists wordcount help charmap quickbars emoticons',
+                toolbar: 'undo redo | bold italic underline strikethrough | fontfamily image fontsize blocks | alignleft aligncenter alignright alignjustify | outdent indent | numlist bullist | forecolor backcolor removeformat | pagebreak | charmap emoticons | fullscreen preview save print | insertfile media template link anchor codesample | ltr rtl',
+                toolbar_sticky: true,
+                image_advtab: false,
+                quickbars_selection_toolbar: 'bold italic | quicklink h2 h3 blockquote quickimage quicktable',
+                quickbars_insert_toolbar: 'quickimage | quicktable quicklink hr',
+                quickbars_insert_toolbar_hover: false,
+                quickbars_image_toolbar: false,
+                noneditable_class: 'mceNonEditable',
+                language: 'tr',
+                language_url: '/js/tinymce/langs/tr.js', // Türkçe dil dosyası
+                toolbar_mode: 'sliding',
+                contextmenu: 'link table',
+                skin: 'oxide',
+                content_css: 'default',
+                content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, San Francisco, Segoe UI, Roboto, Helvetica Neue, sans-serif; font-size: 16px; }',
+                relative_urls: false,
+                remove_script_host: false,
+                convert_urls: true,
+                branding: false,
+                promotion: false,
+                paste_data_images: true, // Panodaki resimlerin yapıştırılmasını sağlar
+                automatic_uploads: false, // Otomatik yüklemeyi devre dışı bıraktık
+                object_resizing: 'img',
+                file_picker_types: 'file media', // image tipini de ekleyelim
+                
+                // Varsayılan resim dialogunu tamamen devre dışı bırak
+                images_upload_handler: function (blobInfo, success, failure) {
+                    failure('Görsel yükleme devre dışı.');
+                },
+                
+                // Görsel dialogu tamamen devre dışı bırak
+                image_title: false,
+                image_description: false, 
+                image_advtab: false,
+                image_uploadtab: false,
+                
+                // Varsayılan dosya seçici fonksiyonu override
+                file_picker_callback: function (callback, value, meta) {
+                    // Resim ekleme işlemleri için FileManagerSystem kullanılacak
+                    if (meta.filetype === 'image') {
+                        // Geçici bir ID oluştur
+                        const tempId = Date.now();
+                        const relatedType = 'service_content';
+                        
+                        // MediaPicker URL
+                        const mediapickerUrl = '/admin/filemanagersystem/mediapicker?type=image&filter=all&related_type=' + relatedType + '&related_id=' + tempId;
+                        
+                        // iFrame'i güncelle
+                        $('#mediapickerFrame').attr('src', mediapickerUrl);
+                        
+                        // Modal'ı göster - Bootstrap 5 ile uyumlu
+                        var modal = new bootstrap.Modal(document.getElementById('mediapickerModal'));
+                        modal.show();
+                        
+                        // Mesaj dinleme işlevi
+                        function handleFilePickerSelection(event) {
+                            try {
+                                if (event.data && event.data.type === 'mediaSelected') {
+                                    let mediaUrl = '';
+                                    let altText = event.data.mediaAlt || '';
+                                    
+                                    // URL değerini al
+                                    if (event.data.mediaUrl) {
+                                        mediaUrl = event.data.mediaUrl;
+                                        
+                                        // URL çevirme
+                                        if (mediaUrl && mediaUrl.startsWith('/')) {
+                                            const baseUrl = window.location.protocol + '//' + window.location.host;
+                                            mediaUrl = baseUrl + mediaUrl;
+                                        }
+                                    } else if (event.data.mediaId) {
+                                        // ID ile kullan
+                                        const previewUrl = '/admin/filemanagersystem/media/preview/' + event.data.mediaId;
+                                        mediaUrl = previewUrl;
+                                    }
+                                    
+                                    if (mediaUrl) {
+                                        // Callback'e URL'yi ve alt metni ilet
+                                        callback(mediaUrl, { alt: altText });
+                                        
+                                        // Modalı kapat
+                                        modal.hide();
+                                        
+                                        // Event listener'ı kaldır
+                                        window.removeEventListener('message', handleFilePickerSelection);
+                                    }
+                                } else if (event.data && event.data.type === 'mediapickerError') {
+                                    console.error('FileManagerSystem hatası:', event.data.message);
+                                    alert('Medya seçici hatası: ' + event.data.message);
+                                    modal.hide();
+                                    
+                                    window.removeEventListener('message', handleFilePickerSelection);
+                                }
+                            } catch (error) {
+                                console.error('Medya seçimi işlenirken hata oluştu:', error);
+                                alert('Medya seçimi işlenirken bir hata oluştu.');
+                                
+                                window.removeEventListener('message', handleFilePickerSelection);
+                            }
+                        }
+                        
+                        // Event listener ekle
+                        window.removeEventListener('message', handleFilePickerSelection);
+                        window.addEventListener('message', handleFilePickerSelection);
+                        
+                        return false;
+                    }
+                    
+                    // Diğer dosya tipleri için standart dosya seçiciyi kullan
+                    if (meta.filetype === 'file' || meta.filetype === 'media') {
+                        window.open('/filemanager/dialog.php?type=' + meta.filetype + '&field_id=tinymce-file', 'filemanager', 'width=900,height=600');
+                        window.SetUrl = function (url, width, height, alt) {
+                            callback(url, {alt: alt});
+                        };
+                    }
+                },
+                
+                // FileManagerSystem entegrasyonu için özel buton
+                setup: function (editor) {
+                    // TinyMCE başlatıldığında image plugininin davranışını değiştir
+                    editor.on('PreInit', function() {
+                        // Image plugin komutlarını ele geçir ve engelle
+                        editor.on('BeforeExecCommand', function(e) {
+                            if (e.command === 'mceImage') {
+                                // FileManagerSystem'i aç
+                                openFileManagerSystemPicker(editor);
+                                e.preventDefault();
+                                return false;
+                            }
+                        });
+                        
+                        // Quickbars'ı özelleştir
+                        editor.contentStyles.push(`
+                            .tox-toolbar-overlord {
+                                font-size: 14px !important;
+                            }
+                            .tox-pop__dialog {
+                                background-color: #fff !important;
+                                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2) !important;
+                                border-radius: 6px !important;
+                            }
+                            .tox-toolbar__group {
+                                padding: 4px !important;
+                            }
+                            .tox-toolbar__primary {
+                                background-color: #fff !important;
+                            }
+                            .tox-tbtn {
+                                margin: 2px !important;
+                            }
+                            .tox-tbtn--enabled, .tox-tbtn:hover {
+                                background-color: #e9ecef !important;
+                            }
+                            .tox-icon.tox-tbtn__icon-wrap {
+                                font-size: 16px !important;
+                            }
+                        `);
+                    });
+                    
+                    // TinyMCE başlatıldığında custom butonları ekle
+                    editor.on('init', function() {
+                        // Özel toolbar butonu ekle
+                        editor.ui.registry.addButton('customimage', {
+                            icon: 'image',
+                            tooltip: 'Resim Ekle/Düzenle',
+                            onAction: function() {
+                                openFileManagerSystemPicker(editor);
+                            }
+                        });
+                        
+                        // QuickImage toolbarı için özel buton ekle
+                        editor.ui.registry.addButton('quickimage', {
+                            icon: 'image',
+                            tooltip: 'Hızlı Resim Ekle',
+                            onAction: function() {
+                                openFileManagerSystemPicker(editor);
+                            }
+                        });
+                    });
+                }
+            });
+            
+            // TinyMCE basit editör yapılandırması (.tinymce sınıfı için)
+            tinymce.init({
+                selector: '.tinymce',
+                height: 200,
+                menubar: false,
+                plugins: 'lists link image table code',
+                toolbar: 'undo redo | formatselect | bold italic | alignleft aligncenter alignright | bullist numlist | link image | table | code',
+                content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, sans-serif; font-size: 14px; }',
+                language: 'tr',
+                language_url: '/js/tinymce/langs/tr.js',
+                branding: false,
+                promotion: false,
+                skin: 'oxide',
+                relative_urls: false,
+                remove_script_host: false,
+                convert_urls: true,
+                object_resizing: 'img',
+                paste_data_images: true,
+                automatic_uploads: false,
+                
+                // Varsayılan dosya seçici fonksiyonu override
+                file_picker_callback: function (callback, value, meta) {
+                    // Resim ekleme işlemleri için FileManagerSystem kullanılacak
+                    if (meta.filetype === 'image') {
+                        // Geçici bir ID oluştur
+                        const tempId = Date.now();
+                        const relatedType = 'service_details';
+                        
+                        // MediaPicker URL
+                        const mediapickerUrl = '/admin/filemanagersystem/mediapicker?type=image&filter=all&related_type=' + relatedType + '&related_id=' + tempId;
+                        
+                        // iFrame'i güncelle
+                        $('#mediapickerFrame').attr('src', mediapickerUrl);
+                        
+                        // Modal'ı göster - Bootstrap 5 ile uyumlu
+                        var modal = new bootstrap.Modal(document.getElementById('mediapickerModal'));
+                        modal.show();
+                        
+                        // Mesaj dinleme işlevi
+                        function handleFilePickerSelection(event) {
+                            try {
+                                if (event.data && event.data.type === 'mediaSelected') {
+                                    let mediaUrl = '';
+                                    let altText = event.data.mediaAlt || '';
+                                    
+                                    // URL değerini al
+                                    if (event.data.mediaUrl) {
+                                        mediaUrl = event.data.mediaUrl;
+                                        
+                                        // URL çevirme
+                                        if (mediaUrl && mediaUrl.startsWith('/')) {
+                                            const baseUrl = window.location.protocol + '//' + window.location.host;
+                                            mediaUrl = baseUrl + mediaUrl;
+                                        }
+                                    } else if (event.data.mediaId) {
+                                        // ID ile kullan
+                                        const previewUrl = '/admin/filemanagersystem/media/preview/' + event.data.mediaId;
+                                        mediaUrl = previewUrl;
+                                    }
+                                    
+                                    if (mediaUrl) {
+                                        // Callback'e URL'yi ve alt metni ilet
+                                        callback(mediaUrl, { alt: altText });
+                                        
+                                        // Modalı kapat
+                                        modal.hide();
+                                        
+                                        // Event listener'ı kaldır
+                                        window.removeEventListener('message', handleFilePickerSelection);
+                                    }
+                                } else if (event.data && event.data.type === 'mediapickerError') {
+                                    console.error('FileManagerSystem hatası:', event.data.message);
+                                    alert('Medya seçici hatası: ' + event.data.message);
+                                    modal.hide();
+                                    
+                                    window.removeEventListener('message', handleFilePickerSelection);
+                                }
+                            } catch (error) {
+                                console.error('Medya seçimi işlenirken hata oluştu:', error);
+                                alert('Medya seçimi işlenirken bir hata oluştu.');
+                                
+                                window.removeEventListener('message', handleFilePickerSelection);
+                            }
+                        }
+                        
+                        // Event listener ekle
+                        window.removeEventListener('message', handleFilePickerSelection);
+                        window.addEventListener('message', handleFilePickerSelection);
+                        
+                        return false;
+                    }
+                    
+                    // Diğer dosya tipleri için standart dosya seçiciyi kullan
+                    if (meta.filetype === 'file' || meta.filetype === 'media') {
+                        window.open('/filemanager/dialog.php?type=' + meta.filetype + '&field_id=tinymce-file', 'filemanager', 'width=900,height=600');
+                        window.SetUrl = function (url, width, height, alt) {
+                            callback(url, {alt: alt});
+                        };
+                    }
+                }
+            });
+            
+            // İşlem Süresi dinamik tablo
+            $('#add-processing-time-row').on('click', function() {
+                const tableBody = $('#processing-time-table tbody');
+                const rowCount = tableBody.find('tr').length;
+                
+                const newRow = `
+                    <tr>
+                        <td>
+                            <input type="text" class="form-control" name="details[processing_times][${rowCount}][title]" placeholder="Başlık">
+                        </td>
+                        <td>
+                            <input type="text" class="form-control" name="details[processing_times][${rowCount}][time]" placeholder="İşlem süresi">
+                        </td>
+                        <td>
+                            <input type="text" class="form-control" name="details[processing_times][${rowCount}][description]" placeholder="Açıklama">
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-sm btn-danger remove-row">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+                
+                tableBody.append(newRow);
+            });
+            
+            // Ücretler dinamik tablo
+            $('#add-fee-row').on('click', function() {
+                const tableBody = $('#fees-table tbody');
+                const rowCount = tableBody.find('tr').length;
+                
+                const newRow = `
+                    <tr>
+                        <td>
+                            <input type="text" class="form-control" name="details[fees][${rowCount}][package]" placeholder="Paket adı">
+                        </td>
+                        <td>
+                            <input type="text" class="form-control" name="details[fees][${rowCount}][description]" placeholder="Açıklama">
+                        </td>
+                        <td>
+                            <input type="text" class="form-control" name="details[fees][${rowCount}][price]" placeholder="Fiyat">
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-sm btn-danger remove-row">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+                
+                tableBody.append(newRow);
+            });
+            
+            // Ödeme Seçenekleri dinamik tablo
+            $('#add-payment-option-row').on('click', function() {
+                const tableBody = $('#payment-options-table tbody');
+                const rowCount = tableBody.find('tr').length;
+                
+                const newRow = `
+                    <tr>
+                        <td>
+                            <input type="text" class="form-control" name="details[payment_options][${rowCount}][method]" placeholder="Ödeme yöntemi">
+                        </td>
+                        <td>
+                            <input type="text" class="form-control" name="details[payment_options][${rowCount}][term]" placeholder="Vade">
+                        </td>
+                        <td>
+                            <input type="text" class="form-control" name="details[payment_options][${rowCount}][description]" placeholder="Açıklama">
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-sm btn-danger remove-row">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+                
+                tableBody.append(newRow);
+            });
+            
+            // Satır silme işlemi (tüm tablolar için)
+            $(document).on('click', '.remove-row', function() {
+                // Eğer tabloda sadece bir satır kaldıysa silmeyi engelle
+                const tableBody = $(this).closest('tbody');
+                if (tableBody.find('tr').length > 1) {
+                    $(this).closest('tr').remove();
+                } else {
+                    // Tabloyu boşalt
+                    tableBody.find('input').val('');
+                }
+            });
+        });
     });
 </script>
 
@@ -1143,24 +1708,6 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 
 <script>
-    // Hero özellikleri ekleme
-    $('#add-feature').on('click', function() {
-        const featureHtml = `
-            <div class="feature-item mb-2 d-flex align-items-center">
-                <input type="text" class="form-control" name="features[]" placeholder="Özellik ekleyin">
-                <button type="button" class="btn btn-sm btn-danger ms-2 remove-feature"><i class="fas fa-times"></i></button>
-            </div>
-        `;
-        $('#features-container').append(featureHtml);
-    });
-    
-    // Hero özellikleri silme (delegate event)
-    $(document).on('click', '.remove-feature', function() {
-        $(this).closest('.feature-item').remove();
-    });
-</script>
-
-<script>
     // Görsel URL'lerini rölatif hale getir (http://localhost:8000 kısmını kaldır)
     function makeRelativeUrl(url) {
         // Boş URL kontrolü
@@ -1199,31 +1746,30 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // Galeri filemanager değişikliğini dinleme
-    $('#fake-gallery-input').on('change', function() {
-        // Seçilen görseli al
-        var url = $(this).val();
-        if (url) {
-            // URL'yi rölatif yola dönüştür
-            url = makeRelativeUrl(url);
-            addGalleryItem(url);
-            $(this).val(''); // input'u temizle
-        }
-    });
-    
-    // Image inputu değiştiğinde rölatif yola dönüştür
-    $('#image').on('change', function() {
-        const url = $(this).val();
-        if (url) {
-            // URL'yi rölatif hale getir
-            $(this).val(makeRelativeUrl(url));
-        }
-    });
-</script>
-
-<script>
-    // Sayfanın ilk yüklenmesinde başlangıç URL'lerini düzelt
     $(document).ready(function() {
+        console.log('Dosya işlemleri script yüklendi');
+        
+        // Galeri filemanager değişikliğini dinleme
+        $('#fake-gallery-input').on('change', function() {
+            // Seçilen görseli al
+            var url = $(this).val();
+            if (url) {
+                // URL'yi rölatif yola dönüştür
+                url = makeRelativeUrl(url);
+                addGalleryItem(url);
+                $(this).val(''); // input'u temizle
+            }
+        });
+        
+        // Image inputu değiştiğinde rölatif yola dönüştür
+        $('#image').on('change', function() {
+            const url = $(this).val();
+            if (url) {
+                // URL'yi rölatif hale getir
+                $(this).val(makeRelativeUrl(url));
+            }
+        });
+        
         // Ana görsel URL'sini düzelt
         if ($('#image').val()) {
             const cleanUrl = makeRelativeUrl($('#image').val());
@@ -1238,5 +1784,760 @@ document.addEventListener('DOMContentLoaded', function() {
             $(this).closest('.gallery-item').find('img').attr('src', cleanUrl);
         });
     });
+</script>
+
+<script>
+    // Dinamik tablo fonksiyonları
+    $(document).ready(function() {
+        console.log('Dinamik tablolar script yüklendi');
+        
+        // İşlem Süresi dinamik tablo
+        $('#add-processing-time-row').on('click', function() {
+            console.log('İşlem süresi satır ekleme butonu tıklandı');
+            const tableBody = $('#processing-time-table tbody');
+            const rowCount = tableBody.find('tr').length;
+            
+            const newRow = `
+                <tr>
+                    <td>
+                        <input type="text" class="form-control" name="details[processing_times][${rowCount}][title]" placeholder="Başlık">
+                    </td>
+                    <td>
+                        <input type="text" class="form-control" name="details[processing_times][${rowCount}][time]" placeholder="İşlem süresi">
+                    </td>
+                    <td>
+                        <input type="text" class="form-control" name="details[processing_times][${rowCount}][description]" placeholder="Açıklama">
+                    </td>
+                    <td>
+                        <button type="button" class="btn btn-sm btn-danger remove-row">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `;
+            
+            tableBody.append(newRow);
+        });
+        
+        // Ücretler dinamik tablo
+        $('#add-fee-row').on('click', function() {
+            console.log('Ücretler satır ekleme butonu tıklandı');
+            const tableBody = $('#fees-table tbody');
+            const rowCount = tableBody.find('tr').length;
+            
+            const newRow = `
+                <tr>
+                    <td>
+                        <input type="text" class="form-control" name="details[fees][${rowCount}][package]" placeholder="Paket adı">
+                    </td>
+                    <td>
+                        <input type="text" class="form-control" name="details[fees][${rowCount}][description]" placeholder="Açıklama">
+                    </td>
+                    <td>
+                        <input type="text" class="form-control" name="details[fees][${rowCount}][price]" placeholder="Fiyat">
+                    </td>
+                    <td>
+                        <button type="button" class="btn btn-sm btn-danger remove-row">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `;
+            
+            tableBody.append(newRow);
+        });
+        
+        // Ödeme Seçenekleri dinamik tablo
+        $('#add-payment-option-row').on('click', function() {
+            console.log('Ödeme seçenekleri satır ekleme butonu tıklandı');
+            const tableBody = $('#payment-options-table tbody');
+            const rowCount = tableBody.find('tr').length;
+            
+            const newRow = `
+                <tr>
+                    <td>
+                        <input type="text" class="form-control" name="details[payment_options][${rowCount}][method]" placeholder="Ödeme yöntemi">
+                    </td>
+                    <td>
+                        <input type="text" class="form-control" name="details[payment_options][${rowCount}][term]" placeholder="Vade">
+                    </td>
+                    <td>
+                        <input type="text" class="form-control" name="details[payment_options][${rowCount}][description]" placeholder="Açıklama">
+                    </td>
+                    <td>
+                        <button type="button" class="btn btn-sm btn-danger remove-row">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `;
+            
+            tableBody.append(newRow);
+        });
+        
+        // Satır silme işlemi (tüm tablolar için)
+        $(document).on('click', '.remove-row', function() {
+            console.log('Satır silme butonu tıklandı');
+            // Eğer tabloda sadece bir satır kaldıysa silmeyi engelle
+            const tableBody = $(this).closest('tbody');
+            if (tableBody.find('tr').length > 1) {
+                $(this).closest('tr').remove();
+            } else {
+                // Tabloyu boşalt
+                tableBody.find('input').val('');
+            }
+        });
+        
+        // Hizmetin Amacı bölümü için aktif/pasif düğmesinin durumunu güncelle
+        function updatePurposeVisibilityStatus() {
+            if ($('#is_purpose_visible').is(':checked')) {
+                $('#purpose_visible_text').removeClass('d-none');
+                $('#purpose_hidden_text').addClass('d-none');
+            } else {
+                $('#purpose_visible_text').addClass('d-none');
+                $('#purpose_hidden_text').removeClass('d-none');
+            }
+        }
+        
+        // Sayfa yüklendiğinde durumu ayarla
+        updatePurposeVisibilityStatus();
+        
+        // Durum değiştiğinde güncelle
+        $('#is_purpose_visible').on('change', function() {
+            updatePurposeVisibilityStatus();
+        });
+        
+        // Kimler Başvurabilir bölümü için aktif/pasif düğmesinin durumunu güncelle
+        function updateWhoCanApplyVisibilityStatus() {
+            if ($('#is_who_can_apply_visible').is(':checked')) {
+                $('#who_can_apply_visible_text').removeClass('d-none');
+                $('#who_can_apply_hidden_text').addClass('d-none');
+            } else {
+                $('#who_can_apply_visible_text').addClass('d-none');
+                $('#who_can_apply_hidden_text').removeClass('d-none');
+            }
+        }
+        
+        // Sayfa yüklendiğinde Kimler Başvurabilir durumunu ayarla
+        updateWhoCanApplyVisibilityStatus();
+        
+        // Kimler Başvurabilir durum değiştiğinde güncelle
+        $('#is_who_can_apply_visible').on('change', function() {
+            updateWhoCanApplyVisibilityStatus();
+        });
+        
+        // Başvuru Şartları bölümü için aktif/pasif düğmesinin durumunu güncelle
+        function updateRequirementsVisibilityStatus() {
+            if ($('#is_requirements_visible').is(':checked')) {
+                $('#requirements_visible_text').removeClass('d-none');
+                $('#requirements_hidden_text').addClass('d-none');
+            } else {
+                $('#requirements_visible_text').addClass('d-none');
+                $('#requirements_hidden_text').removeClass('d-none');
+            }
+        }
+        
+        // Sayfa yüklendiğinde Başvuru Şartları durumunu ayarla
+        updateRequirementsVisibilityStatus();
+        
+        // Başvuru Şartları durum değiştiğinde güncelle
+        $('#is_requirements_visible').on('change', function() {
+            updateRequirementsVisibilityStatus();
+        });
+        
+        // Başvuru Süreci bölümü için aktif/pasif düğmesinin durumunu güncelle
+        function updateApplicationProcessVisibilityStatus() {
+            if ($('#is_application_process_visible').is(':checked')) {
+                $('#application_process_visible_text').removeClass('d-none');
+                $('#application_process_hidden_text').addClass('d-none');
+            } else {
+                $('#application_process_visible_text').addClass('d-none');
+                $('#application_process_hidden_text').removeClass('d-none');
+            }
+        }
+        
+        // Sayfa yüklendiğinde Başvuru Süreci durumunu ayarla
+        updateApplicationProcessVisibilityStatus();
+        
+        // Başvuru Süreci durum değiştiğinde güncelle
+        $('#is_application_process_visible').on('change', function() {
+            updateApplicationProcessVisibilityStatus();
+        });
+        
+        // İşlem Süresi Tablosu bölümü için aktif/pasif düğmesinin durumunu güncelle
+        function updateProcessingTimesVisibilityStatus() {
+            if ($('#is_processing_times_visible').is(':checked')) {
+                $('#processing_times_visible_text').removeClass('d-none');
+                $('#processing_times_hidden_text').addClass('d-none');
+            } else {
+                $('#processing_times_visible_text').addClass('d-none');
+                $('#processing_times_hidden_text').removeClass('d-none');
+            }
+        }
+        
+        // Sayfa yüklendiğinde İşlem Süresi durumunu ayarla
+        updateProcessingTimesVisibilityStatus();
+        
+        // İşlem Süresi durum değiştiğinde güncelle
+        $('#is_processing_times_visible').on('change', function() {
+            updateProcessingTimesVisibilityStatus();
+        });
+        
+        // Ücretler Tablosu bölümü için aktif/pasif düğmesinin durumunu güncelle
+        function updateFeesVisibilityStatus() {
+            if ($('#is_fees_visible').is(':checked')) {
+                $('#fees_visible_text').removeClass('d-none');
+                $('#fees_hidden_text').addClass('d-none');
+            } else {
+                $('#fees_visible_text').addClass('d-none');
+                $('#fees_hidden_text').removeClass('d-none');
+            }
+        }
+        
+        // Sayfa yüklendiğinde Ücretler durumunu ayarla
+        updateFeesVisibilityStatus();
+        
+        // Ücretler durum değiştiğinde güncelle
+        $('#is_fees_visible').on('change', function() {
+            updateFeesVisibilityStatus();
+        });
+        
+        // Diğer Bilgiler bölümü için aktif/pasif düğmesinin durumunu güncelle
+        function updateAdditionalInfoVisibilityStatus() {
+            if ($('#is_additional_info_visible').is(':checked')) {
+                $('#additional_info_visible_text').removeClass('d-none');
+                $('#additional_info_hidden_text').addClass('d-none');
+            } else {
+                $('#additional_info_visible_text').addClass('d-none');
+                $('#additional_info_hidden_text').removeClass('d-none');
+            }
+        }
+        
+        // Sayfa yüklendiğinde Diğer Bilgiler durumunu ayarla
+        updateAdditionalInfoVisibilityStatus();
+        
+        // Diğer Bilgiler durum değiştiğinde güncelle
+        $('#is_additional_info_visible').on('change', function() {
+            updateAdditionalInfoVisibilityStatus();
+        });
+        
+        // Standart Formlar bölümü için aktif/pasif düğmesinin durumunu güncelle
+        function updateStandardFormsVisibilityStatus() {
+            if ($('#is_standard_forms_visible').is(':checked')) {
+                $('#standard_forms_visible_text').removeClass('d-none');
+                $('#standard_forms_hidden_text').addClass('d-none');
+            } else {
+                $('#standard_forms_visible_text').addClass('d-none');
+                $('#standard_forms_hidden_text').removeClass('d-none');
+            }
+        }
+        
+        // Sayfa yüklendiğinde Standart Formlar durumunu ayarla
+        updateStandardFormsVisibilityStatus();
+        
+        // Standart Formlar durum değiştiğinde güncelle
+        $('#is_standard_forms_visible').on('change', function() {
+            updateStandardFormsVisibilityStatus();
+        });
+    });
+</script>
+
+<!-- MediaPicker Modal -->
+<div class="modal fade" id="mediapickerModal" tabindex="-1" role="dialog" aria-labelledby="mediapickerModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="mediapickerModalLabel">Medya Seçici</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+            </div>
+            <div class="modal-body p-0">
+                <iframe id="mediapickerFrame" style="width: 100%; height: 80vh; border: none;"></iframe>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function() {
+        // Dosya seçme modalı ve işlevselliği
+        let currentDocumentIndex = 0;
+        
+        // Dosya Ekle butonu
+        $('#add-document-row').on('click', function() {
+            const tableBody = $('#documents-table tbody');
+            const rowCount = tableBody.find('tr').length;
+            
+            const newRow = `
+                <tr>
+                    <td>
+                        <input type="text" class="form-control" name="documents[${rowCount}][name]" placeholder="Dosya adı">
+                    </td>
+                    <td>
+                        <input type="text" class="form-control" name="documents[${rowCount}][description]" placeholder="Açıklama">
+                    </td>
+                    <td>
+                        <div class="input-group">
+                            <input type="text" class="form-control document-file-input" name="documents[${rowCount}][file]" readonly>
+                            <button type="button" class="btn btn-primary file-browser" data-index="${rowCount}">
+                                <i class="fas fa-file"></i>
+                            </button>
+                        </div>
+                    </td>
+                    <td>
+                        <button type="button" class="btn btn-sm btn-danger remove-row">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `;
+            
+            tableBody.append(newRow);
+        });
+        
+        // Dosya seçme butonu tıklama olayı
+        $(document).on('click', '.file-browser', function() {
+            currentDocumentIndex = $(this).data('index');
+            console.log('Dosya seçici açılıyor. Aktif dokuman index:', currentDocumentIndex);
+            
+            // MediaPicker URL - sadece dosya türleri için filtre ekle
+            const serviceId = {{ $service->id }};
+            const mediapickerUrl = `/admin/filemanagersystem/mediapicker?type=document&filter=all&related_type=service&related_id=${serviceId}`;
+            console.log('MediaPicker URL:', mediapickerUrl);
+            
+            // iFrame'i güncelle
+            $('#mediapickerFrame').attr('src', mediapickerUrl);
+            
+            // Bootstrap 5 Modal oluştur ve aç
+            try {
+                const modalElement = document.getElementById('mediapickerModal');
+                let modal;
+                
+                // Mevcut modal instance'ı var mı kontrol et
+                try {
+                    modal = bootstrap.Modal.getInstance(modalElement);
+                    if (!modal) {
+                        modal = new bootstrap.Modal(modalElement);
+                    }
+                } catch (e) {
+                    console.log('Modal instance bulunamadı, yeni oluşturuluyor');
+                    modal = new bootstrap.Modal(modalElement);
+                }
+                
+                // Modalı aç
+                modal.show();
+                console.log('Modal açıldı');
+            } catch (error) {
+                console.error('Modal açılırken hata oluştu:', error);
+                // Alternatif yöntem
+                try {
+                    $('#mediapickerModal').modal('show');
+                    console.log('Modal jQuery ile açıldı');
+                } catch (jqError) {
+                    console.error('Modal açılamadı:', jqError);
+                    alert('Dosya seçici açılamadı! Lütfen sayfayı yenileyip tekrar deneyin.');
+                }
+            }
+        });
+        
+        // iframe'den medya seçim mesajını dinle
+        window.addEventListener('message', function(event) {
+            let fileUrl = null;
+            let modalClosed = false;
+            
+            // Gelen mesajı analiz et
+            console.group('MediaPicker - Gelen Mesaj');
+            console.log('Event data:', event.data);
+            console.log('Event origin:', event.origin);
+            console.log('Event source:', event.source ? 'Mevcut' : 'Yok');
+            console.groupEnd();
+            
+            try {
+                if (event.data && event.data.type === 'mediaSelected') {
+                    console.group('MediaPicker - Seçilen Dosya');
+                    console.log('Seçilen dosya tam veri:', event.data);
+                    console.log('Dosya URL:', event.data.mediaUrl);
+                    console.log('Dosya adı:', event.data.mediaName);
+                    console.log('Dosya tipi:', event.data.mediaType);
+                    console.log('Dosya ID:', event.data.mediaId);
+                    console.groupEnd();
+                    
+                    // event.data'dan doğrudan URL değerini al
+                    if (event.data.mediaUrl) {
+                        // Dosya URL'sini temizle
+                        fileUrl = event.data.mediaUrl;
+                        
+                        // Eğer URL göreceli ise (/ ile başlıyorsa) tam URL'ye çevir
+                        if (fileUrl && fileUrl.startsWith('/')) {
+                            const baseUrl = window.location.protocol + '//' + window.location.host;
+                            fileUrl = baseUrl + fileUrl;
+                        }
+                        
+                        // Seçilen dosyanın URL'sini input alanına ekle
+                        $(`input[name="documents[${currentDocumentIndex}][file]"]`).val(fileUrl);
+                        
+                        // Dosya adı otomatik doldurma (boşsa)
+                        const nameInput = $(`input[name="documents[${currentDocumentIndex}][name]"]`);
+                        if (!nameInput.val() && event.data.mediaName) {
+                            nameInput.val(event.data.mediaName);
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('Dosya seçimi işlenirken hata oluştu:', error);
+                alert('Dosya seçimi işlenirken bir hata oluştu.');
+            } finally {
+                // Modalı kapat - hata olsa da olmasa da çalışacak
+                try {
+                    modalClosed = closeModal();
+                } catch (modalError) {
+                    console.error('Modal kapatılırken hata oluştu:', modalError);
+                }
+                
+                // Hiçbir yöntemle kapatılamadıysa
+                if (!modalClosed && fileUrl) {
+                    console.log('Modal kapatılamadı ama dosya başarıyla seçildi:', fileUrl);
+                }
+            }
+        });
+    });
+</script>
+
+<script>
+    $(document).ready(function() {
+        // Dosya seçme modalı ve işlevselliği
+        let currentDocumentIndex = 0;
+        
+        // Modal kapatma yardımcı fonksiyonu
+        function closeModal() {
+            try {
+                var modalElement = document.getElementById('mediapickerModal');
+                if (modalElement) {
+                    var modalInstance = bootstrap.Modal.getInstance(modalElement);
+                    if (modalInstance) {
+                        modalInstance.hide();
+                        console.log('Modal resmi yöntemle kapatıldı');
+                        return true;
+                    }
+                }
+            } catch (modalError) {
+                console.error('Modal resmi yöntemle kapatılırken hata oluştu:', modalError);
+            }
+            
+            // JQuery ile kapamayı dene
+            try {
+                $('#mediapickerModal').modal('hide');
+                console.log('Modal jQuery ile kapatıldı');
+                return true;
+            } catch (jqError) {
+                console.error('JQuery ile modal kapatılırken hata oluştu:', jqError);
+            }
+            
+            // Elle içeriği temizle
+            try {
+                $('#mediapickerFrame').attr('src', 'about:blank');
+                console.log('Modal iframe kaynağı temizlendi');
+            } catch (error) {
+                console.error('Modal iframe temizlenirken hata oluştu:', error);
+            }
+            
+            return false;
+        }
+        
+        // Modal kapatma butonu
+        $(document).on('click', '.btn-close', function() {
+            closeModal();
+        });
+        
+        // Dosya Ekle butonu
+        $('#add-document-row').on('click', function() {
+            const tableBody = $('#documents-table tbody');
+            const rowCount = tableBody.find('tr').length;
+            
+            const newRow = `
+                <tr>
+                    <td>
+                        <input type="text" class="form-control" name="documents[${rowCount}][name]" placeholder="Dosya adı">
+                    </td>
+                    <td>
+                        <input type="text" class="form-control" name="documents[${rowCount}][description]" placeholder="Açıklama">
+                    </td>
+                    <td>
+                        <div class="input-group">
+                            <input type="text" class="form-control document-file-input" name="documents[${rowCount}][file]" readonly>
+                            <button type="button" class="btn btn-primary file-browser" data-index="${rowCount}">
+                                <i class="fas fa-file"></i>
+                            </button>
+                        </div>
+                    </td>
+                    <td>
+                        <button type="button" class="btn btn-sm btn-danger remove-row">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `;
+            
+            tableBody.append(newRow);
+        });
+        
+        // Dosya seçme butonu tıklama olayı
+        $(document).on('click', '.file-browser', function() {
+            currentDocumentIndex = $(this).data('index');
+            console.log('Dosya seçici açılıyor. Aktif dokuman index:', currentDocumentIndex);
+            
+            // MediaPicker URL - sadece dosya türleri için filtre ekle
+            const serviceId = {{ $service->id }};
+            const mediapickerUrl = `/admin/filemanagersystem/mediapicker?type=document&filter=all&related_type=service&related_id=${serviceId}`;
+            console.log('MediaPicker URL:', mediapickerUrl);
+            
+            // iFrame'i güncelle
+            $('#mediapickerFrame').attr('src', mediapickerUrl);
+            
+            // Bootstrap 5 Modal oluştur ve aç
+            try {
+                const modalElement = document.getElementById('mediapickerModal');
+                let modal;
+                
+                // Mevcut modal instance'ı var mı kontrol et
+                try {
+                    modal = bootstrap.Modal.getInstance(modalElement);
+                    if (!modal) {
+                        modal = new bootstrap.Modal(modalElement);
+                    }
+                } catch (e) {
+                    console.log('Modal instance bulunamadı, yeni oluşturuluyor');
+                    modal = new bootstrap.Modal(modalElement);
+                }
+                
+                // Modalı aç
+                modal.show();
+                console.log('Modal açıldı');
+            } catch (error) {
+                console.error('Modal açılırken hata oluştu:', error);
+                // Alternatif yöntem
+                try {
+                    $('#mediapickerModal').modal('show');
+                    console.log('Modal jQuery ile açıldı');
+                } catch (jqError) {
+                    console.error('Modal açılamadı:', jqError);
+                    alert('Dosya seçici açılamadı! Lütfen sayfayı yenileyip tekrar deneyin.');
+                }
+            }
+        });
+        
+        // iframe'den medya seçim mesajını dinle
+        window.addEventListener('message', function(event) {
+            let fileUrl = null;
+            let modalClosed = false;
+            
+            // Gelen mesajı analiz et
+            console.group('MediaPicker - Gelen Mesaj');
+            console.log('Event data:', event.data);
+            console.log('Event origin:', event.origin);
+            console.log('Event source:', event.source ? 'Mevcut' : 'Yok');
+            console.groupEnd();
+            
+            try {
+                if (event.data && event.data.type === 'mediaSelected') {
+                    console.group('MediaPicker - Seçilen Dosya');
+                    console.log('Seçilen dosya tam veri:', event.data);
+                    console.log('Dosya URL:', event.data.mediaUrl);
+                    console.log('Dosya adı:', event.data.mediaName);
+                    console.log('Dosya tipi:', event.data.mediaType);
+                    console.log('Dosya ID:', event.data.mediaId);
+                    console.groupEnd();
+                    
+                    // event.data'dan doğrudan URL değerini al
+                    if (event.data.mediaUrl) {
+                        // Dosya URL'sini temizle
+                        fileUrl = event.data.mediaUrl;
+                        
+                        // Eğer URL göreceli ise (/ ile başlıyorsa) tam URL'ye çevir
+                        if (fileUrl && fileUrl.startsWith('/')) {
+                            const baseUrl = window.location.protocol + '//' + window.location.host;
+                            fileUrl = baseUrl + fileUrl;
+                        }
+                        
+                        // Seçilen dosyanın URL'sini input alanına ekle
+                        $(`input[name="documents[${currentDocumentIndex}][file]"]`).val(fileUrl);
+                        
+                        // Dosya adı otomatik doldurma (boşsa)
+                        const nameInput = $(`input[name="documents[${currentDocumentIndex}][name]"]`);
+                        if (!nameInput.val() && event.data.mediaName) {
+                            nameInput.val(event.data.mediaName);
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('Dosya seçimi işlenirken hata oluştu:', error);
+                alert('Dosya seçimi işlenirken bir hata oluştu.');
+            } finally {
+                // Modalı kapat - hata olsa da olmasa da çalışacak
+                try {
+                    modalClosed = closeModal();
+                } catch (modalError) {
+                    console.error('Modal kapatılırken hata oluştu:', modalError);
+                }
+                
+                // Hiçbir yöntemle kapatılamadıysa
+                if (!modalClosed && fileUrl) {
+                    console.log('Modal kapatılamadı ama dosya başarıyla seçildi:', fileUrl);
+                }
+            }
+        });
+    });
+</script>
+
+<script>
+    // FileManagerSystem Picker fonksiyonu 
+    function openFileManagerSystemPicker(editor) {
+        // Geçici bir ID oluştur
+        const tempId = Date.now();
+        const relatedType = 'service_content';
+        
+        // MediaPicker URL
+        const mediapickerUrl = '/admin/filemanagersystem/mediapicker?type=image&filter=all&related_type=' + relatedType + '&related_id=' + tempId;
+        
+        // iFrame'i güncelle
+        $('#mediapickerFrame').attr('src', mediapickerUrl);
+        
+        // Modal'ı göster - Bootstrap 5 ile uyumlu
+        var modal = new bootstrap.Modal(document.getElementById('mediapickerModal'));
+        modal.show();
+        
+        // Mesaj dinleme işlevi
+        function handleMediaSelection(event) {
+            try {
+                if (event.data && event.data.type === 'mediaSelected') {
+                    let mediaUrl = '';
+                    let altText = event.data.mediaAlt || '';
+                    let titleText = event.data.mediaTitle || '';
+                    
+                    // URL değerini al
+                    if (event.data.mediaUrl) {
+                        mediaUrl = event.data.mediaUrl;
+                        
+                        // URL çevirme
+                        if (mediaUrl && mediaUrl.startsWith('/')) {
+                            const baseUrl = window.location.protocol + '//' + window.location.host;
+                            mediaUrl = baseUrl + mediaUrl;
+                        }
+                    } else if (event.data.mediaId) {
+                        // ID ile kullan
+                        const previewUrl = '/admin/filemanagersystem/media/preview/' + event.data.mediaId;
+                        mediaUrl = previewUrl;
+                    }
+                    
+                    if (mediaUrl) {
+                        // Görsel ekle
+                        editor.insertContent('<img src="' + mediaUrl + '" alt="' + altText + '" title="' + titleText + '" />');
+                        
+                        // Modalı kapat
+                        modal.hide();
+                        
+                        // Event listener'ı kaldır
+                        window.removeEventListener('message', handleMediaSelection);
+                    }
+                } else if (event.data && event.data.type === 'mediapickerError') {
+                    console.error('FileManagerSystem hatası:', event.data.message);
+                    alert('Medya seçici hatası: ' + event.data.message);
+                    modal.hide();
+                    
+                    window.removeEventListener('message', handleMediaSelection);
+                }
+            } catch (error) {
+                console.error('Medya seçimi işlenirken hata oluştu:', error);
+                alert('Medya seçimi işlenirken bir hata oluştu.');
+                
+                window.removeEventListener('message', handleMediaSelection);
+            }
+        }
+        
+        // Event listener ekle
+        window.removeEventListener('message', handleMediaSelection);
+        window.addEventListener('message', handleMediaSelection);
+    }
+</script>
+
+<!-- FileManagerSystem görsel seçici script -->
+<script>
+$(document).ready(function() {
+    // FileManagerSystem entegrasyonu - Ana Görsel Seçimi
+    $('#filemanagersystem_image_button').on('click', function() {
+        const input = $('#filemanagersystem_image');
+        const preview = $('#filemanagersystem_image_preview');
+        const previewImg = preview.find('img');
+        
+        // Geçici bir ID oluştur
+        const tempId = Date.now();
+        const relatedType = 'service';
+        
+        // MediaPicker URL
+        const mediapickerUrl = '/admin/filemanagersystem/mediapicker?type=image&filter=all&related_type=' + relatedType + '&related_id=' + tempId;
+        
+        // iFrame'i güncelle
+        $('#mediapickerFrame').attr('src', mediapickerUrl);
+        
+        // Modal'ı göster - Bootstrap 5 ile uyumlu
+        var modal = new bootstrap.Modal(document.getElementById('mediapickerModal'));
+        modal.show();
+        
+        // Medya seçimi mesaj dinleyicisi
+        function handleMediaSelection(event) {
+            try {
+                if (event.data && event.data.type === 'mediaSelected') {
+                    let mediaUrl = '';
+                    
+                    // URL değerini al
+                    if (event.data.mediaUrl) {
+                        mediaUrl = event.data.mediaUrl;
+                    } else if (event.data.mediaId) {
+                        // ID ile kullan
+                        mediaUrl = '/admin/filemanagersystem/media/preview/' + event.data.mediaId;
+                    }
+                    
+                    if (mediaUrl) {
+                        // Input'a URL'yi ekle
+                        input.val(mediaUrl);
+                        
+                        // Önizlemeyi göster
+                        previewImg.attr('src', mediaUrl);
+                        preview.show();
+                        
+                        // Uyarıyı gizle
+                        $('#image-warning').hide();
+                        
+                        // Modalı kapat
+                        modal.hide();
+                        
+                        // Event listener'ı kaldır
+                        window.removeEventListener('message', handleMediaSelection);
+                    }
+                } else if (event.data && event.data.type === 'mediapickerError') {
+                    console.error('MediaPicker hatası:', event.data.message);
+                    alert('Medya seçici hatası: ' + event.data.message);
+                    modal.hide();
+                    
+                    window.removeEventListener('message', handleMediaSelection);
+                }
+            } catch (error) {
+                console.error('Medya seçimi işlenirken hata oluştu:', error);
+                window.removeEventListener('message', handleMediaSelection);
+            }
+        }
+        
+        // Event listener ekle
+        window.removeEventListener('message', handleMediaSelection);
+        window.addEventListener('message', handleMediaSelection);
+    });
+
+    // Mevcut görsel varsa göster
+    const initialImageValue = $('#filemanagersystem_image').val();
+    if (initialImageValue) {
+        $('#filemanagersystem_image_preview').show();
+        $('#filemanagersystem_image_preview img').attr('src', initialImageValue);
+        $('#image-warning').hide(); // Görsel varsa uyarıyı gizle
+    }
+});
 </script>
 @stop 

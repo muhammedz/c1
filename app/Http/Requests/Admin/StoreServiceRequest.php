@@ -26,7 +26,7 @@ class StoreServiceRequest extends FormRequest
             'slug' => 'nullable|string|max:255|unique:services,slug',
             'summary' => 'nullable|string|max:1000',
             'content' => 'required|string',
-            'image' => 'required|string',
+            'image' => 'nullable|string',
             'gallery' => 'nullable|array',
             'gallery.*' => 'nullable|string',
             'features' => 'nullable|array',
@@ -55,7 +55,6 @@ class StoreServiceRequest extends FormRequest
         return [
             'title.required' => 'Başlık alanı zorunludur.',
             'content.required' => 'İçerik alanı zorunludur.',
-            'image.required' => 'Ana görsel alanı zorunludur.',
             'image.image' => 'Ana görsel geçerli bir resim dosyası olmalıdır.',
             'image.mimes' => 'Ana görsel jpeg, png, jpg veya gif formatında olmalıdır.',
             'image.max' => 'Ana görsel en fazla 2MB olabilir.',

@@ -352,100 +352,35 @@
                     </div>
                 </div>
                         
-                <!-- Medya -->
+                <!-- Hizmet Görseli -->
                 <div class="card mb-4">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0">Medya</h5>
+                    <div class="card-header">
+                        <h5 class="mb-0">Hizmet Görseli</h5>
                     </div>
                     <div class="card-body">
+                        <!-- FileManagerSystem Görsel -->
                         <div class="mb-4">
-                            <label for="image" class="form-label">Ana Görsel <span class="text-danger">*</span></label>
+                            <label for="filemanagersystem_image" class="form-label">Hizmet Görseli <span class="text-danger">*</span></label>
                             <div class="input-group">
-                                <input type="text" class="form-control @error('image') is-invalid @enderror" id="image" name="image" value="{{ old('image') }}" required readonly>
-                                <button class="btn btn-primary" type="button" id="image-browser" data-input="image" data-preview="image-preview">
-                                    <i class="fas fa-folder-open"></i> Göz At
+                                <input type="text" class="form-control @error('image') is-invalid @enderror" id="filemanagersystem_image" name="image" value="{{ old('image') }}">
+                                <button type="button" class="btn btn-primary" id="filemanagersystem_image_button">
+                                    <i class="fas fa-image"></i> Görsel Seç
                                 </button>
-                                <button class="btn btn-danger" type="button" id="image-clear">
-                                    <i class="fas fa-times"></i>
-                                </button>
-                            </div>
-                            <div id="image-preview" class="mt-3" style="display: none;">
-                                <div class="position-relative d-inline-block">
-                                    <img src="" class="img-fluid" alt="Seçilen görsel">
-                                </div>
                             </div>
                             @error('image')
-                                <div class="invalid-feedback d-block">{{ $message }}</div>
+                                <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
-                            <small class="text-muted mt-2 d-block">
-                                <i class="fas fa-info-circle"></i> Önerilen görsel boyutu: 1200x630 piksel
-                            </small>
-                        </div>
-                                
-                        <div class="mb-4">
-                            <label class="form-label d-flex justify-content-between align-items-center">
-                                <span>Galeri</span>
-                                <small class="text-muted">En fazla 10 görsel ekleyebilirsiniz</small>
-                            </label>
-                            <div class="d-flex mb-3">
-                                <button type="button" id="gallery-browser" class="btn btn-outline-primary" data-input="fake-gallery-input">
-                                    <i class="fas fa-images me-1"></i> Görsel Ekle
-                                </button>
+                            <div id="filemanagersystem_image_preview" class="mt-2" style="display: {{ old('image') ? 'block' : 'none' }};">
+                                <img src="{{ old('image') ? asset(old('image')) : '' }}" alt="Önizleme" class="img-thumbnail">
                             </div>
-                            <input type="hidden" id="fake-gallery-input" class="fake-gallery-input">
-                            <div class="gallery-container" id="gallery-preview"></div>
-                            <div id="gallery-inputs"></div>
-                            @error('gallery')
-                                <div class="invalid-feedback d-block">{{ $message }}</div>
-                            @enderror
-                            @error('gallery.*')
-                                <div class="invalid-feedback d-block">{{ $message }}</div>
-                            @enderror
-                        </div>
-                        
-                        <!-- Hero Özellikleri -->
-                        <div class="mb-4">
-                            <label class="form-label d-flex justify-content-between align-items-center">
-                                <span>Hero Özellikleri</span>
-                                <small class="text-muted">Hizmet detay sayfasında gösterilecek özellikler</small>
-                            </label>
-                            
-                            <div class="card">
-                                <div class="card-body">
-                                    <p class="text-muted small mb-3">Bu özellikler hizmet detay sayfasında ana görsel üzerinde listelenecektir.</p>
-                                    
-                                    <div id="features-container">
-                                        @if(old('features'))
-                                            @foreach(old('features') as $index => $feature)
-                                                <div class="feature-item mb-2 d-flex align-items-center">
-                                                    <input type="text" class="form-control" name="features[]" value="{{ $feature }}" placeholder="Özellik ekleyin">
-                                                    <button type="button" class="btn btn-sm btn-danger ms-2 remove-feature"><i class="fas fa-times"></i></button>
-                                                </div>
-                                            @endforeach
-                                        @else
-                                            <div class="feature-item mb-2 d-flex align-items-center">
-                                                <input type="text" class="form-control" name="features[]" placeholder="Özellik ekleyin">
-                                                <button type="button" class="btn btn-sm btn-danger ms-2 remove-feature"><i class="fas fa-times"></i></button>
-                                            </div>
-                                        @endif
-                                    </div>
-                                    
-                                    <button type="button" id="add-feature" class="btn btn-sm btn-outline-primary mt-2">
-                                        <i class="fas fa-plus me-1"></i> Özellik Ekle
-                                    </button>
-                                </div>
+                            <div class="alert alert-warning mt-2" id="image-warning">
+                                <i class="fas fa-exclamation-triangle me-1"></i>
+                                <strong>Not:</strong> Hizmet görsel alanı opsiyoneldir. İsterseniz bir görsel seçebilirsiniz.
                             </div>
-                            
-                            @error('features')
-                                <div class="invalid-feedback d-block">{{ $message }}</div>
-                            @enderror
-                            @error('features.*')
-                                <div class="invalid-feedback d-block">{{ $message }}</div>
-                            @enderror
                         </div>
                     </div>
                 </div>
-                        
+                
                 <!-- CTA Ayarları -->
                 <div class="card mb-4">
                     <div class="card-header">
@@ -1120,5 +1055,102 @@
             $(this).closest('.feature-item').remove();
         });
     });
+</script>
+
+<!-- MediaPicker Modal -->
+<div class="modal fade" id="mediapickerModal" tabindex="-1" role="dialog" aria-labelledby="mediapickerModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="mediapickerModalLabel">Medya Seçici</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+            </div>
+            <div class="modal-body p-0">
+                <iframe id="mediapickerFrame" style="width: 100%; height: 80vh; border: none;"></iframe>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- FileManagerSystem görsel seçici script -->
+<script>
+$(document).ready(function() {
+    // FileManagerSystem entegrasyonu - Ana Görsel Seçimi
+    $('#filemanagersystem_image_button').on('click', function() {
+        const input = $('#filemanagersystem_image');
+        const preview = $('#filemanagersystem_image_preview');
+        const previewImg = preview.find('img');
+        
+        // Geçici bir ID oluştur
+        const tempId = Date.now();
+        const relatedType = 'service';
+        
+        // MediaPicker URL
+        const mediapickerUrl = '/admin/filemanagersystem/mediapicker?type=image&filter=all&related_type=' + relatedType + '&related_id=' + tempId;
+        
+        // iFrame'i güncelle
+        $('#mediapickerFrame').attr('src', mediapickerUrl);
+        
+        // Modal'ı göster - Bootstrap 5 ile uyumlu
+        var modal = new bootstrap.Modal(document.getElementById('mediapickerModal'));
+        modal.show();
+        
+        // Medya seçimi mesaj dinleyicisi
+        function handleMediaSelection(event) {
+            try {
+                if (event.data && event.data.type === 'mediaSelected') {
+                    let mediaUrl = '';
+                    
+                    // URL değerini al
+                    if (event.data.mediaUrl) {
+                        mediaUrl = event.data.mediaUrl;
+                    } else if (event.data.mediaId) {
+                        // ID ile kullan
+                        mediaUrl = '/admin/filemanagersystem/media/preview/' + event.data.mediaId;
+                    }
+                    
+                    if (mediaUrl) {
+                        // Input'a URL'yi ekle
+                        input.val(mediaUrl);
+                        
+                        // Önizlemeyi göster
+                        previewImg.attr('src', mediaUrl);
+                        preview.show();
+                        
+                        // Uyarıyı gizle
+                        $('#image-warning').hide();
+                        
+                        // Modalı kapat
+                        modal.hide();
+                        
+                        // Event listener'ı kaldır
+                        window.removeEventListener('message', handleMediaSelection);
+                    }
+                } else if (event.data && event.data.type === 'mediapickerError') {
+                    console.error('MediaPicker hatası:', event.data.message);
+                    alert('Medya seçici hatası: ' + event.data.message);
+                    modal.hide();
+                    
+                    window.removeEventListener('message', handleMediaSelection);
+                }
+            } catch (error) {
+                console.error('Medya seçimi işlenirken hata oluştu:', error);
+                window.removeEventListener('message', handleMediaSelection);
+            }
+        }
+        
+        // Event listener ekle
+        window.removeEventListener('message', handleMediaSelection);
+        window.addEventListener('message', handleMediaSelection);
+    });
+
+    // Mevcut görsel varsa göster
+    const initialImageValue = $('#filemanagersystem_image').val();
+    if (initialImageValue) {
+        $('#filemanagersystem_image_preview').show();
+        $('#filemanagersystem_image_preview img').attr('src', initialImageValue);
+        $('#image-warning').hide(); // Görsel varsa uyarıyı gizle
+    }
+});
 </script>
 @endsection 

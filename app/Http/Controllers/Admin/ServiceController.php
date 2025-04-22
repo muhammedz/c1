@@ -75,8 +75,11 @@ class ServiceController extends Controller
             $data = $request->validated();
             
             // URL'deki yinelenen /storage/ yolunu düzelt
-            if (isset($data['image'])) {
+            if (isset($data['image']) && !empty($data['image'])) {
                 $data['image'] = $this->fixStoragePath($data['image']);
+            } else {
+                // Image yoksa data'dan kaldır
+                unset($data['image']);
             }
             
             // Galeri URL'lerini düzelt
@@ -108,6 +111,14 @@ class ServiceController extends Controller
             
             // Özellikler dizisini ekleyelim
             $data['features'] = $features;
+            
+            // Detay sayfası içeriğini ekle
+            $details = $request->input('details', []);
+            if (!empty($details)) {
+                foreach ($details as $key => $value) {
+                    $data['features'][$key] = $value;
+                }
+            }
             
             // Diğer alanlar
             $data['view_count'] = 0;
@@ -165,6 +176,18 @@ class ServiceController extends Controller
             $service->gallery = [];
         }
         
+        // Features değerleri içerisindeki standard_forms dizisini string yap
+        if (isset($service->features['standard_forms']) && is_array($service->features['standard_forms'])) {
+            $features = $service->features;
+            $features['standard_forms'] = '';
+            
+            // Özelliği doğrudan atama yapmadan güncelle
+            $service->update(['features' => $features]);
+            
+            // Güncel veriyi yeniden alalım
+            $service->refresh();
+        }
+        
         $headlineCount = Service::where('is_headline', true)->count();
         $maxHeadlinesReached = $headlineCount >= 4 && !$service->is_headline;
         $categories = ServiceCategory::where('is_active', true)->orderBy('name')->get();
@@ -186,8 +209,11 @@ class ServiceController extends Controller
             $data = $request->validated();
             
             // URL'deki yinelenen /storage/ yolunu düzelt
-            if (isset($data['image'])) {
+            if (isset($data['image']) && !empty($data['image'])) {
                 $data['image'] = $this->fixStoragePath($data['image']);
+            } else {
+                // Image yoksa data'dan kaldır
+                unset($data['image']);
             }
             
             // Galeri URL'lerini düzelt
@@ -220,11 +246,38 @@ class ServiceController extends Controller
             // Özellikler dizisini ekleyelim
             $data['features'] = $features;
             
+            // Detay sayfası içeriğini ekle
+            $details = $request->input('details', []);
+            if (!empty($details)) {
+                foreach ($details as $key => $value) {
+                    $data['features'][$key] = $value;
+                }
+            }
+            
             // Yayınlanma durumu ile ilgili özel ayarlar
             $data['is_scheduled'] = !empty($request->end_date);
             
             // Hizmeti güncelle
             $service->update($data);
+            
+            // Dokümanları güncelle
+            $documents = $request->input('documents', []);
+            if (!empty($documents)) {
+                // Boş dosya alanlarını temizle
+                $filteredDocuments = [];
+                foreach ($documents as $document) {
+                    if (!empty($document['file']) && !empty($document['name'])) {
+                        // Dosya yolunu düzelt
+                        $document['file'] = $this->fixStoragePath($document['file']);
+                        $filteredDocuments[] = $document;
+                    }
+                }
+                
+                // Dokümanları özellikler içine ekle
+                $features = $service->features;
+                $features['documents'] = $filteredDocuments;
+                $service->update(['features' => $features]);
+            }
             
             // Kategorileri güncelle
             $service->categories()->sync($categories);
