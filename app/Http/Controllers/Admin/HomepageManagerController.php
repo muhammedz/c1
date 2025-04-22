@@ -47,12 +47,16 @@ class HomepageManagerController extends Controller
         $request->validate([
             'name' => 'nullable|string|max:255',
             'title' => 'nullable|string|max:255',
-            'profile_photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'filemanagersystem_profile_photo' => 'nullable|string',
+            'filemanagersystem_profile_photo_alt' => 'nullable|string|max:255',
+            'filemanagersystem_profile_photo_title' => 'nullable|string|max:255',
             'facebook_url' => 'nullable|url',
             'instagram_url' => 'nullable|url',
             'twitter_url' => 'nullable|url',
             'youtube_url' => 'nullable|url',
-            'contact_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'filemanagersystem_contact_image' => 'nullable|string',
+            'filemanagersystem_contact_image_alt' => 'nullable|string|max:255',
+            'filemanagersystem_contact_image_title' => 'nullable|string|max:255',
         ]);
         
         // İlk kaydı al veya yeni oluştur
@@ -66,28 +70,18 @@ class HomepageManagerController extends Controller
         $profileSettings->twitter_url = $request->twitter_url;
         $profileSettings->youtube_url = $request->youtube_url;
         
-        // Profil fotoğrafını güncelle
-        if ($request->hasFile('profile_photo')) {
-            // Eğer varsa eski dosyayı sil
-            if ($profileSettings->profile_photo) {
-                Storage::disk('public')->delete($profileSettings->profile_photo);
-            }
-            
-            // Yeni fotoğrafı yükle
-            $profilePhotoPath = $request->file('profile_photo')->store('profile', 'public');
-            $profileSettings->profile_photo = $profilePhotoPath;
+        // FileManagerSystem profil fotoğrafı
+        if ($request->has('filemanagersystem_profile_photo')) {
+            $profileSettings->filemanagersystem_profile_photo = $request->filemanagersystem_profile_photo;
+            $profileSettings->filemanagersystem_profile_photo_alt = $request->filemanagersystem_profile_photo_alt;
+            $profileSettings->filemanagersystem_profile_photo_title = $request->filemanagersystem_profile_photo_title;
         }
         
-        // İletişim görselini güncelle
-        if ($request->hasFile('contact_image')) {
-            // Eğer varsa eski dosyayı sil
-            if ($profileSettings->contact_image) {
-                Storage::disk('public')->delete($profileSettings->contact_image);
-            }
-            
-            // Yeni görseli yükle
-            $contactImagePath = $request->file('contact_image')->store('contact', 'public');
-            $profileSettings->contact_image = $contactImagePath;
+        // FileManagerSystem iletişim görseli
+        if ($request->has('filemanagersystem_contact_image')) {
+            $profileSettings->filemanagersystem_contact_image = $request->filemanagersystem_contact_image;
+            $profileSettings->filemanagersystem_contact_image_alt = $request->filemanagersystem_contact_image_alt;
+            $profileSettings->filemanagersystem_contact_image_title = $request->filemanagersystem_contact_image_title;
         }
         
         $profileSettings->save();

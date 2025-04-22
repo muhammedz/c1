@@ -32,20 +32,46 @@
                                 <h3 class="card-title">Kişisel Bilgiler</h3>
                             </div>
                             <div class="card-body">
-                                <!-- Profil Fotoğrafı -->
+                                <!-- Profil Fotoğrafı - Medya Kütüphanesi -->
                                 <div class="form-group">
-                                    <label for="profile_photo">Profil Fotoğrafı</label>
-                                    <div class="input-group mb-3">
-                                        <div class="custom-file">
-                                            <input type="file" class="custom-file-input" id="profile_photo" name="profile_photo">
-                                            <label class="custom-file-label" for="profile_photo">Dosya Seç</label>
+                                    <label for="filemanagersystem_profile_photo">Profil Fotoğrafı</label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control @error('filemanagersystem_profile_photo') is-invalid @enderror" id="filemanagersystem_profile_photo" name="filemanagersystem_profile_photo" value="{{ old('filemanagersystem_profile_photo', $profileSettings->filemanagersystem_profile_photo) }}" readonly>
+                                        <div class="input-group-append">
+                                            <button type="button" class="btn btn-primary" id="filemanagersystem_profile_photo_button">
+                                                <i class="fas fa-image"></i> Görsel Seç
+                                            </button>
                                         </div>
                                     </div>
-                                    @if($profileSettings->profile_photo)
-                                        <div class="mt-2">
-                                            <img src="{{ asset('storage/' . $profileSettings->profile_photo) }}" alt="Profil Fotoğrafı" class="img-thumbnail" style="max-width: 200px;">
+                                    <div id="filemanagersystem_profile_photo_preview" class="mt-2" style="{{ $profileSettings->filemanagersystem_profile_photo ? '' : 'display: none;' }}">
+                                        <img src="{{ $profileSettings->filemanagersystem_profile_photo }}" alt="Profil Fotoğrafı" class="img-thumbnail" style="max-width: 200px;">
+                                    </div>
+                                    @error('filemanagersystem_profile_photo')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="filemanagersystem_profile_photo_alt">Görsel Alt Metni</label>
+                                            <input type="text" class="form-control @error('filemanagersystem_profile_photo_alt') is-invalid @enderror" id="filemanagersystem_profile_photo_alt" name="filemanagersystem_profile_photo_alt" value="{{ old('filemanagersystem_profile_photo_alt', $profileSettings->filemanagersystem_profile_photo_alt) }}">
+                                            <small class="text-muted">Görsel yüklenemediğinde gösterilecek metin.</small>
+                                            @error('filemanagersystem_profile_photo_alt')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
                                         </div>
-                                    @endif
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="filemanagersystem_profile_photo_title">Görsel Başlığı</label>
+                                            <input type="text" class="form-control @error('filemanagersystem_profile_photo_title') is-invalid @enderror" id="filemanagersystem_profile_photo_title" name="filemanagersystem_profile_photo_title" value="{{ old('filemanagersystem_profile_photo_title', $profileSettings->filemanagersystem_profile_photo_title) }}">
+                                            <small class="text-muted">Görsel üzerine gelindiğinde gösterilecek metin.</small>
+                                            @error('filemanagersystem_profile_photo_title')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+                                    </div>
                                 </div>
                                 
                                 <!-- İsim -->
@@ -68,19 +94,46 @@
                                 <h3 class="card-title">İletişim Merkezi Görseli</h3>
                             </div>
                             <div class="card-body">
+                                <!-- İletişim Görseli - Medya Kütüphanesi -->
                                 <div class="form-group">
-                                    <label for="contact_image">İletişim Görseli</label>
-                                    <div class="input-group mb-3">
-                                        <div class="custom-file">
-                                            <input type="file" class="custom-file-input" id="contact_image" name="contact_image">
-                                            <label class="custom-file-label" for="contact_image">Dosya Seç</label>
+                                    <label for="filemanagersystem_contact_image">İletişim Görseli</label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control @error('filemanagersystem_contact_image') is-invalid @enderror" id="filemanagersystem_contact_image" name="filemanagersystem_contact_image" value="{{ old('filemanagersystem_contact_image', $profileSettings->filemanagersystem_contact_image) }}" readonly>
+                                        <div class="input-group-append">
+                                            <button type="button" class="btn btn-primary" id="filemanagersystem_contact_image_button">
+                                                <i class="fas fa-image"></i> Görsel Seç
+                                            </button>
                                         </div>
                                     </div>
-                                    @if($profileSettings->contact_image)
-                                        <div class="mt-2">
-                                            <img src="{{ asset('storage/' . $profileSettings->contact_image) }}" alt="İletişim Görseli" class="img-thumbnail" style="max-width: 200px;">
+                                    <div id="filemanagersystem_contact_image_preview" class="mt-2" style="{{ $profileSettings->filemanagersystem_contact_image ? '' : 'display: none;' }}">
+                                        <img src="{{ $profileSettings->filemanagersystem_contact_image }}" alt="İletişim Görseli" class="img-thumbnail" style="max-width: 200px;">
+                                    </div>
+                                    @error('filemanagersystem_contact_image')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="filemanagersystem_contact_image_alt">Görsel Alt Metni</label>
+                                            <input type="text" class="form-control @error('filemanagersystem_contact_image_alt') is-invalid @enderror" id="filemanagersystem_contact_image_alt" name="filemanagersystem_contact_image_alt" value="{{ old('filemanagersystem_contact_image_alt', $profileSettings->filemanagersystem_contact_image_alt) }}">
+                                            <small class="text-muted">Görsel yüklenemediğinde gösterilecek metin.</small>
+                                            @error('filemanagersystem_contact_image_alt')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
                                         </div>
-                                    @endif
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="filemanagersystem_contact_image_title">Görsel Başlığı</label>
+                                            <input type="text" class="form-control @error('filemanagersystem_contact_image_title') is-invalid @enderror" id="filemanagersystem_contact_image_title" name="filemanagersystem_contact_image_title" value="{{ old('filemanagersystem_contact_image_title', $profileSettings->filemanagersystem_contact_image_title) }}">
+                                            <small class="text-muted">Görsel üzerine gelindiğinde gösterilecek metin.</small>
+                                            @error('filemanagersystem_contact_image_title')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -139,7 +192,6 @@
                             </div>
                         </div>
                         
-                        <!-- Ön İzleme -->
                         <div class="card card-primary card-outline">
                             <div class="card-header">
                                 <h3 class="card-title">Ön İzleme</h3>
@@ -168,6 +220,23 @@
             </form>
         </div>
     </div>
+    
+    <!-- MediaPicker Modal -->
+    <div class="modal fade" id="mediapickerModal" tabindex="-1" role="dialog" aria-labelledby="mediapickerModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="mediapickerModalLabel">Medya Seçici</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Kapat">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body p-0">
+                    <iframe id="mediapickerFrame" style="width: 100%; height: 80vh; border: none;"></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
 @stop
 
 @section('css')
@@ -181,10 +250,120 @@
 @section('js')
     <script>
         $(function() {
-            // Dosya seçildiğinde adını göster
-            $('.custom-file-input').on('change', function() {
-                var fileName = $(this).val().split('\\').pop();
-                $(this).siblings('.custom-file-label').addClass('selected').html(fileName);
+            // FileManagerSystem entegrasyonu - Profil Fotoğrafı
+            $('#filemanagersystem_profile_photo_button').on('click', function() {
+                const input = $('#filemanagersystem_profile_photo');
+                const preview = $('#filemanagersystem_profile_photo_preview');
+                const previewImg = preview.find('img');
+                
+                // Geçici bir ID oluştur
+                const tempId = Date.now();
+                const relatedType = 'profile_settings';
+                
+                // MediaPicker URL
+                const mediapickerUrl = '/admin/filemanagersystem/mediapicker?type=image&filter=all&related_type=' + relatedType + '&related_id=' + tempId;
+                
+                // iFrame'i güncelle
+                $('#mediapickerFrame').attr('src', mediapickerUrl);
+                
+                // Modal'ı göster
+                $('#mediapickerModal').modal('show');
+                
+                // Global mesaj dinleyicisi
+                window.removeEventListener('message', handleFilemanagerMessage);
+                window.addEventListener('message', handleFilemanagerMessage);
+                
+                // Mesaj işleme fonksiyonu
+                function handleFilemanagerMessage(event) {
+                    console.log('Mesaj alındı:', event.data);
+                    
+                    let data;
+                    // Gelen veri string mi yoksa obje mi kontrol et
+                    if (typeof event.data === 'string') {
+                        try {
+                            data = JSON.parse(event.data);
+                        } catch (e) {
+                            console.log('String mesaj JSON olarak işlenemedi:', e);
+                            return;
+                        }
+                    } else {
+                        // Zaten obje ise doğrudan kullan
+                        data = event.data;
+                    }
+                    
+                    // data objesinde type property'si var mı kontrol et - mediaSelected mesajını dinle
+                    if (data && data.type === 'mediaSelected') {
+                        console.log('Medya seçildi:', data);
+                        
+                        // Input alanını güncelle
+                        input.val(data.mediaUrl);
+                        
+                        // Önizlemeyi güncelle
+                        previewImg.attr('src', data.mediaUrl);
+                        preview.show();
+                        
+                        // Modal'ı kapat
+                        $('#mediapickerModal').modal('hide');
+                    }
+                }
+            });
+            
+            // FileManagerSystem entegrasyonu - İletişim Görseli
+            $('#filemanagersystem_contact_image_button').on('click', function() {
+                const input = $('#filemanagersystem_contact_image');
+                const preview = $('#filemanagersystem_contact_image_preview');
+                const previewImg = preview.find('img');
+                
+                // Geçici bir ID oluştur
+                const tempId = Date.now();
+                const relatedType = 'profile_settings_contact';
+                
+                // MediaPicker URL
+                const mediapickerUrl = '/admin/filemanagersystem/mediapicker?type=image&filter=all&related_type=' + relatedType + '&related_id=' + tempId;
+                
+                // iFrame'i güncelle
+                $('#mediapickerFrame').attr('src', mediapickerUrl);
+                
+                // Modal'ı göster
+                $('#mediapickerModal').modal('show');
+                
+                // Global mesaj dinleyicisi
+                window.removeEventListener('message', handleFilemanagerMessage);
+                window.addEventListener('message', handleFilemanagerMessage);
+                
+                // Mesaj işleme fonksiyonu
+                function handleFilemanagerMessage(event) {
+                    console.log('Mesaj alındı:', event.data);
+                    
+                    let data;
+                    // Gelen veri string mi yoksa obje mi kontrol et
+                    if (typeof event.data === 'string') {
+                        try {
+                            data = JSON.parse(event.data);
+                        } catch (e) {
+                            console.log('String mesaj JSON olarak işlenemedi:', e);
+                            return;
+                        }
+                    } else {
+                        // Zaten obje ise doğrudan kullan
+                        data = event.data;
+                    }
+                    
+                    // data objesinde type property'si var mı kontrol et - mediaSelected mesajını dinle
+                    if (data && data.type === 'mediaSelected') {
+                        console.log('Medya seçildi:', data);
+                        
+                        // Input alanını güncelle
+                        input.val(data.mediaUrl);
+                        
+                        // Önizlemeyi güncelle
+                        previewImg.attr('src', data.mediaUrl);
+                        preview.show();
+                        
+                        // Modal'ı kapat
+                        $('#mediapickerModal').modal('hide');
+                    }
+                }
             });
         });
     </script>
