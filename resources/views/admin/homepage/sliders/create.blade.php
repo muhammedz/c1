@@ -55,7 +55,7 @@
                         <!-- Sıralama -->
                         <div class="form-group">
                             <label for="order">Sıralama</label>
-                            <input type="number" class="form-control @error('order') is-invalid @enderror" id="order" name="order" value="{{ old('order', 0) }}" min="0" required>
+                            <input type="number" class="form-control @error('order') is-invalid @enderror" id="order" name="order" value="{{ old('order', 0) }}" min="0">
                             @error('order')
                                 <span class="invalid-feedback">{{ $message }}</span>
                             @enderror

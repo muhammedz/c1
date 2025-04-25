@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
@@ -11,22 +12,36 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('news', function (Blueprint $table) {
-            // Filtreleme işlemlerinde sık kullanılan alanlara index ekle
-            $table->index('status');
-            $table->index('is_headline');
-            $table->index('is_featured');
-            $table->index('is_scheduled');
-            $table->index('published_at');
-            $table->index('end_date');
-            $table->index('created_at');
+        // Öncelikle is_featured sütununu ekleyelim
+        if (Schema::hasTable('news') && !Schema::hasColumn('news', 'is_featured')) {
+            Schema::table('news', function (Blueprint $table) {
+                $table->boolean('is_featured')->default(false)->after('is_headline');
+            });
+        }
+
+        // Şimdi indeksleri kontrol edip eksik olanları ekleyelim
+        if (Schema::hasTable('news')) {
+            $indexes = $this->getTableIndexes('news');
             
-            // Sıralama ve manşet için çoklu index
-            $table->index(['is_headline', 'headline_order']);
+            // Sırayla her indeksi kontrol edelim
+            if (!in_array('news_is_headline_index', $indexes)) {
+                DB::statement('ALTER TABLE news ADD INDEX news_is_headline_index (is_headline)');
+            }
             
-            // Öne çıkan haberler ve yayın tarihi için çoklu index
-            $table->index(['is_featured', 'published_at']);
-        });
+            if (!in_array('news_is_featured_index', $indexes)) {
+                if (Schema::hasColumn('news', 'is_featured')) {
+                    DB::statement('ALTER TABLE news ADD INDEX news_is_featured_index (is_featured)');
+                }
+            }
+            
+            if (!in_array('news_status_index', $indexes)) {
+                DB::statement('ALTER TABLE news ADD INDEX news_status_index (status)');
+            }
+            
+            if (!in_array('news_published_at_index', $indexes)) {
+                DB::statement('ALTER TABLE news ADD INDEX news_published_at_index (published_at)');
+            }
+        }
     }
 
     /**
@@ -34,19 +49,41 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('news', function (Blueprint $table) {
-            // Tekli indexleri kaldır
-            $table->dropIndex(['status']);
-            $table->dropIndex(['is_headline']);
-            $table->dropIndex(['is_featured']);
-            $table->dropIndex(['is_scheduled']);
-            $table->dropIndex(['published_at']);
-            $table->dropIndex(['end_date']);
-            $table->dropIndex(['created_at']);
+        // İndeksleri siler
+        // Hataya sebep olmaması için sadece varsa siliyoruz
+        if (Schema::hasTable('news')) {
+            $indexes = $this->getTableIndexes('news');
             
-            // Çoklu indexleri kaldır
-            $table->dropIndex(['is_headline', 'headline_order']);
-            $table->dropIndex(['is_featured', 'published_at']);
-        });
+            if (in_array('news_is_headline_index', $indexes)) {
+                DB::statement('ALTER TABLE news DROP INDEX news_is_headline_index');
+            }
+            
+            if (in_array('news_is_featured_index', $indexes)) {
+                DB::statement('ALTER TABLE news DROP INDEX news_is_featured_index');
+            }
+            
+            if (in_array('news_status_index', $indexes)) {
+                DB::statement('ALTER TABLE news DROP INDEX news_status_index');
+            }
+            
+            if (in_array('news_published_at_index', $indexes)) {
+                DB::statement('ALTER TABLE news DROP INDEX news_published_at_index');
+            }
+        }
+    }
+    
+    /**
+     * Bir tablonun tüm indekslerini getirir
+     */
+    private function getTableIndexes($tableName)
+    {
+        $indexes = [];
+        $results = DB::select("SHOW INDEX FROM {$tableName}");
+        
+        foreach ($results as $result) {
+            $indexes[] = $result->Key_name;
+        }
+        
+        return array_unique($indexes);
     }
 }; 

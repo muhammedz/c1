@@ -12,19 +12,19 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('news', function (Blueprint $table) {
-            // Galeri için
-            $table->json('gallery')->nullable()->after('image');
+            // Galeri için - zaten var
+            // $table->json('gallery')->nullable()->after('image');
             
-            // Öne çıkarma ve popülerlik için
-            $table->boolean('is_featured')->default(false)->after('is_headline');
-            $table->integer('view_count')->default(0)->after('is_featured');
+            // Öne çıkarma ve popülerlik için - zaten var
+            // $table->boolean('is_featured')->default(false)->after('is_headline');
+            // $table->integer('view_count')->default(0)->after('is_featured');
             
-            // Planlama ve zamanlama için
+            // Planlama ve zamanlama için - eklenecek sütunlar
             $table->boolean('is_scheduled')->default(false)->after('status');
             $table->timestamp('end_date')->nullable()->after('published_at');
             
-            // Özet ve içerik ayrımı
-            $table->text('summary')->nullable()->after('slug');
+            // Özet ve içerik ayrımı - zaten var
+            // $table->text('summary')->nullable()->after('slug');
         });
     }
 
@@ -35,12 +35,12 @@ return new class extends Migration
     {
         Schema::table('news', function (Blueprint $table) {
             $table->dropColumn([
-                'gallery',
-                'is_featured',
-                'view_count',
+                // 'gallery',
+                // 'is_featured',
+                // 'view_count',
                 'is_scheduled',
                 'end_date',
-                'summary'
+                // 'summary'
             ]);
         });
     }

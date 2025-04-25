@@ -172,6 +172,7 @@ return [
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
         App\Providers\AnnouncementServiceProvider::class,
+        App\Providers\HeaderServiceProvider::class,
         // App\Providers\FileManagerServiceProvider::class,
     ])->toArray(),
 

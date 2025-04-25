@@ -1,0 +1,223 @@
+/* 
+ * Mega Menu CSS Styles
+ * Header.blade.php.bak dosyasına uygun stillerle oluşturulmuştur
+ */
+
+/* Ana Konteyner Yapısı */
+.nav-desktop-menu {
+    display: flex;
+    height: 100%;
+}
+
+/* Menü Öğeleri */
+.nav-desktop-menu a {
+    display: flex;
+    align-items: center;
+    height: 100%;
+    padding: 0 0.75rem;
+    font-weight: 600;
+    color: #00352b;
+    transition: color 0.2s ease;
+}
+
+.nav-desktop-menu a:hover {
+    color: #007b32;
+}
+
+/* Alt Çizgi Animasyonu */
+.underline-anim {
+    position: relative;
+}
+
+.underline-anim::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 3px;
+    bottom: 0;
+    left: 0;
+    background-color: #007b32;
+    transition: width 0.3s ease;
+}
+
+.underline-anim:hover::after,
+.group:hover .underline-anim::after {
+    width: 100%;
+}
+
+/* Mega Menü Konteyner */
+.mega-menu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    min-width: 600px;
+    background-color: #fff;
+    border: 1px solid #eaeaea;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    z-index: 1000;
+    border-radius: 0 0 8px 8px;
+    border-top: 3px solid #007b32;
+}
+
+.group:hover .mega-menu {
+    display: block;
+}
+
+/* Mega Menü İçerik Stili */
+.mega-menu-content {
+    padding: 16px;
+}
+
+/* Mega Menü Kategori Stili */
+.mega-menu-category h3 {
+    font-weight: bold;
+    font-size: 16px;
+    margin-bottom: 8px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #f0f0f0;
+    color: #333;
+}
+
+/* Mega Menü Bağlantı Stili */
+.mega-menu-link {
+    display: flex;
+    align-items: center;
+    padding: 6px 0;
+    color: #4a5568;
+    transition: all 0.2s;
+    font-size: 14px;
+}
+
+.mega-menu-link:hover {
+    color: #007b32;
+    transform: translateX(4px);
+}
+
+.mega-menu-link-icon {
+    font-size: 18px;
+    margin-right: 8px;
+    color: #007b32;
+}
+
+/* Standard Mega Menu Özellikleri */
+.mega-menu-standard .mega-menu-category {
+    padding: 10px;
+}
+
+/* Card Grid Mega Menu Özellikleri */
+.mm-tag {
+    transition: all 0.2s ease;
+    cursor: pointer;
+    padding: 0.25rem 0.75rem;
+    font-size: 0.875rem;
+    border-radius: 9999px;
+}
+
+.mm-tags-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.tag-active {
+    font-weight: bold;
+    background-color: #e2e8f0 !important;
+}
+
+.mm-cards-container {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 0.75rem;
+}
+
+.mm-card {
+    padding: 1rem;
+    background-color: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.mm-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.mm-card i {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.mm-card-title {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #4a5568;
+}
+
+/* Custom Mega Menu Özellikleri */
+.mega-menu-custom .mega-menu-custom-column {
+    padding: 10px;
+}
+
+/* Mobil Menü Özellikleri */
+#mobileMenu {
+    width: 100%;
+    position: absolute;
+    z-index: 50;
+    background-color: white;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.mobile-menu-toggle, .mobile-category-toggle {
+    cursor: pointer;
+}
+
+.mobile-submenu {
+    padding-left: 1rem;
+}
+
+.mobile-category-items {
+    padding-left: 1rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .nav-desktop-menu {
+        display: none;
+    }
+    
+    .mobile-menu-toggle {
+        display: block;
+    }
+    
+    .mega-menu {
+        position: static;
+        width: 100%;
+        min-width: auto;
+        box-shadow: none;
+        border: none;
+    }
+}
+
+/* Material Icons için düzenlemeler */
+.material-icons {
+    font-family: 'Material Icons';
+    font-weight: normal;
+    font-style: normal;
+    font-size: 24px;
+    line-height: 1;
+    letter-spacing: normal;
+    text-transform: none;
+    display: inline-block;
+    white-space: nowrap;
+    word-wrap: normal;
+    direction: ltr;
+    -webkit-font-feature-settings: 'liga';
+    -webkit-font-smoothing: antialiased;
+} 

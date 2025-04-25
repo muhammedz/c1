@@ -38,7 +38,7 @@
                         <!-- Başlık -->
                         <div class="form-group">
                             <label for="title">Başlık</label>
-                            <input type="text" class="form-control @error('title') is-invalid @enderror" id="title" name="title" value="{{ old('title', $slider->title) }}" required>
+                            <input type="text" class="form-control @error('title') is-invalid @enderror" id="title" name="title" value="{{ old('title', $slider->title) }}">
                             @error('title')
                                 <span class="invalid-feedback">{{ $message }}</span>
                             @enderror
@@ -56,7 +56,7 @@
                         <!-- Sıralama -->
                         <div class="form-group">
                             <label for="order">Sıralama</label>
-                            <input type="number" class="form-control @error('order') is-invalid @enderror" id="order" name="order" value="{{ old('order', $slider->order) }}" min="0" required>
+                            <input type="number" class="form-control @error('order') is-invalid @enderror" id="order" name="order" value="{{ old('order', $slider->order) }}" min="0">
                             @error('order')
                                 <span class="invalid-feedback">{{ $message }}</span>
                             @enderror

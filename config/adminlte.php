@@ -435,6 +435,12 @@ return [
                     'icon' => 'fas fa-fw fa-star',
                     'active' => ['admin/homepage/featured-services']
                 ],
+                [
+                    'text' => 'Header Yönetimi',
+                    'url'  => 'admin/homepage/header',
+                    'icon' => 'fas fa-fw fa-heading',
+                    'active' => ['admin/homepage/header', 'admin/homepage/header/*']
+                ],
             ],
         ],
         [
@@ -633,6 +639,21 @@ return [
                     'type' => 'css',
                     'asset' => true,
                     'location' => 'css/custom-fixes.css',
+                ],
+            ],
+        ],
+        'Toastr' => [
+            'active' => true,
+            'files' => [
+                [
+                    'type' => 'css',
+                    'asset' => false,
+                    'location' => '//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css',
+                ],
+                [
+                    'type' => 'js',
+                    'asset' => false,
+                    'location' => '//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js',
                 ],
             ],
         ],

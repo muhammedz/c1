@@ -24,586 +24,114 @@
 
                 <!-- Desktop Menü -->
                 <div class="hidden md:flex items-center h-full space-x-1">
-                    <!-- Kurumsal Mega Menü -->
-                    <div class="group relative h-full flex items-center">
-                        <a href="#"
-                            class="text-[#00352b] h-full px-3 font-semibold hover:text-gray-900 text-md flex items-center">
-                            Kurumsal
-                            <span class="material-icons text-sm ml-1">expand_more</span>
-                        </a>
-                        <div class="mega-menu">
-                            <div class="mega-menu-content mega-menu-kurumsal">
-                                <div class="py-2 px-1">
-                                    <div class="flex mb-2">
-                                        <div class="w-full">
-                                            <div class="grid grid-cols-4 gap-3">
-                                                <!-- BELEDİYE MAKAMLARI -->
-                                                <div class="mega-menu-category">
-                                                    <h3>Belediye Makamları</h3>
-                                                    <ul class="space-y-0.5">
-                                                        <li>
-                                                            <a href="#" class="mega-menu-link">
-                                                                <span class="material-icons mega-menu-link-icon">person</span>
-                                                                <span>Belediye Başkanı</span>
-                                                            </a>
-                                                        </li>
-                                                        <li>
-                                                            <a href="#" class="mega-menu-link">
-                                                                <span class="material-icons mega-menu-link-icon">groups</span>
-                                                                <span>Belediye Meclisi</span>
-                                                            </a>
-                                                        </li>
-                                                        <li>
-                                                            <a href="#" class="mega-menu-link">
-                                                                <span class="material-icons mega-menu-link-icon">table_chart</span>
-                                                                <span>Belediye Encümeni</span>
-                                                            </a>
-                                                        </li>
-                                                        <li>
-                                                            <a href="#" class="mega-menu-link">
-                                                                <span class="material-icons mega-menu-link-icon">supervisor_account</span>
-                                                                <span>Başkan Yardımcıları</span>
-                                                            </a>
-                                                        </li>
-                                                        <li>
-                                                            <a href="#" class="mega-menu-link">
-                                                                <span class="material-icons mega-menu-link-icon">assignment_ind</span>
-                                                                <span>Çalışma Komisyonları</span>
-                                                            </a>
-                                                        </li>
-                                                        <li>
-                                                            <a href="#" class="mega-menu-link">
-                                                                <span class="material-icons mega-menu-link-icon">account_balance</span>
-                                                                <span>Müdürlükler</span>
-                                                            </a>
-                                                        </li>
-                                                    </ul>
+                    @if(isset($mainMenuItems) && $mainMenuItems->count() > 0)
+                        @foreach($mainMenuItems as $menu)
+                            @if($menu->type == 1)
+                                <!-- Küçük menü için sadece link göster -->
+                                <div class="relative h-full flex items-center">
+                                    <a href="{{ $menu->url ?? '#' }}"
+                                        class="text-[#00352b] h-full px-3 font-semibold hover:text-gray-900 text-md flex items-center">
+                                        {{ $menu->name }}
+                                    </a>
+                                </div>
+                            @else
+                                <!-- Büyük menü için mega menü göster -->
+                                <div class="group relative h-full flex items-center">
+                                    <a href="{{ $menu->url ?? '#' }}"
+                                        class="text-[#00352b] h-full px-3 font-semibold hover:text-gray-900 text-md flex items-center">
+                                        {{ $menu->name }}
+                                        <span class="material-icons text-sm ml-1">expand_more</span>
+                                    </a>
+                                    <div class="mega-menu">
+                                        <div class="mega-menu-content mega-menu-kurumsal">
+                                            <div class="py-2 px-1">
+                                                <div class="flex mb-2">
+                                                    <div class="w-full">
+                                                        <div class="grid grid-cols-1 gap-3">
+                                                            @php
+                                                                $menuItems = app(\App\Services\HeaderService::class)->getMenuItems($menu->id);
+                                                            @endphp
+                                                            
+                                                            @foreach($menuItems as $item)
+                                                                <!-- BELEDİYE MAKAMLARI -->
+                                                                <div class="mega-menu-category">
+                                                                    <h3>{{ $item->title }}</h3>
+                                                                    @if($item->children && $item->children->count() > 0)
+                                                                        <ul class="space-y-0.5">
+                                                                            @foreach($item->children as $subItem)
+                                                                                <li>
+                                                                                    <a href="{{ $subItem->url ?? '#' }}" class="mega-menu-link" {{ $subItem->new_tab ? 'target="_blank"' : '' }}>
+                                                                                        <span class="material-icons mega-menu-link-icon">{{ $subItem->icon ?? 'person' }}</span>
+                                                                                        <span>{{ $subItem->title }}</span>
+                                                                                    </a>
+                                                                                </li>
+                                                                            @endforeach
+                                                                        </ul>
+                                                                    @endif
+                                                                </div>
+                                                            @endforeach
+                                                        </div>
+                                                    </div>
                                                 </div>
-
-                                                <!-- KURUMSAL POLİTİKALARIMIZ -->
-                                                <div class="mega-menu-category">
-                                                    <h3>Kurumsal Politikalarımız</h3>
-                                                    <ul class="space-y-0.5">
-                                                        <li>
-                                                            <a href="#" class="mega-menu-link">
-                                                                <span class="material-icons mega-menu-link-icon">verified</span>
-                                                                <span>Hizmet Standartlarımız</span>
-                                                            </a>
-                                                        </li>
-                                                        <li>
-                                                            <a href="#" class="mega-menu-link">
-                                                                <span class="material-icons mega-menu-link-icon">security</span>
-                                                                <span>Bilgi Güvenliği</span>
-                                                            </a>
-                                                        </li>
-                                                        <li>
-                                                            <a href="#" class="mega-menu-link">
-                                                                <span class="material-icons mega-menu-link-icon">public</span>
-                                                                <span>Uluslararası İş Birlikleri</span>
-                                                            </a>
-                                                        </li>
-                                                        <li>
-                                                            <a href="#" class="mega-menu-link">
-                                                                <span class="material-icons mega-menu-link-icon">accessible</span>
-                                                                <span>Engelsiz İş Yerleri</span>
-                                                            </a>
-                                                        </li>
-                                                        <li>
-                                                            <a href="#" class="mega-menu-link">
-                                                                <span class="material-icons mega-menu-link-icon">restore_from_trash</span>
-                                                                <span>Sıfır Atık</span>
-                                                            </a>
-                                                        </li>
-                                                        <li>
-                                                            <a href="#" class="mega-menu-link">
-                                                                <span class="material-icons mega-menu-link-icon">wb_sunny</span>
-                                                                <span>İklim Değişikliği</span>
-                                                            </a>
-                                                        </li>
-                                                        <li>
-                                                            <a href="#" class="mega-menu-link">
-                                                                <span class="material-icons mega-menu-link-icon">lightbulb</span>
-                                                                <span>Misyonumuz ve Vizyonumuz</span>
-                                                            </a>
-                                                        </li>
-                                                    </ul>
-                                                </div>
-
-                                                <!-- BELEDİYE İŞTİRAKLERİ -->
-                                                <div class="mega-menu-category">
-                                                    <h3>Belediye İştirakleri</h3>
-                                                    <ul class="space-y-0.5">
-                                                        <li>
-                                                            <a href="#" class="mega-menu-link">
-                                                                <span class="material-icons mega-menu-link-icon">business</span>
-                                                                <span>Çankaya İmar A.Ş.</span>
-                                                            </a>
-                                                        </li>
-                                                        <li>
-                                                            <a href="#" class="mega-menu-link">
-                                                                <span class="material-icons mega-menu-link-icon">business</span>
-                                                                <span>Çankaya BELDE A.Ş.</span>
-                                                            </a>
-                                                        </li>
-                                                        <li>
-                                                            <a href="#" class="mega-menu-link">
-                                                                <span class="material-icons mega-menu-link-icon">business</span>
-                                                                <span>ÇANPAŞ</span>
-                                                            </a>
-                                                        </li>
-                                                        <li>
-                                                            <a href="#" class="mega-menu-link">
-                                                                <span class="material-icons mega-menu-link-icon">business</span>
-                                                                <span>BELPET</span>
-                                                            </a>
-                                                        </li>
-                                                    </ul>
-                                                </div>
-
-                                                <!-- KİMLİK -->
-                                                <div class="mega-menu-category">
-                                                    <h3>Kimlik</h3>
-                                                    <ul class="space-y-0.5">
-                                                        <li>
-                                                            <a href="#" class="mega-menu-link">
-                                                                <span class="material-icons mega-menu-link-icon">badge</span>
-                                                                <span>Kurumsal Kimlik</span>
-                                                            </a>
-                                                        </li>
-                                                        <li>
-                                                            <a href="#" class="mega-menu-link">
-                                                                <span class="material-icons mega-menu-link-icon">bar_chart</span>
-                                                                <span>Rakamlarla Çankaya</span>
-                                                            </a>
-                                                        </li>
-                                                        <li>
-                                                            <a href="#" class="mega-menu-link">
-                                                                <span class="material-icons mega-menu-link-icon">history</span>
-                                                                <span>Tarihçe</span>
-                                                            </a>
-                                                        </li>
-                                                        <li>
-                                                            <a href="#" class="mega-menu-link">
-                                                                <span class="material-icons mega-menu-link-icon">museum</span>
-                                                                <span>Antik Tarih</span>
-                                                            </a>
-                                                        </li>
-                                                        <li>
-                                                            <a href="#" class="mega-menu-link">
-                                                                <span class="material-icons mega-menu-link-icon">theater_comedy</span>
-                                                                <span>Kültürel Yaşam</span>
-                                                            </a>
-                                                        </li>
-                                                        <li>
-                                                            <a href="#" class="mega-menu-link">
-                                                                <span class="material-icons mega-menu-link-icon">location_city</span>
-                                                                <span>Anıtkabir'in Tarihi</span>
-                                                            </a>
-                                                        </li>
-                                                        <li>
-                                                            <a href="#" class="mega-menu-link">
-                                                                <span class="material-icons mega-menu-link-icon">landscape</span>
-                                                                <span>Doğal Yapı</span>
-                                                            </a>
-                                                        </li>
-                                                        <li>
-                                                            <a href="#" class="mega-menu-link">
-                                                                <span class="material-icons mega-menu-link-icon">savings</span>
-                                                                <span>Ekonomik Yaşam</span>
-                                                            </a>
-                                                        </li>
-                                                        <li>
-                                                            <a href="#" class="mega-menu-link">
-                                                                <span class="material-icons mega-menu-link-icon">palette</span>
-                                                                <span>Kültürel Miras</span>
-                                                            </a>
-                                                        </li>
-                                                        <li>
-                                                            <a href="#" class="mega-menu-link">
-                                                                <span class="material-icons mega-menu-link-icon">label</span>
-                                                                <span>Çankaya'nın Adı</span>
-                                                            </a>
-                                                        </li>
-                                                    </ul>
+                                                <div class="mt-2 pt-2 border-t border-gray-200">
+                                                    <div class="flex justify-between items-center">
+                                                        <p class="text-xs text-gray-500">{{ $menu->footer_text ?? 'Açıklama Yazısı' }}</p>
+                                                        <a href="{{ $menu->footer_link ?? '#' }}" class="text-[#00352b] hover:text-[#007b32] text-sm font-medium flex items-center gap-1 transition-all hover:gap-2">
+                                                            {{ $menu->name }} 
+                                                            <span class="material-icons text-sm">arrow_forward</span>
+                                                        </a>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="mt-2 pt-2 border-t border-gray-200">
-                                        <div class="flex justify-between items-center">
-                                            <p class="text-xs text-gray-500">Belediyemizin kurumsal hizmetleri hakkında daha fazla bilgi almak için iletişime geçin.</p>
-                                            <a href="#" class="text-[#00352b] hover:text-[#007b32] text-sm font-medium flex items-center gap-1 transition-all hover:gap-2">
-                                                İletişim 
-                                                <span class="material-icons text-sm">arrow_forward</span>
-                                            </a>
-                                        </div>
-                                    </div>
                                 </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Hizmetler Mega Menü -->
-                    <div class="group relative h-full flex items-center">
-                        <a href="#"
-                            class="text-[#00352b] h-full px-3 font-semibold hover:text-gray-900 text-md flex items-center {{ request()->is('pages/hizmetler*') ? 'active-nav' : '' }}">
-                            Hizmetler
-                            <span class="material-icons text-sm ml-1">expand_more</span>
-                        </a>
-                        <div class="mega-menu">
-                            <div class="container">
-                                <div class="bg-white rounded-lg shadow-lg p-6 mega-menu-content">
-                                    <!-- İlgili Gruplar -->
-                                    <div class="mb-4">
-                                        <div class="flex justify-between items-center mb-3">
-                                            <h3 class="text-lg font-semibold text-gray-700">İlgili Gruplar:</h3>
-                                            <a href="/hizmetler" class="bg-gradient-to-r from-[#007b32] to-[#00352b] text-white font-medium py-2 px-4 rounded-md shadow-sm transition duration-300 flex items-center gap-2 hover:shadow-md hover:translate-y-[-2px]">
-                                                <span class="material-icons text-sm">category</span>
-                                                <span>TÜM HİZMETLERİMİZ</span>
-                                                <span class="material-icons text-sm">arrow_forward</span>
-                                            </a>
-                                        </div>
-                                        <div class="flex flex-wrap gap-2">
-                                            <a href="#" class="py-1 px-3 text-sm bg-blue-100 hover:bg-blue-200 text-blue-800 rounded-full transition">Öğrenciler</a>
-                                            <a href="#" class="py-1 px-3 text-sm bg-pink-100 hover:bg-pink-200 text-pink-800 rounded-full transition">Anneler</a>
-                                            <a href="#" class="py-1 px-3 text-sm bg-purple-100 hover:bg-purple-200 text-purple-800 rounded-full transition">Engelliler</a>
-                                            <a href="#" class="py-1 px-3 text-sm bg-yellow-100 hover:bg-yellow-200 text-yellow-800 rounded-full transition">Emekliler</a>
-                                            <a href="#" class="py-1 px-3 text-sm bg-green-100 hover:bg-green-200 text-green-800 rounded-full transition">İş Arayanlar</a>
-                                        </div>
-                                    </div>
-
-                                    <!-- Hizmet Kategorileri Kartları -->
-                                    <div class="grid grid-cols-6 gap-3">
-                                        <!-- İş Yerleri -->
-                                        <a href="#" data-category="isyerleri" class="p-4 bg-white hover:bg-gray-50 rounded-lg border border-gray-200 flex flex-col items-center text-center transition transform hover:translate-y-[-5px] hover:shadow-md">
-                                            <span class="material-icons text-[#007b32] text-2xl mb-2">store</span>
-                                            <span class="text-sm font-medium text-gray-700">İş Yerleri</span>
-                                        </a>
-                                        
-                                        <!-- Kültür -->
-                                        <a href="#" data-category="kultur" class="p-4 bg-white hover:bg-gray-50 rounded-lg border border-gray-200 flex flex-col items-center text-center transition transform hover:translate-y-[-5px] hover:shadow-md">
-                                            <span class="material-icons text-[#007b32] text-2xl mb-2">theater_comedy</span>
-                                            <span class="text-sm font-medium text-gray-700">Kültür</span>
-                                        </a>
-                                        
-                                        <!-- Sağlık -->
-                                        <a href="#" data-category="saglik" class="p-4 bg-white hover:bg-gray-50 rounded-lg border border-gray-200 flex flex-col items-center text-center transition transform hover:translate-y-[-5px] hover:shadow-md">
-                                            <span class="material-icons text-[#007b32] text-2xl mb-2">local_hospital</span>
-                                            <span class="text-sm font-medium text-gray-700">Sağlık</span>
-                                        </a>
-                                        
-                                        <!-- İmar -->
-                                        <a href="#" data-category="imar" class="p-4 bg-white hover:bg-gray-50 rounded-lg border border-gray-200 flex flex-col items-center text-center transition transform hover:translate-y-[-5px] hover:shadow-md">
-                                            <span class="material-icons text-[#007b32] text-2xl mb-2">apartment</span>
-                                            <span class="text-sm font-medium text-gray-700">İmar</span>
-                                        </a>
-                                        
-                                        <!-- Sosyal Yardım -->
-                                        <a href="#" data-category="sosyalyardim" class="p-4 bg-white hover:bg-gray-50 rounded-lg border border-gray-200 flex flex-col items-center text-center transition transform hover:translate-y-[-5px] hover:shadow-md">
-                                            <span class="material-icons text-[#007b32] text-2xl mb-2">volunteer_activism</span>
-                                            <span class="text-sm font-medium text-gray-700">Sosyal Yardım</span>
-                                        </a>
-                                        
-                                        <!-- Çevre -->
-                                        <a href="#" data-category="cevre" class="p-4 bg-white hover:bg-gray-50 rounded-lg border border-gray-200 flex flex-col items-center text-center transition transform hover:translate-y-[-5px] hover:shadow-md">
-                                            <span class="material-icons text-[#007b32] text-2xl mb-2">nature</span>
-                                            <span class="text-sm font-medium text-gray-700">Çevre</span>
-                                        </a>
-                                        
-                                        <!-- Veterinerlik -->
-                                        <a href="#" data-category="veterinerlik" class="p-4 bg-white hover:bg-gray-50 rounded-lg border border-gray-200 flex flex-col items-center text-center transition transform hover:translate-y-[-5px] hover:shadow-md">
-                                            <span class="material-icons text-[#007b32] text-2xl mb-2">pets</span>
-                                            <span class="text-sm font-medium text-gray-700">Veterinerlik</span>
-                                        </a>
-                                        
-                                        <!-- Temizlik -->
-                                        <a href="#" data-category="temizlik" class="p-4 bg-white hover:bg-gray-50 rounded-lg border border-gray-200 flex flex-col items-center text-center transition transform hover:translate-y-[-5px] hover:shadow-md">
-                                            <span class="material-icons text-[#007b32] text-2xl mb-2">cleaning_services</span>
-                                            <span class="text-sm font-medium text-gray-700">Temizlik</span>
-                                        </a>
-                                        
-                                        <!-- Kamu Emlak ve İstimlak İşlemleri -->
-                                        <a href="#" data-category="kamuEmlak" class="p-4 bg-white hover:bg-gray-50 rounded-lg border border-gray-200 flex flex-col items-center text-center transition transform hover:translate-y-[-5px] hover:shadow-md">
-                                            <span class="material-icons text-[#007b32] text-2xl mb-2">real_estate_agent</span>
-                                            <span class="text-sm font-medium text-gray-700">Kamu Emlak ve İstimlak</span>
-                                        </a>
-                                        
-                                        <!-- Park -->
-                                        <a href="#" data-category="park" class="p-4 bg-white hover:bg-gray-50 rounded-lg border border-gray-200 flex flex-col items-center text-center transition transform hover:translate-y-[-5px] hover:shadow-md">
-                                            <span class="material-icons text-[#007b32] text-2xl mb-2">park</span>
-                                            <span class="text-sm font-medium text-gray-700">Park</span>
-                                        </a>
-                                        
-                                        <!-- Fen İşleri -->
-                                        <a href="#" data-category="fenisleri" class="p-4 bg-white hover:bg-gray-50 rounded-lg border border-gray-200 flex flex-col items-center text-center transition transform hover:translate-y-[-5px] hover:shadow-md">
-                                            <span class="material-icons text-[#007b32] text-2xl mb-2">construction</span>
-                                            <span class="text-sm font-medium text-gray-700">Fen İşleri</span>
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Duyurular -->
-                    <div class="group relative h-full flex items-center">
-                        <a href="#"
-                            class="text-[#00352b] h-full px-3 font-semibold hover:text-gray-900 text-md flex items-center">
-                            Duyurular
-                            <span class="material-icons text-sm ml-1">expand_more</span>
-                        </a>
-                        <div class="mega-menu">
-                            <div class="mega-menu-content mega-menu-kurumsal">
-                                <div class="py-2 px-1">
-                                    <div class="flex mb-2">
-                                        <div class="w-full">
-                                            <div class="grid grid-cols-3 gap-3">
-                                                <!-- DUYURULAR -->
-                                                <div class="mega-menu-category">
-                                                    <h3>Belediye Duyuruları</h3>
-                                                    <ul class="space-y-0.5">
-                                                        <li>
-                                                            <a href="#" class="mega-menu-link">
-                                                                <span class="material-icons mega-menu-link-icon">announcement</span>
-                                                                <span>Tüm Etkinlikler</span>
-                                                            </a>
-                                                        </li>
-                                                        <li>
-                                                            <a href="#" class="mega-menu-link">
-                                                                <span class="material-icons mega-menu-link-icon">flag</span>
-                                                                <span>Askıdaki Planlar</span>
-                                                            </a>
-                                                        </li>
-                                                        <li>
-                                                            <a href="#" class="mega-menu-link">
-                                                                <span class="material-icons mega-menu-link-icon">gavel</span>
-                                                                <span>Güncel Meclis Kararları</span>
-                                                            </a>
-                                                        </li>
-                                                        <li>
-                                                            <a href="#" class="mega-menu-link">
-                                                                <span class="material-icons mega-menu-link-icon">shopping_bag</span>
-                                                                <span>İhaleler</span>
-                                                            </a>
-                                                        </li>
-                                                    </ul>
-                                                </div>
-
-                                                <!-- PLANLAR -->
-                                                <div class="mega-menu-category">
-                                                    <h3>Planlar ve Projeler</h3>
-                                                    <ul class="space-y-0.5">
-                                                        <li>
-                                                            <a href="#" class="mega-menu-link">
-                                                                <span class="material-icons mega-menu-link-icon">description</span>
-                                                                <span>Yürürlükteki Stratejik Plan</span>
-                                                            </a>
-                                                        </li>
-                                                        <li>
-                                                            <a href="#" class="mega-menu-link">
-                                                                <span class="material-icons mega-menu-link-icon">construction</span>
-                                                                <span>Fen İşleri Müdürlüğü Çalışma Planı</span>
-                                                            </a>
-                                                        </li>
-                                                        <li>
-                                                            <a href="#" class="mega-menu-link">
-                                                                <span class="material-icons mega-menu-link-icon">architecture</span>
-                                                                <span>İmar Planları</span>
-                                                            </a>
-                                                        </li>
-                                                        <li>
-                                                            <a href="#" class="mega-menu-link">
-                                                                <span class="material-icons mega-menu-link-icon">apartment</span>
-                                                                <span>Kentsel Dönüşüm Projeleri</span>
-                                                            </a>
-                                                        </li>
-                                                    </ul>
-                                                </div>
-
-                                                <!-- BASINA DUYURULAR -->
-                                                <div class="mega-menu-category">
-                                                    <h3>Basına Duyurular</h3>
-                                                    <ul class="space-y-0.5">
-                                                        <li>
-                                                            <a href="#" class="mega-menu-link">
-                                                                <span class="material-icons mega-menu-link-icon">campaign</span>
-                                                                <span>Basın Bültenleri</span>
-                                                            </a>
-                                                        </li>
-                                                        <li>
-                                                            <a href="#" class="mega-menu-link">
-                                                                <span class="material-icons mega-menu-link-icon">newspaper</span>
-                                                                <span>Haberler</span>
-                                                            </a>
-                                                        </li>
-                                                        <li>
-                                                            <a href="#" class="mega-menu-link">
-                                                                <span class="material-icons mega-menu-link-icon">event</span>
-                                                                <span>Etkinlik Takvimi</span>
-                                                            </a>
-                                                        </li>
-                                                        <li>
-                                                            <a href="#" class="mega-menu-link">
-                                                                <span class="material-icons mega-menu-link-icon">photo_library</span>
-                                                                <span>Fotoğraf Galerisi</span>
-                                                            </a>
-                                                        </li>
-                                                    </ul>
+                            @endif
+                        @endforeach
+                    @else
+                        <!-- Kurumsal Mega Menü -->
+                        <div class="group relative h-full flex items-center">
+                            <a href="#"
+                                class="text-[#00352b] h-full px-3 font-semibold hover:text-gray-900 text-md flex items-center">
+                                Menü Adı
+                                <span class="material-icons text-sm ml-1">expand_more</span>
+                            </a>
+                            <div class="mega-menu">
+                                <div class="mega-menu-content mega-menu-kurumsal">
+                                    <div class="py-2 px-1">
+                                        <div class="flex mb-2">
+                                            <div class="w-full">
+                                                <div class="grid grid-cols-1 gap-3">
+                                                    <!-- BELEDİYE MAKAMLARI -->
+                                                    <div class="mega-menu-category">
+                                                        <h3>Alt Başlık</h3>
+                                                        <ul class="space-y-0.5">
+                                                            <li>
+                                                                <a href="#" class="mega-menu-link">
+                                                                    <span class="material-icons mega-menu-link-icon">person</span>
+                                                                    <span>Alt Menü 1</span>
+                                                                </a>
+                                                            </li>
+                                                            
+                                                        </ul>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div class="mt-2 pt-2 border-t border-gray-200">
-                                        <div class="flex justify-between items-center">
-                                            <p class="text-xs text-gray-500">Belediyemizin güncel duyuruları ve etkinlikleri hakkında bilgi alın.</p>
-                                            <a href="#" class="text-[#00352b] hover:text-[#007b32] text-sm font-medium flex items-center gap-1 transition-all hover:gap-2">
-                                                Tüm Duyurular
-                                                <span class="material-icons text-sm">arrow_forward</span>
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Ne Nerede -->
-                    <div class="group relative h-full flex items-center">
-                        <a href="#"
-                            class="text-[#00352b] h-full px-3 font-semibold hover:text-gray-900 text-md flex items-center">
-                            Ne Nerede
-                            <span class="material-icons text-sm ml-1">expand_more</span>
-                        </a>
-                        <div class="mega-menu">
-                            <div class="mega-menu-content mega-menu-kurumsal">
-                                <div class="py-2 px-1">
-                                    <div class="flex mb-2">
-                                        <div class="w-full">
-                                            <div class="grid grid-cols-3 gap-3">
-                                                <!-- KAMU TESİSLERİ -->
-                                                <div class="mega-menu-category">
-                                                    <h3>Kamu Tesisleri</h3>
-                                                    <ul class="space-y-0.5">
-                                                        <li>
-                                                            <a href="#" class="mega-menu-link">
-                                                                <span class="material-icons mega-menu-link-icon">home</span>
-                                                                <span>Çankaya Evlerimiz</span>
-                                                            </a>
-                                                        </li>
-                                                        <li>
-                                                            <a href="#" class="mega-menu-link">
-                                                                <span class="material-icons mega-menu-link-icon">policy</span>
-                                                                <span>Zabıta Karakollarımız</span>
-                                                            </a>
-                                                        </li>
-                                                        <li>
-                                                            <a href="#" class="mega-menu-link">
-                                                                <span class="material-icons mega-menu-link-icon">location_city</span>
-                                                                <span>Muhtarlıklar</span>
-                                                            </a>
-                                                        </li>
-                                                        <li>
-                                                            <a href="#" class="mega-menu-link">
-                                                                <span class="material-icons mega-menu-link-icon">wifi</span>
-                                                                <span>Ücretsiz İnternet Alanlarımız</span>
-                                                            </a>
-                                                        </li>
-                                                        <li>
-                                                            <a href="#" class="mega-menu-link">
-                                                                <span class="material-icons mega-menu-link-icon">warning</span>
-                                                                <span>Acil Toplanma Alanları</span>
-                                                            </a>
-                                                        </li>
-                                                    </ul>
-                                                </div>
-
-                                                <!-- EĞİTİM VE KÜLTÜR -->
-                                                <div class="mega-menu-category">
-                                                    <h3>Eğitim ve Kültür</h3>
-                                                    <ul class="space-y-0.5">
-                                                        <li>
-                                                            <a href="#" class="mega-menu-link">
-                                                                <span class="material-icons mega-menu-link-icon">child_care</span>
-                                                                <span>Kreşlerimiz</span>
-                                                            </a>
-                                                        </li>
-                                                        <li>
-                                                            <a href="#" class="mega-menu-link">
-                                                                <span class="material-icons mega-menu-link-icon">menu_book</span>
-                                                                <span>Kütüphanelerimiz</span>
-                                                            </a>
-                                                        </li>
-                                                        <li>
-                                                            <a href="#" class="mega-menu-link">
-                                                                <span class="material-icons mega-menu-link-icon">palette</span>
-                                                                <span>Kültür ve Sanat Merkezlerimiz</span>
-                                                            </a>
-                                                        </li>
-                                                        <li>
-                                                            <a href="#" class="mega-menu-link">
-                                                                <span class="material-icons mega-menu-link-icon">school</span>
-                                                                <span>Eğitim Merkezlerimiz</span>
-                                                            </a>
-                                                        </li>
-                                                        <li>
-                                                            <a href="#" class="mega-menu-link">
-                                                                <span class="material-icons mega-menu-link-icon">theater_comedy</span>
-                                                                <span>Tiyatro ve Konser Alanlarımız</span>
-                                                            </a>
-                                                        </li>
-                                                    </ul>
-                                                </div>
-
-                                                <!-- SPOR VE ALTYAPI -->
-                                                <div class="mega-menu-category">
-                                                    <h3>Spor ve Altyapı</h3>
-                                                    <ul class="space-y-0.5">
-                                                        <li>
-                                                            <a href="#" class="mega-menu-link">
-                                                                <span class="material-icons mega-menu-link-icon">pool</span>
-                                                                <span>Spor Tesisi ve Havuzlarımız</span>
-                                                            </a>
-                                                        </li>
-                                                        <li>
-                                                            <a href="#" class="mega-menu-link">
-                                                                <span class="material-icons mega-menu-link-icon">construction</span>
-                                                                <span>Yol ve Kaldırım Çalışmalarımız</span>
-                                                            </a>
-                                                        </li>
-                                                        <li>
-                                                            <a href="#" class="mega-menu-link">
-                                                                <span class="material-icons mega-menu-link-icon">recycling</span>
-                                                                <span>Geri Dönüşüm Merkezleri</span>
-                                                            </a>
-                                                        </li>
-                                                        <li>
-                                                            <a href="#" class="mega-menu-link">
-                                                                <span class="material-icons mega-menu-link-icon">map</span>
-                                                                <span>Tüm Harita Katmanları</span>
-                                                            </a>
-                                                        </li>
-                                                    </ul>
-                                                </div>
+                                        <div class="mt-2 pt-2 border-t border-gray-200">
+                                            <div class="flex justify-between items-center">
+                                                <p class="text-xs text-gray-500">Örnek açıklama yazısı</p>
+                                                <a href="#" class="text-[#00352b] hover:text-[#007b32] text-sm font-medium flex items-center gap-1 transition-all hover:gap-2">
+                                                    Menü Adı 
+                                                    <span class="material-icons text-sm">arrow_forward</span>
+                                                </a>
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="mt-2 pt-2 border-t border-gray-200">
-                                        <div class="flex justify-between items-center">
-                                            <p class="text-xs text-gray-500">Çankaya'daki tesislerimiz, hizmet noktalarımız ve altyapı çalışmalarımız hakkında bilgi alın.</p>
-                                            <a href="#" class="text-[#00352b] hover:text-[#007b32] text-sm font-medium flex items-center gap-1 transition-all hover:gap-2">
-                                                Haritada Göster
-                                                <span class="material-icons text-sm">place</span>
-                                            </a>
-                                        </div>
-                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-
-                    <!-- İletişim -->
-                    <a href="#" class="text-[#00352b] font-semibold px-3 hover:text-[#007b32] text-md flex items-center h-full">İletişim</a>
-                    <div class="h-4 w-px bg-gray-300 mx-1"></div>
+                    @endif
                 </div>
                 
                 <!-- Arama İkonu ve Slogan -->
@@ -624,19 +152,51 @@
     <div class="md:hidden hidden w-full z-50 absolute bg-white shadow-lg" id="mobileMenu">
         <!-- Mobil Menü İçeriği -->
         <div class="px-4 py-2">
-            <!-- Kurumsal -->
-            <div class="group border-b border-gray-200">
-                <a href="#" class="py-3 px-2 block text-gray-800 font-medium flex justify-between items-center">
-                    Kurumsal
-                    <span class="material-icons text-sm">expand_more</span>
-                </a>
-                <div class="quick-menu-dropdown hidden">
-                    <!-- Mobil dropdown içeriği -->
+            @if(isset($mainMenuItems) && $mainMenuItems->count() > 0)
+                @foreach($mainMenuItems as $menu)
+                    @if($menu->type == 1)
+                        <!-- Küçük menü için direkt link göster -->
+                        <div class="group border-b border-gray-200">
+                            <a href="{{ $menu->url ?? '#' }}" class="py-3 px-2 block text-gray-800 font-medium">
+                                {{ $menu->name }}
+                            </a>
+                        </div>
+                    @else
+                        <!-- Büyük menü için dropdown göster -->
+                        <div class="group border-b border-gray-200">
+                            <a href="#" class="py-3 px-2 block text-gray-800 font-medium flex justify-between items-center">
+                                {{ $menu->name }}
+                                <span class="material-icons text-sm">expand_more</span>
+                            </a>
+                            <div class="quick-menu-dropdown hidden">
+                                <!-- Mobil dropdown içeriği -->
+                                @php
+                                    $menuItems = app(\App\Services\HeaderService::class)->getMenuItems($menu->id);
+                                @endphp
+                                
+                                @foreach($menuItems as $item)
+                                    <div class="border-t border-gray-100 py-2 px-4">
+                                        <p class="text-gray-700 font-medium">{{ $item->title }}</p>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    @endif
+                @endforeach
+            @else
+                <!-- Kurumsal -->
+                <div class="group border-b border-gray-200">
+                    <a href="#" class="py-3 px-2 block text-gray-800 font-medium flex justify-between items-center">
+                        Kurumsal
+                        <span class="material-icons text-sm">expand_more</span>
+                    </a>
+                    <div class="quick-menu-dropdown hidden">
+                        <!-- Mobil dropdown içeriği -->
+                    </div>
                 </div>
-            </div>
-            
-            <!-- Diğer mobil menü öğeleri -->
-            
+                
+                <!-- Diğer mobil menü öğeleri -->
+            @endif
         </div>
     </div>
 
@@ -680,6 +240,36 @@
         }
     </style>
 </section>
+
+<script>
+    // Mobile Menu Toggle
+    document.getElementById('mobileMenuButton').addEventListener('click', function() {
+        const mobileMenu = document.getElementById('mobileMenu');
+        mobileMenu.classList.toggle('hidden');
+    });
+    
+    // Menu Item Toggle for dropdowns
+    document.addEventListener('DOMContentLoaded', function() {
+        const menuToggles = document.querySelectorAll('.group > a');
+        menuToggles.forEach(function(toggle) {
+            if (toggle.querySelector('.material-icons')) {
+                toggle.addEventListener('click', function(e) {
+                    const dropdown = this.closest('.group').querySelector('.quick-menu-dropdown');
+                    if (dropdown) {
+                        e.preventDefault();
+                        dropdown.classList.toggle('hidden');
+                    }
+                });
+            }
+        });
+    });
+    
+    // Search Button
+    document.getElementById('searchButton').addEventListener('click', function() {
+        // Arama işlevselliği eklenecek
+        alert('Arama fonksiyonu yapım aşamasında');
+    });
+</script>
 
 <!-- Yeşil sınır çizgisi - Navbar altı, slider üstü -->
 <div class="w-full h-1 bg-[#007b32]" style="position: relative; z-index: 100;"></div> 

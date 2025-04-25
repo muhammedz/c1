@@ -22,5 +22,17 @@ class DatabaseSeeder extends Seeder
         $this->call([
             AdminUserSeeder::class,
         ]);
+
+        // Header menü öğelerini oluştur
+        $this->call(HeaderMenuSeeder::class);
+        
+        // Menu öğelerini HeaderMenuItem tablosuna aktar
+        $this->call(HeaderMenuItemSeeder::class);
+
+        // Mega menu seeders
+        $this->call([
+            MenuTagSeeder::class,
+            MenuCardSeeder::class,
+        ]);
     }
 }

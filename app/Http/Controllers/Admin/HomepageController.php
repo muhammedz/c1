@@ -65,8 +65,8 @@ class HomepageController extends Controller
             'button_text' => 'nullable|string|max:50',
             'button_url' => 'nullable|string|max:255',
             'order' => 'nullable|integer|min:0',
-            'is_active' => 'boolean',
-            'filemanagersystem_image' => 'required|string',
+            'is_active' => 'nullable|boolean',
+            'filemanagersystem_image' => 'nullable|string',
             'filemanagersystem_image_alt' => 'nullable|string|max:255',
             'filemanagersystem_image_title' => 'nullable|string|max:255'
         ]);
@@ -160,8 +160,8 @@ class HomepageController extends Controller
             'button_text' => 'nullable|string|max:50',
             'button_url' => 'nullable|string|max:255',
             'order' => 'nullable|integer|min:0',
-            'is_active' => 'boolean',
-            'filemanagersystem_image' => 'required|string',
+            'is_active' => 'nullable|boolean',
+            'filemanagersystem_image' => 'nullable|string',
             'filemanagersystem_image_alt' => 'nullable|string|max:255',
             'filemanagersystem_image_title' => 'nullable|string|max:255'
         ]);

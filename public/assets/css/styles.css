@@ -665,33 +665,57 @@ p {
     }
 }
 
-/* Mega Menu Styles */
+/* Mega Menu Styles - Tamamen Yeniden Düzenlendi */
 .mega-menu {
     position: fixed;
-    top: 64px;
+    top: 100%;
     left: 0;
     width: 100%;
     background: #f9fafb;
     box-shadow: 0 6px 18px -4px rgba(0, 0, 0, 0.12);
     opacity: 0;
     visibility: hidden;
-    transform: translateY(0);
-    transition: all 0.3s ease;
-    z-index: 60;
+    z-index: 50;
+    pointer-events: none;
     border-bottom: 3px solid #007d32;
+    display: none;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
 }
 
+/* Normal hover durumu */
 .group:hover .mega-menu {
     opacity: 1;
     visibility: visible;
-    transform: translateY(0);
+    pointer-events: auto;
+    display: flex;
+}
+
+/* Scroll sırasında tüm mega menüleri gizle */
+body.is-scrolling .mega-menu,
+body.is-scrolling .group:hover .mega-menu {
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+    display: none !important;
+}
+
+/* Force-hide sınıfı - JavaScript tarafından eklenir */
+.mega-menu.force-hide {
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+    display: none !important;
 }
 
 .mega-menu-content {
-    max-width: 1100px;
+    max-width: 1280px;
+    width: 100%;
     margin: 0 auto;
-    padding: 0.5rem;
+    padding: 1rem;
     background: transparent;
+    box-sizing: border-box;
 }
 
 /* Kurumsal mega menü özel stilleri */
@@ -699,81 +723,25 @@ p {
     background-color: transparent;
     border-radius: 0 0 12px 12px;
     overflow: hidden;
+    width: 100%;
+    max-width: 1280px;
 }
 
-.mega-menu-category h3 {
-    color: #00352b;
-    margin-bottom: 0.4rem;
-    font-size: 0.8rem;
-    letter-spacing: 0.01em;
-    padding: 0.3rem 0.5rem;
-    font-weight: 600;
-    text-transform: none;
-    background: linear-gradient(135deg, #f9fafb, #f3f4f6);
-    border-radius: 8px;
-    position: relative;
-    padding-left: 1.75rem;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-    display: flex;
-    align-items: center;
-    transition: all 0.2s ease;
-    border-left: 3px solid #007d32;
-}
-
-.mega-menu-category h3::before {
-    content: '';
-    position: absolute;
-    left: 0.6rem;
-    top: 0;
-    bottom: 0;
-    margin: auto;
-    width: 16px;
-    height: 16px;
-    background-color: #007d32;
-    opacity: 0.1;
-    border-radius: 6px;
-}
-
-.mega-menu-category h3::after {
-    content: '';
-    position: absolute;
-    left: 0.7rem;
-    top: 0;
-    bottom: 0;
-    margin: auto;
-    width: 8px;
-    height: 8px;
-    background-color: #007d32;
-    border-radius: 3px;
-}
-
-.mega-menu-link {
-    display: flex;
-    align-items: center;
-    gap: 3px;
-    padding: 3px 6px;
-    border-radius: 4px;
-    transition: all 0.2s ease;
-    font-size: 0.75rem;
-    color: #4b5563;
-    position: relative;
-    line-height: 1.15;
-    border-left: 2px solid transparent;
-}
-
-.mega-menu-link:hover {
-    background-color: #f0f8f4;
-    color: #007d32;
-    transform: translateX(3px);
-    border-left: 2px solid #007d32;
-    padding-left: 10px;
+/* Mega menu item'lar için düzeltme */
+.mega-menu-content .grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(220px, 1fr));
+    gap: 1rem;
+    padding: 0.5rem;
+    max-width: 100%;
+    width: 100%;
 }
 
 /* Mega menü kategori kartları için stiller */
 .mega-menu-category {
     background-color: #ffffff;
     border-radius: 8px;
-    padding: 0.6rem 0.8rem;
+    padding: 0.75rem 0.9rem;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.03);
     transition: all 0.25s ease;
     border: 1px solid rgba(240, 245, 242, 0.8);
@@ -782,11 +750,56 @@ p {
     flex-direction: column;
     width: 100%;
     justify-content: flex-start;
+    min-width: 0; /* Taşmayı önlemek için */
 }
 
 .mega-menu-category ul {
     flex-grow: 1;
     margin-top: 0.15rem;
+}
+
+.mega-menu-category h3 {
+    color: #00352b;
+    margin-bottom: 0.5rem;
+    font-size: 0.85rem;
+    letter-spacing: 0.01em;
+    padding: 0.35rem 0.5rem;
+    font-weight: 600;
+    text-transform: none;
+    background: linear-gradient(135deg, #f9fafb, #f3f4f6);
+    border-radius: 8px;
+    position: relative;
+    padding-left: 1.5rem;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    display: flex;
+    align-items: center;
+    transition: all 0.2s ease;
+    border-left: 3px solid #007d32;
+}
+
+.mega-menu-link {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 6px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    font-size: 0.8rem;
+    color: #4b5563;
+    position: relative;
+    line-height: 1.2;
+    border-left: 2px solid transparent;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.mega-menu-link:hover {
+    background-color: #f0f8f4;
+    color: #007d32;
+    transform: translateX(3px);
+    border-left: 2px solid #007d32;
+    padding-left: 8px;
 }
 
 .mega-menu-category:hover {
@@ -800,52 +813,11 @@ p {
     color: #006428;
 }
 
-/* Mega menu item'lar için düzeltme */
-.mega-menu-content .grid {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 0.5rem;
-    padding: 0.3rem;
-}
-
-/* Alt kısımdaki bilgi alanı için stiller */
-.mega-menu-kurumsal .mt-3.pt-3 {
-    margin-top: 0.5rem !important;
-    padding-top: 0.5rem !important;
-    background-color: #f0f8f4;
-    border-radius: 6px;
-    padding: 0.5rem 0.75rem !important;
-    border: 1px solid rgba(0, 125, 50, 0.1);
-}
-
 .mega-menu-link-icon {
     color: #007d32;
-    font-size: 12px;
+    font-size: 14px;
     opacity: 0.7;
     transition: all 0.25s ease;
-}
-
-.mega-menu-category .space-y-1 > * {
-    margin-top: 0.15rem !important;
-    margin-bottom: 0.15rem !important;
-}
-
-/* Sol info alanı için özel stil */
-.mega-menu-info-title {
-    position: relative;
-    padding-bottom: 0.5rem;
-    margin-bottom: 0.75rem;
-    border-bottom: 1px solid rgba(0, 77, 46, 0.1);
-}
-
-.mega-menu-info-title::after {
-    content: '';
-    position: absolute;
-    left: 0;
-    bottom: -1px;
-    width: 50px;
-    height: 2px;
-    background-color: #007d32;
 }
 
 /* Header Section Styles */
@@ -861,6 +833,27 @@ p {
     width: 100%;
     z-index: 40 !important;
     background: white;
+}
+
+/* Container styles */
+.container {
+    width: 100%;
+    max-width: 1280px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+
+@media (min-width: 1536px) {
+    .container {
+        max-width: 1440px;
+    }
+    
+    .mega-menu-content,
+    .mega-menu-kurumsal {
+        max-width: 1440px;
+    }
 }
 
 /* Yeni eklenen düzeltmeler - dropdown menüler için */
@@ -967,4 +960,20 @@ p {
     .tab-btn span:not(.material-icons) {
         font-size: 11px;
     }
+}
+
+/* Yeni hover kontrolü - JavaScript ile sınıf ekleniyor */
+.group.hover .mega-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.mega-menu-content {
+    max-width: 1280px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 1rem;
+    background: transparent;
+    box-sizing: border-box;
 }

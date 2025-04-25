@@ -1,4 +1,99 @@
 document.addEventListener('DOMContentLoaded', function () {
+    /* Mega Menü Yönetimi - Tamamen Yeniden Yazıldı */
+    
+    // Scroll olayı için değişkenler
+    let scrollTimeout;
+    let isScrolling = false;
+    const scrollThreshold = 10; // piksel
+    let lastScrollPos = window.scrollY;
+    
+    // Mega menü gruplarını bul ve data-mega-menu özelliği ekle
+    const menuGroups = document.querySelectorAll('.group');
+    menuGroups.forEach((group, index) => {
+        const menuId = `menu-${index}`;
+        group.setAttribute('data-mega-menu', menuId);
+        
+        const megaMenu = group.querySelector('.mega-menu');
+        if (megaMenu) {
+            megaMenu.setAttribute('data-mega-menu-content', menuId);
+            
+            // Mega menü container genişliğini ayarla
+            group.addEventListener('mouseenter', () => {
+                adjustMegaMenuWidth(megaMenu);
+            });
+        }
+    });
+    
+    // Mega menü genişliğini ayarlama fonksiyonu
+    function adjustMegaMenuWidth(megaMenu) {
+        if (!megaMenu) return;
+        
+        // Mega menünün genişliğini tam olarak ayarla
+        const headerWidth = document.querySelector('header')?.offsetWidth || document.body.offsetWidth;
+        const headerLeft = document.querySelector('header')?.getBoundingClientRect().left || 0;
+        
+        megaMenu.style.width = headerWidth + 'px';
+        megaMenu.style.left = -headerLeft + 'px';
+        
+        // İçerik genişliğini de ayarla
+        const content = megaMenu.querySelector('.mega-menu-content');
+        if (content) {
+            content.style.maxWidth = '1280px';
+            content.style.margin = '0 auto';
+            content.style.width = '100%';
+        }
+    }
+    
+    // Sayfa boyutu değiştiğinde mega menü genişliklerini yeniden ayarla
+    window.addEventListener('resize', () => {
+        document.querySelectorAll('.mega-menu').forEach(menu => {
+            if (menu.closest('.group:hover')) {
+                adjustMegaMenuWidth(menu);
+            }
+        });
+    });
+    
+    // Scroll olayını dinle
+    window.addEventListener('scroll', function() {
+        // Scroll miktarını kontrol et
+        const currentScrollPos = window.scrollY;
+        const scrollAmount = Math.abs(currentScrollPos - lastScrollPos);
+        
+        if (scrollAmount > scrollThreshold) {
+            // Scroll belirli bir eşiği geçerse, menüleri gizle
+            document.body.classList.add('is-scrolling');
+            isScrolling = true;
+            
+            // Tüm mega menüleri gizle ve hover durumlarını sıfırla
+            menuGroups.forEach(group => {
+                // Grup içindeki menüyü bul
+                const menuId = group.getAttribute('data-mega-menu');
+                const megaMenu = document.querySelector(`[data-mega-menu-content="${menuId}"]`);
+                
+                if (megaMenu) {
+                    megaMenu.classList.add('force-hide');
+                }
+            });
+        }
+        
+        // Scroll durduğunda
+        clearTimeout(scrollTimeout);
+        scrollTimeout = setTimeout(() => {
+            // Scroll durduğunda gizleme iptal
+            document.body.classList.remove('is-scrolling');
+            isScrolling = false;
+            
+            // Force-hide sınıfını kaldır
+            document.querySelectorAll('.force-hide').forEach(menu => {
+                menu.classList.remove('force-hide');
+            });
+            
+            // Son scroll pozisyonunu güncelle
+            lastScrollPos = window.scrollY;
+        }, 150);
+    });
+    
+    // Mobil menü kodları
     const mobileMenuItems = document.querySelectorAll('.md\\:hidden .group');
 
     mobileMenuItems.forEach(item => {
@@ -23,29 +118,13 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
     
-    // Mega menü konumlandırma düzeltmesi
-    function adjustMegaMenuPosition() {
-        const header = document.querySelector('.header-section');
-        const greenLine = document.querySelector('.head .bg-[#007d32]');
-        
-        if (header && greenLine) {
-            const headerHeight = header.offsetHeight;
-            const greenLineHeight = greenLine.offsetHeight;
-            const totalOffset = headerHeight + greenLineHeight;
-            
-            const megaMenus = document.querySelectorAll('.mega-menu');
-            
-            megaMenus.forEach(menu => {
-                menu.style.top = totalOffset + 'px';
-            });
-        }
-    }
-    
     // Mega menü kategorileri için hover efekti
     const megaMenuCategories = document.querySelectorAll('.mega-menu-category');
     megaMenuCategories.forEach(category => {
         category.addEventListener('mouseenter', () => {
-            category.classList.add('hover-active');
+            if (!isScrolling) {
+                category.classList.add('hover-active');
+            }
         });
         
         category.addEventListener('mouseleave', () => {
@@ -59,7 +138,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const icon = link.querySelector('.material-icons');
         
         link.addEventListener('mouseenter', () => {
-            if (icon) {
+            if (!isScrolling && icon) {
                 icon.style.transform = 'translateX(3px)';
                 icon.style.opacity = '1';
             }
@@ -72,10 +151,6 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     });
-    
-    // Sayfa yüklendiğinde ve pencere boyutu değiştiğinde konum düzeltmesi
-    adjustMegaMenuPosition();
-    window.addEventListener('resize', adjustMegaMenuPosition);
 });
 
 // Mobile Menu Toggle

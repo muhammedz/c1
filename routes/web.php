@@ -165,7 +165,7 @@ Route::middleware(['auth', 'role:admin'])->name('admin.')->prefix('admin')->grou
     Route::post('/projects/categories/{id}/toggle-visibility', [ProjectManagerController::class, 'toggleCategoryVisibility'])->name('projects.categories.toggle-visibility');
     
     // Proje İşlemleri
-    Route::post('/projects', [ProjectManagerController::class, 'storeProject'])->name('admin.projects.store2');
+    Route::post('/projects', [ProjectManagerController::class, 'storeProject'])->name('projects.store');
     Route::put('/projects/{id}', [ProjectManagerController::class, 'updateProject'])->name('projects.update');
     Route::delete('/projects/{id}', [ProjectManagerController::class, 'deleteProject'])->name('projects.delete');
     Route::post('/projects/update-order', [ProjectManagerController::class, 'updateProjectOrder'])->name('projects.update-order');
@@ -224,34 +224,57 @@ Route::middleware(['auth', 'role:admin'])->name('admin.')->prefix('admin')->grou
         Route::delete('members/{member}', [App\Http\Controllers\Admin\CorporateMemberController::class, 'destroy'])->name('members.destroy');
         Route::post('members/order', [App\Http\Controllers\Admin\CorporateMemberController::class, 'order'])->name('members.order');
     });
-});
 
-// Proje Yönetimi Rotaları
-Route::prefix('admin/projects')->name('admin.projects.')->middleware(['auth'])->group(function () {
-    Route::get('/', [App\Http\Controllers\Admin\ProjectManagerController::class, 'index'])->name('index');
-    Route::get('/create', [App\Http\Controllers\Admin\ProjectManagerController::class, 'create'])->name('create');
-    Route::post('/store', [App\Http\Controllers\Admin\ProjectManagerController::class, 'store'])->name('store');
-    Route::get('/edit/{id}', [App\Http\Controllers\Admin\ProjectManagerController::class, 'edit'])->name('edit');
-    Route::post('/update/{id}', [App\Http\Controllers\Admin\ProjectManagerController::class, 'update'])->name('update');
-    Route::delete('/delete/{id}', [App\Http\Controllers\Admin\ProjectManagerController::class, 'delete'])->name('delete');
-    
-    // Proje Görünürlük ve Sıralama İşlemleri
-    Route::post('/{id}/toggle-visibility', [App\Http\Controllers\Admin\ProjectManagerController::class, 'toggleVisibility'])->name('toggle-visibility');
-    Route::post('/{id}/toggle-homepage', [App\Http\Controllers\Admin\ProjectManagerController::class, 'toggleHomepage'])->name('toggle-homepage');
-    Route::post('/update-order', [App\Http\Controllers\Admin\ProjectManagerController::class, 'updateOrder'])->name('update-order');
-    
-    // Kategori Yönetimi
-    Route::get('/categories', [App\Http\Controllers\Admin\ProjectManagerController::class, 'categories'])->name('categories');
-    Route::post('/categories/store', [App\Http\Controllers\Admin\ProjectManagerController::class, 'storeCategory'])->name('categories.store');
-    Route::post('/categories/update/{id}', [App\Http\Controllers\Admin\ProjectManagerController::class, 'updateCategory'])->name('categories.update');
-    Route::delete('/categories/delete/{id}', [App\Http\Controllers\Admin\ProjectManagerController::class, 'deleteCategory'])->name('categories.delete');
-    Route::post('/categories/{id}/toggle-visibility', [App\Http\Controllers\Admin\ProjectManagerController::class, 'toggleCategoryVisibility'])->name('categories.toggle-visibility');
-    Route::post('/categories/update-order', [App\Http\Controllers\Admin\ProjectManagerController::class, 'updateCategoryOrder'])->name('categories.update-order');
-    
-    // Ayarlar
-    Route::get('/settings', [App\Http\Controllers\Admin\ProjectManagerController::class, 'settings'])->name('settings');
-    Route::post('/settings/update', [App\Http\Controllers\Admin\ProjectManagerController::class, 'updateSettings'])->name('settings.update');
-    Route::post('/toggle-module-visibility', [App\Http\Controllers\Admin\ProjectManagerController::class, 'toggleModuleVisibility'])->name('toggle-module-visibility');
+    // Menü Sistemi Rotaları
+    Route::prefix('menusystem')->as('menusystem.')->group(function () {
+        // Ana menü routes
+        Route::get('/', [App\Http\Controllers\Admin\MenuSystemController::class, 'index'])->name('index');
+        Route::get('/create', [App\Http\Controllers\Admin\MenuSystemController::class, 'create'])->name('create');
+        Route::post('/', [App\Http\Controllers\Admin\MenuSystemController::class, 'store'])->name('store');
+        Route::get('/{menusystem}/edit', [App\Http\Controllers\Admin\MenuSystemController::class, 'edit'])->name('edit');
+        Route::put('/{menusystem}', [App\Http\Controllers\Admin\MenuSystemController::class, 'update'])->name('update');
+        Route::delete('/{menusystem}', [App\Http\Controllers\Admin\MenuSystemController::class, 'destroy'])->name('destroy');
+        Route::post('/order', [App\Http\Controllers\Admin\MenuSystemController::class, 'updateOrder'])->name('order');
+        Route::get('/type-form', [App\Http\Controllers\Admin\MenuSystemController::class, 'getMenuTypeForm'])->name('type-form');
+        Route::post('/update-status', [App\Http\Controllers\Admin\MenuSystemController::class, 'updateStatus'])->name('update-status');
+        
+        // Menü öğelerini görüntüleme rotası
+        Route::get('/{menusystem}/items', [App\Http\Controllers\Admin\MenuSystemController::class, 'showItems'])->name('items');
+        
+        // Menü açıklama bilgilerini güncelleme rotası
+        Route::put('/{menusystem}/footer-info', [App\Http\Controllers\Admin\MenuSystemController::class, 'updateFooterInfo'])->name('update-footer-info');
+        
+        // Parent items için ajax route
+        Route::get('/get-parent-items', [App\Http\Controllers\Admin\MenuSystemController::class, 'getParentItems'])->name('get-parent-items');
+        
+        // Menu Items routes
+        Route::post('/items/store', [App\Http\Controllers\Admin\MenuSystemController::class, 'storeItem'])->name('items.store');
+        Route::put('/items/{item}', [App\Http\Controllers\Admin\MenuSystemController::class, 'updateItem'])->name('items.update');
+        Route::delete('/items/{item}', [App\Http\Controllers\Admin\MenuSystemController::class, 'destroyItem'])->name('items.destroy');
+        Route::post('/items/order', [App\Http\Controllers\Admin\MenuSystemController::class, 'updateItemOrder'])->name('items.order');
+        Route::post('/items/update-status', [App\Http\Controllers\Admin\MenuSystemController::class, 'updateItemStatus'])->name('items.update_status');
+        Route::get('/items/{menu_id}', [App\Http\Controllers\Admin\MenuSystemController::class, 'getItems'])->name('items.getItems');
+        
+        // Menu Category routes (menusystem altında)
+        Route::get('/menu-categories', [App\Http\Controllers\Admin\MenuCategoryController::class, 'index'])->name('categories.index');
+        Route::get('/menu-categories/create', [App\Http\Controllers\Admin\MenuCategoryController::class, 'create'])->name('categories.create');
+        Route::post('/menu-categories', [App\Http\Controllers\Admin\MenuCategoryController::class, 'store'])->name('categories.store');
+        Route::get('/menu-categories/{category}/edit', [App\Http\Controllers\Admin\MenuCategoryController::class, 'edit'])->name('categories.edit');
+        Route::put('/menu-categories/{category}', [App\Http\Controllers\Admin\MenuCategoryController::class, 'update'])->name('categories.update');
+        Route::delete('/menu-categories/{category}', [App\Http\Controllers\Admin\MenuCategoryController::class, 'destroy'])->name('categories.destroy');
+        Route::post('/menu-categories/order', [App\Http\Controllers\Admin\MenuCategoryController::class, 'updateOrder'])->name('categories.order');
+        Route::post('/menu-categories/update-status', [App\Http\Controllers\Admin\MenuCategoryController::class, 'updateStatus'])->name('categories.update-status');
+        
+        // Menu Item routes (menusystem altında)
+        Route::get('/menu-items', [App\Http\Controllers\Admin\MenuItemController::class, 'index'])->name('items.index');
+        Route::get('/menu-items/create', [App\Http\Controllers\Admin\MenuItemController::class, 'create'])->name('items.create');
+        Route::post('/menu-items', [App\Http\Controllers\Admin\MenuItemController::class, 'store'])->name('items.store');
+        Route::get('/menu-items/{item}/edit', [App\Http\Controllers\Admin\MenuItemController::class, 'edit'])->name('items.edit');
+        Route::put('/menu-items/{item}', [App\Http\Controllers\Admin\MenuItemController::class, 'update'])->name('items.update');
+        Route::delete('/menu-items/{item}', [App\Http\Controllers\Admin\MenuItemController::class, 'destroy'])->name('items.destroy');
+        Route::post('/menu-items/order', [App\Http\Controllers\Admin\MenuItemController::class, 'updateOrder'])->name('items.order');
+        Route::get('/menu-items/icons', [App\Http\Controllers\Admin\MenuItemController::class, 'getIcons'])->name('items.icons');
+    });
 });
 
 // Etkinlik Yönetimi Rotaları
@@ -331,7 +354,7 @@ Route::prefix('admin/homepage')->name('admin.homepage.')->middleware(['auth'])->
     Route::get('/sliders/create', [App\Http\Controllers\Admin\HomepageController::class, 'createSlider'])->name('sliders.create');
     Route::post('/sliders/store', [App\Http\Controllers\Admin\HomepageController::class, 'storeSlider'])->name('sliders.store');
     Route::get('/sliders/edit/{id}', [App\Http\Controllers\Admin\HomepageController::class, 'editSlider'])->name('sliders.edit');
-    Route::match(['put', 'post'], '/sliders/update/{id}', [App\Http\Controllers\Admin\HomepageController::class, 'updateSlider'])->name('sliders.update');
+    Route::match(['put', 'patch', 'post'], '/sliders/update/{id}', [App\Http\Controllers\Admin\HomepageController::class, 'updateSlider'])->name('sliders.update');
     Route::delete('/sliders/delete/{id}', [App\Http\Controllers\Admin\HomepageController::class, 'deleteSlider'])->name('sliders.delete');
     Route::post('/sliders/update-order', [App\Http\Controllers\Admin\HomepageController::class, 'updateSliderOrder'])->name('sliders.order');
     Route::post('/sliders/{id}/toggle', [App\Http\Controllers\Admin\HomepageController::class, 'toggleSlider'])->name('sliders.toggle');

@@ -7,21 +7,24 @@
             $sliders = \App\Models\Slider::where('is_active', true)->orderBy('order')->get();
             
             // URL'deki yinelenen /storage/ yolunu düzelten yardımcı fonksiyon
-            function fixStoragePath($url) {
-                if (empty($url)) {
+            // Dosya içinde tanımlamak yerine global fonksiyon olarak kullanıyoruz
+            if (!function_exists('fixStoragePathSlider')) {
+                function fixStoragePathSlider($url) {
+                    if (empty($url)) {
+                        return $url;
+                    }
+                    
+                    // Yinelenen /storage/ yolunu düzelt
+                    if (strpos($url, '/storage//storage/') !== false) {
+                        return str_replace('/storage//storage/', '/storage/', $url);
+                    }
+                    
+                    if (strpos($url, '/storage/storage/') !== false) {
+                        return str_replace('/storage/storage/', '/storage/', $url);
+                    }
+                    
                     return $url;
                 }
-                
-                // Yinelenen /storage/ yolunu düzelt
-                if (strpos($url, '/storage//storage/') !== false) {
-                    return str_replace('/storage//storage/', '/storage/', $url);
-                }
-                
-                if (strpos($url, '/storage/storage/') !== false) {
-                    return str_replace('/storage/storage/', '/storage/', $url);
-                }
-                
-                return $url;
             }
             @endphp
             

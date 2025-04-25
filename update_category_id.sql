@@ -1,0 +1,1 @@
+ALTER TABLE `menu_system_items` MODIFY `category_id` INT UNSIGNED DEFAULT 1 NULL; 
