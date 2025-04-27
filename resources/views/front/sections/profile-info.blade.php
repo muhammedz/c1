@@ -7,7 +7,53 @@
                 <div class="flex flex-col md:flex-row">
                     <!-- Profil Fotoğrafı ve Sosyal Medya İkonları Yan Yana -->
                     <div class="w-full relative">
-                        @if($profileSettings->profile_photo)
+                        @if($profileSettings->filemanagersystem_profile_photo)
+                            <div class="flex">
+                                <div class="w-3/4">
+                                    <img src="{{ asset($profileSettings->filemanagersystem_profile_photo) }}" alt="{{ $profileSettings->filemanagersystem_profile_photo_alt ?? $profileSettings->name }}" class="w-full">
+                                </div>
+                                <div class="w-1/4 bg-white p-3 flex flex-col justify-center items-center gap-2">
+                                    @if($profileSettings->facebook_url)
+                                        <a href="{{ $profileSettings->facebook_url }}" target="_blank" class="w-8 h-8 bg-[#007d32] rounded-lg flex items-center justify-center hover:bg-[#003d24] transition-colors">
+                                            <i class="fab fa-facebook-f text-white text-xs"></i>
+                                        </a>
+                                    @endif
+                                    
+                                    @if($profileSettings->instagram_url)
+                                        <a href="{{ $profileSettings->instagram_url }}" target="_blank" class="w-8 h-8 bg-[#007d32] rounded-lg flex items-center justify-center hover:bg-[#003d24] transition-colors">
+                                            <i class="fab fa-instagram text-white text-xs"></i>
+                                        </a>
+                                    @endif
+                                    
+                                    @if($profileSettings->twitter_url)
+                                        <a href="{{ $profileSettings->twitter_url }}" target="_blank" class="w-8 h-8 bg-[#007d32] rounded-lg flex items-center justify-center hover:bg-[#003d24] transition-colors">
+                                            <i class="fab fa-twitter text-white text-xs"></i>
+                                        </a>
+                                    @endif
+                                    
+                                    @if($profileSettings->youtube_url)
+                                        <a href="{{ $profileSettings->youtube_url }}" target="_blank" class="w-8 h-8 bg-[#007d32] rounded-lg flex items-center justify-center hover:bg-[#003d24] transition-colors">
+                                            <i class="fab fa-youtube text-white text-xs"></i>
+                                        </a>
+                                    @endif
+                                    
+                                    @if(!$profileSettings->facebook_url && !$profileSettings->instagram_url && !$profileSettings->twitter_url && !$profileSettings->youtube_url)
+                                        <a href="#" class="w-8 h-8 bg-[#007d32] rounded-lg flex items-center justify-center hover:bg-[#003d24] transition-colors">
+                                            <i class="fab fa-facebook-f text-white text-xs"></i>
+                                        </a>
+                                        <a href="#" class="w-8 h-8 bg-[#007d32] rounded-lg flex items-center justify-center hover:bg-[#003d24] transition-colors">
+                                            <i class="fab fa-instagram text-white text-xs"></i>
+                                        </a>
+                                        <a href="#" class="w-8 h-8 bg-[#007d32] rounded-lg flex items-center justify-center hover:bg-[#003d24] transition-colors">
+                                            <i class="fab fa-twitter text-white text-xs"></i>
+                                        </a>
+                                        <a href="#" class="w-8 h-8 bg-[#007d32] rounded-lg flex items-center justify-center hover:bg-[#003d24] transition-colors">
+                                            <i class="fab fa-youtube text-white text-xs"></i>
+                                        </a>
+                                    @endif
+                                </div>
+                            </div>
+                        @elseif($profileSettings->profile_photo)
                             <div class="flex">
                                 <div class="w-3/4">
                                     <img src="{{ asset('storage/' . $profileSettings->profile_photo) }}" alt="{{ $profileSettings->name }}" class="w-full">
@@ -126,7 +172,11 @@
                                 </div>
                             </div>
                             <div class="w-2/3 flex items-center" style="margin-bottom: -4px;">
-                                @if($profileSettings->contact_image)
+                                @if($profileSettings->filemanagersystem_contact_image)
+                                    <img src="{{ asset($profileSettings->filemanagersystem_contact_image) }}" 
+                                         alt="{{ $profileSettings->filemanagersystem_contact_image_alt ?? 'İletişim Merkezi' }}" 
+                                         class="w-full">
+                                @elseif($profileSettings->contact_image)
                                     <img src="{{ asset('storage/' . $profileSettings->contact_image) }}" 
                                          alt="İletişim Merkezi" 
                                          class="w-full">

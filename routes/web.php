@@ -166,6 +166,7 @@ Route::middleware(['auth', 'role:admin'])->name('admin.')->prefix('admin')->grou
     
     // Proje İşlemleri
     Route::post('/projects', [ProjectManagerController::class, 'storeProject'])->name('projects.store');
+    Route::get('/projects/{id}', [ProjectManagerController::class, 'show'])->name('projects.show');
     Route::put('/projects/{id}', [ProjectManagerController::class, 'updateProject'])->name('projects.update');
     Route::delete('/projects/{id}', [ProjectManagerController::class, 'deleteProject'])->name('projects.delete');
     Route::post('/projects/update-order', [ProjectManagerController::class, 'updateProjectOrder'])->name('projects.update-order');

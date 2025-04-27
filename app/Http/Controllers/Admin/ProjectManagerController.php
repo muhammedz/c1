@@ -139,9 +139,20 @@ class ProjectManagerController extends Controller
     }
     
     /**
+     * Proje detayını görüntüleme
+     */
+    public function show($id)
+    {
+        $project = Project::with(['category', 'images'])->findOrFail($id);
+        $categories = ProjectCategory::orderBy('name', 'asc')->get();
+        
+        return view('admin.projects.show', compact('project', 'categories'));
+    }
+    
+    /**
      * Proje düzenleme formu
      */
-    public function edit($id)
+    public function editProject($id)
     {
         $project = Project::with(['category', 'images'])->findOrFail($id);
         $categories = ProjectCategory::orderBy('name', 'asc')->get();
@@ -152,7 +163,7 @@ class ProjectManagerController extends Controller
     /**
      * Proje güncelleme
      */
-    public function update(Request $request, $id)
+    public function updateProject(Request $request, $id)
     {
         $project = Project::findOrFail($id);
         

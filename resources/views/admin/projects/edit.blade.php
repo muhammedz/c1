@@ -213,7 +213,7 @@
 @section('content')
 <form action="{{ route('admin.projects.update', $project->id) }}" method="POST" enctype="multipart/form-data" id="project-form">
     @csrf
-    @method('POST')
+    @method('PUT')
     
     <div class="row">
         <div class="col-lg-8">

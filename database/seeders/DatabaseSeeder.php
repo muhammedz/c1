@@ -34,5 +34,9 @@ class DatabaseSeeder extends Seeder
             MenuTagSeeder::class,
             MenuCardSeeder::class,
         ]);
+
+        $this->call([
+            NewsAndCategoriesSeeder::class,
+        ]);
     }
 }
