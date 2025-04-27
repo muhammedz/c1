@@ -47,6 +47,41 @@
                                             <div class="py-2 px-1">
                                                 <div class="flex mb-2">
                                                     <div class="w-full">
+                                                        @if($menu->type == 3)
+                                                        <!-- Minimal Yatay Buton Tipi Menü Görünümü -->
+                                                        <div class="grid grid-cols-2 gap-2 py-2">
+                                                            @php
+                                                                $menuItems = app(\App\Services\HeaderService::class)->getMenuItems($menu->id);
+                                                                $iconMapping = [
+                                                                    'Adalet' => 'gavel',
+                                                                    'Çevre, Tarım ve Hayvancılık' => 'agriculture',
+                                                                    'Devlet ve Mevzuat' => 'account_balance',
+                                                                    'Eğitim' => 'school',
+                                                                    'Genel Bilgiler' => 'menu_book',
+                                                                    'Güvenlik' => 'security',
+                                                                    'İş ve Kariyer' => 'business',
+                                                                    'Kişisel Bilgiler' => 'badge',
+                                                                    'Sağlık' => 'favorite',
+                                                                    'Sosyal Güvenlik ve Sigorta' => 'umbrella',
+                                                                    'Şikayet ve Bilgi Edinme' => 'contact_support',
+                                                                    'Telekomünikasyon' => 'settings_phone',
+                                                                    'Trafik ve Ulaşım' => 'directions_car',
+                                                                    'Vergi, Harç ve Cezalar' => 'payments'
+                                                                ];
+                                                            @endphp
+                                                            
+                                                            @foreach($menuItems as $item)
+                                                                <!-- Minimal Yatay Kategori Buton Tasarımı -->
+                                                                <a href="{{ $item->url ?? '#' }}" class="category-button flex items-center p-2 bg-white hover:bg-gray-50 rounded border border-gray-100 shadow-sm transition-colors">
+                                                                    <div class="w-8 h-8 flex items-center justify-center rounded-full mr-3 flex-shrink-0" style="background-color: #f8f9fa;">
+                                                                        <span class="material-icons text-[#00352b] text-sm">{{ $item->icon ?? $iconMapping[$item->title] ?? 'article' }}</span>
+                                                                    </div>
+                                                                    <span class="font-medium text-[#00352b] text-sm truncate">{{ $item->title }}</span>
+                                                                </a>
+                                                            @endforeach
+                                                        </div>
+                                                        @else
+                                                        <!-- Normal Liste Tipi Menü -->
                                                         <div class="grid grid-cols-1 gap-3">
                                                             @php
                                                                 $menuItems = app(\App\Services\HeaderService::class)->getMenuItems($menu->id);
@@ -71,11 +106,12 @@
                                                                 </div>
                                                             @endforeach
                                                         </div>
+                                                        @endif
                                                     </div>
                                                 </div>
                                                 <div class="mt-2 pt-2 border-t border-gray-200">
                                                     <div class="flex justify-between items-center">
-                                                        <p class="text-xs text-gray-500">{{ $menu->footer_text ?? 'Açıklama Yazısı' }}</p>
+                                                        <p class="text-xs text-gray-500">{{ $menu->description ?? $menu->footer_text ?? 'Açıklama Yazısı' }}</p>
                                                         <a href="{{ $menu->footer_link ?? '#' }}" class="text-[#00352b] hover:text-[#007b32] text-sm font-medium flex items-center gap-1 transition-all hover:gap-2">
                                                             {{ $menu->name }} 
                                                             <span class="material-icons text-sm">arrow_forward</span>
@@ -169,6 +205,37 @@
                                 <span class="material-icons text-sm">expand_more</span>
                             </a>
                             <div class="quick-menu-dropdown hidden">
+                                @if($menu->type == 3)
+                                <!-- Minimal Mobil Buton Menü -->
+                                <div class="grid grid-cols-1 gap-1 p-2">
+                                    @php
+                                        $menuItems = app(\App\Services\HeaderService::class)->getMenuItems($menu->id);
+                                        $iconMapping = [
+                                            'Adalet' => 'gavel',
+                                            'Çevre, Tarım ve Hayvancılık' => 'agriculture',
+                                            'Devlet ve Mevzuat' => 'account_balance',
+                                            'Eğitim' => 'school',
+                                            'Genel Bilgiler' => 'menu_book',
+                                            'Güvenlik' => 'security',
+                                            'İş ve Kariyer' => 'business',
+                                            'Kişisel Bilgiler' => 'badge',
+                                            'Sağlık' => 'favorite',
+                                            'Sosyal Güvenlik ve Sigorta' => 'umbrella',
+                                            'Şikayet ve Bilgi Edinme' => 'contact_support',
+                                            'Telekomünikasyon' => 'settings_phone',
+                                            'Trafik ve Ulaşım' => 'directions_car',
+                                            'Vergi, Harç ve Cezalar' => 'payments'
+                                        ];
+                                    @endphp
+                                    
+                                    @foreach($menuItems as $item)
+                                    <a href="{{ $item->url ?? '#' }}" class="flex items-center p-2 hover:bg-gray-50 border-b border-gray-100">
+                                        <span class="material-icons text-[#00352b] text-base mr-3">{{ $item->icon ?? $iconMapping[$item->title] ?? 'article' }}</span>
+                                        <span class="text-sm">{{ $item->title }}</span>
+                                    </a>
+                                    @endforeach
+                                </div>
+                                @else
                                 <!-- Mobil dropdown içeriği -->
                                 @php
                                     $menuItems = app(\App\Services\HeaderService::class)->getMenuItems($menu->id);
@@ -179,6 +246,7 @@
                                         <p class="text-gray-700 font-medium">{{ $item->title }}</p>
                                     </div>
                                 @endforeach
+                                @endif
                             </div>
                         </div>
                     @endif
@@ -237,6 +305,23 @@
         .w-full.h-1.bg-\[\#007b32\] {
             position: relative;
             z-index: 100;
+        }
+        
+        /* Yatay buton hover efekti */
+        .category-button:hover {
+            border-color: #e6f7ec;
+            background-color: #f0f9f6;
+        }
+        
+        .category-button:hover .material-icons {
+            color: #007b32;
+        }
+        
+        /* Metni kesme */
+        .truncate {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
     </style>
 </section>

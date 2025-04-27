@@ -22,7 +22,9 @@ class MenuSystemItem extends Model
         'icon',
         'target',
         'description',
-        'properties'
+        'properties',
+        'item_type',
+        'button_style'
     ];
 
     protected $casts = [

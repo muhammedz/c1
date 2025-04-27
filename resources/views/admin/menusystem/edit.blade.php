@@ -1,30 +1,7 @@
 @extends('adminlte::page')
 
 @section('css')
-<style>
-    .button-menu-item {
-        transition: all 0.3s;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    }
-    
-    .button-menu-item:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
-    }
-    
-    .button-menu-container {
-        background-color: #f8f9fa;
-        border-radius: 8px;
-    }
-    
-    .button-menu-item .card-body {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        min-height: 160px;
-    }
-</style>
+<meta name="csrf-token" content="{{ csrf_token() }}">
 @endsection
 
 @section('title', 'Menü Düzenle')
@@ -302,269 +279,205 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-header bg-light">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0">Buton Menü Öğeleri</h5>
-                        <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#addButtonMenuItemModal">
-                            <i class="mdi mdi-plus-circle mr-1"></i> Yeni Buton Ekle
-                        </button>
-                    </div>
+                    <h5 class="mb-0">Buton Alt Menü Öğeleri</h5>
                 </div>
                 <div class="card-body">
-                    <div class="row" id="buttonMenuPreview">
-                        <div class="col-12 mb-4">
-                            <h5>Önizleme</h5>
-                            <div class="button-menu-container p-3 border rounded">
-                                <div class="row">
-                                    @if(isset($menuItems) && count($menuItems) > 0)
-                                        @foreach($menuItems as $item)
-                                        <div class="col-lg-3 col-md-4 col-sm-6 mb-3">
-                                            <div class="card h-100 button-menu-item">
-                                                <div class="card-body text-center">
-                                                    @if($item->icon)
-                                                    <div class="mb-3">
-                                                        <i class="{{ $item->icon }} fa-3x"></i>
-                                                    </div>
-                                                    @endif
-                                                    <h5 class="card-title">{{ $item->title }}</h5>
-                                                    @if($item->description)
-                                                    <p class="card-text small">{{ $item->description }}</p>
-                                                    @endif
+                    <div class="mb-4">
+                        <button type="button" class="btn btn-primary" data-toggle="collapse" data-target="#newButtonForm">
+                            <i class="fas fa-plus-circle mr-1"></i> Yeni Buton Ekle
+                        </button>
+                        
+                        <div class="collapse mt-3" id="newButtonForm">
+                            <div class="card card-body bg-light">
+                                <form action="{{ url('/admin/menusystem/items/store') }}" method="POST">
+                                    @csrf
+                                    <input type="hidden" name="menu_id" value="{{ $menu->id }}">
+                                    <input type="hidden" name="item_type" value="2">
+                                    
+                                    <div class="form-group">
+                                        <label>Başlık <span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control @error('title') is-invalid @enderror" name="title" required>
+                                        @error('title')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label>URL <span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control @error('url') is-invalid @enderror" name="url" required>
+                                        @error('url')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label>İkon (FontAwesome)</label>
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text"><i class="fas fa-icons"></i></span>
+                                            </div>
+                                            <input type="text" class="form-control" name="icon" placeholder="fa-home, fa-user, fa-cog" value="fa-link">
+                                        </div>
+                                        <small class="form-text text-muted">FontAwesome ikon adı girin (ör: fa-home, fa-user)</small>
+                                    </div>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label>Buton Stili</label>
+                                                <select class="form-control" name="button_style">
+                                                    <option value="primary">Mavi (Primary)</option>
+                                                    <option value="success">Yeşil (Success)</option>
+                                                    <option value="danger">Kırmızı (Danger)</option>
+                                                    <option value="warning">Sarı (Warning)</option>
+                                                    <option value="info">Açık Mavi (Info)</option>
+                                                    <option value="secondary">Gri (Secondary)</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label>Sıralama</label>
+                                                <input type="number" class="form-control" name="order" value="0" min="0">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="custom-control custom-switch mb-3">
+                                        <input type="checkbox" class="custom-control-input" id="newButtonStatus" name="status" value="1" checked>
+                                        <label class="custom-control-label" for="newButtonStatus">Aktif</label>
+                                    </div>
+                                    
+                                    <button type="submit" class="btn btn-success">Kaydet</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Buton Kartları -->
+                    <div class="row">
+                        @if(isset($buttonItems) && count($buttonItems) > 0)
+                            @foreach($buttonItems as $item)
+                                <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+                                    <div class="card h-100 border-{{ $item->button_style ?? 'primary' }}">
+                                        <div class="card-header bg-{{ $item->button_style ?? 'primary' }} text-white d-flex justify-content-between align-items-center">
+                                            <h5 class="mb-0">
+                                                <i class="fas {{ $item->icon ?? 'fa-link' }} mr-2"></i>
+                                                {{ $item->title }}
+                                            </h5>
+                                            <div class="dropdown">
+                                                <button class="btn btn-sm btn-light" type="button" data-toggle="dropdown">
+                                                    <i class="fas fa-ellipsis-v"></i>
+                                                </button>
+                                                <div class="dropdown-menu dropdown-menu-right">
+                                                    <button class="dropdown-item edit-button" type="button" data-toggle="collapse" data-target="#editForm{{ $item->id }}">
+                                                        <i class="fas fa-edit mr-2"></i> Düzenle
+                                                    </button>
+                                                    <div class="dropdown-divider"></div>
+                                                    <form action="{{ url('/admin/menusystem/items/'.$item->id) }}" method="POST">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit" class="dropdown-item text-danger" onclick="return confirm('Bu öğeyi silmek istediğinize emin misiniz?')">
+                                                            <i class="fas fa-trash mr-2"></i> Sil
+                                                        </button>
+                                                    </form>
                                                 </div>
                                             </div>
                                         </div>
-                                        @endforeach
-                                    @else
-                                        <div class="col-12">
-                                            <p class="text-center">Henüz buton öğesi bulunmuyor</p>
-                                        </div>
-                                    @endif
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="table-responsive">
-                        <table class="table table-bordered table-hover mb-0">
-                            <thead class="thead-light">
-                                <tr>
-                                    <th style="width: 5%">#</th>
-                                    <th style="width: 20%">Başlık</th>
-                                    <th style="width: 15%">İkon</th>
-                                    <th style="width: 20%">URL</th>
-                                    <th style="width: 20%">Açıklama</th>
-                                    <th style="width: 10%">Sıralama</th>
-                                    <th style="width: 10%">Durum</th>
-                                    <th style="width: 15%">İşlemler</th>
-                                </tr>
-                            </thead>
-                            <tbody id="buttonMenuItemsContainer">
-                                @if(isset($menuItems) && count($menuItems) > 0)
-                                    @foreach($menuItems as $item)
-                                    <tr id="button-item-{{ $item->id }}">
-                                        <td>{{ $loop->iteration }}</td>
-                                        <td>{{ $item->title }}</td>
-                                        <td>
-                                            @if($item->icon)
-                                            <i class="{{ $item->icon }}"></i> {{ $item->icon }}
-                                            @else
-                                            <span class="text-muted">-</span>
-                                            @endif
-                                        </td>
-                                        <td>{{ $item->url }}</td>
-                                        <td>{{ Str::limit($item->description, 30) }}</td>
-                                        <td>
-                                            <input type="number" class="form-control form-control-sm item-order" 
-                                                data-id="{{ $item->id }}" 
-                                                value="{{ $item->order }}" min="0">
-                                        </td>
-                                        <td>
+                                        <div class="card-body">
+                                            <p><strong>URL:</strong> <a href="{{ $item->url }}" target="_blank">{{ $item->url }}</a></p>
+                                            <p><strong>Sıra:</strong> {{ $item->order }}</p>
                                             <div class="custom-control custom-switch">
-                                                <input type="checkbox" class="custom-control-input item-status" 
-                                                    id="buttonItemStatus{{ $item->id }}" 
-                                                    data-id="{{ $item->id }}" 
-                                                    {{ $item->status ? 'checked' : '' }}>
-                                                <label class="custom-control-label" for="buttonItemStatus{{ $item->id }}"></label>
+                                                <input type="checkbox" class="custom-control-input" id="statusSwitch{{ $item->id }}" 
+                                                    {{ $item->status ? 'checked' : '' }} disabled>
+                                                <label class="custom-control-label" for="statusSwitch{{ $item->id }}">
+                                                    {{ $item->status ? 'Aktif' : 'Pasif' }}
+                                                </label>
                                             </div>
-                                        </td>
-                                        <td>
-                                            <button type="button" class="btn btn-sm btn-info edit-button-item" 
-                                                data-id="{{ $item->id }}"
-                                                data-title="{{ $item->title }}"
-                                                data-icon="{{ $item->icon }}"
-                                                data-url="{{ $item->url }}"
-                                                data-description="{{ $item->description }}"
-                                                data-order="{{ $item->order }}"
-                                                data-status="{{ $item->status }}"
-                                                data-new-tab="{{ $item->new_tab }}">
-                                                <i class="mdi mdi-pencil"></i>
-                                            </button>
-                                            <button type="button" class="btn btn-sm btn-danger delete-button-item" 
-                                                data-id="{{ $item->id }}">
-                                                <i class="mdi mdi-delete"></i>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                    @endforeach
-                                @else
-                                <tr>
-                                    <td colspan="8" class="text-center">Henüz buton öğesi bulunmuyor</td>
-                                </tr>
-                                @endif
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Buton Menü Öğesi Ekleme Modal -->
-    <div class="modal fade" id="addButtonMenuItemModal" tabindex="-1" role="dialog" aria-labelledby="addButtonMenuItemModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-                <div class="modal-header bg-primary text-white">
-                    <h5 class="modal-title" id="addButtonMenuItemModalLabel"><i class="fas fa-plus-circle mr-2"></i>Yeni Buton Öğesi Ekle</h5>
-                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                
-                <form action="{{ route('admin.menusystem.items.store') }}" method="POST" id="directSubmitForm">
-                    @csrf
-                    <input type="hidden" name="menu_id" value="{{ $menu->id }}">
-                    
-                    <div class="modal-body">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="buttonItemTitle">Başlık <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" id="buttonItemTitle" name="title" required>
-                                </div>
-                                
-                                <div class="form-group">
-                                    <label for="buttonItemIcon">İkon (Font Awesome)</label>
-                                    <div class="input-group">
-                                        <div class="input-group-prepend">
-                                            <span class="input-group-text"><i class="fas fa-icons"></i></span>
+                                            
+                                            <div class="collapse mt-3" id="editForm{{ $item->id }}">
+                                                <hr>
+                                                <h6 class="mb-3">Düzenle</h6>
+                                                <form action="{{ url('/admin/menusystem/items/'.$item->id) }}" method="POST">
+                                                    @csrf
+                                                    @method('PUT')
+                                                    <input type="hidden" name="menu_id" value="{{ $menu->id }}">
+                                                    <input type="hidden" name="item_type" value="2">
+                                                    
+                                                    <div class="form-group">
+                                                        <label>Başlık <span class="text-danger">*</span></label>
+                                                        <input type="text" class="form-control @error('title') is-invalid @enderror" name="title" value="{{ $item->title }}" required>
+                                                    </div>
+                                                    
+                                                    <div class="form-group">
+                                                        <label>URL <span class="text-danger">*</span></label>
+                                                        <input type="text" class="form-control @error('url') is-invalid @enderror" name="url" value="{{ $item->url }}" required>
+                                                    </div>
+                                                    
+                                                    <div class="form-group">
+                                                        <label>İkon</label>
+                                                        <div class="input-group">
+                                                            <div class="input-group-prepend">
+                                                                <span class="input-group-text"><i class="fas {{ $item->icon ?? 'fa-link' }}"></i></span>
+                                                            </div>
+                                                            <input type="text" class="form-control" name="icon" value="{{ $item->icon }}">
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    <div class="row">
+                                                        <div class="col-md-6">
+                                                            <div class="form-group">
+                                                                <label>Buton Stili</label>
+                                                                <select class="form-control" name="button_style">
+                                                                    <option value="primary" {{ $item->button_style == 'primary' ? 'selected' : '' }}>Mavi (Primary)</option>
+                                                                    <option value="success" {{ $item->button_style == 'success' ? 'selected' : '' }}>Yeşil (Success)</option>
+                                                                    <option value="danger" {{ $item->button_style == 'danger' ? 'selected' : '' }}>Kırmızı (Danger)</option>
+                                                                    <option value="warning" {{ $item->button_style == 'warning' ? 'selected' : '' }}>Sarı (Warning)</option>
+                                                                    <option value="info" {{ $item->button_style == 'info' ? 'selected' : '' }}>Açık Mavi (Info)</option>
+                                                                    <option value="secondary" {{ $item->button_style == 'secondary' ? 'selected' : '' }}>Gri (Secondary)</option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <div class="form-group">
+                                                                <label>Sıralama</label>
+                                                                <input type="number" class="form-control" name="order" value="{{ $item->order }}" min="0">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    <div class="custom-control custom-switch mb-3">
+                                                        <input type="checkbox" class="custom-control-input" id="editStatusSwitch{{ $item->id }}" name="status" value="1" {{ $item->status ? 'checked' : '' }}>
+                                                        <label class="custom-control-label" for="editStatusSwitch{{ $item->id }}">Aktif</label>
+                                                    </div>
+                                                    
+                                                    <button type="submit" class="btn btn-primary btn-sm">Güncelle</button>
+                                                    <button type="button" class="btn btn-secondary btn-sm" data-toggle="collapse" data-target="#editForm{{ $item->id }}">İptal</button>
+                                                </form>
+                                            </div>
                                         </div>
-                                        <input type="text" class="form-control" id="buttonItemIcon" name="icon" placeholder="örn: fas fa-home">
                                     </div>
-                                    <small class="form-text text-muted">
-                                        <a href="https://fontawesome.com/icons" target="_blank">Font Awesome</a> ikonları kullanabilirsiniz
-                                    </small>
                                 </div>
-                                
-                                <div class="form-group">
-                                    <label for="buttonItemUrl">URL <span class="text-danger">*</span></label>
-                                    <div class="input-group">
-                                        <div class="input-group-prepend">
-                                            <span class="input-group-text"><i class="fas fa-link"></i></span>
-                                        </div>
-                                        <input type="text" class="form-control" id="buttonItemUrl" name="url" required>
-                                    </div>
+                            @endforeach
+                        @else
+                            <div class="col-12">
+                                <div class="alert alert-info">
+                                    Henüz buton menü öğesi bulunmuyor. Yukarıdaki "Yeni Buton Ekle" butonunu kullanarak buton ekleyebilirsiniz.
                                 </div>
                             </div>
-                            
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="buttonItemDescription">Kısa Açıklama</label>
-                                    <textarea class="form-control" id="buttonItemDescription" name="description" rows="3"></textarea>
-                                </div>
-                                
-                                <div class="form-group">
-                                    <label for="buttonItemOrder">Sıralama</label>
-                                    <input type="number" class="form-control" id="buttonItemOrder" name="order" value="0" min="0">
-                                </div>
-                                
-                                <div class="form-group">
-                                    <div class="custom-control custom-switch">
-                                        <input type="checkbox" class="custom-control-input" id="buttonItemStatus" name="status" value="1" checked>
-                                        <label class="custom-control-label" for="buttonItemStatus">Aktif</label>
-                                    </div>
-                                </div>
-                                
-                                <div class="form-group">
-                                    <div class="custom-control custom-switch">
-                                        <input type="checkbox" class="custom-control-input" id="buttonItemNewTab" name="new_tab" value="1">
-                                        <label class="custom-control-label" for="buttonItemNewTab">Yeni sekmede aç</label>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        @endif
                     </div>
-                    
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fas fa-times mr-1"></i>İptal</button>
-                        <button type="submit" class="btn btn-success"><i class="fas fa-save mr-1"></i>Kaydet</button>
+
+                    @if($errors->any())
+                    <div class="alert alert-danger mt-3">
+                        <h5><i class="icon fas fa-exclamation-triangle"></i> Hata!</h5>
+                        <ul>
+                            @foreach($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
                     </div>
-                </form>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Buton Menü Öğesi Düzenleme Modal -->
-    <div class="modal fade" id="editButtonMenuItemModal" tabindex="-1" role="dialog" aria-labelledby="editButtonMenuItemModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="editButtonMenuItemModalLabel">Buton Öğesi Düzenle</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <form id="editButtonMenuItemForm">
-                        @csrf
-                        <input type="hidden" name="item_id" id="editButtonItemId">
-                        
-                        <div class="form-group">
-                            <label for="editButtonItemTitle">Başlık <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" id="editButtonItemTitle" name="title" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="editButtonItemIcon">İkon (Font Awesome)</label>
-                            <input type="text" class="form-control" id="editButtonItemIcon" name="icon" placeholder="örn: fas fa-home">
-                            <small class="form-text text-muted">
-                                <a href="https://fontawesome.com/icons" target="_blank">Font Awesome</a> ikonları kullanabilirsiniz
-                            </small>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="editButtonItemUrl">URL <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" id="editButtonItemUrl" name="url" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="editButtonItemDescription">Kısa Açıklama</label>
-                            <textarea class="form-control" id="editButtonItemDescription" name="description" rows="2"></textarea>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="editButtonItemOrder">Sıralama</label>
-                            <input type="number" class="form-control" id="editButtonItemOrder" name="order" value="0" min="0">
-                        </div>
-                        
-                        <div class="form-group">
-                            <div class="custom-control custom-switch">
-                                <input type="checkbox" class="custom-control-input status-toggle" id="editButtonItemStatus">
-                                <input type="hidden" name="status" value="0" id="editButtonItemStatusHidden">
-                                <label class="custom-control-label" for="editButtonItemStatus">Aktif</label>
-                            </div>
-                        </div>
-                        
-                        <div class="form-group">
-                            <div class="custom-control custom-switch">
-                                <input type="checkbox" class="custom-control-input new-tab-toggle" id="editButtonItemNewTab">
-                                <input type="hidden" name="new_tab" value="0" id="editButtonItemNewTabHidden">
-                                <label class="custom-control-label" for="editButtonItemNewTab">Yeni sekmede aç</label>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
-                    <button type="button" class="btn btn-primary" id="updateButtonMenuItem">Güncelle</button>
+                    @endif
                 </div>
             </div>
         </div>
@@ -576,6 +489,8 @@
 @section('scripts')
 <script>
     $(document).ready(function() {
+        console.log('Document ready - JavaScript yüklendi');
+        
         // Menü tipi değiştiğinde özel alanları göster/gizle
         $('#type').change(function() {
             updateMenuTypeUI();
@@ -817,342 +732,6 @@
                             toastr.error('Menü öğesi silinirken hata oluştu');
                         }
                     });
-                }
-            });
-        });
-        @endif
-        
-        @if($menu->type == 3)
-        // Sayfa yüklendiğinde
-        $(document).ready(function() {
-            // Buton menü öğesi ekleme
-            $('#saveButtonMenuItem').click(function() {
-                // Form verilerini topla
-                const form = $('#addButtonMenuItemForm');
-                
-                // Form doğrulama
-                if (!$('#buttonItemTitle').val()) {
-                    toastr.error('Başlık alanı zorunludur');
-                    return;
-                }
-                
-                if (!$('#buttonItemUrl').val()) {
-                    toastr.error('URL alanı zorunludur');
-                    return;
-                }
-                
-                // Checkbox durumlarını kontrol et ve hidden input olarak ekle
-                if ($('#buttonItemStatus').is(':checked') && !form.find('input[name="status"]').length) {
-                    form.append('<input type="hidden" name="status" value="1">');
-                }
-                
-                if ($('#buttonItemNewTab').is(':checked') && !form.find('input[name="new_tab"]').length) {
-                    form.append('<input type="hidden" name="new_tab" value="1">');
-                }
-                
-                // Form verilerini serialize et
-                const formData = form.serialize();
-                
-                $.ajax({
-                    url: '{{ route("admin.menusystem.items.store") }}',
-                    method: 'POST',
-                    data: formData,
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    },
-                    success: function(response) {
-                        if (response.success) {
-                            // Modal'ı kapat
-                            $('#addButtonMenuItemModal').modal('hide');
-                            
-                            // Form alanlarını temizle
-                            form[0].reset();
-                            
-                            // Başarı mesajı göster
-                            toastr.success('Buton öğesi başarıyla eklendi');
-                            
-                            // Sayfayı yenile
-                            setTimeout(function() {
-                                window.location.reload();
-                            }, 1000);
-                        } else {
-                            toastr.error('Buton öğesi eklenirken bir hata oluştu');
-                        }
-                    },
-                    error: function(xhr) {
-                        if (xhr.responseJSON && xhr.responseJSON.errors) {
-                            const errors = xhr.responseJSON.errors;
-                            for (const key in errors) {
-                                toastr.error(errors[key][0]);
-                            }
-                        } else {
-                            toastr.error('Buton öğesi eklenirken bir hata oluştu');
-                        }
-                    }
-                });
-            });
-            
-            // Formun doğrudan sunucuya gönderilmesini engelle, JS ile işle
-            $('#directSubmitForm').on('submit', function(e) {
-                e.preventDefault();
-                
-                // Form verilerini topla
-                var formData = $(this).serialize();
-                
-                // AJAX ile gönder
-                $.ajax({
-                    url: $(this).attr('action'),
-                    type: 'POST',
-                    data: formData,
-                    success: function(response) {
-                        if (response.success) {
-                            // Modal'ı kapat
-                            $('#addButtonMenuItemModal').modal('hide');
-                            
-                            // Başarı mesajı göster
-                            toastr.success('Buton öğesi başarıyla eklendi');
-                            
-                            // Sayfayı yenile
-                            setTimeout(function() {
-                                window.location.reload();
-                            }, 1000);
-                        } else {
-                            toastr.error('Buton öğesi eklenirken bir hata oluştu');
-                        }
-                    },
-                    error: function(xhr) {
-                        if (xhr.responseJSON && xhr.responseJSON.errors) {
-                            var errors = xhr.responseJSON.errors;
-                            $.each(errors, function(key, value) {
-                                toastr.error(value[0]);
-                            });
-                        } else {
-                            toastr.error('Buton öğesi eklenirken bir hata oluştu');
-                        }
-                    }
-                });
-            });
-        });
-        
-        // Buton menü öğesi düzenleme modalını aç
-        $('.edit-button-item').click(function() {
-            const itemId = $(this).data('id');
-            const title = $(this).data('title');
-            const icon = $(this).data('icon');
-            const url = $(this).data('url');
-            const description = $(this).data('description');
-            const order = $(this).data('order');
-            const status = $(this).data('status');
-            const newTab = $(this).data('new-tab');
-            
-            $('#editButtonItemId').val(itemId);
-            $('#editButtonItemTitle').val(title);
-            $('#editButtonItemIcon').val(icon);
-            $('#editButtonItemUrl').val(url);
-            $('#editButtonItemDescription').val(description);
-            $('#editButtonItemOrder').val(order);
-            
-            // Checkbox durumlarını ayarla
-            $('#editButtonItemStatus').prop('checked', status === '1' || status === true);
-            $('#editButtonItemNewTab').prop('checked', newTab === '1' || newTab === true);
-            
-            $('#editButtonMenuItemModal').modal('show');
-        });
-        
-        // Buton menü öğesi güncelleme
-        $('#updateButtonMenuItem').click(function() {
-            const form = $('#editButtonMenuItemForm');
-            
-            // Checkbox durumlarını kontrol et ve hidden input olarak ekle
-            if ($('#editButtonItemStatus').is(':checked') && !$('input[name="status"]').length) {
-                form.append('<input type="hidden" name="status" value="1">');
-            }
-            
-            if ($('#editButtonItemNewTab').is(':checked') && !$('input[name="new_tab"]').length) {
-                form.append('<input type="hidden" name="new_tab" value="1">');
-            }
-            
-            const formData = form.serialize();
-            const itemId = $('#editButtonItemId').val();
-            
-            // Form doğrulama
-            if (!$('#editButtonItemTitle').val()) {
-                toastr.error('Başlık alanı zorunludur');
-                return;
-            }
-            
-            if (!$('#editButtonItemUrl').val()) {
-                toastr.error('URL alanı zorunludur');
-                return;
-            }
-            
-            $.ajax({
-                url: '{{ route("admin.menusystem.items.update", ":id") }}'.replace(':id', itemId),
-                method: 'POST',
-                data: formData + '&_method=PUT',
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                },
-                success: function(response) {
-                    if (response.success) {
-                        $('#editButtonMenuItemModal').modal('hide');
-                        
-                        // Başarı mesajı göster
-                        toastr.success('Buton öğesi başarıyla güncellendi');
-                        
-                        // Sayfayı yenile
-                        setTimeout(function() {
-                            window.location.reload();
-                        }, 1000);
-                    } else {
-                        toastr.error('Buton öğesi güncellenirken bir hata oluştu');
-                    }
-                },
-                error: function(xhr) {
-                    if (xhr.responseJSON && xhr.responseJSON.errors) {
-                        const errors = xhr.responseJSON.errors;
-                        for (const key in errors) {
-                            toastr.error(errors[key][0]);
-                        }
-                    } else {
-                        toastr.error('Buton öğesi güncellenirken bir hata oluştu');
-                    }
-                }
-            });
-        });
-        
-        // Buton menü öğesi silme
-        $('.delete-button-item').click(function() {
-            const itemId = $(this).data('id');
-            
-            Swal.fire({
-                title: 'Emin misiniz?',
-                text: 'Bu buton öğesini silmek istediğinize emin misiniz?',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Evet, sil!',
-                cancelButtonText: 'İptal'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $.ajax({
-                        url: '{{ route("admin.menusystem.items.destroy", ":id") }}'.replace(':id', itemId),
-                        method: 'POST',
-                        data: {
-                            _token: '{{ csrf_token() }}',
-                            _method: 'DELETE'
-                        },
-                        success: function(response) {
-                            if (response.success) {
-                                $('#button-item-' + itemId).fadeOut(300, function() {
-                                    $(this).remove();
-                                    
-                                    // Eğer kalan öğe yoksa mesaj göster
-                                    if ($('#buttonMenuItemsContainer tr').length === 0) {
-                                        $('#buttonMenuItemsContainer').html('<tr><td colspan="8" class="text-center">Henüz buton öğesi bulunmuyor</td></tr>');
-                                    }
-                                    
-                                    // Önizlemedeki butonları da güncelle
-                                    updateButtonMenuPreview();
-                                });
-                                
-                                toastr.success('Buton öğesi silindi');
-                            } else {
-                                toastr.error('Buton öğesi silinirken hata oluştu');
-                            }
-                        },
-                        error: function() {
-                            toastr.error('Buton öğesi silinirken hata oluştu');
-                        }
-                    });
-                }
-            });
-        });
-        
-        // Buton menü önizlemesini güncelle
-        function updateButtonMenuPreview() {
-            // Ajax ile önizleme verilerini çek
-            $.ajax({
-                url: '{{ route("admin.menusystem.items.getItems", $menu->id) }}',
-                method: 'GET',
-                success: function(response) {
-                    if (response.success && response.items) {
-                        let html = '<div class="row">';
-                        
-                        if (response.items.length > 0) {
-                            response.items.forEach(function(item) {
-                                html += `
-                                <div class="col-lg-3 col-md-4 col-sm-6 mb-3">
-                                    <div class="card h-100 button-menu-item">
-                                        <div class="card-body text-center">`;
-                                
-                                if (item.icon) {
-                                    html += `<div class="mb-3"><i class="${item.icon} fa-3x"></i></div>`;
-                                }
-                                
-                                html += `<h5 class="card-title">${item.title}</h5>`;
-                                
-                                if (item.description) {
-                                    html += `<p class="card-text small">${item.description}</p>`;
-                                }
-                                
-                                html += `
-                                        </div>
-                                    </div>
-                                </div>`;
-                            });
-                        } else {
-                            html += '<div class="col-12"><p class="text-center">Henüz buton öğesi bulunmuyor</p></div>';
-                        }
-                        
-                        html += '</div>';
-                        
-                        $('.button-menu-container').html(html);
-                    }
-                }
-            });
-        }
-        
-        // Status/new_tab toggle olayları
-        $('.status-toggle').change(function() {
-            const isChecked = $(this).is(':checked');
-            $(this).siblings('input[type="hidden"]').val(isChecked ? '1' : '0');
-        });
-        
-        $('.new-tab-toggle').change(function() {
-            const isChecked = $(this).is(':checked');
-            $(this).siblings('input[type="hidden"]').val(isChecked ? '1' : '0');
-        });
-        
-        // Sıralama veya durum değiştiğinde önizlemeyi güncelle
-        $('.item-order, .item-status').change(function() {
-            const id = $(this).data('id');
-            const value = $(this).val();
-            const isStatus = $(this).hasClass('item-status');
-            
-            const data = {
-                _token: '{{ csrf_token() }}',
-                item_id: id
-            };
-            
-            if (isStatus) {
-                data.status = $(this).prop('checked') ? 1 : 0;
-            } else {
-                data.order = value;
-            }
-            
-            $.ajax({
-                url: isStatus ? '{{ route("admin.menusystem.items.update_status") }}' : '{{ route("admin.menusystem.items.order") }}',
-                method: 'POST',
-                data: data,
-                success: function(response) {
-                    if (response.success) {
-                        toastr.success(isStatus ? 'Durum güncellendi' : 'Sıralama güncellendi');
-                        
-                        // Önizlemeyi güncelle
-                        updateButtonMenuPreview();
-                    }
                 }
             });
         });

@@ -105,8 +105,20 @@ class MenuSystemController extends Controller
         $menu = MenuSystem::findOrFail($id);
         
         // Menü tipi "büyük menü" (2) veya "buton menü" (3) ise menü öğelerini de getir
-        if ($menu->type == 2 || $menu->type == 3) {
-            $menu->load('items');
+        if ($menu->type == 2) {
+            $menuItems = MenuSystemItem::where('menu_id', $menu->id)
+                ->where('item_type', 1)
+                ->orderBy('order')
+                ->get();
+                
+            return view('admin.menusystem.edit', compact('menu', 'menuItems'));
+        } elseif ($menu->type == 3) {
+            $buttonItems = MenuSystemItem::where('menu_id', $menu->id)
+                ->where('item_type', 2)
+                ->orderBy('order')
+                ->get();
+                
+            return view('admin.menusystem.edit', compact('menu', 'buttonItems'));
         }
         
         return view('admin.menusystem.edit', compact('menu'));
@@ -256,167 +268,140 @@ class MenuSystemController extends Controller
     }
 
     /**
-     * Ajax ile yeni menü öğesi kaydeder.
+     * Menü öğesi ekler.
      */
     public function storeItem(Request $request)
     {
+        \Log::info('Buton menü öğesi ekleme isteği geldi:', $request->all());
+        
+        $request->validate([
+            'menu_id' => 'required|exists:menu_systems,id',
+            'title' => 'required|string|max:255',
+            'url' => 'required|string|max:255',
+            'item_type' => 'nullable|integer',
+            'button_style' => 'nullable|string|max:50',
+            'icon' => 'nullable|string|max:100',
+            'order' => 'nullable|integer|min:0',
+            'status' => 'nullable|boolean',
+        ]);
+
         try {
-            // Debug için tüm request verilerini logla
-            \Log::info('Buton ekleme isteği - ham veri:', $request->all());
-            
-            // Validasyon
-            $request->validate([
-                'menu_id' => 'required|integer',
-                'title' => 'required|string|max:255',
-                'url' => 'nullable|string|max:255',
-                'parent_id' => 'nullable|integer',
-                'icon' => 'nullable|string|max:50',
-                'order' => 'nullable|integer',
-                'status' => 'nullable',
-                'new_tab' => 'nullable',
-                'description' => 'nullable|string'
-            ]);
-            
-            \Log::info('Validasyon başarılı, verileri işleme başlanıyor');
-            
             DB::beginTransaction();
             
-            // Menu ID kontrolü
-            $menuId = $request->menu_id;
-            \Log::info('İşlenecek menu_id:', ['menu_id' => $menuId]);
-            
-            // Menü varlığını kontrol et
-            $menu = MenuSystem::find($menuId);
-            if (!$menu) {
-                throw new \Exception("Menu ID {$menuId} bulunamadı");
-            }
-            
-            // Menü öğesi oluştur
             $menuItem = new MenuSystemItem();
-            $menuItem->menu_id = $menuId;
-            $menuItem->parent_id = $request->parent_id ?? 0;
+            $menuItem->menu_id = $request->menu_id;
             $menuItem->title = $request->title;
-            $menuItem->url = $request->url ?? '';
+            $menuItem->url = $request->url;
+            $menuItem->item_type = $request->item_type ?? 1; // Varsayılan olarak standart menü öğesi
+            $menuItem->button_style = $request->button_style;
             $menuItem->icon = $request->icon;
             $menuItem->order = $request->order ?? 0;
-            
-            // Checkbox değerleri kontrolü
-            $status = $request->has('status');
-            $newTab = $request->has('new_tab');
-            
-            \Log::info('Checkbox değerleri:', [
-                'status_has' => $request->has('status'),
-                'status_input' => $request->input('status'),
-                'new_tab_has' => $request->has('new_tab'),
-                'new_tab_input' => $request->input('new_tab')
-            ]);
-            
-            $menuItem->status = $status ? 1 : 0;
-            $menuItem->new_tab = $newTab ? 1 : 0;
-            $menuItem->target = $newTab ? '_blank' : '_self';
-            $menuItem->description = $request->description;
+            $menuItem->status = $request->has('status') ? 1 : 0;
+            $menuItem->parent_id = $request->parent_id ?? null;
             
             \Log::info('Kaydedilecek veri:', $menuItem->toArray());
             
             $menuItem->save();
             
-            \Log::info('Menü öğesi başarıyla kaydedildi', ['id' => $menuItem->id]);
+            \Log::info('Buton menü öğesi başarıyla kaydedildi. ID: ' . $menuItem->id);
             
             DB::commit();
             
             // Header menü cache'ini temizle
             app(\App\Services\HeaderService::class)->clearCache();
             
-            return response()->json(['success' => true, 'item' => $menuItem]);
-        } catch (ValidationException $e) {
-            DB::rollBack();
-            \Log::error('Validasyon hatası:', ['errors' => $e->errors()]);
-            return response()->json(['success' => false, 'errors' => $e->errors()], 422);
+            if ($request->ajax()) {
+                return response()->json(['success' => true, 'message' => 'Menü öğesi başarıyla eklendi', 'item' => $menuItem]);
+            }
+            
+            return redirect()->back()->with('success', 'Menü öğesi başarıyla eklendi');
         } catch (\Exception $e) {
             DB::rollBack();
-            \Log::error('Hata oluştu:', [
+            
+            \Log::error('Buton menü öğesi eklenirken hata:', [
                 'message' => $e->getMessage(),
                 'file' => $e->getFile(),
                 'line' => $e->getLine()
             ]);
-            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+            
+            if ($request->ajax()) {
+                return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+            }
+            
+            return redirect()->back()->with('error', 'Menü öğesi eklenirken bir hata oluştu: ' . $e->getMessage())->withInput();
         }
     }
 
     /**
-     * Ajax ile menü öğesi günceller.
+     * Menü öğesini günceller.
      */
     public function updateItem(Request $request, $id)
     {
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'url' => 'required|string|max:255',
+            'item_type' => 'nullable|integer',
+            'button_style' => 'nullable|string|max:50',
+            'icon' => 'nullable|string|max:100',
+            'order' => 'nullable|integer|min:0',
+        ]);
+
         try {
-            // Validasyon
-            $request->validate([
-                'title' => 'required|string|max:255',
-                'url' => 'nullable|string|max:255',
-                'parent_id' => 'nullable|exists:menu_system_items,id',
-                'icon' => 'nullable|string|max:50',
-                'order' => 'nullable|integer',
-                'status' => 'boolean',
-                'new_tab' => 'boolean',
-                'description' => 'nullable|string'
-            ]);
-            
             DB::beginTransaction();
             
-            // Menü öğesini bul ve güncelle
-            $item = MenuSystemItem::findOrFail($id);
-            $item->parent_id = $request->parent_id;
-            $item->title = $request->title;
-            $item->url = $request->url;
-            $item->icon = $request->icon;
-            $item->order = $request->order ?? 0;
-            $item->status = $request->input('status') ? 1 : 0;
-            $item->new_tab = $request->input('new_tab') ? 1 : 0;
-            $item->target = $request->input('new_tab') ? '_blank' : '_self';
-            $item->description = $request->description;
-            $item->save();
+            $menuItem = MenuSystemItem::findOrFail($id);
+            $menuItem->title = $request->title;
+            $menuItem->url = $request->url;
+            // item_type değeri değiştirilmemeli, orijinal türünü korumalı
+            if ($request->has('button_style')) {
+                $menuItem->button_style = $request->button_style;
+            }
+            if ($request->has('icon')) {
+                $menuItem->icon = $request->icon;
+            }
+            if ($request->has('order')) {
+                $menuItem->order = $request->order;
+            }
+            $menuItem->save();
             
             DB::commit();
             
             // Header menü cache'ini temizle
             app(\App\Services\HeaderService::class)->clearCache();
             
-            return response()->json(['success' => true, 'item' => $item]);
-        } catch (ValidationException $e) {
-            DB::rollBack();
-            return response()->json(['success' => false, 'errors' => $e->errors()], 422);
+            if ($request->ajax()) {
+                return response()->json(['success' => true]);
+            }
+            
+            return redirect()->back()->with('success', 'Menü öğesi başarıyla güncellendi');
         } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+            
+            if ($request->ajax()) {
+                return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+            }
+            
+            return redirect()->back()->with('error', 'Menü öğesi güncellenirken bir hata oluştu: ' . $e->getMessage())->withInput();
         }
     }
 
     /**
-     * Ajax ile menü öğesi siler.
+     * Menü öğesini siler.
      */
     public function destroyItem($id)
     {
         try {
-            DB::beginTransaction();
-            
             // Menü öğesini bul
-            $item = MenuSystemItem::findOrFail($id);
-            $menuId = $item->menu_id;
-            
-            // Alt öğeleri varsa sil
-            MenuSystemItem::where('parent_id', $id)->delete();
+            $menuItem = MenuSystemItem::findOrFail($id);
             
             // Menü öğesini sil
-            $item->delete();
-            
-            DB::commit();
+            $menuItem->delete();
             
             // Header menü cache'ini temizle
             app(\App\Services\HeaderService::class)->clearCache();
             
             return response()->json(['success' => true]);
         } catch (\Exception $e) {
-            DB::rollBack();
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
     }
