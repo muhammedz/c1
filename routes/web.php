@@ -69,9 +69,9 @@ Route::get('/{categorySlug}', [App\Http\Controllers\CorporateController::class, 
     ->where('categorySlug', '^(?!admin|login|register|password|kurumsal-kadro|projeler|etkinlikler|hizmetler|sayfalar).*$');
 
 // Proje Detay Sayfaları
-Route::get('/projects', [App\Http\Controllers\FrontController::class, 'projects'])->name('front.projects');
-Route::get('/projects/{slug}', [App\Http\Controllers\FrontController::class, 'projectDetail'])->name('front.projects.detail');
-Route::get('/project-category/{slug}', [App\Http\Controllers\FrontController::class, 'projectCategory'])->name('front.projects.category');
+Route::get('/projeler', [App\Http\Controllers\FrontController::class, 'projects'])->name('front.projects');
+Route::get('/projeler/{slug}', [App\Http\Controllers\FrontController::class, 'projectDetail'])->name('front.projects.detail');
+Route::get('/projeler-kategori/{slug}', [App\Http\Controllers\FrontController::class, 'projectCategory'])->name('front.projects.category');
 
 Auth::routes();
 
@@ -316,10 +316,6 @@ Route::prefix('admin/events')->name('admin.events.')->middleware(['auth'])->grou
     Route::post('/preview', [App\Http\Controllers\Admin\EventScrapeController::class, 'preview'])->name('preview');
     Route::post('/add-single-event', [App\Http\Controllers\Admin\EventScrapeController::class, 'addSingleEvent'])->name('add-single-event');
 });
-
-// Ön Yüz Proje Rotaları
-Route::get('/projeler', [App\Http\Controllers\Front\FrontController::class, 'projects'])->name('front.projects');
-Route::get('/projeler/{slug}', [App\Http\Controllers\Front\FrontController::class, 'projectDetail'])->name('front.projects.detail');
 
 // Ön Yüz Etkinlik Rotaları
 Route::prefix('etkinlikler')->name('events.')->group(function () {

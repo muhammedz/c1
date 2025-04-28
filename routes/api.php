@@ -39,7 +39,6 @@ Route::middleware('api.key')->prefix('news')->group(function () {
     Route::get('/featured', [NewsApiController::class, 'getFeatured']);
     Route::get('/categories', [NewsApiController::class, 'getCategories']);
     Route::get('/category/{category_id}', [NewsApiController::class, 'getByCategory']);
-    Route::get('/search', [NewsApiController::class, 'search']);
     Route::get('/{slug}', [NewsApiController::class, 'show']);
 });
 
@@ -75,6 +74,5 @@ Route::prefix('filemanagersystem')->group(function () {
     Route::post('relations/reorder', [FilemanagersystemRelationController::class, 'reorder']);
 
     // Search and Bulk Actions
-    Route::get('search', [FilemanagersystemController::class, 'search']);
     Route::post('bulk-actions', [FilemanagersystemController::class, 'bulkActions']);
 });

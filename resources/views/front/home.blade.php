@@ -64,20 +64,6 @@
             }
         });
 
-        // Proje Slider Inicializasyonu
-        var projectSwipers = {};
-        document.querySelectorAll('.projectSwiper').forEach(function(element) {
-            var category = element.dataset.category;
-            projectSwipers[category] = new Swiper(element, {
-                slidesPerView: 1,
-                spaceBetween: 20,
-                navigation: {
-                    nextEl: '.swiper-next',
-                    prevEl: '.swiper-prev',
-                },
-            });
-        });
-
         // Etkinlikler Timeline Slider Inicializasyonu
         var timelineSwiper = new Swiper(".timelineSwiper", {
             slidesPerView: 1,
@@ -99,39 +85,17 @@
             },
         });
 
-        // Kategori Değiştirme İşlevi
-        document.querySelectorAll('.category-btn').forEach(function(button) {
-            button.addEventListener('click', function() {
-                var category = this.dataset.category;
-                
-                // Aktif kategori butonunu güncelle
-                document.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('active'));
-                this.classList.add('active');
-                
-                // Başlığı güncelle
-                document.getElementById('categoryTitle').textContent = this.textContent.trim();
-                
-                // Sliderleri gizle/göster
-                document.querySelectorAll('.projectSwiper').forEach(slider => {
-                    if (slider.dataset.category === category) {
-                        slider.classList.remove('hidden');
-                        projectSwipers[category].update();
-                    } else {
-                        slider.classList.add('hidden');
-                    }
-                });
-            });
-        });
-
         // Mobil Menü Toggle İşlevi
         document.addEventListener('DOMContentLoaded', function() {
             const menuItems = document.querySelectorAll('.md\\:hidden .group');
             menuItems.forEach(item => {
                 const link = item.querySelector('a');
-                link.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    item.classList.toggle('active');
-                });
+                if (link) {
+                    link.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        item.classList.toggle('active');
+                    });
+                }
             });
         });
     </script>

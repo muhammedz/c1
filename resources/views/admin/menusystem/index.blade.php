@@ -32,6 +32,7 @@
                                         <option value="">Tüm Tipler</option>
                                         <option value="1" {{ request('type') == '1' ? 'selected' : '' }}>Küçük Menü</option>
                                         <option value="2" {{ request('type') == '2' ? 'selected' : '' }}>Büyük Menü</option>
+                                        <option value="3" {{ request('type') == '3' ? 'selected' : '' }}>Buton Menü</option>
                                     </select>
                                 </div>
                                 <div class="form-group mb-2 mr-2">
@@ -52,7 +53,7 @@
                         </div>
                         <div class="col-md-6 text-md-right">
                             <a href="{{ route('admin.menusystem.create') }}" class="btn btn-primary mb-2">
-                                <i class="mdi mdi-plus-circle mr-1"></i> Yeni Menü
+                                <i class="fas fa-plus-circle mr-1"></i> Yeni Menü
                             </a>
                         </div>
                     </div>
@@ -81,6 +82,8 @@
                                         <span class="badge badge-info">Küçük Menü</span>
                                         @elseif($menu->type == 2)
                                         <span class="badge badge-primary">Büyük Menü</span>
+                                        @elseif($menu->type == 3)
+                                        <span class="badge badge-warning">Buton Menü</span>
                                         @endif
                                     </td>
                                     <td>
@@ -95,7 +98,7 @@
                                         @endif
                                     </td>
                                     <td>
-                                        @if($menu->type == 2)
+                                        @if($menu->type == 2 || $menu->type == 3)
                                         <span class="badge badge-light">{{ $menu->items_count ?? 0 }}</span>
                                         @else
                                         <span class="badge badge-light">-</span>
@@ -114,15 +117,15 @@
                                     <td>
                                         <div class="btn-group">
                                             <a href="{{ route('admin.menusystem.edit', $menu->id) }}" class="btn btn-sm btn-info">
-                                                <i class="mdi mdi-pencil"></i>
+                                                <i class="fas fa-edit"></i>
                                             </a>
-                                            @if($menu->type == 2)
+                                            @if($menu->type == 2 || $menu->type == 3)
                                             <a href="{{ route('admin.menusystem.items', $menu->id) }}" class="btn btn-sm btn-success">
-                                                <i class="mdi mdi-format-list-bulleted"></i>
+                                                <i class="fas fa-list"></i>
                                             </a>
                                             @endif
                                             <button type="button" class="btn btn-sm btn-danger delete-menu" data-id="{{ $menu->id }}">
-                                                <i class="mdi mdi-delete"></i>
+                                                <i class="fas fa-trash"></i>
                                             </button>
                                         </div>
                                     </td>

@@ -268,6 +268,33 @@ function initIconPicker() {
     
     // SVG yükleme özelliğini kurulum
     setupSvgUpload();
+
+    // Sayfa yüklendiğinde mevcut ikonları göster
+    $('.icon-picker').each(function() {
+        var iconValue = $(this).val();
+        var previewElement = $(this).closest('.icon-picker-wrapper').find('.icon-preview span');
+        
+        if (iconValue) {
+            if (iconValue.startsWith('<svg') || iconValue.includes('<?xml')) {
+                // SVG içeriği - önce XML deklarasyonlarını temizle
+                const cleanedSvg = sanitizeSvg(iconValue);
+                $(this).val(cleanedSvg); // İçeriği temizle ve güncelle
+                previewElement.html(cleanedSvg);
+            } else {
+                // Font Awesome ikonu - eski "fas fa-XXX" formatından veya tam "fas fa-XXX" formatından
+                if (iconValue.includes('fa-')) {
+                    // Zaten tam sınıf adı var
+                    previewElement.html('<i class="' + iconValue + ' fa-2x"></i>');
+                } else {
+                    // Eski format (sadece ikon adı)
+                    previewElement.html('<i class="fas fa-' + iconValue + ' fa-2x"></i>');
+                    // Eski formatı yeni formata güncelle
+                    $(this).val('fas fa-' + iconValue);
+                    console.log('Eski format ikon güncellendi:', iconValue, '->', 'fas fa-' + iconValue);
+                }
+            }
+        }
+    });
 }
 
 // İkon seçimi gerçekleştiğinde
@@ -464,14 +491,16 @@ function setupSvgUpload() {
                 document.getElementById('use-svg-button')?.addEventListener('click', function() {
                     const svgContent = document.getElementById('svg-preview')?.innerHTML;
                     if (svgContent && activeIconInput) {
-                        activeIconInput.value = svgContent;
+                        // SVG içeriğini tekrar sanitize et (preview içerisinden alınıyor olsa bile)
+                        const finalSvgContent = sanitizeSvg(svgContent);
+                        activeIconInput.value = finalSvgContent;
                         
                         // Önizleme ikonunu güncelle
                         const wrapper = activeIconInput.closest('.icon-picker-wrapper');
                         const previewIcon = wrapper.querySelector('.icon-preview span');
                         
                         if (previewIcon) {
-                            previewIcon.innerHTML = svgContent;
+                            previewIcon.innerHTML = finalSvgContent;
                         }
                         
                         // Change event tetikle
@@ -507,12 +536,31 @@ function handleSvgFileUpload(e) {
                 previewContainer.classList.remove('d-none');
                 svgPreview.innerHTML = sanitizedSvg;
                 
-                // SVG boyutlandırma
+                // SVG boyutlandırma ve renk düzenleme
                 const svgElement = svgPreview.querySelector('svg');
                 if (svgElement) {
+                    // Boyutlandırma
                     svgElement.setAttribute('width', '48');
                     svgElement.setAttribute('height', '48');
                     svgElement.style.maxWidth = '100%';
+                    
+                    // SVG viewBox kontrolü - eksikse ekle
+                    if (!svgElement.hasAttribute('viewBox') && 
+                        svgElement.hasAttribute('width') && 
+                        svgElement.hasAttribute('height')) {
+                        
+                        const width = svgElement.getAttribute('width').replace(/px$/i, '');
+                        const height = svgElement.getAttribute('height').replace(/px$/i, '');
+                        
+                        if (!isNaN(parseFloat(width)) && !isNaN(parseFloat(height))) {
+                            svgElement.setAttribute('viewBox', `0 0 ${width} ${height}`);
+                        }
+                    }
+                    
+                    // Renk özelliklerini kontrol et
+                    if (!svgElement.getAttribute('fill') && !svgElement.getAttribute('style')) {
+                        svgElement.setAttribute('fill', 'currentColor');
+                    }
                 }
             }
         };
@@ -526,8 +574,17 @@ function handleSvgFileUpload(e) {
 
 // SVG içeriğini sanitize etme
 function sanitizeSvg(svgContent) {
+    // XML Deklarasyonunu kaldır
+    let sanitized = svgContent.replace(/<\?xml[^>]*\?>/gi, '');
+    
+    // SVG tag'ini içeren kısmı bul
+    const svgMatch = sanitized.match(/<svg[\s\S]*<\/svg>/i);
+    if (svgMatch) {
+        sanitized = svgMatch[0];
+    }
+    
     // Basit bir sanitizasyon: script tag'lerini kaldır
-    let sanitized = svgContent.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
+    sanitized = sanitized.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
     
     // onclick, onload gibi event handler'ları kaldır
     sanitized = sanitized.replace(/\son\w+\s*=\s*["'][^"']*["']/gi, '');

@@ -67,7 +67,7 @@ class Project extends Model
      */
     public function category()
     {
-        return $this->belongsTo(ProjectCategory::class);
+        return $this->belongsTo(ProjectCategory::class, 'category_id');
     }
 
     /**
@@ -174,13 +174,21 @@ class Project extends Model
      */
     public static function getAllActiveProjects()
     {
-        return self::with('category')
-            ->where('is_active', true)
-            ->join('project_categories', 'projects.category_id', '=', 'project_categories.id')
-            ->orderBy('project_categories.order')
-            ->orderBy('projects.order')
-            ->select('projects.*')
-            ->get();
+        try {
+            return self::with('category')
+                ->where('is_active', true)
+                ->leftJoin('project_categories', 'projects.category_id', '=', 'project_categories.id')
+                ->orderBy('project_categories.order', 'asc')
+                ->orderBy('projects.order', 'asc')
+                ->select('projects.*')
+                ->get();
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Proje listesi hatası: ' . $e->getMessage());
+            // Hata durumunda daha basit bir sorgu ile sadece projeleri getirelim
+            return self::where('is_active', true)
+                ->orderBy('order', 'asc')
+                ->get();
+        }
     }
 
     /**

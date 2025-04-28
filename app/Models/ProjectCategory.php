@@ -57,7 +57,7 @@ class ProjectCategory extends Model
      */
     public function projects()
     {
-        return $this->hasMany(Project::class);
+        return $this->hasMany(Project::class, 'category_id');
     }
 
     /**
@@ -65,7 +65,7 @@ class ProjectCategory extends Model
      */
     public function activeProjects()
     {
-        return $this->hasMany(Project::class)->where('is_active', true);
+        return $this->hasMany(Project::class, 'category_id')->where('is_active', true);
     }
 
     /**
