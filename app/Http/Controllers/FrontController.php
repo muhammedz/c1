@@ -26,7 +26,10 @@ class FrontController extends Controller
         $mobileAppSettings = MobileAppSettings::first() ?? new MobileAppSettings();
         $featuredServiceSettings = \App\Models\FeaturedServiceSetting::first() ?? new \App\Models\FeaturedServiceSetting();
         $featuredServices = \App\Models\FeaturedService::getActiveServices();
+        
+        // LogoPlanSettings - URL'leri temizleyerek al
         $logoPlans = \App\Models\LogoPlanSettings::first() ?? new \App\Models\LogoPlanSettings();
+        $this->cleanLogoPlansUrls($logoPlans);
         
         // Anasayfada gösterilecek projeler
         $projectSettings = ProjectSetting::getSettings();
@@ -176,5 +179,57 @@ class FrontController extends Controller
             \Illuminate\Support\Facades\Log::error('Proje kategorisi hatası: ' . $e->getMessage());
             abort(404);
         }
+    }
+
+    /**
+     * LogoPlanSettings için URL'leri temizler
+     * 
+     * @param \App\Models\LogoPlanSettings $logoPlans
+     * @return void
+     */
+    protected function cleanLogoPlansUrls($logoPlans)
+    {
+        if (!$logoPlans) return;
+        
+        // Logo imaj URL'sini temizle
+        if ($logoPlans->logo_image) {
+            $logoPlans->logo_image = $this->cleanImageUrl($logoPlans->logo_image);
+        }
+        
+        // Kart 2 imaj URL'sini temizle
+        if ($logoPlans->card2_image) {
+            $logoPlans->card2_image = $this->cleanImageUrl($logoPlans->card2_image);
+        }
+    }
+    
+    /**
+     * Bir imaj URL'sini temizler
+     * 
+     * @param string $imageUrl
+     * @return string
+     */
+    protected function cleanImageUrl($imageUrl)
+    {
+        if (empty($imageUrl)) return $imageUrl;
+        
+        // URL türünü kontrol et
+        if (filter_var($imageUrl, FILTER_VALIDATE_URL)) {
+            // Eğer tam URL ise
+            $urlParts = parse_url($imageUrl);
+            $pathName = $urlParts['path'] ?? '';
+            
+            // /storage/ kısmını da çıkar (eğer varsa)
+            if (strpos($pathName, '/storage/') !== false) {
+                $imageUrl = explode('/storage/', $pathName)[1] ?? $pathName;
+            } else {
+                // Eğer /storage/ yoksa, / ile başlayan path'i temizle
+                $imageUrl = ltrim($pathName, '/');
+            }
+        } else if (strpos($imageUrl, '/storage/') === 0) {
+            // Sadece /storage/ ile başlıyorsa, bu kısmı çıkar
+            $imageUrl = substr($imageUrl, strlen('/storage/'));
+        }
+        
+        return $imageUrl;
     }
 } 

@@ -115,6 +115,7 @@ class HomepageManagerController extends Controller
             'app_subtitle' => 'nullable|string|max:255',
             'app_description' => 'nullable|string',
             'filemanagersystem_app_logo' => 'nullable|string',
+            'filemanagersystem_app_header_image' => 'nullable|string',
             'filemanagersystem_phone_image' => 'nullable|string',
             'app_store_link' => 'nullable|url',
             'google_play_link' => 'nullable|url',
@@ -160,6 +161,16 @@ class HomepageManagerController extends Controller
             // Log ile kaydedilen URL'yi kontrol edelim
             \Log::info('MediaPicker app_logo kaydediliyor', [
                 'url' => $request->filemanagersystem_app_logo
+            ]);
+        }
+        
+        if ($request->filemanagersystem_app_header_image) {
+            // MediaPicker URL'sini doğrudan kullan
+            $mobileAppSettings->app_header_image = $request->filemanagersystem_app_header_image;
+            
+            // Log ile kaydedilen URL'yi kontrol edelim
+            \Log::info('MediaPicker app_header_image kaydediliyor', [
+                'url' => $request->filemanagersystem_app_header_image
             ]);
         }
         
@@ -513,47 +524,129 @@ class HomepageManagerController extends Controller
             'logo_bg_color' => 'nullable|string|max:30',
         ]);
         
-        // İlk kaydı al veya yeni oluştur
-        $logoPlans = \App\Models\LogoPlanSettings::firstOrNew(['id' => 1]);
-        
-        // Metin verilerini güncelle
-        $logoPlans->card1_title = $request->card1_title;
-        $logoPlans->card1_icon = $request->card1_icon;
-        $logoPlans->card1_url = $request->card1_url;
-        $logoPlans->card2_title = $request->card2_title;
-        $logoPlans->card2_url = $request->card2_url;
-        $logoPlans->logo_title = $request->logo_title;
-        $logoPlans->logo_bg_color = $request->logo_bg_color ?: '#004d2e';
-        
-        // Debug bilgisi ekleyelim
-        \Log::info('Logo ve planlar güncelleniyor', [
-            'card2_image' => $request->card2_image,
-            'logo_image' => $request->logo_image,
-        ]);
-        
-        // Kart 2 görseli güncelle - FileManagerSystem
-        if ($request->filled('card2_image')) {
-            // Gelen imaj yolunu olduğu gibi kaydet
-            $logoPlans->card2_image = $request->card2_image;
-            \Log::info('Card2 image kaydedildi', [
-                'path' => $logoPlans->card2_image,
-                'raw_input' => $request->card2_image
+        try {
+            // Form verilerini logla
+            \Log::info('Logo ve planlar kayıt isteği', [
+                'request_data' => $request->all(),
+                'ip' => $request->ip(),
+                'user_agent' => $request->userAgent()
             ]);
-        }
-        
-        // Logo görseli güncelle - FileManagerSystem
-        if ($request->filled('logo_image')) {
-            // Gelen imaj yolunu olduğu gibi kaydet
-            $logoPlans->logo_image = $request->logo_image;
-            \Log::info('Logo image kaydedildi', [
-                'path' => $logoPlans->logo_image,
-                'raw_input' => $request->logo_image
+            
+            // İlk kaydı al veya yeni oluştur
+            $logoPlans = \App\Models\LogoPlanSettings::firstOrNew(['id' => 1]);
+            
+            // Metin verilerini güncelle
+            $logoPlans->card1_title = $request->card1_title;
+            $logoPlans->card1_icon = $request->card1_icon;
+            $logoPlans->card1_url = $request->card1_url;
+            $logoPlans->card2_title = $request->card2_title;
+            $logoPlans->card2_url = $request->card2_url;
+            $logoPlans->logo_title = $request->logo_title;
+            $logoPlans->logo_bg_color = $request->logo_bg_color ?: '#004d2e';
+            
+            // Debug bilgisi ekleyelim
+            \Log::info('Logo ve planlar güncelleniyor', [
+                'card2_image' => $request->card2_image,
+                'logo_image' => $request->logo_image,
             ]);
+            
+            // Kart 2 görseli güncelle - FileManagerSystem
+            if ($request->filled('card2_image')) {
+                // Gelen URL'yi temizle
+                $card2Image = $request->card2_image;
+                
+                // URL'yi temizle - dış kaynaklı URL'leri ve gereksiz kısımları kaldır
+                if (filter_var($card2Image, FILTER_VALIDATE_URL)) {
+                    // Eğer tam URL ise
+                    $urlParts = parse_url($card2Image);
+                    $pathName = $urlParts['path'] ?? '';
+                    
+                    // /storage/ kısmını da çıkar (eğer varsa)
+                    if (strpos($pathName, '/storage/') !== false) {
+                        $card2Image = explode('/storage/', $pathName)[1] ?? $pathName;
+                    } else {
+                        // Eğer /storage/ yoksa, / ile başlayan path'i temizle
+                        $card2Image = ltrim($pathName, '/');
+                    }
+                } else if (strpos($card2Image, '/storage/') === 0) {
+                    // Sadece /storage/ ile başlıyorsa, bu kısmı çıkar
+                    $card2Image = substr($card2Image, strlen('/storage/'));
+                }
+                
+                // Temizlenmiş URL'yi kaydet
+                $logoPlans->card2_image = $card2Image;
+                
+                \Log::info('Card2 image kaydedildi', [
+                    'original_input' => $request->card2_image,
+                    'cleaned_path' => $card2Image
+                ]);
+            }
+            
+            // Logo görseli güncelle - FileManagerSystem
+            if ($request->filled('logo_image')) {
+                // Gelen URL'yi temizle
+                $logoImage = $request->logo_image;
+                
+                // URL'yi temizle - dış kaynaklı URL'leri ve gereksiz kısımları kaldır
+                if (filter_var($logoImage, FILTER_VALIDATE_URL)) {
+                    // Eğer tam URL ise
+                    $urlParts = parse_url($logoImage);
+                    $pathName = $urlParts['path'] ?? '';
+                    
+                    // /storage/ kısmını da çıkar (eğer varsa)
+                    if (strpos($pathName, '/storage/') !== false) {
+                        $logoImage = explode('/storage/', $pathName)[1] ?? $pathName;
+                    } else {
+                        // Eğer /storage/ yoksa, / ile başlayan path'i temizle
+                        $logoImage = ltrim($pathName, '/');
+                    }
+                } else if (strpos($logoImage, '/storage/') === 0) {
+                    // Sadece /storage/ ile başlıyorsa, bu kısmı çıkar
+                    $logoImage = substr($logoImage, strlen('/storage/'));
+                }
+                
+                // Temizlenmiş URL'yi kaydet
+                $logoPlans->logo_image = $logoImage;
+                
+                \Log::info('Logo image kaydedildi', [
+                    'original_input' => $request->logo_image,
+                    'cleaned_path' => $logoImage
+                ]);
+            }
+            
+            // Modeli kaydetmeden önce durumu kontrol et
+            \Log::info('Kaydetmeden önce LogoPlanSettings modeli', [
+                'id' => $logoPlans->id,
+                'card1_title' => $logoPlans->card1_title,
+                'card1_icon' => $logoPlans->card1_icon,
+                'card1_url' => $logoPlans->card1_url,
+                'card2_title' => $logoPlans->card2_title,
+                'card2_image' => $logoPlans->card2_image,
+                'card2_url' => $logoPlans->card2_url,
+                'logo_title' => $logoPlans->logo_title,
+                'logo_image' => $logoPlans->logo_image,
+                'logo_bg_color' => $logoPlans->logo_bg_color,
+                'is_active' => $logoPlans->is_active,
+            ]);
+            
+            $result = $logoPlans->save();
+            
+            if (!$result) {
+                \Log::error('LogoPlanSettings kaydedilemedi!');
+                return redirect()->route('admin.homepage.logo-and-plans')->with('error', 'Logo ve planlar kaydedilirken bir hata oluştu.');
+            }
+            
+            \Log::info('LogoPlanSettings başarıyla kaydedildi', ['model_id' => $logoPlans->id]);
+            
+            return redirect()->route('admin.homepage.logo-and-plans')->with('success', 'Logo ve planlar başarıyla güncellendi.');
+        } catch (\Exception $e) {
+            \Log::error('Logo ve planlar güncellenirken hata oluştu: ' . $e->getMessage(), [
+                'exception' => $e,
+                'request_data' => $request->all()
+            ]);
+            
+            return redirect()->route('admin.homepage.logo-and-plans')->with('error', 'Bir hata oluştu: ' . $e->getMessage());
         }
-        
-        $logoPlans->save();
-        
-        return redirect()->route('admin.homepage.logo-and-plans')->with('success', 'Logo ve planlar başarıyla güncellendi.');
     }
 
     /**

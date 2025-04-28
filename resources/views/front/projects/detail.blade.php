@@ -537,7 +537,7 @@
                         </div>
                         
                         <div class="project-content">
-                            {!! $project->content !!}
+                            {!! $project->description !!}
                         </div>
                     </div>
                 </div>

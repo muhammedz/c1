@@ -217,6 +217,9 @@
 @section('js')
     <script src="{{ asset('js/icon-picker.js') }}"></script>
     <script>
+        // Asset URL'yi JavaScript'te kullanmak için
+        const asset_url = '{{ url('/') }}/';
+        
         $(function() {
             // Renk değişikliğinde önizlemeyi güncelle
             $('#logo_bg_color').on('input', function() {
@@ -306,8 +309,39 @@
                         return;
                     }
                     
+                    // URL değerini al ve düzelt
+                    let mediaUrl = data.mediaUrl;
+                    
+                    // URL'yi temizle - external URL'leri ve gereksiz yolları kaldır
+                    if (mediaUrl) {
+                        console.log('Orijinal URL:', mediaUrl);
+                        
+                        // Eğer tam URL ise (http:// veya https:// içeriyorsa)
+                        if (mediaUrl.includes('http://') || mediaUrl.includes('https://')) {
+                            // Domain kısmını çıkar, sadece gerçek dosya yolunu al
+                            // Örnek: https://example.com/storage/images/file.jpg -> images/file.jpg
+                            
+                            // URL'den domain kısmını çıkar
+                            const urlObj = new URL(mediaUrl);
+                            const pathName = urlObj.pathname;
+                            
+                            // /storage/ kısmını da çıkar (eğer varsa)
+                            if (pathName.includes('/storage/')) {
+                                mediaUrl = pathName.split('/storage/')[1];
+                            } else {
+                                // Eğer /storage/ yoksa, / ile başlayan path'i temizle
+                                mediaUrl = pathName.startsWith('/') ? pathName.substring(1) : pathName;
+                            }
+                        } else if (mediaUrl.startsWith('/storage/')) {
+                            // Sadece /storage/ ile başlıyorsa, bu kısmı çıkar
+                            mediaUrl = mediaUrl.substring('/storage/'.length);
+                        }
+                        
+                        console.log('Temizlenmiş URL:', mediaUrl);
+                    }
+                    
                     // Input alanını güncelle
-                    $('#' + inputId).val(data.mediaUrl);
+                    $('#' + inputId).val(mediaUrl);
                     
                     // Önizleme alanını güncelle
                     const previewElement = $('#' + previewId);
@@ -318,13 +352,15 @@
                         previewElement.html(previewImg);
                     }
                     
-                    previewImg.attr('src', data.mediaUrl);
+                    // Önizleme için tam URL kullan
+                    const previewUrl = asset_url + 'storage/' + mediaUrl;
+                    previewImg.attr('src', previewUrl);
                     previewImg.attr('alt', data.alt || 'Seçilen Görsel');
                     previewElement.show();
                     
                     // Eğer logo görseli ise ana önizlemeyi de güncelle
                     if (inputId === 'logo_image') {
-                        $('#logo_preview').html('<img src="' + data.mediaUrl + '" alt="Logo Görseli" style="max-width: 100%; max-height: 150px;">');
+                        $('#logo_preview').html('<img src="' + previewUrl + '" alt="Logo Görseli" style="max-width: 100%; max-height: 150px;">');
                     }
                     
                     // Modal'ı kapat

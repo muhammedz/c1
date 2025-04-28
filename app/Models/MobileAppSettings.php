@@ -16,6 +16,7 @@ class MobileAppSettings extends Model
      */
     protected $fillable = [
         'app_logo',
+        'app_header_image',
         'app_name',
         'app_subtitle',
         'app_description',

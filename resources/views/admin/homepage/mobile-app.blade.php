@@ -78,6 +78,25 @@
                                     <input type="text" class="form-control" id="app_subtitle" name="app_subtitle" value="{{ old('app_subtitle', $mobileAppSettings->app_subtitle) }}" placeholder="Örn: PNG formatında">
                                 </div>
                                 
+                                <!-- Uygulama Başlık Görseli -->
+                                <div class="form-group">
+                                    <label for="filemanagersystem_app_header_image">Uygulama Başlık Görseli</label>
+                                    <div class="input-group mb-3">
+                                        <input type="text" class="form-control" id="filemanagersystem_app_header_image" name="filemanagersystem_app_header_image" value="{{ old('filemanagersystem_app_header_image', $mobileAppSettings->app_header_image ?? '') }}" readonly>
+                                        <div class="input-group-append">
+                                            <button type="button" class="btn btn-primary mediapicker-btn" data-input="filemanagersystem_app_header_image" data-preview="app_header_image_preview" data-type="image">
+                                                <i class="fas fa-images"></i> Medya Seç
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <small class="form-text text-muted">Önerilen boyut: 800x400 piksel, PNG formatı</small>
+                                    <div id="app_header_image_preview" class="mt-2">
+                                        @if($mobileAppSettings->app_header_image)
+                                            <img src="{{ asset('storage/' . $mobileAppSettings->app_header_image) }}" alt="Uygulama Başlık Görseli" class="img-thumbnail" style="max-width: 100%;">
+                                        @endif
+                                    </div>
+                                </div>
+                                
                                 <!-- Uygulama Açıklaması -->
                                 <div class="form-group">
                                     <label for="app_description">Uygulama Açıklaması</label>

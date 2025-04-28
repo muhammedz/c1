@@ -7,7 +7,7 @@
             <div class="flex flex-col items-center lg:items-start gap-6">
                 <div class="flex items-center justify-between gap-4">
                     <!-- App Icon -->
-                    <div class="w-32 h-32 bg-[#004d2e] rounded-[24px] flex items-center justify-center">
+                    <div class="w-32 h-32 rounded-[24px] flex items-center justify-center">
                         @if($mobileAppSettings->app_logo)
                             @if(strpos($mobileAppSettings->app_logo, '/uploads/') !== false)
                                 <img src="{{ $mobileAppSettings->app_logo }}" alt="{{ $mobileAppSettings->app_name ?? 'Uygulama' }}" class="w-full h-full object-contain p-2">
@@ -19,11 +19,22 @@
                         @endif
                     </div>
 
-                    <!-- Logo Text -->
-                    <div class="text-center lg:text-left">
-                        <h3 class="text-xl font-bold text-gray-800 mb-1">{{ $mobileAppSettings->app_name ?? 'Farklı Logo gelecek' }}</h3>
-                        <p class="text-gray-600">{{ $mobileAppSettings->app_subtitle ?? 'Png formatında' }}</p>
-                    </div>
+                    <!-- Header Image (Uygulama Adı ve Alt Başlığı yerine) -->
+                    @if($mobileAppSettings->app_header_image)
+                        <div class="w-32 h-32 flex items-center justify-center overflow-hidden">
+                            @if(strpos($mobileAppSettings->app_header_image, '/uploads/') !== false)
+                                <img src="{{ $mobileAppSettings->app_header_image }}" alt="{{ $mobileAppSettings->app_name ?? 'Uygulama' }} Görsel" class="w-full h-full object-cover">
+                            @else
+                                <img src="{{ asset('storage/' . $mobileAppSettings->app_header_image) }}" alt="{{ $mobileAppSettings->app_name ?? 'Uygulama' }} Görsel" class="w-full h-full object-cover">
+                            @endif
+                        </div>
+                    @else
+                        <!-- Logo Text (Eğer app_header_image yoksa göster) -->
+                        <div class="text-center lg:text-left">
+                            <h3 class="text-xl font-bold text-gray-800 mb-1">{{ $mobileAppSettings->app_name ?? 'Farklı Logo gelecek' }}</h3>
+                            <p class="text-gray-600">{{ $mobileAppSettings->app_subtitle ?? 'Png formatında' }}</p>
+                        </div>
+                    @endif
                 </div>
 
                 <!-- Store Buttons -->
