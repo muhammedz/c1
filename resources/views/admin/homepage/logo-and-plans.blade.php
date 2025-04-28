@@ -84,18 +84,21 @@
                                 <div class="form-group">
                                     <label for="card2_image">Görsel</label>
                                     <div class="input-group">
-                                        <div class="custom-file">
-                                            <input type="file" class="custom-file-input" id="card2_image" name="card2_image">
-                                            <label class="custom-file-label" for="card2_image">Dosya Seç</label>
+                                        <input type="text" class="form-control" id="card2_image" name="card2_image" 
+                                               value="{{ old('card2_image', $logoPlans->card2_image) }}" readonly>
+                                        <div class="input-group-append">
+                                            <button type="button" class="btn btn-outline-primary" id="card2_image_button">
+                                                <i class="fas fa-images"></i> Medya Seç
+                                            </button>
                                         </div>
                                     </div>
                                     <small class="text-muted">Önerilen boyut: 128x128 piksel, PNG formatı</small>
                                     
-                                    @if($logoPlans->card2_image)
-                                        <div class="mt-2">
+                                    <div class="mt-2" id="card2_image_preview" style="{{ $logoPlans->card2_image ? '' : 'display: none;' }}">
+                                        @if($logoPlans->card2_image)
                                             <img src="{{ asset('storage/' . $logoPlans->card2_image) }}" alt="Kart 2 Görseli" class="img-thumbnail" style="max-width: 128px;">
-                                        </div>
-                                    @endif
+                                        @endif
+                                    </div>
                                 </div>
                                 
                                 <div class="form-group">
@@ -124,18 +127,21 @@
                                 <div class="form-group">
                                     <label for="logo_image">Logo Görseli</label>
                                     <div class="input-group">
-                                        <div class="custom-file">
-                                            <input type="file" class="custom-file-input" id="logo_image" name="logo_image">
-                                            <label class="custom-file-label" for="logo_image">Dosya Seç</label>
+                                        <input type="text" class="form-control" id="logo_image" name="logo_image" 
+                                               value="{{ old('logo_image', $logoPlans->logo_image) }}" readonly>
+                                        <div class="input-group-append">
+                                            <button type="button" class="btn btn-outline-primary" id="logo_image_button">
+                                                <i class="fas fa-images"></i> Medya Seç
+                                            </button>
                                         </div>
                                     </div>
                                     <small class="text-muted">Önerilen boyut: 300x100 piksel, PNG formatı</small>
                                     
-                                    @if($logoPlans->logo_image)
-                                        <div class="mt-2">
+                                    <div class="mt-2" id="logo_image_preview" style="{{ $logoPlans->logo_image ? '' : 'display: none;' }}">
+                                        @if($logoPlans->logo_image)
                                             <img src="{{ asset('storage/' . $logoPlans->logo_image) }}" alt="Logo Görseli" class="img-thumbnail" style="max-width: 300px;">
-                                        </div>
-                                    @endif
+                                        @endif
+                                    </div>
                                 </div>
                                 
                                 <div class="form-group">
@@ -180,6 +186,23 @@
             </form>
         </div>
     </div>
+    
+    <!-- MediaPicker Modal -->
+    <div class="modal fade" id="mediapickerModal" tabindex="-1" role="dialog" aria-labelledby="mediapickerModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="mediapickerModalLabel">Medya Seçici</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Kapat">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body p-0">
+                    <iframe id="mediapickerFrame" style="width: 100%; height: 80vh; border: none;"></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
 @stop
 
 @section('css')
@@ -195,12 +218,6 @@
     <script src="{{ asset('js/icon-picker.js') }}"></script>
     <script>
         $(function() {
-            // Dosya seçildiğinde adını göster
-            $('.custom-file-input').on('change', function() {
-                var fileName = $(this).val().split('\\').pop();
-                $(this).siblings('.custom-file-label').addClass('selected').html(fileName);
-            });
-            
             // Renk değişikliğinde önizlemeyi güncelle
             $('#logo_bg_color').on('input', function() {
                 var color = $(this).val();
@@ -256,6 +273,120 @@
                         btn.prop('disabled', false);
                     }
                 });
+            });
+            
+            // Global mesaj işleyicisi
+            function handleFilemanagerMessage(event) {
+                console.log('Mesaj alındı:', event.data);
+                
+                let data;
+                // Gelen veri string mi yoksa obje mi kontrol et
+                if (typeof event.data === 'string') {
+                    try {
+                        data = JSON.parse(event.data);
+                    } catch (e) {
+                        console.log('String mesaj JSON olarak işlenemedi:', e);
+                        return;
+                    }
+                } else {
+                    // Zaten obje ise doğrudan kullan
+                    data = event.data;
+                }
+                
+                // Seçim verisi kontrol et
+                if (data && data.type === 'mediaSelected') {
+                    console.log('Medya seçildi:', data);
+                    
+                    // Aktif input ID ve preview ID'lerini al
+                    const inputId = activeInputId;
+                    const previewId = activePreviewId;
+                    
+                    if (!inputId || !previewId) {
+                        console.error('Aktif input veya preview ID bulunamadı');
+                        return;
+                    }
+                    
+                    // Input alanını güncelle
+                    $('#' + inputId).val(data.mediaUrl);
+                    
+                    // Önizleme alanını güncelle
+                    const previewElement = $('#' + previewId);
+                    let previewImg = previewElement.find('img');
+                    
+                    if (previewImg.length === 0) {
+                        previewImg = $('<img>').addClass('img-thumbnail');
+                        previewElement.html(previewImg);
+                    }
+                    
+                    previewImg.attr('src', data.mediaUrl);
+                    previewImg.attr('alt', data.alt || 'Seçilen Görsel');
+                    previewElement.show();
+                    
+                    // Eğer logo görseli ise ana önizlemeyi de güncelle
+                    if (inputId === 'logo_image') {
+                        $('#logo_preview').html('<img src="' + data.mediaUrl + '" alt="Logo Görseli" style="max-width: 100%; max-height: 150px;">');
+                    }
+                    
+                    // Modal'ı kapat
+                    $('#mediapickerModal').modal('hide');
+                }
+            }
+            
+            // Global değişkenler
+            var activeInputId = '';
+            var activePreviewId = '';
+            
+            // Kart 2 görseli seçimi
+            $('#card2_image_button').on('click', function() {
+                // Aktif input ve preview bilgilerini güncelle
+                activeInputId = 'card2_image';
+                activePreviewId = 'card2_image_preview';
+                
+                // Geçici ID oluştur
+                const tempId = Date.now();
+                const relatedType = 'logo_plans';
+                
+                // MediaPicker URL
+                const mediapickerUrl = '/admin/filemanagersystem/mediapicker?type=image&filter=all&related_type=' + relatedType + '&related_id=' + tempId;
+                
+                // iFrame'i güncelle
+                $('#mediapickerFrame').attr('src', mediapickerUrl);
+                
+                // Global mesaj dinleyicisi ekle
+                window.removeEventListener('message', handleFilemanagerMessage);
+                window.addEventListener('message', handleFilemanagerMessage);
+                
+                // Modal'ı göster
+                $('#mediapickerModal').modal('show');
+            });
+            
+            // Logo görseli seçimi
+            $('#logo_image_button').on('click', function() {
+                // Aktif input ve preview bilgilerini güncelle
+                activeInputId = 'logo_image';
+                activePreviewId = 'logo_image_preview';
+                
+                // Geçici ID oluştur
+                const tempId = Date.now();
+                const relatedType = 'logo_plans';
+                
+                // MediaPicker URL
+                const mediapickerUrl = '/admin/filemanagersystem/mediapicker?type=image&filter=all&related_type=' + relatedType + '&related_id=' + tempId;
+                
+                // iFrame'i güncelle
+                $('#mediapickerFrame').attr('src', mediapickerUrl);
+                
+                // Global mesaj dinleyicisi ekle
+                window.removeEventListener('message', handleFilemanagerMessage);
+                window.addEventListener('message', handleFilemanagerMessage);
+                
+                // Modal'ı göster
+                $('#mediapickerModal').modal('show');
+            });
+            
+            // Modal kapandığında event listener'ı kaldır
+            $('#mediapickerModal').on('hidden.bs.modal', function() {
+                window.removeEventListener('message', handleFilemanagerMessage);
             });
         });
     </script>

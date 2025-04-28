@@ -509,10 +509,10 @@ class HomepageManagerController extends Controller
             'card1_icon' => 'nullable|string|max:255',
             'card1_url' => 'nullable|string|max:255',
             'card2_title' => 'nullable|string|max:255',
-            'card2_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'card2_image' => 'nullable|string', // FileManagerSystem ile gelecek path
             'card2_url' => 'nullable|string|max:255',
             'logo_title' => 'nullable|string|max:255',
-            'logo_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'logo_image' => 'nullable|string', // FileManagerSystem ile gelecek path
             'logo_bg_color' => 'nullable|string|max:30',
         ]);
         
@@ -528,28 +528,14 @@ class HomepageManagerController extends Controller
         $logoPlans->logo_title = $request->logo_title;
         $logoPlans->logo_bg_color = $request->logo_bg_color ?: '#004d2e';
         
-        // Kart 2 görseli güncelle
-        if ($request->hasFile('card2_image')) {
-            // Eğer varsa eski dosyayı sil
-            if ($logoPlans->card2_image) {
-                Storage::disk('public')->delete($logoPlans->card2_image);
-            }
-            
-            // Yeni görseli yükle
-            $card2ImagePath = $request->file('card2_image')->store('logo-plans', 'public');
-            $logoPlans->card2_image = $card2ImagePath;
+        // Kart 2 görseli güncelle - FileManagerSystem
+        if ($request->filled('card2_image')) {
+            $logoPlans->card2_image = $request->card2_image;
         }
         
-        // Logo görseli güncelle
-        if ($request->hasFile('logo_image')) {
-            // Eğer varsa eski dosyayı sil
-            if ($logoPlans->logo_image) {
-                Storage::disk('public')->delete($logoPlans->logo_image);
-            }
-            
-            // Yeni logoyu yükle
-            $logoImagePath = $request->file('logo_image')->store('logo-plans', 'public');
-            $logoPlans->logo_image = $logoImagePath;
+        // Logo görseli güncelle - FileManagerSystem
+        if ($request->filled('logo_image')) {
+            $logoPlans->logo_image = $request->logo_image;
         }
         
         $logoPlans->save();
