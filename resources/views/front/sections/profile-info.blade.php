@@ -1,5 +1,5 @@
 <!-- Profil Bilgileri Bölümü -->
-<div id="profile-info-section" class="profile-info-section container max-w-7xl mx-auto px-4 py-8 mt-20">
+<div id="profile-info-section" class="profile-info-section container max-w-7xl mx-auto px-4 py-6 mt-1">
     <div class="flex flex-col md:flex-row gap-8">
         <!-- Profil Kartı -->
         <div class="bg-white rounded-3xl shadow-lg overflow-hidden md:w-1/2">

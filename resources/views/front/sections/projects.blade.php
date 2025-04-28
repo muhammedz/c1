@@ -70,28 +70,30 @@
                         Gerçekleşen Projeler
                     @endif
                 </h2>
-                @if($projectSettings->show_view_all_button)
-                    <a href="{{ $projectSettings->view_all_url ?? route('front.projects') }}" class="text-gray-600 hover:text-gray-800 view-all-link">
-                        {{ $projectSettings->view_all_text ?? 'Tümünü Gör' }}
-                    </a>
-                @endif
+                <div class="flex items-center space-x-4">
+                    <!-- Navigation Butonları -->
+                    <div class="prev-button w-8 h-8 border border-gray-300 rounded-full flex items-center justify-center cursor-pointer transition-all duration-200 hover:bg-gray-100">
+                        <svg class="w-4 h-4 text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                        </svg>
+                    </div>
+                    
+                    <div class="next-button w-8 h-8 border border-gray-300 rounded-full flex items-center justify-center cursor-pointer transition-all duration-200 hover:bg-gray-100">
+                        <svg class="w-4 h-4 text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                        </svg>
+                    </div>
+                    
+                    @if($projectSettings->show_view_all_button)
+                        <a href="{{ $projectSettings->view_all_url ?? route('front.projects') }}" class="text-gray-600 hover:text-gray-800 view-all-link ml-2">
+                            {{ $projectSettings->view_all_text ?? 'Tümünü Gör' }}
+                        </a>
+                    @endif
+                </div>
             </div>
 
             <!-- Proje Panelleri -->
             <div class="relative projects-container max-w-full">
-                <!-- Navigation Butonları -->
-                <div class="absolute left-0 top-1/2 -translate-y-1/2 -mx-4 -translate-x-4 z-10 w-8 h-8 bg-white rounded-full shadow-lg border border-gray-800 flex items-center justify-center prev-button">
-                    <svg class="w-5 h-5 text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-                    </svg>
-                </div>
-
-                <div class="absolute right-0 top-1/2 -translate-y-1/2 -mx-4 translate-x-4 z-10 w-8 h-8 bg-white rounded-full shadow-lg border border-gray-800 flex items-center justify-center next-button">
-                    <svg class="w-5 h-5 text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                    </svg>
-                </div>
-
                 <!-- Kategori Panelleri -->
                 @foreach($projectCategories as $category)
                     <div class="project-panel {{ !$loop->first ? 'hidden' : '' }}" data-category="{{ $category->slug }}">
@@ -342,6 +344,16 @@
 .projects-section a:focus {
     outline: none;
     -webkit-tap-highlight-color: transparent;
+}
+
+/* Navigasyon butonları için stil */
+.prev-button, .next-button {
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.prev-button:hover, .next-button:hover {
+    background-color: #f3f4f6;
 }
 
 /* Ekstra alan koruma için */

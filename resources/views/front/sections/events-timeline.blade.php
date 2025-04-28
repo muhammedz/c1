@@ -1,5 +1,12 @@
 <!-- #### Events Timeline Section -->
 {{-- Debug info: isAktif: {{ $eventSettings->is_active ?? 'undefined' }}, upcomingEventsCount: {{ count($upcomingEvents ?? []) }} --}}
+@php
+// Türkçe karakter destekli ilk harf büyütme fonksiyonu
+function titleCase($string) {
+    $string = mb_convert_case($string, MB_CASE_TITLE, 'UTF-8');
+    return $string;
+}
+@endphp
 @if(isset($eventSettings) && $eventSettings->is_active && count($upcomingEvents) > 0)
 <section id="events-timeline-section" class="events-timeline-section container max-w-7xl mx-auto px-4 py-12">
     <div class="flex items-center justify-between mb-8">
@@ -31,7 +38,7 @@
                     <div class="flex items-start gap-6">
                         <div class="w-32 h-32 bg-gray-100 rounded-xl overflow-hidden flex-shrink-0">
                             @if($event->cover_image)
-                                <img src="{{ $event->cover_image_url }}" alt="{{ $event->title }}" class="w-full h-full object-cover">
+                                <img src="{{ $event->cover_image_url }}" alt="{{ titleCase($event->title) }}" class="w-full h-full object-cover">
                             @else
                                 <div class="w-full h-full flex items-center justify-center text-gray-400 text-sm text-center">
                                     Etkinlik<br>Görseli<br>Gelecek
@@ -40,8 +47,8 @@
                         </div>
                         <div class="flex-1">
                             <div class="flex flex-col items-start ">
-                                <h3 class="text-[#004d2e] font-semibold !p-0 !mb-0">{{ $event->title }}</h3>
-                                <span class="text-gray-400 text-sm">{{ $event->category->name ?? 'Genel' }}</span>
+                                <h3 class="text-[#004d2e] font-semibold !p-0 !mb-0">{{ titleCase($event->title) }}</h3>
+                                <span class="text-gray-400 text-sm">{{ titleCase($event->category->name ?? 'Genel') }}</span>
                             </div>
                             <div class="space-y-3 mt-2">
                                 <div class="flex items-center gap-2 text-sm text-gray-500">
@@ -66,7 +73,7 @@
                                     <svg class="w-4 h-4 text-[#004d2e] flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                                         <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
                                     </svg>
-                                    <span class="flex-1">{{ $event->location }}</span>
+                                    <span class="flex-1">{{ titleCase($event->location) }}</span>
                                 </div>
                             </div>
                             <div class="mt-4">
@@ -92,6 +99,160 @@
         <p class="text-center mt-2">
             <a href="{{ route('events.index') }}" class="text-[#004d2e] font-medium hover:underline">Tüm etkinlikleri görüntüle</a>
         </p>
+    </div>
+</section>
+@endif 
+
+<!-- #### Alternatif Etkinlikler Bölümü - Featured Card Tasarımı -->
+@if(isset($eventSettings) && $eventSettings->is_active && count($upcomingEvents) > 0)
+<section id="events-alternative-section" class="container max-w-7xl mx-auto px-4 py-12 border-t border-gray-100 mt-8">
+    <div class="flex items-center justify-between mb-8">
+        <h2 class="text-2xl font-bold text-gray-800">{{ $eventSettings->section_title ?? 'Etkinlikler' }} <span class="text-[#004d2e]">Alternatif</span></h2>
+        <a href="{{ route('events.index') }}" class="text-[#004d2e] font-medium text-sm hover:underline flex items-center gap-1">
+            Tümünü Gör
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
+        </a>
+    </div>
+    
+    <style>
+        .event-featured-card {
+            display: flex;
+            flex-direction: column;
+            background-color: white;
+            border-radius: 24px;
+            border: 1px solid #eee;
+            transition: all 0.3s ease;
+            overflow: hidden;
+            height: 100%;
+        }
+        
+        .event-featured-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .event-featured-image {
+            width: 100%;
+            aspect-ratio: 1/1;
+            overflow: hidden;
+            border-top-left-radius: 24px;
+            border-top-right-radius: 24px;
+            position: relative;
+        }
+        
+        .event-featured-content {
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+        
+        .event-featured-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 0.75rem;
+            line-height: 1.4;
+        }
+        
+        .event-featured-meta {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #666;
+            font-size: 0.875rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .event-featured-meta svg {
+            color: #004d2e;
+            flex-shrink: 0;
+        }
+        
+        .event-featured-category {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background-color: white;
+            color: #004d2e;
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            border: 1px solid rgba(0,77,46,0.1);
+        }
+        
+        .event-featured-date-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
+            padding: 1rem;
+            color: white;
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+    </style>
+    
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        @foreach($upcomingEvents->take(4) as $event)
+        <div>
+            <a href="{{ route('events.show', $event->slug) }}" class="event-featured-card">
+                <!-- Etkinlik Görseli -->
+                <div class="event-featured-image">
+                    @if($event->cover_image)
+                        <img src="{{ $event->cover_image_url }}" alt="{{ titleCase($event->title) }}" class="w-full h-full object-cover">
+                    @else
+                        <div class="w-full h-full bg-gradient-to-r from-[#004d2e] to-[#006a3e] flex items-center justify-center text-white p-4">
+                            <span class="text-xl font-semibold text-center">{{ titleCase($event->title) }}</span>
+                        </div>
+                    @endif
+                    
+                    <!-- Kategori Etiketi -->
+                    <div class="event-featured-category">
+                        {{ titleCase($event->category->name ?? 'Genel') }}
+                    </div>
+                    
+                    <!-- Tarih Overlay -->
+                    <div class="event-featured-date-overlay">
+                        <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" />
+                        </svg>
+                        <span>{{ $event->turkish_start_date }}</span>
+                    </div>
+                </div>
+                
+                <!-- Etkinlik Bilgileri -->
+                <div class="event-featured-content">
+                    <h3 class="event-featured-title line-clamp-2">{{ titleCase($event->title) }}</h3>
+                    
+                    <div class="space-y-2 mt-auto">
+                        <div class="event-featured-meta">
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V5z" />
+                            </svg>
+                            <span>{{ $event->start_date->format('H:i') }}
+                            @if($event->end_date)
+                             - {{ $event->end_date->format('H:i') }}
+                            @endif
+                            </span>
+                        </div>
+                        
+                        <div class="event-featured-meta">
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
+                            </svg>
+                            <span class="line-clamp-1">{{ titleCase($event->location) }}</span>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+        @endforeach
     </div>
 </section>
 @endif 

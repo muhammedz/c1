@@ -1,6 +1,6 @@
 <!-- #### Featured Services Section -->
 @if(isset($featuredServiceSettings) && $featuredServiceSettings->is_active)
-<section id="featured-services-section" class="featured-services-section container max-w-7xl mx-auto px-4 py-12">
+<section id="featured-services-section" class="featured-services-section container max-w-7xl mx-auto px-4 py-8">
     <h2 class="text-2xl font-bold text-gray-800 mb-8">{{ $featuredServiceSettings->title }}</h2>
 
     <style>
