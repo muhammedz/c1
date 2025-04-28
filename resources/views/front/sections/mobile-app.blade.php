@@ -9,7 +9,11 @@
                     <!-- App Icon -->
                     <div class="w-32 h-32 bg-[#004d2e] rounded-[24px] flex items-center justify-center">
                         @if($mobileAppSettings->app_logo)
-                            <img src="{{ asset('storage/' . $mobileAppSettings->app_logo) }}" alt="{{ $mobileAppSettings->app_name ?? 'Uygulama' }}" class="w-full h-full object-contain p-2">
+                            @if(strpos($mobileAppSettings->app_logo, '/uploads/') !== false)
+                                <img src="{{ $mobileAppSettings->app_logo }}" alt="{{ $mobileAppSettings->app_name ?? 'Uygulama' }}" class="w-full h-full object-contain p-2">
+                            @else
+                                <img src="{{ asset('storage/' . $mobileAppSettings->app_logo) }}" alt="{{ $mobileAppSettings->app_name ?? 'Uygulama' }}" class="w-full h-full object-contain p-2">
+                            @endif
                         @else
                             <span class="text-white text-2xl">icon</span>
                         @endif
@@ -78,7 +82,11 @@
             <!-- Orta Kısım - Telefon Görseli -->
             <div class="hidden lg:flex justify-center">
                 @if($mobileAppSettings->phone_image)
-                    <img src="{{ asset('storage/' . $mobileAppSettings->phone_image) }}" alt="Mobile App Screenshot" class="w-auto h-[500px] object-cover">
+                    @if(strpos($mobileAppSettings->phone_image, '/uploads/') !== false)
+                        <img src="{{ $mobileAppSettings->phone_image }}" alt="Mobile App Screenshot" class="w-auto h-[500px] object-cover">
+                    @else
+                        <img src="{{ asset('storage/' . $mobileAppSettings->phone_image) }}" alt="Mobile App Screenshot" class="w-auto h-[500px] object-cover">
+                    @endif
                 @else
                     <img src="{{ asset('assets/image/mobile-app.png') }}" alt="Mobile App Screenshot" class="w-auto h-[500px] object-cover">
                 @endif

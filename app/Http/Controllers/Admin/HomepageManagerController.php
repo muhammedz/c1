@@ -114,8 +114,8 @@ class HomepageManagerController extends Controller
             'app_name' => 'nullable|string|max:255',
             'app_subtitle' => 'nullable|string|max:255',
             'app_description' => 'nullable|string',
-            'app_logo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'phone_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'filemanagersystem_app_logo' => 'nullable|string',
+            'filemanagersystem_phone_image' => 'nullable|string',
             'app_store_link' => 'nullable|url',
             'google_play_link' => 'nullable|url',
             'link_card_1_title' => 'nullable|string|max:255',
@@ -152,28 +152,25 @@ class HomepageManagerController extends Controller
         $mobileAppSettings->link_card_3_url = $request->link_card_3_url;
         $mobileAppSettings->link_card_3_icon = $request->link_card_3_icon;
         
-        // Uygulama logosu güncelle
-        if ($request->hasFile('app_logo')) {
-            // Eğer varsa eski dosyayı sil
-            if ($mobileAppSettings->app_logo) {
-                Storage::disk('public')->delete($mobileAppSettings->app_logo);
-            }
+        // MediaPicker ile seçilen görselleri güncelle
+        if ($request->filemanagersystem_app_logo) {
+            // MediaPicker URL'sini doğrudan kullan
+            $mobileAppSettings->app_logo = $request->filemanagersystem_app_logo;
             
-            // Yeni logoyu yükle
-            $appLogoPath = $request->file('app_logo')->store('mobile-app', 'public');
-            $mobileAppSettings->app_logo = $appLogoPath;
+            // Log ile kaydedilen URL'yi kontrol edelim
+            \Log::info('MediaPicker app_logo kaydediliyor', [
+                'url' => $request->filemanagersystem_app_logo
+            ]);
         }
         
-        // Telefon görseli güncelle
-        if ($request->hasFile('phone_image')) {
-            // Eğer varsa eski dosyayı sil
-            if ($mobileAppSettings->phone_image) {
-                Storage::disk('public')->delete($mobileAppSettings->phone_image);
-            }
+        if ($request->filemanagersystem_phone_image) {
+            // MediaPicker URL'sini doğrudan kullan
+            $mobileAppSettings->phone_image = $request->filemanagersystem_phone_image;
             
-            // Yeni görseli yükle
-            $phoneImagePath = $request->file('phone_image')->store('mobile-app', 'public');
-            $mobileAppSettings->phone_image = $phoneImagePath;
+            // Log ile kaydedilen URL'yi kontrol edelim
+            \Log::info('MediaPicker phone_image kaydediliyor', [
+                'url' => $request->filemanagersystem_phone_image
+            ]);
         }
         
         $mobileAppSettings->save();
@@ -528,14 +525,30 @@ class HomepageManagerController extends Controller
         $logoPlans->logo_title = $request->logo_title;
         $logoPlans->logo_bg_color = $request->logo_bg_color ?: '#004d2e';
         
+        // Debug bilgisi ekleyelim
+        \Log::info('Logo ve planlar güncelleniyor', [
+            'card2_image' => $request->card2_image,
+            'logo_image' => $request->logo_image,
+        ]);
+        
         // Kart 2 görseli güncelle - FileManagerSystem
         if ($request->filled('card2_image')) {
+            // Gelen imaj yolunu olduğu gibi kaydet
             $logoPlans->card2_image = $request->card2_image;
+            \Log::info('Card2 image kaydedildi', [
+                'path' => $logoPlans->card2_image,
+                'raw_input' => $request->card2_image
+            ]);
         }
         
         // Logo görseli güncelle - FileManagerSystem
         if ($request->filled('logo_image')) {
+            // Gelen imaj yolunu olduğu gibi kaydet
             $logoPlans->logo_image = $request->logo_image;
+            \Log::info('Logo image kaydedildi', [
+                'path' => $logoPlans->logo_image,
+                'raw_input' => $request->logo_image
+            ]);
         }
         
         $logoPlans->save();

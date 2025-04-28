@@ -49,19 +49,21 @@
                             <div class="card-body">
                                 <!-- Uygulama Logosu -->
                                 <div class="form-group">
-                                    <label for="app_logo">Uygulama Logosu</label>
+                                    <label for="filemanagersystem_app_logo">Uygulama Logosu</label>
                                     <div class="input-group mb-3">
-                                        <div class="custom-file">
-                                            <input type="file" class="custom-file-input" id="app_logo" name="app_logo">
-                                            <label class="custom-file-label" for="app_logo">Dosya Seç</label>
+                                        <input type="text" class="form-control" id="filemanagersystem_app_logo" name="filemanagersystem_app_logo" value="{{ old('filemanagersystem_app_logo', $mobileAppSettings->app_logo ?? '') }}" readonly>
+                                        <div class="input-group-append">
+                                            <button type="button" class="btn btn-primary mediapicker-btn" data-input="filemanagersystem_app_logo" data-preview="app_logo_preview" data-type="image">
+                                                <i class="fas fa-images"></i> Medya Seç
+                                            </button>
                                         </div>
                                     </div>
                                     <small class="form-text text-muted">Önerilen boyut: 128x128 piksel, PNG formatı</small>
-                                    @if($mobileAppSettings->app_logo)
-                                        <div class="mt-2">
+                                    <div id="app_logo_preview" class="mt-2">
+                                        @if($mobileAppSettings->app_logo)
                                             <img src="{{ asset('storage/' . $mobileAppSettings->app_logo) }}" alt="Uygulama Logosu" class="img-thumbnail" style="max-width: 128px;">
-                                        </div>
-                                    @endif
+                                        @endif
+                                    </div>
                                 </div>
                                 
                                 <!-- Uygulama Adı -->
@@ -124,24 +126,26 @@
                             </div>
                             <div class="card-body">
                                 <div class="form-group">
-                                    <label for="phone_image">Telefon Ekran Görseli</label>
+                                    <label for="filemanagersystem_phone_image">Telefon Ekran Görseli</label>
                                     <div class="input-group mb-3">
-                                        <div class="custom-file">
-                                            <input type="file" class="custom-file-input" id="phone_image" name="phone_image">
-                                            <label class="custom-file-label" for="phone_image">Dosya Seç</label>
+                                        <input type="text" class="form-control" id="filemanagersystem_phone_image" name="filemanagersystem_phone_image" value="{{ old('filemanagersystem_phone_image', $mobileAppSettings->phone_image ?? '') }}" readonly>
+                                        <div class="input-group-append">
+                                            <button type="button" class="btn btn-primary mediapicker-btn" data-input="filemanagersystem_phone_image" data-preview="phone_image_preview" data-type="image">
+                                                <i class="fas fa-images"></i> Medya Seç
+                                            </button>
                                         </div>
                                     </div>
                                     <small class="form-text text-muted">Önerilen boyut: 320x650 piksel, PNG formatı</small>
-                                    @if($mobileAppSettings->phone_image)
-                                        <div class="mt-2">
+                                    <div id="phone_image_preview" class="mt-2">
+                                        @if($mobileAppSettings->phone_image)
                                             <img src="{{ asset('storage/' . $mobileAppSettings->phone_image) }}" alt="Telefon Görseli" class="img-thumbnail" style="max-height: 300px;">
-                                        </div>
-                                    @else
-                                        <div class="mt-2 text-center">
-                                            <img src="{{ asset('assets/image/mobile-app.png') }}" alt="Varsayılan Telefon Görseli" class="img-thumbnail" style="max-height: 300px;">
-                                            <p class="text-muted">Varsayılan görsel</p>
-                                        </div>
-                                    @endif
+                                        @else
+                                            <div class="mt-2 text-center">
+                                                <img src="{{ asset('assets/image/mobile-app.png') }}" alt="Varsayılan Telefon Görseli" class="img-thumbnail" style="max-height: 300px;">
+                                                <p class="text-muted">Varsayılan görsel</p>
+                                            </div>
+                                        @endif
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -236,6 +240,23 @@
             </form>
         </div>
     </div>
+
+    <!-- MediaPicker Modal -->
+    <div class="modal fade" id="mediapickerModal" tabindex="-1" role="dialog" aria-labelledby="mediapickerModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="mediapickerModalLabel">Medya Seçici</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Kapat">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body p-0">
+                    <iframe id="mediapickerFrame" src="" style="width: 100%; height: 600px; border: none;"></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
 @stop
 
 @section('css')
@@ -248,62 +269,119 @@
 
 @section('js')
     <script>
-        $(function() {
-            // Dosya seçildiğinde adını göster
-            $('.custom-file-input').on('change', function() {
-                var fileName = $(this).val().split('\\').pop();
-                $(this).siblings('.custom-file-label').addClass('selected').html(fileName);
+        $(function () {
+            // Form submit işlemi
+            $('form').on('submit', function(e) {
+                // Form değerlerini loglayalım
+                console.log('Form submit edildi');
+                console.log('app_logo:', $('#filemanagersystem_app_logo').val());
+                console.log('phone_image:', $('#filemanagersystem_phone_image').val());
+                
+                // İşleme devam et
+                return true;
             });
             
-            // Görünürlük butonu tıklaması
+            // Görünürlük durumu değişikliği
             $('#toggle-visibility-btn').on('click', function() {
-                var btn = $(this);
-                
-                // Buton yükleniyor görünümü
-                btn.prop('disabled', true);
-                btn.html('<i class="fas fa-spinner fa-spin"></i> İşleniyor...');
-                
-                // AJAX isteği
                 $.ajax({
-                    url: '{{ route('admin.homepage.toggle-mobile-app-visibility') }}',
+                    url: '{{ route("admin.homepage.toggle-mobile-app-visibility") }}',
                     type: 'POST',
                     data: {
                         _token: '{{ csrf_token() }}'
                     },
-                    dataType: 'json',
                     success: function(response) {
-                        // Başarılı durumda buton güncelleme
                         if (response.success) {
+                            // Durum mesajını göster
+                            $('#status-message').text(response.message);
+                            $('#status-alert').show();
+                            
+                            // Buton rengini değiştir
                             if (response.is_active) {
-                                btn.removeClass('btn-danger').addClass('btn-success');
-                                btn.html('<i class="fas fa-eye mr-1"></i> Aktif');
+                                $('#toggle-visibility-btn')
+                                    .removeClass('btn-danger')
+                                    .addClass('btn-success')
+                                    .html('<i class="fas fa-eye mr-1"></i> Aktif');
                             } else {
-                                btn.removeClass('btn-success').addClass('btn-danger');
-                                btn.html('<i class="fas fa-eye-slash mr-1"></i> Pasif');
+                                $('#toggle-visibility-btn')
+                                    .removeClass('btn-success')
+                                    .addClass('btn-danger')
+                                    .html('<i class="fas fa-eye-slash mr-1"></i> Pasif');
                             }
                             
-                            // Bildirim göster
-                            $('#status-message').text(response.message);
-                            $('#status-alert').fadeIn();
-                            
-                            // 3 saniye sonra bildirimi kapat
+                            // 3 saniye sonra mesajı gizle
                             setTimeout(function() {
-                                $('#status-alert').fadeOut();
+                                $('#status-alert').fadeOut('slow');
                             }, 3000);
                         } else {
-                            // Hata durumu
-                            alert('Bir hata oluştu: ' + response.message);
+                            alert('Hata: ' + response.message);
                         }
                     },
-                    error: function(xhr, status, error) {
-                        // Sunucu hatası
-                        alert('Sunucu hatası: ' + error);
-                    },
-                    complete: function() {
-                        // İşlem tamamlandığında butonu etkinleştir
-                        btn.prop('disabled', false);
+                    error: function(xhr) {
+                        alert('Bir hata oluştu: ' + xhr.responseText);
                     }
                 });
+            });
+
+            // MediaPicker Entegrasyonu
+            $('.mediapicker-btn').on('click', function() {
+                const inputId = $(this).data('input');
+                const previewId = $(this).data('preview');
+                const fileType = $(this).data('type') || 'image';
+                
+                // Medya seçici URL'ini oluştur
+                const mediapickerUrl = '/admin/filemanagersystem/mediapicker?related_type=mobile-app&related_id=1&type=' + fileType + '&filter=all';
+                
+                // iframe src'sini ayarla
+                $('#mediapickerFrame').attr('src', mediapickerUrl);
+                
+                // Modal'ı göster
+                $('#mediapickerModal').modal('show');
+                
+                // Mesaj dinleme işlevi
+                function handleMediaSelection(event) {
+                    try {
+                        console.log('MediaPicker mesajı alındı:', event.data);
+                        
+                        if (event.data && event.data.type === 'mediaSelected') {
+                            let mediaUrl = '';
+                            
+                            // URL değerini al
+                            if (event.data.mediaUrl) {
+                                mediaUrl = event.data.mediaUrl;
+                                console.log('MediaPicker URL kullanılıyor:', mediaUrl);
+                            } else if (event.data.mediaId) {
+                                // ID ile kullan
+                                mediaUrl = '/admin/filemanagersystem/media/preview/' + event.data.mediaId;
+                                console.log('MediaPicker ID kullanılıyor:', event.data.mediaId, 'URL:', mediaUrl);
+                            }
+                            
+                            if (mediaUrl) {
+                                // Input değerini güncelle
+                                $('#' + inputId).val(mediaUrl);
+                                console.log('Input değeri güncellendi:', inputId, mediaUrl);
+                                
+                                // Önizleme göster
+                                if (previewId) {
+                                    $('#' + previewId).html('<img src="' + mediaUrl + '" alt="Seçilen Medya" class="img-thumbnail" style="max-height: 300px;">');
+                                    console.log('Önizleme gösterildi:', previewId, mediaUrl);
+                                }
+                                
+                                // Modalı kapat
+                                $('#mediapickerModal').modal('hide');
+                                
+                                // Event listener'ı kaldır
+                                window.removeEventListener('message', handleMediaSelection);
+                            }
+                        }
+                    } catch (error) {
+                        console.error('Medya seçimi işlenirken hata oluştu:', error);
+                        window.removeEventListener('message', handleMediaSelection);
+                    }
+                }
+                
+                // Event listener ekle
+                window.removeEventListener('message', handleMediaSelection);
+                window.addEventListener('message', handleMediaSelection);
             });
         });
     </script>

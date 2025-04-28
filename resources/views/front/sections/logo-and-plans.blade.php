@@ -1,5 +1,6 @@
 <!-- #### Logo and Plans Section -->
 @if(isset($logoPlans) && $logoPlans->is_active)
+
 <section id="logo-and-plans-section" class="logo-and-plans-section container max-w-7xl mx-auto px-4 py-8 md:py-12">
     <div class="flex flex-col md:flex-row gap-4 md:gap-8">
         <!-- 1. Kart -->
@@ -28,7 +29,7 @@
         <div class="bg-white rounded-2xl w-full h-48 md:w-1/4 shadow-sm p-6 md:p-8 flex items-center justify-center">
             <div class="text-center">
                 @if($logoPlans->card2_image)
-                    <img src="{{ asset('storage/' . $logoPlans->card2_image) }}" alt="{{ $logoPlans->card2_title ?? 'Stratejik Plan' }}" class="w-24 h-24 md:w-32 md:h-32 mx-auto mb-3 md:mb-4 object-contain">
+                    <img src="https://cankaya.epoxsoft.net.tr/uploads/images/nxefkrPVG0piCeTVdOMOgQBYmaV489HprGnyiB5P.webp" alt="{{ $logoPlans->card2_title ?? 'Stratejik Plan' }}" class="w-24 h-24 md:w-32 md:h-32 mx-auto mb-3 md:mb-4 object-contain">
                 @else
                     <img src="https://cdn-icons-png.flaticon.com/512/1087/1087927.png" alt="{{ $logoPlans->card2_title ?? 'Stratejik Plan' }}" class="w-24 h-24 md:w-32 md:h-32 mx-auto mb-3 md:mb-4 object-contain">
                 @endif
@@ -46,9 +47,9 @@
         <div class="bg-[{{ $logoPlans->logo_bg_color ?? '#004d2e' }}] w-full md:w-2/4 h-48 rounded-2xl p-6 md:p-8 flex items-center justify-center" style="background-color: {{ $logoPlans->logo_bg_color ?? '#004d2e' }}">
             <div class="text-center text-white">
                 @if($logoPlans->logo_image)
-                    <img src="{{ asset('storage/' . $logoPlans->logo_image) }}" alt="{{ $logoPlans->logo_title ?? 'Logo' }}" class="max-h-36 max-w-full mx-auto">
+                    <img src="https://cankaya.epoxsoft.net.tr/uploads/images/nxefkrPVG0piCeTVdOMOgQBYmaV489HprGnyiB5P.webp" alt="{{ $logoPlans->logo_title ?? 'Logo' }}" class="max-h-36 max-w-full mx-auto">
                 @else
-                    <p class="text-xl md:text-2xl font-medium">{{ $logoPlans->logo_title ?? 'Farklı Logo gelecek' }}<br>Png formatında</p>
+                    <p class="text-xl md:text-2xl font-medium">{{ $logoPlans->logo_title ?? 'Farklı Logo gelecek' }}<br>Önerilen boyut: 300x100 piksel, PNG formatı</p>
                 @endif
             </div>
         </div>
