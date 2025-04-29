@@ -208,11 +208,20 @@
                                         </div>
                                         <div class="form-group">
                                             <label for="link_card_1_icon">İkon Kodu</label>
-                                            <input type="text" class="form-control" id="link_card_1_icon" name="link_card_1_icon" value="{{ old('link_card_1_icon', $mobileAppSettings->link_card_1_icon) }}" placeholder="Örn: user">
+                                            <div class="input-group">
+                                                <input type="text" class="form-control icon-picker" id="link_card_1_icon" name="link_card_1_icon" value="{{ old('link_card_1_icon', $mobileAppSettings->link_card_1_icon) }}" placeholder="Örn: user">
+                                                <div class="input-group-append">
+                                                    <button type="button" class="btn btn-outline-secondary mediapicker-btn" data-input="filemanagersystem_link_card_1_icon" data-preview="link_card_1_icon_preview" data-type="image">
+                                                        <i class="fas fa-upload"></i> İkon Yükle
+                                                    </button>
+                                                </div>
+                                            </div>
                                             <small class="form-text text-muted">
                                                 <a href="https://fontawesome.com/icons" target="_blank">Font Awesome</a> 
-                                                simge isimlerini kullanabilirsiniz (örneğin "user", "envelope", "phone", vb.)
+                                                simge isimlerini kullanabilirsiniz veya özel ikon yükleyebilirsiniz.
                                             </small>
+                                            <div id="link_card_1_icon_preview" class="mt-2"></div>
+                                            <input type="hidden" id="filemanagersystem_link_card_1_icon" name="filemanagersystem_link_card_1_icon" value="{{ old('filemanagersystem_link_card_1_icon', $mobileAppSettings->link_card_1_custom_icon ?? '') }}">
                                         </div>
                                     </div>
                                 </div>
@@ -233,7 +242,20 @@
                                         </div>
                                         <div class="form-group">
                                             <label for="link_card_2_icon">İkon Kodu</label>
-                                            <input type="text" class="form-control" id="link_card_2_icon" name="link_card_2_icon" value="{{ old('link_card_2_icon', $mobileAppSettings->link_card_2_icon) }}" placeholder="Örn: envelope">
+                                            <div class="input-group">
+                                                <input type="text" class="form-control icon-picker" id="link_card_2_icon" name="link_card_2_icon" value="{{ old('link_card_2_icon', $mobileAppSettings->link_card_2_icon) }}" placeholder="Örn: envelope">
+                                                <div class="input-group-append">
+                                                    <button type="button" class="btn btn-outline-secondary mediapicker-btn" data-input="filemanagersystem_link_card_2_icon" data-preview="link_card_2_icon_preview" data-type="image">
+                                                        <i class="fas fa-upload"></i> İkon Yükle
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <small class="form-text text-muted">
+                                                <a href="https://fontawesome.com/icons" target="_blank">Font Awesome</a> 
+                                                simge isimlerini kullanabilirsiniz veya özel ikon yükleyebilirsiniz.
+                                            </small>
+                                            <div id="link_card_2_icon_preview" class="mt-2"></div>
+                                            <input type="hidden" id="filemanagersystem_link_card_2_icon" name="filemanagersystem_link_card_2_icon" value="{{ old('filemanagersystem_link_card_2_icon', $mobileAppSettings->link_card_2_custom_icon ?? '') }}">
                                         </div>
                                     </div>
                                 </div>
@@ -254,7 +276,20 @@
                                         </div>
                                         <div class="form-group">
                                             <label for="link_card_3_icon">İkon Kodu</label>
-                                            <input type="text" class="form-control" id="link_card_3_icon" name="link_card_3_icon" value="{{ old('link_card_3_icon', $mobileAppSettings->link_card_3_icon) }}" placeholder="Örn: phone">
+                                            <div class="input-group">
+                                                <input type="text" class="form-control icon-picker" id="link_card_3_icon" name="link_card_3_icon" value="{{ old('link_card_3_icon', $mobileAppSettings->link_card_3_icon) }}" placeholder="Örn: phone">
+                                                <div class="input-group-append">
+                                                    <button type="button" class="btn btn-outline-secondary mediapicker-btn" data-input="filemanagersystem_link_card_3_icon" data-preview="link_card_3_icon_preview" data-type="image">
+                                                        <i class="fas fa-upload"></i> İkon Yükle
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <small class="form-text text-muted">
+                                                <a href="https://fontawesome.com/icons" target="_blank">Font Awesome</a> 
+                                                simge isimlerini kullanabilirsiniz veya özel ikon yükleyebilirsiniz.
+                                            </small>
+                                            <div id="link_card_3_icon_preview" class="mt-2"></div>
+                                            <input type="hidden" id="filemanagersystem_link_card_3_icon" name="filemanagersystem_link_card_3_icon" value="{{ old('filemanagersystem_link_card_3_icon', $mobileAppSettings->link_card_3_custom_icon ?? '') }}">
                                         </div>
                                     </div>
                                 </div>
@@ -304,6 +339,7 @@
 @stop
 
 @section('js')
+    <script src="{{ asset('js/icon-picker.js') }}"></script>
     <script>
         $(function () {
             // Form submit işlemi
@@ -360,46 +396,55 @@
 
             // MediaPicker Entegrasyonu
             $('.mediapicker-btn').on('click', function() {
-                const inputId = $(this).data('input');
-                const previewId = $(this).data('preview');
-                const fileType = $(this).data('type') || 'image';
-                
-                // Medya seçici URL'ini oluştur
-                const mediapickerUrl = '/admin/filemanagersystem/mediapicker?related_type=mobile-app&related_id=1&type=' + fileType + '&filter=all';
-                
-                // iframe src'sini ayarla
-                $('#mediapickerFrame').attr('src', mediapickerUrl);
-                
-                // Modal'ı göster
-                $('#mediapickerModal').modal('show');
-                
-                // Mesaj dinleme işlevi
-                function handleMediaSelection(event) {
-                    try {
-                        console.log('MediaPicker mesajı alındı:', event.data);
-                        
-                        if (event.data && event.data.type === 'mediaSelected') {
-                            let mediaUrl = '';
-                            
-                            // URL değerini al
-                            if (event.data.mediaUrl) {
-                                mediaUrl = event.data.mediaUrl;
-                                console.log('MediaPicker URL kullanılıyor:', mediaUrl);
-                            } else if (event.data.mediaId) {
-                                // ID ile kullan
-                                mediaUrl = '/admin/filemanagersystem/media/preview/' + event.data.mediaId;
-                                console.log('MediaPicker ID kullanılıyor:', event.data.mediaId, 'URL:', mediaUrl);
-                            }
-                            
-                            if (mediaUrl) {
+                try {
+                    const input = $(this).data('input');
+                    const preview = $(this).data('preview');
+                    const type = $(this).data('type');
+                    const relatedType = 'mobile_app_settings';
+                    const relatedId = '{{ $mobileAppSettings->id ?? "temp_" . time() }}';
+                    
+                    // MediaPicker URL
+                    const mediapickerUrl = '/admin/filemanagersystem/mediapicker?type=' + 
+                        encodeURIComponent(type) + '&related_type=' + 
+                        encodeURIComponent(relatedType) + '&related_id=' + 
+                        encodeURIComponent(relatedId);
+                    
+                    // Modal açma ve iframe yükleme
+                    $('#mediapickerFrame').attr('src', mediapickerUrl);
+                    $('#mediapickerModal').modal('show');
+                    
+                    // Önceki mesaj dinleyiciyi temizleme
+                    window.removeEventListener('message', handleMediaSelection);
+                    
+                    // Medya seçici mesaj dinleme fonksiyonu
+                    function handleMediaSelection(event) {
+                        try {
+                            if (event.data && event.data.type === 'mediaSelected') {
+                                let mediaUrl = '';
+                                
+                                // URL değerini al
+                                if (event.data.mediaUrl) {
+                                    mediaUrl = event.data.mediaUrl;
+                                    
+                                    // URL çevirme
+                                    if (mediaUrl && mediaUrl.startsWith('/')) {
+                                        const baseUrl = window.location.protocol + '//' + window.location.host;
+                                        mediaUrl = baseUrl + mediaUrl;
+                                    }
+                                } else if (event.data.mediaId) {
+                                    // ID ile kullan
+                                    const previewUrl = '/admin/filemanagersystem/media/preview/' + event.data.mediaId;
+                                    mediaUrl = previewUrl;
+                                }
+                                
                                 // Input değerini güncelle
-                                $('#' + inputId).val(mediaUrl);
-                                console.log('Input değeri güncellendi:', inputId, mediaUrl);
+                                if (input) {
+                                    $('#' + input).val(event.data.mediaId);
+                                }
                                 
                                 // Önizleme göster
-                                if (previewId) {
-                                    $('#' + previewId).html('<img src="' + mediaUrl + '" alt="Seçilen Medya" class="img-thumbnail" style="max-height: 300px;">');
-                                    console.log('Önizleme gösterildi:', previewId, mediaUrl);
+                                if (preview) {
+                                    $('#' + preview).html('<img src="' + mediaUrl + '" alt="Seçilen İkon" class="img-thumbnail" style="max-height: 48px;">');
                                 }
                                 
                                 // Modalı kapat
@@ -408,17 +453,25 @@
                                 // Event listener'ı kaldır
                                 window.removeEventListener('message', handleMediaSelection);
                             }
+                        } catch (error) {
+                            console.error('Medya seçimi işlenirken hata oluştu:', error);
                         }
-                    } catch (error) {
-                        console.error('Medya seçimi işlenirken hata oluştu:', error);
-                        window.removeEventListener('message', handleMediaSelection);
                     }
+                    
+                    // Event listener ekle
+                    window.addEventListener('message', handleMediaSelection);
+                    
+                } catch (error) {
+                    console.error('MediaPicker açılırken hata oluştu:', error);
                 }
-                
-                // Event listener ekle
-                window.removeEventListener('message', handleMediaSelection);
-                window.addEventListener('message', handleMediaSelection);
             });
+
+            // İkon seçiciyi başlat
+            if (typeof setupIconPickers === 'function') {
+                setupIconPickers();
+            } else {
+                console.error('icon-picker.js yüklenemedi!');
+            }
         });
     </script>
 @stop 

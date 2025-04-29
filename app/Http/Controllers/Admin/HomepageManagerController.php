@@ -124,12 +124,15 @@ class HomepageManagerController extends Controller
             'link_card_1_title' => 'nullable|string|max:255',
             'link_card_1_url' => 'nullable|url',
             'link_card_1_icon' => 'nullable|string|max:50',
+            'filemanagersystem_link_card_1_icon' => 'nullable|string',
             'link_card_2_title' => 'nullable|string|max:255',
             'link_card_2_url' => 'nullable|url',
             'link_card_2_icon' => 'nullable|string|max:50',
+            'filemanagersystem_link_card_2_icon' => 'nullable|string',
             'link_card_3_title' => 'nullable|string|max:255',
             'link_card_3_url' => 'nullable|url',
             'link_card_3_icon' => 'nullable|string|max:50',
+            'filemanagersystem_link_card_3_icon' => 'nullable|string',
         ]);
         
         // İlk kaydı al veya yeni oluştur
@@ -187,6 +190,28 @@ class HomepageManagerController extends Controller
             // Log ile kaydedilen URL'yi kontrol edelim
             \Log::info('MediaPicker phone_image kaydediliyor', [
                 'url' => $request->filemanagersystem_phone_image
+            ]);
+        }
+        
+        // Bağlantı kartları için özel ikon kaydetme
+        if ($request->filemanagersystem_link_card_1_icon) {
+            $mobileAppSettings->link_card_1_custom_icon = $request->filemanagersystem_link_card_1_icon;
+            \Log::info('Bağlantı Kartı 1 özel ikon kaydediliyor', [
+                'id' => $request->filemanagersystem_link_card_1_icon
+            ]);
+        }
+        
+        if ($request->filemanagersystem_link_card_2_icon) {
+            $mobileAppSettings->link_card_2_custom_icon = $request->filemanagersystem_link_card_2_icon;
+            \Log::info('Bağlantı Kartı 2 özel ikon kaydediliyor', [
+                'id' => $request->filemanagersystem_link_card_2_icon
+            ]);
+        }
+        
+        if ($request->filemanagersystem_link_card_3_icon) {
+            $mobileAppSettings->link_card_3_custom_icon = $request->filemanagersystem_link_card_3_icon;
+            \Log::info('Bağlantı Kartı 3 özel ikon kaydediliyor', [
+                'id' => $request->filemanagersystem_link_card_3_icon
             ]);
         }
         
