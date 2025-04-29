@@ -90,6 +90,23 @@
                                         </div>
                                     </div>
                                     <small class="form-text text-muted">Önerilen boyut: 800x400 piksel, PNG formatı</small>
+                                    
+                                    <!-- Görsel Boyut Ayarları -->
+                                    <div class="row mt-2">
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="app_header_image_width">Genişlik (px)</label>
+                                                <input type="number" class="form-control" id="app_header_image_width" name="app_header_image_width" value="{{ old('app_header_image_width', $mobileAppSettings->app_header_image_width ?? 320) }}" min="50" max="800">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="app_header_image_height">Yükseklik (px)</label>
+                                                <input type="number" class="form-control" id="app_header_image_height" name="app_header_image_height" value="{{ old('app_header_image_height', $mobileAppSettings->app_header_image_height ?? 200) }}" min="50" max="600">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
                                     <div id="app_header_image_preview" class="mt-2">
                                         @if($mobileAppSettings->app_header_image)
                                             <img src="{{ asset('storage/' . $mobileAppSettings->app_header_image) }}" alt="Uygulama Başlık Görseli" class="img-thumbnail" style="max-width: 100%;">

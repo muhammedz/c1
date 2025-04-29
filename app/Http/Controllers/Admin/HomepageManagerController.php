@@ -116,6 +116,8 @@ class HomepageManagerController extends Controller
             'app_description' => 'nullable|string',
             'filemanagersystem_app_logo' => 'nullable|string',
             'filemanagersystem_app_header_image' => 'nullable|string',
+            'app_header_image_width' => 'nullable|integer|min:50|max:800',
+            'app_header_image_height' => 'nullable|integer|min:50|max:600',
             'filemanagersystem_phone_image' => 'nullable|string',
             'app_store_link' => 'nullable|url',
             'google_play_link' => 'nullable|url',
@@ -139,6 +141,10 @@ class HomepageManagerController extends Controller
         $mobileAppSettings->app_description = $request->app_description;
         $mobileAppSettings->app_store_link = $request->app_store_link;
         $mobileAppSettings->google_play_link = $request->google_play_link;
+        
+        // Görsel boyutlarını güncelle
+        $mobileAppSettings->app_header_image_width = $request->app_header_image_width ?? 320;
+        $mobileAppSettings->app_header_image_height = $request->app_header_image_height ?? 200;
         
         // Link kartları verilerini güncelle
         $mobileAppSettings->link_card_1_title = $request->link_card_1_title;

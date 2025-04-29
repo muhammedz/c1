@@ -21,11 +21,13 @@
 
                     <!-- Header Image (Uygulama Adı ve Alt Başlığı yerine) -->
                     @if($mobileAppSettings->app_header_image)
-                        <div class="w-32 h-32 flex items-center justify-center overflow-hidden">
+                        <div class="flex items-center justify-center overflow-hidden">
                             @if(strpos($mobileAppSettings->app_header_image, '/uploads/') !== false)
-                                <img src="{{ $mobileAppSettings->app_header_image }}" alt="{{ $mobileAppSettings->app_name ?? 'Uygulama' }} Görsel" class="w-full h-full object-cover">
+                                <img src="{{ $mobileAppSettings->app_header_image }}" alt="{{ $mobileAppSettings->app_name ?? 'Uygulama' }} Görsel" 
+                                    style="width: {{ $mobileAppSettings->app_header_image_width ?? 320 }}px; height: {{ $mobileAppSettings->app_header_image_height ?? 200 }}px; object-fit: cover;">
                             @else
-                                <img src="{{ asset('storage/' . $mobileAppSettings->app_header_image) }}" alt="{{ $mobileAppSettings->app_name ?? 'Uygulama' }} Görsel" class="w-full h-full object-cover">
+                                <img src="{{ asset('storage/' . $mobileAppSettings->app_header_image) }}" alt="{{ $mobileAppSettings->app_name ?? 'Uygulama' }} Görsel" 
+                                    style="width: {{ $mobileAppSettings->app_header_image_width ?? 320 }}px; height: {{ $mobileAppSettings->app_header_image_height ?? 200 }}px; object-fit: cover;">
                             @endif
                         </div>
                     @else
