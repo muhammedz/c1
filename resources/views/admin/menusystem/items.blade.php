@@ -843,8 +843,11 @@
                     cancelButtonText: 'İptal'
                 }).then((result) => {
                     if (result.isConfirmed) {
+                        // Debug için URL konsola yazdırma
+                        console.log('Silme URL:', '/admin/menusystem/items/' + itemId);
+                        
                         $.ajax({
-                            url: '{{ route("admin.menusystem.items.destroy", ":id") }}'.replace(':id', itemId),
+                            url: '/admin/menusystem/items/' + itemId,
                             method: 'DELETE',
                             data: {
                                 _token: '{{ csrf_token() }}'
@@ -860,8 +863,9 @@
                                     toastr.error('Menü öğesi silinirken hata oluştu');
                                 }
                             },
-                            error: function() {
-                                toastr.error('Menü öğesi silinirken hata oluştu');
+                            error: function(xhr) {
+                                console.error('Silme hatası:', xhr.status, xhr.responseText);
+                                toastr.error('Menü öğesi silinirken hata oluştu: ' + xhr.status);
                             }
                         });
                     }

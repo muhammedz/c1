@@ -58,10 +58,31 @@
     z-index: 1000;
     border-radius: 0 0 8px 8px;
     border-top: 3px solid #007b32;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.group {
+    position: relative;
 }
 
 .group:hover .mega-menu {
     display: block;
+    opacity: 1;
+    visibility: visible;
+    transition-delay: 0.1s;
+}
+
+/* Mega menüye giriş yolunu daha tolere edecek alan oluşturma */
+.group::after {
+    content: '';
+    position: absolute;
+    height: 20px;
+    width: 100%;
+    bottom: -10px;
+    left: 0;
+    z-index: 999;
 }
 
 /* Mega Menü İçerik Stili */

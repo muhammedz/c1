@@ -1,5 +1,5 @@
     <!-- #### News Section -->
-    <section id="news-section" class="news-section container max-w-7xl mx-auto px-4 py-6 -mt-18">
+    <section id="news-section" class="news-section container max-w-7xl mx-auto px-4 py-6 mt-5">
         <div class="flex flex-col lg:flex-row gap-6">
             <!-- Ana Haber Slider -->
             <div class="w-full md:w-[55%] ">

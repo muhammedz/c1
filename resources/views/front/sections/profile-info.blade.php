@@ -1,5 +1,5 @@
 <!-- Profil Bilgileri Bölümü -->
-<div id="profile-info-section" class="profile-info-section container max-w-7xl mx-auto px-4 py-6 mt-1">
+<div id="profile-info-section" class="profile-info-section container max-w-7xl mx-auto px-4 py-6 mt-5">
     <div class="flex flex-col md:flex-row gap-8">
         <!-- Profil Kartı -->
         <div class="bg-white rounded-3xl shadow-lg overflow-hidden md:w-1/2">
@@ -157,21 +157,31 @@
                 <div class="flex flex-col md:flex-row h-full">
                     <div class="w-full">
                         <div class="flex h-full">
-                            <div class="w-1/3 bg-white p-3 flex flex-col justify-center items-center" style="padding-top: 80px">
-                                <div class="text-center">
-                                    <h2 class="text-3xl font-bold leading-tight" style="font-family: 'TT Norms Pro', sans-serif;">İletişim</h2>
-                                    <h3 class="text-2xl leading-tight mb-3" style="font-family: 'TT Norms Pro', sans-serif;">Merkezi</h3>
+                            <div class="w-1/3 bg-white p-3 flex flex-col justify-center items-center" style="padding-top: 50px">
+                                <div class="text-center pl-4">
+                                    <div class="flex justify-center items-center whitespace-nowrap">
+                                        <h2 class="text-3xl font-bold" style="font-family: 'TT Norms Pro', sans-serif;">İletişim</h2>
+                                        <h2 class="text-2xl ml-2" style="font-family: 'TT Norms Pro', sans-serif;">Merkezi</h2>
+                                    </div>
                                     
-                                    <div class="flex items-center justify-center mt-3">
-                                        <a href="https://wa.me/905321234567" target="_blank" class="flex items-center">
-                                            <span class="w-8 h-8 bg-[#25D366] rounded-full flex items-center justify-center mr-1">
+                                    <div class="flex flex-col items-center justify-center mt-5 gap-2">
+                                        <a href="tel:4440601" class="flex items-center">
+                                            <span class="w-8 h-8 bg-[#0066cc] rounded-full flex items-center justify-center mr-2">
+                                                <i class="fas fa-phone-alt text-white text-sm"></i>
+                                            </span>
+                                            <span class="text-lg font-bold">444 06 01</span>
+                                        </a>
+                                        
+                                        <a href="https://wa.me/905051671967" target="_blank" class="flex items-center">
+                                            <span class="w-8 h-8 bg-[#25D366] rounded-full flex items-center justify-center mr-2">
                                                 <i class="fab fa-whatsapp text-white text-sm"></i>
                                             </span>
+                                            <span class="text-sm font-medium">0505 167 19 67</span>
                                         </a>
                                     </div>
                                 </div>
                             </div>
-                            <div class="w-2/3 flex items-center" style="margin-bottom: -4px;">
+                            <div class="w-2/3 flex items-end justify-end" style="margin-bottom: -4px; padding-right: 10px;">
                                 @if($profileSettings->filemanagersystem_contact_image)
                                     <img src="{{ asset($profileSettings->filemanagersystem_contact_image) }}" 
                                          alt="{{ $profileSettings->filemanagersystem_contact_image_alt ?? 'İletişim Merkezi' }}" 

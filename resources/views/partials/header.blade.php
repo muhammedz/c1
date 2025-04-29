@@ -290,6 +290,29 @@
             z-index: 60 !important;
         }
         
+        /* Mega Menü için geçiş alanı */
+        .group::before {
+            content: '';
+            display: block;
+            position: absolute;
+            width: 100%;
+            height: 20px;
+            bottom: -20px;
+            left: 0;
+            z-index: 100;
+        }
+        
+        /* Mega Menü için üst köprü alanı */
+        .mega-menu::before {
+            content: '';
+            display: block;
+            position: absolute;
+            width: 100%;
+            height: 20px;
+            top: -20px;
+            left: 0;
+        }
+        
         /* Header yüksekliği */
         .header-section {
             height: 100px !important; /* 96px + 4px (pt-1) */
@@ -327,32 +350,79 @@
 </section>
 
 <script>
-    // Mobile Menu Toggle
-    document.getElementById('mobileMenuButton').addEventListener('click', function() {
-        const mobileMenu = document.getElementById('mobileMenu');
-        mobileMenu.classList.toggle('hidden');
-    });
-    
-    // Menu Item Toggle for dropdowns
     document.addEventListener('DOMContentLoaded', function() {
-        const menuToggles = document.querySelectorAll('.group > a');
-        menuToggles.forEach(function(toggle) {
-            if (toggle.querySelector('.material-icons')) {
-                toggle.addEventListener('click', function(e) {
-                    const dropdown = this.closest('.group').querySelector('.quick-menu-dropdown');
-                    if (dropdown) {
+        // Mega menü davranışını iyileştirme
+        const menuGroups = document.querySelectorAll('.group');
+        let activeMenu = null;
+        let timeoutId = null;
+        
+        menuGroups.forEach(group => {
+            const megaMenu = group.querySelector('.mega-menu');
+            if (!megaMenu) return;
+            
+            // Mouse menü üzerine geldiğinde
+            group.addEventListener('mouseenter', () => {
+                if (timeoutId) {
+                    clearTimeout(timeoutId);
+                    timeoutId = null;
+                }
+                
+                // Aktif menüyü ayarla
+                if (activeMenu && activeMenu !== megaMenu) {
+                    activeMenu.style.display = 'none';
+                    activeMenu.style.opacity = '0';
+                    activeMenu.style.visibility = 'hidden';
+                }
+                
+                megaMenu.style.display = 'block';
+                // Küçük bir gecikme ile görünürlüğü ayarla (CSS transition için)
+                setTimeout(() => {
+                    megaMenu.style.opacity = '1';
+                    megaMenu.style.visibility = 'visible';
+                }, 50);
+                
+                activeMenu = megaMenu;
+            });
+            
+            // Mouse menüden çıktığında
+            group.addEventListener('mouseleave', () => {
+                timeoutId = setTimeout(() => {
+                    if (megaMenu) {
+                        megaMenu.style.opacity = '0';
+                        megaMenu.style.visibility = 'hidden';
+                        // CSS transition tamamlandıktan sonra display'i none yap
+                        setTimeout(() => {
+                            if (megaMenu.style.opacity === '0') {
+                                megaMenu.style.display = 'none';
+                            }
+                        }, 300);
+                    }
+                    activeMenu = null;
+                }, 200); // Çıkış için 200ms gecikme
+            });
+        });
+        
+        // Mobil menü toggle
+        const mobileMenuButton = document.getElementById('mobileMenuButton');
+        const mobileMenu = document.getElementById('mobileMenu');
+        
+        if (mobileMenuButton && mobileMenu) {
+            mobileMenuButton.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+            
+            // Mobil menü dropdown'ları
+            const mobileDropdownButtons = document.querySelectorAll('.quick-menu-dropdown');
+            mobileDropdownButtons.forEach(dropdown => {
+                const parent = dropdown.previousElementSibling;
+                if (parent) {
+                    parent.addEventListener('click', (e) => {
                         e.preventDefault();
                         dropdown.classList.toggle('hidden');
-                    }
-                });
-            }
-        });
-    });
-    
-    // Search Button
-    document.getElementById('searchButton').addEventListener('click', function() {
-        // Arama işlevselliği eklenecek
-        alert('Arama fonksiyonu yapım aşamasında');
+                    });
+                }
+            });
+        }
     });
 </script>
 
