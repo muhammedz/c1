@@ -56,17 +56,20 @@ Route::prefix('haberler')->name('news.')->group(function () {
     Route::get('/{slug}', [App\Http\Controllers\Front\NewsController::class, 'show'])->name('show');
 });
 
+// Başkan Sayfası (Özel rotaları wildcard rotalardan önce tanımlıyoruz)
+Route::get('/baskan', [App\Http\Controllers\FrontController::class, 'baskan'])->name('front.baskan');
+
 // Kurumsal Kadro Frontend Route'ları
 Route::get('/kurumsal-kadro', [App\Http\Controllers\CorporateController::class, 'index'])->name('corporate.index');
 
 // Kurumsal Kadro Kategori ve Üye Rotaları - Daha spesifik rotaları önce tanımla
 Route::get('/{categorySlug}/{memberSlug}', [App\Http\Controllers\CorporateController::class, 'showMember'])
     ->name('corporate.member')
-    ->where('categorySlug', '^(?!admin|login|register|password|kurumsal-kadro|projeler|etkinlikler|hizmetler|sayfalar).*$');
+    ->where('categorySlug', '^(?!admin|login|register|password|kurumsal-kadro|projeler|etkinlikler|hizmetler|sayfalar|baskan).*$');
 
 Route::get('/{categorySlug}', [App\Http\Controllers\CorporateController::class, 'showCategory'])
     ->name('corporate.category')
-    ->where('categorySlug', '^(?!admin|login|register|password|kurumsal-kadro|projeler|etkinlikler|hizmetler|sayfalar).*$');
+    ->where('categorySlug', '^(?!admin|login|register|password|kurumsal-kadro|projeler|etkinlikler|hizmetler|sayfalar|baskan).*$');
 
 // Proje Detay Sayfaları
 Route::get('/projeler', [App\Http\Controllers\FrontController::class, 'projects'])->name('front.projects');

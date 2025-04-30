@@ -232,4 +232,14 @@ class FrontController extends Controller
         
         return $imageUrl;
     }
+
+    /**
+     * Başkan sayfasını gösterir
+     *
+     * @return \Illuminate\View\View
+     */
+    public function baskan()
+    {
+        return view('frontend.corporate.baskan');
+    }
 } 
