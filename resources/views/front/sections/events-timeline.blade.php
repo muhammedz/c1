@@ -12,7 +12,7 @@ function titleCase($string) {
 @if(isset($eventSettings) && $eventSettings->is_active && count($upcomingEvents) > 0)
 <section id="events-alternative-section" class="container max-w-7xl mx-auto px-4 py-12">
     <div class="flex items-center justify-between mb-8">
-        <h2 class="text-2xl font-bold text-gray-800">{{ $eventSettings->section_title ?? 'Etkinlikler' }} <span class="text-[#004d2e]">Alternatif</span></h2>
+        <h2 class="text-2xl font-bold text-gray-800">{{ $eventSettings->section_title ?? 'Etkinlikler' }}</h2>
         <a href="{{ route('events.index') }}" class="text-[#004d2e] font-medium text-sm hover:underline flex items-center gap-1">
             Tümünü Gör
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -106,7 +106,7 @@ function titleCase($string) {
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         @foreach($upcomingEvents->take(4) as $event)
         <div>
-            <a href="{{ route('events.show', $event->slug) }}" class="event-featured-card">
+            <div class="event-featured-card">
                 <!-- Etkinlik Görseli -->
                 <div class="event-featured-image">
                     @if($event->cover_image)
@@ -155,7 +155,7 @@ function titleCase($string) {
                         </div>
                     </div>
                 </div>
-            </a>
+            </div>
         </div>
         @endforeach
     </div>
