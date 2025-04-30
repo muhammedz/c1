@@ -59,7 +59,7 @@
             <div class="hikaye-item flex-shrink-0 text-center" onclick="acLightbox(0)">
                 <div class="w-20 h-20 rounded-full p-1 bg-gradient-to-r from-amber-500 to-green-500 mx-auto cursor-pointer">
                     <div class="w-full h-full rounded-full overflow-hidden border-2 border-white">
-                        <img src="https://cankaya.epoxsoft.net.tr/uploads/images/iyu1AIj1YVxWUezQXpVwYyco4PDjuOkHYVmtkPmH.webp" alt="Projeler" class="w-full h-full object-cover">
+                        <img src="https://cankaya.epoxsoft.net.tr/images/huseyincanguner/huseyincanguner1.jpeg" alt="Projeler" class="w-full h-full object-cover">
                     </div>
                 </div>
                 <p class="text-xs font-medium mt-2 text-gray-700">Projeler</p>
@@ -69,7 +69,7 @@
             <div class="hikaye-item flex-shrink-0 text-center" onclick="acLightbox(1)">
                 <div class="w-20 h-20 rounded-full p-1 bg-gradient-to-r from-purple-500 to-pink-500 mx-auto cursor-pointer">
                     <div class="w-full h-full rounded-full overflow-hidden border-2 border-white">
-                        <img src="https://cankaya.epoxsoft.net.tr/uploads/images/iyu1AIj1YVxWUezQXpVwYyco4PDjuOkHYVmtkPmH.webp" alt="Etkinlikler" class="w-full h-full object-cover">
+                        <img src="https://cankaya.epoxsoft.net.tr/images/huseyincanguner/huseyincanguner2.jpeg" alt="Etkinlikler" class="w-full h-full object-cover">
                     </div>
                 </div>
                 <p class="text-xs font-medium mt-2 text-gray-700">Etkinlikler</p>
@@ -79,7 +79,7 @@
             <div class="hikaye-item flex-shrink-0 text-center" onclick="acLightbox(2)">
                 <div class="w-20 h-20 rounded-full p-1 bg-gradient-to-r from-blue-500 to-cyan-400 mx-auto cursor-pointer">
                     <div class="w-full h-full rounded-full overflow-hidden border-2 border-white">
-                        <img src="https://cankaya.epoxsoft.net.tr/uploads/images/iyu1AIj1YVxWUezQXpVwYyco4PDjuOkHYVmtkPmH.webp" alt="Buluşmalar" class="w-full h-full object-cover">
+                        <img src="https://cankaya.epoxsoft.net.tr/images/huseyincanguner/huseyincanguner3.jpeg" alt="Buluşmalar" class="w-full h-full object-cover">
                     </div>
                 </div>
                 <p class="text-xs font-medium mt-2 text-gray-700">Buluşmalar</p>
@@ -89,7 +89,7 @@
             <div class="hikaye-item flex-shrink-0 text-center" onclick="acLightbox(3)">
                 <div class="w-20 h-20 rounded-full p-1 bg-gradient-to-r from-green-500 to-emerald-400 mx-auto cursor-pointer">
                     <div class="w-full h-full rounded-full overflow-hidden border-2 border-white">
-                        <img src="https://cankaya.epoxsoft.net.tr/uploads/images/iyu1AIj1YVxWUezQXpVwYyco4PDjuOkHYVmtkPmH.webp" alt="Kent Tarımı" class="w-full h-full object-cover">
+                        <img src="https://cankaya.epoxsoft.net.tr/images/huseyincanguner/huseyincanguner4.jpeg" alt="Kent Tarımı" class="w-full h-full object-cover">
                     </div>
                 </div>
                 <p class="text-xs font-medium mt-2 text-gray-700">Kent Tarımı</p>
@@ -99,7 +99,7 @@
             <div class="hikaye-item flex-shrink-0 text-center" onclick="acLightbox(4)">
                 <div class="w-20 h-20 rounded-full p-1 bg-gradient-to-r from-red-500 to-orange-400 mx-auto cursor-pointer">
                     <div class="w-full h-full rounded-full overflow-hidden border-2 border-white">
-                        <img src="https://cankaya.epoxsoft.net.tr/uploads/images/iyu1AIj1YVxWUezQXpVwYyco4PDjuOkHYVmtkPmH.webp" alt="Eğitim" class="w-full h-full object-cover">
+                        <img src="https://cankaya.epoxsoft.net.tr/images/huseyincanguner/huseyincanguner5.jpeg" alt="Eğitim" class="w-full h-full object-cover">
                     </div>
                 </div>
                 <p class="text-xs font-medium mt-2 text-gray-700">Eğitim</p>
@@ -109,7 +109,7 @@
             <div class="hikaye-item flex-shrink-0 text-center" onclick="acLightbox(5)">
                 <div class="w-20 h-20 rounded-full p-1 bg-gradient-to-r from-indigo-500 to-purple-500 mx-auto cursor-pointer">
                     <div class="w-full h-full rounded-full overflow-hidden border-2 border-white">
-                        <img src="https://cankaya.epoxsoft.net.tr/uploads/images/iyu1AIj1YVxWUezQXpVwYyco4PDjuOkHYVmtkPmH.webp" alt="Spor" class="w-full h-full object-cover">
+                        <img src="https://cankaya.epoxsoft.net.tr/images/huseyincanguner/huseyincanguner6.jpeg" alt="Spor" class="w-full h-full object-cover">
                     </div>
                 </div>
                 <p class="text-xs font-medium mt-2 text-gray-700">Spor</p>
@@ -119,7 +119,7 @@
             <div class="hikaye-item flex-shrink-0 text-center" onclick="acLightbox(6)">
                 <div class="w-20 h-20 rounded-full p-1 bg-gradient-to-r from-pink-500 to-rose-500 mx-auto cursor-pointer">
                     <div class="w-full h-full rounded-full overflow-hidden border-2 border-white">
-                        <img src="https://cankaya.epoxsoft.net.tr/uploads/images/iyu1AIj1YVxWUezQXpVwYyco4PDjuOkHYVmtkPmH.webp" alt="Kültür" class="w-full h-full object-cover">
+                        <img src="https://cankaya.epoxsoft.net.tr/images/huseyincanguner/huseyincanguner7.jpeg" alt="Kültür" class="w-full h-full object-cover">
                     </div>
                 </div>
                 <p class="text-xs font-medium mt-2 text-gray-700">Kültür Sanat</p>
@@ -129,7 +129,7 @@
             <div class="hikaye-item flex-shrink-0 text-center" onclick="acLightbox(7)">
                 <div class="w-20 h-20 rounded-full p-1 bg-gradient-to-r from-blue-600 to-blue-400 mx-auto cursor-pointer">
                     <div class="w-full h-full rounded-full overflow-hidden border-2 border-white">
-                        <img src="https://cankaya.epoxsoft.net.tr/uploads/images/iyu1AIj1YVxWUezQXpVwYyco4PDjuOkHYVmtkPmH.webp" alt="Dijital" class="w-full h-full object-cover">
+                        <img src="https://cankaya.epoxsoft.net.tr/images/huseyincanguner/huseyincanguner8.jpeg" alt="Dijital" class="w-full h-full object-cover">
                     </div>
                 </div>
                 <p class="text-xs font-medium mt-2 text-gray-700">Dijital</p>
@@ -139,7 +139,7 @@
             <div class="hikaye-item flex-shrink-0 text-center" onclick="acLightbox(8)">
                 <div class="w-20 h-20 rounded-full p-1 bg-gradient-to-r from-amber-600 to-amber-400 mx-auto cursor-pointer">
                     <div class="w-full h-full rounded-full overflow-hidden border-2 border-white">
-                        <img src="https://cankaya.epoxsoft.net.tr/uploads/images/iyu1AIj1YVxWUezQXpVwYyco4PDjuOkHYVmtkPmH.webp" alt="Ulaşım" class="w-full h-full object-cover">
+                        <img src="https://cankaya.epoxsoft.net.tr/images/huseyincanguner/huseyincanguner9.jpeg" alt="Ulaşım" class="w-full h-full object-cover">
                     </div>
                 </div>
                 <p class="text-xs font-medium mt-2 text-gray-700">Ulaşım</p>
@@ -149,7 +149,7 @@
             <div class="hikaye-item flex-shrink-0 text-center" onclick="acLightbox(9)">
                 <div class="w-20 h-20 rounded-full p-1 bg-gradient-to-r from-teal-500 to-teal-300 mx-auto cursor-pointer">
                     <div class="w-full h-full rounded-full overflow-hidden border-2 border-white">
-                        <img src="https://cankaya.epoxsoft.net.tr/uploads/images/iyu1AIj1YVxWUezQXpVwYyco4PDjuOkHYVmtkPmH.webp" alt="Çevre" class="w-full h-full object-cover">
+                        <img src="https://cankaya.epoxsoft.net.tr/images/huseyincanguner/huseyincanguner10.jpeg" alt="Çevre" class="w-full h-full object-cover">
                     </div>
                 </div>
                 <p class="text-xs font-medium mt-2 text-gray-700">Çevre</p>
@@ -342,7 +342,7 @@
                 </div>
                 
                 <div class="flex items-center mt-6 ml-6">
-                    <img src="https://via.placeholder.com/100" alt="Av. Hüseyin Can Güner" class="w-12 h-12 rounded-full mr-4 border-2 border-[#00352b]">
+                    <img src="https://cankaya.epoxsoft.net.tr/images/huseyincanguner/huseyincanguner6.jpeg" alt="Av. Hüseyin Can Güner" class="w-12 h-12 rounded-full mr-4 border-2 border-[#00352b]">
                     <div>
                         <p class="font-bold text-gray-900">Av. Hüseyin Can Güner</p>
                         <p class="text-gray-600 text-sm">Çankaya Belediye Başkanı</p>
@@ -403,7 +403,7 @@
                 <!-- Haber Kartı 1 -->
                 <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
                     <div class="aspect-video overflow-hidden">
-                        <img src="https://cankaya.epoxsoft.net.tr/uploads/images/iyu1AIj1YVxWUezQXpVwYyco4PDjuOkHYVmtkPmH.webp" alt="Başkan Mahalle Ziyaretinde" class="w-full h-full object-cover transition-transform duration-500 hover:scale-105">
+                        <img src="https://cankaya.epoxsoft.net.tr/images/huseyincanguner/huseyincanguner1.jpeg" alt="Başkan Mahalle Ziyaretinde" class="w-full h-full object-cover transition-transform duration-500 hover:scale-105">
                     </div>
                     <div class="p-5">
                         <span class="inline-block px-3 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-full mb-3">Ziyaret</span>
@@ -425,7 +425,7 @@
                 <!-- Haber Kartı 2 -->
                 <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
                     <div class="aspect-video overflow-hidden">
-                        <img src="https://cankaya.epoxsoft.net.tr/uploads/images/iyu1AIj1YVxWUezQXpVwYyco4PDjuOkHYVmtkPmH.webp" alt="Başkan Toplantıda" class="w-full h-full object-cover transition-transform duration-500 hover:scale-105">
+                        <img src="https://cankaya.epoxsoft.net.tr/images/huseyincanguner/huseyincanguner2.jpeg" alt="Başkan Toplantıda" class="w-full h-full object-cover transition-transform duration-500 hover:scale-105">
                     </div>
                     <div class="p-5">
                         <span class="inline-block px-3 py-1 bg-purple-100 text-purple-800 text-xs font-medium rounded-full mb-3">Toplantı</span>
@@ -447,7 +447,7 @@
                 <!-- Haber Kartı 3 -->
                 <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
                     <div class="aspect-video overflow-hidden">
-                        <img src="https://cankaya.epoxsoft.net.tr/uploads/images/iyu1AIj1YVxWUezQXpVwYyco4PDjuOkHYVmtkPmH.webp" alt="Başkan Projede" class="w-full h-full object-cover transition-transform duration-500 hover:scale-105">
+                        <img src="https://cankaya.epoxsoft.net.tr/images/huseyincanguner/huseyincanguner3.jpeg" alt="Başkan Projede" class="w-full h-full object-cover transition-transform duration-500 hover:scale-105">
                     </div>
                     <div class="p-5">
                         <span class="inline-block px-3 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full mb-3">Proje</span>
@@ -469,7 +469,7 @@
                 <!-- Haber Kartı 4 -->
                 <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
                     <div class="aspect-video overflow-hidden">
-                        <img src="https://cankaya.epoxsoft.net.tr/uploads/images/iyu1AIj1YVxWUezQXpVwYyco4PDjuOkHYVmtkPmH.webp" alt="Başkan Konuşma Yaparken" class="w-full h-full object-cover transition-transform duration-500 hover:scale-105">
+                        <img src="https://cankaya.epoxsoft.net.tr/images/huseyincanguner/huseyincanguner4.jpeg" alt="Başkan Konuşma Yaparken" class="w-full h-full object-cover transition-transform duration-500 hover:scale-105">
                     </div>
                     <div class="p-5">
                         <span class="inline-block px-3 py-1 bg-amber-100 text-amber-800 text-xs font-medium rounded-full mb-3">Etkinlik</span>
@@ -503,7 +503,7 @@
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <!-- Fotoğraf 1 -->
                 <div class="relative overflow-hidden rounded-lg group h-48 md:h-64">
-                    <img src="https://cankaya.epoxsoft.net.tr/uploads/images/iyu1AIj1YVxWUezQXpVwYyco4PDjuOkHYVmtkPmH.webp" alt="Galeri Fotoğrafı 1" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                    <img src="https://cankaya.epoxsoft.net.tr/images/huseyincanguner/huseyincanguner5.jpeg" alt="Galeri Fotoğrafı 1" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
                     <div class="absolute inset-0 bg-black opacity-0 group-hover:opacity-50 transition-opacity"></div>
                     <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                         <span class="material-icons text-white text-3xl">zoom_in</span>
@@ -512,7 +512,7 @@
                 
                 <!-- Fotoğraf 2 -->
                 <div class="relative overflow-hidden rounded-lg group h-48 md:h-64">
-                    <img src="https://cankaya.epoxsoft.net.tr/uploads/images/iyu1AIj1YVxWUezQXpVwYyco4PDjuOkHYVmtkPmH.webp" alt="Galeri Fotoğrafı 2" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                    <img src="https://cankaya.epoxsoft.net.tr/images/huseyincanguner/huseyincanguner6.jpeg" alt="Galeri Fotoğrafı 2" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
                     <div class="absolute inset-0 bg-black opacity-0 group-hover:opacity-50 transition-opacity"></div>
                     <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                         <span class="material-icons text-white text-3xl">zoom_in</span>
@@ -521,7 +521,7 @@
                 
                 <!-- Fotoğraf 3 -->
                 <div class="relative overflow-hidden rounded-lg group h-48 md:h-64">
-                    <img src="https://cankaya.epoxsoft.net.tr/uploads/images/iyu1AIj1YVxWUezQXpVwYyco4PDjuOkHYVmtkPmH.webp" alt="Galeri Fotoğrafı 3" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                    <img src="https://cankaya.epoxsoft.net.tr/images/huseyincanguner/huseyincanguner7.jpeg" alt="Galeri Fotoğrafı 3" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
                     <div class="absolute inset-0 bg-black opacity-0 group-hover:opacity-50 transition-opacity"></div>
                     <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                         <span class="material-icons text-white text-3xl">zoom_in</span>
@@ -530,7 +530,7 @@
                 
                 <!-- Fotoğraf 4 -->
                 <div class="relative overflow-hidden rounded-lg group h-48 md:h-64">
-                    <img src="https://cankaya.epoxsoft.net.tr/uploads/images/iyu1AIj1YVxWUezQXpVwYyco4PDjuOkHYVmtkPmH.webp" alt="Galeri Fotoğrafı 4" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                    <img src="https://cankaya.epoxsoft.net.tr/images/huseyincanguner/huseyincanguner8.jpeg" alt="Galeri Fotoğrafı 4" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
                     <div class="absolute inset-0 bg-black opacity-0 group-hover:opacity-50 transition-opacity"></div>
                     <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                         <span class="material-icons text-white text-3xl">zoom_in</span>
@@ -548,52 +548,52 @@
         {
             baslik: "Belediye Projeleri",
             metin: "Başkan Güner, sürdürülebilir belediyecilik anlayışıyla yeni projeleri hayata geçiriyor.",
-            resim: "https://cankaya.epoxsoft.net.tr/uploads/images/iyu1AIj1YVxWUezQXpVwYyco4PDjuOkHYVmtkPmH.webp"
+            resim: "https://cankaya.epoxsoft.net.tr/images/huseyincanguner/huseyincanguner1.jpeg"
         },
         {
             baslik: "Etkinlikler",
             metin: "Çankaya'da kültürel ve sanatsal etkinliklerle dolu bir yaz sezonu başlıyor.",
-            resim: "https://cankaya.epoxsoft.net.tr/uploads/images/iyu1AIj1YVxWUezQXpVwYyco4PDjuOkHYVmtkPmH.webp"
+            resim: "https://cankaya.epoxsoft.net.tr/images/huseyincanguner/huseyincanguner2.jpeg"
         },
         {
             baslik: "Mahalle Buluşmaları",
             metin: "Başkan Güner, mahalle sakinleriyle bir araya geliyor, sorunları yerinde tespit ediyor.",
-            resim: "https://cankaya.epoxsoft.net.tr/uploads/images/iyu1AIj1YVxWUezQXpVwYyco4PDjuOkHYVmtkPmH.webp"
+            resim: "https://cankaya.epoxsoft.net.tr/images/huseyincanguner/huseyincanguner3.jpeg"
         },
         {
             baslik: "Kent Tarımı",
             metin: "Çankaya'da kent tarımı projeleriyle organik tarım yaygınlaşıyor, yerel üretim destekleniyor.",
-            resim: "https://cankaya.epoxsoft.net.tr/uploads/images/iyu1AIj1YVxWUezQXpVwYyco4PDjuOkHYVmtkPmH.webp"
+            resim: "https://cankaya.epoxsoft.net.tr/images/huseyincanguner/huseyincanguner4.jpeg"
         },
         {
             baslik: "Eğitim Destekleri",
             metin: "Gençlere ve çocuklara yönelik eğitim destekleri artarak devam ediyor.",
-            resim: "https://cankaya.epoxsoft.net.tr/uploads/images/iyu1AIj1YVxWUezQXpVwYyco4PDjuOkHYVmtkPmH.webp"
+            resim: "https://cankaya.epoxsoft.net.tr/images/huseyincanguner/huseyincanguner5.jpeg"
         },
         {
             baslik: "Spor Faaliyetleri",
             metin: "Çankaya'da spor tesisleri ve etkinliklerle her yaştan vatandaşlar spora teşvik ediliyor.",
-            resim: "https://cankaya.epoxsoft.net.tr/uploads/images/iyu1AIj1YVxWUezQXpVwYyco4PDjuOkHYVmtkPmH.webp"
+            resim: "https://cankaya.epoxsoft.net.tr/images/huseyincanguner/huseyincanguner6.jpeg"
         },
         {
             baslik: "Kültür Sanat",
             metin: "Çankaya'da kültür sanat etkinlikleri tüm hızıyla devam ediyor.",
-            resim: "https://cankaya.epoxsoft.net.tr/uploads/images/iyu1AIj1YVxWUezQXpVwYyco4PDjuOkHYVmtkPmH.webp"
+            resim: "https://cankaya.epoxsoft.net.tr/images/huseyincanguner/huseyincanguner7.jpeg"
         },
         {
             baslik: "Dijital Hizmetler",
             metin: "Çankaya Belediyesi dijital dönüşüm ile hizmetlerini daha erişilebilir hale getiriyor.",
-            resim: "https://cankaya.epoxsoft.net.tr/uploads/images/iyu1AIj1YVxWUezQXpVwYyco4PDjuOkHYVmtkPmH.webp"
+            resim: "https://cankaya.epoxsoft.net.tr/images/huseyincanguner/huseyincanguner8.jpeg"
         },
         {
             baslik: "Ulaşım Projeleri",
             metin: "Çankaya'da ulaşım altyapısı yenileniyor, daha sürdürülebilir ulaşım çözümleri sunuluyor.",
-            resim: "https://cankaya.epoxsoft.net.tr/uploads/images/iyu1AIj1YVxWUezQXpVwYyco4PDjuOkHYVmtkPmH.webp"
+            resim: "https://cankaya.epoxsoft.net.tr/images/huseyincanguner/huseyincanguner9.jpeg"
         },
         {
             baslik: "Çevre Dönüşümü",
             metin: "Çevre dostu projelerle Çankaya daha yeşil bir ilçe haline geliyor.",
-            resim: "https://cankaya.epoxsoft.net.tr/uploads/images/iyu1AIj1YVxWUezQXpVwYyco4PDjuOkHYVmtkPmH.webp"
+            resim: "https://cankaya.epoxsoft.net.tr/images/huseyincanguner/huseyincanguner10.jpeg"
         }
     ];
     
