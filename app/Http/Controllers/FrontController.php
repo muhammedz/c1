@@ -240,7 +240,7 @@ class FrontController extends Controller
      */
     public function baskan()
     {
-        return view('front.baskan');
+        return view('frontend.corporate.baskan');
     }
 
     /**
