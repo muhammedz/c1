@@ -240,6 +240,14 @@ class FrontController extends Controller
      */
     public function baskan()
     {
-        return view('frontend.corporate.baskan');
+        return view('front.baskan');
+    }
+
+    /**
+     * İletişim sayfasını gösterir
+     */
+    public function iletisim()
+    {
+        return view('front.iletisim');
     }
 } 

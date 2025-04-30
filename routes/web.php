@@ -49,6 +49,9 @@ use App\Http\Controllers\Auth\UpdatePasswordController;
 
 Route::get('/', [App\Http\Controllers\FrontController::class, 'index'])->name('front.home');
 
+// İletişim Sayfası
+Route::get('/iletisim', [App\Http\Controllers\FrontController::class, 'iletisim'])->name('front.iletisim');
+
 // Ön Yüz Haber Rotaları
 Route::prefix('haberler')->name('news.')->group(function () {
     Route::get('/', [App\Http\Controllers\Front\NewsController::class, 'index'])->name('index');
@@ -375,7 +378,7 @@ Route::prefix('admin/homepage')->name('admin.homepage.')->middleware(['auth'])->
         Route::get('/{category_id}/items/create', [App\Http\Controllers\Admin\HomepageController::class, 'createQuickMenuItem'])->name('items.create');
         Route::post('/{category_id}/items/store', [App\Http\Controllers\Admin\HomepageController::class, 'storeQuickMenuItem'])->name('items.store');
         Route::get('/{category_id}/items/{id}/edit', [App\Http\Controllers\Admin\HomepageController::class, 'editQuickMenuItem'])->name('items.edit');
-        Route::post('/{category_id}/items/{id}/update', [App\Http\Controllers\Admin\HomepageController::class, 'updateQuickMenuItem'])->name('items.update');
+        Route::put('/{category_id}/items/{id}/update', [App\Http\Controllers\Admin\HomepageController::class, 'updateQuickMenuItem'])->name('items.update');
         Route::delete('/{category_id}/items/{id}/delete', [App\Http\Controllers\Admin\HomepageController::class, 'deleteQuickMenuItem'])->name('items.delete');
         Route::post('/{category_id}/items/order', [App\Http\Controllers\Admin\HomepageController::class, 'updateQuickMenuItemOrder'])->name('items.order');
         Route::post('/{category_id}/items/{id}/toggle', [App\Http\Controllers\Admin\HomepageController::class, 'toggleQuickMenuItem'])->name('items.toggle');
