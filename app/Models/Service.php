@@ -68,6 +68,13 @@ class Service extends Model
                    ->withTimestamps();
     }
     
+    // Hedef Kitleler
+    public function hedefKitleler()
+    {
+        return $this->belongsToMany(HedefKitle::class, 'hedef_kitle_service', 'service_id', 'hedef_kitle_id')
+                   ->withTimestamps();
+    }
+    
     // Kapsamlar (Scopes)
     
     // Yayında olan hizmetler

@@ -38,6 +38,8 @@ class UpdateServiceRequest extends FormRequest
             'cta_url' => 'nullable|string|max:255',
             'category_ids' => 'nullable|array',
             'category_ids.*' => 'exists:service_categories,id',
+            'hedef_kitleler' => 'nullable|array',
+            'hedef_kitleler.*' => 'exists:hedef_kitleler,id',
             'tags' => 'nullable|string',
             'status' => 'required|in:draft,published',
             'is_featured' => 'nullable|boolean',

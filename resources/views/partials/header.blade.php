@@ -125,6 +125,28 @@
                             @endif
                         @endforeach
                     @else
+                        <!-- Örnek Sabit Menüler -->
+                        <div class="relative h-full flex items-center">
+                            <a href="/haberler" class="text-[#00352b] h-full px-3 font-semibold hover:text-gray-900 text-md flex items-center">
+                                Haberler
+                            </a>
+                        </div>
+                        <div class="relative h-full flex items-center">
+                            <a href="/sayfalar" class="text-[#00352b] h-full px-3 font-semibold hover:text-gray-900 text-md flex items-center">
+                                Sayfalar
+                            </a>
+                        </div>
+                        <div class="relative h-full flex items-center">
+                            <a href="/hedefkitleler" class="text-[#00352b] h-full px-3 font-semibold hover:text-gray-900 text-md flex items-center">
+                                Hedef Kitleler
+                            </a>
+                        </div>
+                        <div class="relative h-full flex items-center">
+                            <a href="/iletisim" class="text-[#00352b] h-full px-3 font-semibold hover:text-gray-900 text-md flex items-center">
+                                İletişim
+                            </a>
+                        </div>
+                        
                         <!-- Kurumsal Mega Menü -->
                         <div class="group relative h-full flex items-center">
                             <a href="#"

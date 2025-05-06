@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 
 class ServiceController extends Controller
 {
@@ -55,12 +56,18 @@ class ServiceController extends Controller
      */
     public function create()
     {
-        $headlineCount = Service::where('is_headline', true)->count();
-        $maxHeadlinesReached = $headlineCount >= 4;
-        $categories = ServiceCategory::where('is_active', true)->orderBy('name')->get();
+        $categories = ServiceCategory::where('is_active', true)
+            ->orderBy('name')
+            ->get();
+            
         $tags = ServiceTag::orderBy('name')->get();
         
-        return view('admin.services.create', compact('maxHeadlinesReached', 'categories', 'tags'));
+        // Hedef kitleleri ekle
+        $hedefKitleler = \App\Models\HedefKitle::where('is_active', true)
+            ->orderBy('order')
+            ->get();
+            
+        return view('admin.services.create', compact('categories', 'tags', 'hedefKitleler'));
     }
 
     /**
@@ -68,133 +75,48 @@ class ServiceController extends Controller
      */
     public function store(StoreServiceRequest $request)
     {
+        // Gelen verilerin tümünü alıyoruz
+        $data = $request->validated();
+        
+        // Belirli alanlarda düzeltmeler yapıp veri yapısını oluşturuyoruz
+        $serviceData = $this->prepareServiceData($data);
+        
         try {
-            // Boş array değerlerini temizle
-            $features = array_filter($request->input('features', []));
+            DB::beginTransaction();
             
-            $data = $request->validated();
-            
-            // URL'deki yinelenen /storage/ yolunu düzelt
-            if (isset($data['image']) && !empty($data['image'])) {
-                $data['image'] = $this->fixStoragePath($data['image']);
-            } else {
-                // Image yoksa data'dan kaldır
-                unset($data['image']);
-            }
-            
-            // Galeri URL'lerini düzelt
-            if (isset($data['gallery']) && is_array($data['gallery'])) {
-                foreach ($data['gallery'] as $key => $url) {
-                    $data['gallery'][$key] = $this->fixStoragePath($url);
-                }
-            }
-            
-            // Kategoriler ve etiketler ayrı tutulur
-            $categories = $request->input('categories', []);
-            $tags = $request->input('tags', '');
-            
-            // Tarih ayarlamaları
-            if ($request->has('published_at') && !empty($request->published_at)) {
-                $data['published_at'] = Carbon::parse($request->published_at);
-            } else {
-                $data['published_at'] = Carbon::now();
-            }
-            
-            if ($request->has('end_date') && !empty($request->end_date)) {
-                $data['end_date'] = Carbon::parse($request->end_date);
-            }
-            
-            // Eğer slug boş geldiyse title'dan oluştur
-            if (empty($data['slug'])) {
-                $data['slug'] = Str::slug($data['title']);
-            }
-            
-            // Slug zaten kullanılmışsa oluşturulan slug sonuna rastgele sayı ekle
-            $baseSlug = $data['slug'];
-            $counter = 1;
-            
-            while (Service::where('slug', $data['slug'])->exists()) {
-                $data['slug'] = $baseSlug . '-' . $counter;
-                $counter++;
-            }
-            
-            // Özellikler dizisini ekleyelim
-            $data['features'] = $features;
-            
-            // Detay sayfası içeriğini ekle
-            $details = $request->input('details', []);
-            if (!empty($details)) {
-                foreach ($details as $key => $value) {
-                    $data['features'][$key] = $value;
-                }
-            }
-            
-            // Yayınlanma durumu ile ilgili özel ayarlar
-            $data['is_scheduled'] = !empty($request->end_date);
-            
-            // Varsayılan değerleri ata
-            $data['view_count'] = 0;
-            $data['status'] = $data['status'] ?? 'published'; // Varsayılan olarak yayında
-            
-            // Yeni service objesi oluştur
-            $service = Service::create($data);
-            
-            // Dokümanları ekle
-            $documents = $request->input('documents');
-            if (!empty($documents) && is_array($documents)) {
-                // Boş dosya alanlarını temizle
-                $filteredDocuments = [];
-                foreach ($documents as $document) {
-                    if (!empty($document['file']) && !empty($document['name'])) {
-                        // Dosya yolunu düzelt
-                        $document['file'] = $this->fixStoragePath($document['file']);
-                        $filteredDocuments[] = $document;
-                    }
-                }
-                
-                // Dokümanları özellikler içine ekle
-                $features = $service->features;
-                $features['documents'] = $filteredDocuments;
-                $service->update(['features' => $features]);
-            }
+            // Hizmeti oluştur
+            $service = Service::create($serviceData);
             
             // Kategorileri ekle
-            if (!empty($categories)) {
-                $service->categories()->sync($categories);
+            if ($request->has('category_ids')) {
+                $service->categories()->sync($request->category_ids);
             }
             
-            // Etiketleri ekle
-            if (!empty($tags)) {
-                // Eğer tags bir string ise, virgülle ayrılmış etiketleri diziye dönüştür
-                if (is_string($tags)) {
-                    $tags = array_filter(array_map('trim', explode(',', $tags)));
-                }
-                
-                // Önce etiketleri düzgün formatta hazırla
-                $tagIds = [];
-                foreach ($tags as $tag) {
-                    if (!empty($tag)) {
-                        $tagModel = ServiceTag::findOrCreateByName($tag);
-                        $tagIds[] = $tagModel->id;
-                    }
-                }
-                
-                // Etiketleri service ile ilişkilendir
-                if (!empty($tagIds)) {
-                    $service->tags()->sync($tagIds);
-                }
+            // Hizmetin etiketlerini güncelle
+            if ($request->has('tags')) {
+                $this->serviceService->syncServiceTags($service, $request->tags);
             } else {
-                $service->tags()->detach();
+                // Etiket yoksa boş string ile sync işlemi yapılsın
+                $this->serviceService->syncServiceTags($service, '');
             }
             
-            return redirect()->route('admin.services.edit', $service->id)
-                             ->withInput()
-                             ->with('success', 'Hizmet başarıyla oluşturuldu.');
+            // Hedef kitleleri ekle
+            if ($request->has('hedef_kitleler')) {
+                $service->hedefKitleler()->sync($request->hedef_kitleler);
+            }
+            
+            DB::commit();
+            
+            // Başarılı mesajı göster
+            return redirect()->route('admin.services.edit', $service)
+                ->with('success', 'Hizmet başarıyla oluşturuldu.');
         } catch (\Exception $e) {
+            DB::rollBack();
             Log::error('Hizmet oluşturma hatası: ' . $e->getMessage());
+            
             return redirect()->back()
-                             ->withInput()
-                             ->with('error', 'Hizmet oluşturulurken bir hata oluştu: ' . $e->getMessage());
+                ->withInput()
+                ->with('error', 'Hizmet oluşturulurken bir hata oluştu: ' . $e->getMessage());
         }
     }
 
@@ -235,7 +157,12 @@ class ServiceController extends Controller
         $selectedCategories = $service->categories->pluck('id')->toArray();
         $tags = ServiceTag::orderBy('name')->get();
         
-        return view('admin.services.edit', compact('service', 'maxHeadlinesReached', 'categories', 'selectedCategories', 'tags'));
+        // Hedef kitleleri ekle
+        $hedefKitleler = \App\Models\HedefKitle::where('is_active', true)
+            ->orderBy('order')
+            ->get();
+        
+        return view('admin.services.edit', compact('service', 'maxHeadlinesReached', 'categories', 'selectedCategories', 'tags', 'hedefKitleler'));
     }
 
     /**
@@ -243,118 +170,52 @@ class ServiceController extends Controller
      */
     public function update(UpdateServiceRequest $request, Service $service)
     {
+        // Gelen verilerin tümünü alıyoruz
+        $data = $request->validated();
+        
+        // Belirli alanlarda düzeltmeler yapıp veri yapısını oluşturuyoruz
+        $serviceData = $this->prepareServiceData($data, $service);
+        
         try {
-            // Boş array değerlerini temizle
-            $features = array_filter($request->input('features', []));
-            
-            $data = $request->validated();
-            
-            // URL'deki yinelenen /storage/ yolunu düzelt
-            if (isset($data['image']) && !empty($data['image'])) {
-                $data['image'] = $this->fixStoragePath($data['image']);
-            } else {
-                // Image yoksa data'dan kaldır
-                unset($data['image']);
-            }
-            
-            // Galeri URL'lerini düzelt
-            if (isset($data['gallery']) && is_array($data['gallery'])) {
-                foreach ($data['gallery'] as $key => $url) {
-                    $data['gallery'][$key] = $this->fixStoragePath($url);
-                }
-            }
-            
-            // Kategoriler ve etiketler ayrı tutulur
-            $categories = $request->input('categories', []);
-            $tags = $request->input('tags', '');
-            
-            // Tarih ayarlamaları
-            if ($request->has('published_at') && !empty($request->published_at)) {
-                $data['published_at'] = Carbon::parse($request->published_at);
-            }
-            
-            if ($request->has('end_date') && !empty($request->end_date)) {
-                $data['end_date'] = Carbon::parse($request->end_date);
-            } else {
-                $data['end_date'] = null;
-            }
-            
-            // Eğer slug boş geldiyse title'dan oluştur
-            if (empty($data['slug'])) {
-                $data['slug'] = Str::slug($data['title']);
-            }
-            
-            // Özellikler dizisini ekleyelim
-            $data['features'] = $features;
-            
-            // Detay sayfası içeriğini ekle
-            $details = $request->input('details', []);
-            if (!empty($details)) {
-                foreach ($details as $key => $value) {
-                    $data['features'][$key] = $value;
-                }
-            }
-            
-            // Yayınlanma durumu ile ilgili özel ayarlar
-            $data['is_scheduled'] = !empty($request->end_date);
+            DB::beginTransaction();
             
             // Hizmeti güncelle
-            $service->update($data);
-            
-            // Dokümanları güncelle
-            $documents = $request->input('documents');
-            if (!empty($documents) && is_array($documents)) {
-                // Boş dosya alanlarını temizle
-                $filteredDocuments = [];
-                foreach ($documents as $document) {
-                    if (!empty($document['file']) && !empty($document['name'])) {
-                        // Dosya yolunu düzelt
-                        $document['file'] = $this->fixStoragePath($document['file']);
-                        $filteredDocuments[] = $document;
-                    }
-                }
-                
-                // Dokümanları özellikler içine ekle
-                $features = $service->features;
-                $features['documents'] = $filteredDocuments;
-                $service->update(['features' => $features]);
-            }
+            $service->update($serviceData);
             
             // Kategorileri güncelle
-            $service->categories()->sync($categories);
-            
-            // Etiketleri güncelle
-            if (!empty($tags)) {
-                // Eğer tags bir string ise, virgülle ayrılmış etiketleri diziye dönüştür
-                if (is_string($tags)) {
-                    $tags = array_filter(array_map('trim', explode(',', $tags)));
-                }
-                
-                // Önce etiketleri düzgün formatta hazırla
-                $tagIds = [];
-                foreach ($tags as $tag) {
-                    if (!empty($tag)) {
-                        $tagModel = ServiceTag::findOrCreateByName($tag);
-                        $tagIds[] = $tagModel->id;
-                    }
-                }
-                
-                // Etiketleri service ile ilişkilendir
-                if (!empty($tagIds)) {
-                    $service->tags()->sync($tagIds);
-                }
+            if ($request->has('category_ids')) {
+                $service->categories()->sync($request->category_ids);
             } else {
-                $service->tags()->detach();
+                $service->categories()->detach();
             }
             
-            return redirect()->route('admin.services.edit', $service->id)
-                             ->withInput()
-                             ->with('success', 'Hizmet başarıyla güncellendi.');
+            // Hizmetin etiketlerini güncelle
+            if ($request->has('tags')) {
+                $this->serviceService->syncServiceTags($service, $request->tags);
+            } else {
+                // Etiket yoksa boş string ile sync işlemi yapılsın
+                $this->serviceService->syncServiceTags($service, '');
+            }
+            
+            // Hedef kitleleri güncelle
+            if ($request->has('hedef_kitleler')) {
+                $service->hedefKitleler()->sync($request->hedef_kitleler);
+            } else {
+                $service->hedefKitleler()->detach();
+            }
+            
+            DB::commit();
+            
+            // Başarılı mesajı göster
+            return redirect()->route('admin.services.edit', $service)
+                ->with('success', 'Hizmet başarıyla güncellendi.');
         } catch (\Exception $e) {
+            DB::rollBack();
             Log::error('Hizmet güncelleme hatası: ' . $e->getMessage());
+            
             return redirect()->back()
-                             ->withInput()
-                             ->with('error', 'Hizmet güncellenirken bir hata oluştu: ' . $e->getMessage());
+                ->withInput()
+                ->with('error', 'Hizmet güncellenirken bir hata oluştu: ' . $e->getMessage());
         }
     }
 
@@ -601,5 +462,69 @@ class ServiceController extends Controller
         ];
         
         return view('admin.services.debug', compact('serviceRoutes', 'views', 'debugRoutes'));
+    }
+
+    private function prepareServiceData($data, $service = null)
+    {
+        // Boş array değerlerini temizle
+        $features = array_filter($data['features'] ?? []);
+        
+        // URL'deki yinelenen /storage/ yolunu düzelt
+        if (isset($data['image']) && !empty($data['image'])) {
+            $data['image'] = $this->fixStoragePath($data['image']);
+        } else {
+            // Image yoksa data'dan kaldır
+            unset($data['image']);
+        }
+        
+        // Galeri URL'lerini düzelt
+        if (isset($data['gallery']) && is_array($data['gallery'])) {
+            foreach ($data['gallery'] as $key => $url) {
+                $data['gallery'][$key] = $this->fixStoragePath($url);
+            }
+        }
+        
+        // Tarih ayarlamaları
+        if ($data['published_at'] instanceof Carbon) {
+            $data['published_at'] = $data['published_at']->toDateTimeString();
+        }
+        
+        if ($data['end_date'] instanceof Carbon) {
+            $data['end_date'] = $data['end_date']->toDateTimeString();
+        }
+        
+        // Eğer slug boş geldiyse title'dan oluştur
+        if (empty($data['slug'])) {
+            $data['slug'] = Str::slug($data['title']);
+        }
+        
+        // Slug zaten kullanılmışsa oluşturulan slug sonuna rastgele sayı ekle
+        $baseSlug = $data['slug'];
+        $counter = 1;
+        
+        while ($service && $service::where('slug', $data['slug'])->exists()) {
+            $data['slug'] = $baseSlug . '-' . $counter;
+            $counter++;
+        }
+        
+        // Özellikler dizisini ekleyelim
+        $data['features'] = $features;
+        
+        // Detay sayfası içeriğini ekle
+        $details = $data['details'] ?? [];
+        if (!empty($details)) {
+            foreach ($details as $key => $value) {
+                $data['features'][$key] = $value;
+            }
+        }
+        
+        // Yayınlanma durumu ile ilgili özel ayarlar
+        $data['is_scheduled'] = !empty($data['end_date']);
+        
+        // Varsayılan değerleri ata
+        $data['view_count'] = $service ? $service->view_count : 0;
+        $data['status'] = $data['status'] ?? 'published'; // Varsayılan olarak yayında
+        
+        return $data;
     }
 }

@@ -465,22 +465,46 @@
                         <h5 class="mb-0">SEO Ayarları</h5>
                     </div>
                     <div class="card-body">
-                        <div class="mb-4">
+                        <div class="mb-3">
                             <label for="meta_title" class="form-label">Meta Başlık</label>
-                            <input type="text" class="form-control @error('meta_title') is-invalid @enderror" id="meta_title" name="meta_title" value="{{ old('meta_title') }}">
-                            @error('meta_title')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                            <small class="text-muted">Boş bırakılırsa hizmet başlığı kullanılacaktır.</small>
+                            <input type="text" class="form-control" id="meta_title" name="meta_title" value="{{ old('meta_title') }}">
+                            <small class="text-muted">Boş bırakılırsa hizmet başlığı kullanılır. (60-65 karakter ideal)</small>
                         </div>
-                                
-                        <div class="mb-4">
+                        <div class="mb-3">
                             <label for="meta_description" class="form-label">Meta Açıklama</label>
-                            <textarea class="form-control @error('meta_description') is-invalid @enderror" id="meta_description" name="meta_description" rows="3">{{ old('meta_description') }}</textarea>
-                            @error('meta_description')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                            <small class="text-muted">Boş bırakılırsa hizmet özeti kullanılacaktır.</small>
+                            <textarea class="form-control" id="meta_description" name="meta_description" rows="3">{{ old('meta_description') }}</textarea>
+                            <small class="text-muted">Boş bırakılırsa hizmet açıklaması kullanılır. (150-160 karakter ideal)</small>
+                        </div>
+                        <div class="mb-3">
+                            <label for="meta_keywords" class="form-label">Meta Anahtar Kelimeler</label>
+                            <input type="text" class="form-control" id="meta_keywords" name="meta_keywords" value="{{ old('meta_keywords') }}">
+                            <small class="text-muted">Virgülle ayırarak ekleyin. Örn: hizmet, eğitim, danışmanlık (5-7 kelime ideal)</small>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Hedef Kitleler -->
+                <div class="card mb-4">
+                    <div class="card-header d-flex align-items-center">
+                        <i class="fas fa-users me-2 text-primary"></i>
+                        <h5 class="mb-0">Hedef Kitleler</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-muted mb-3">Bu hizmetin hitap ettiği hedef kitleleri seçin:</p>
+                        
+                        <div class="row">
+                            @foreach($hedefKitleler as $hedefKitle)
+                            <div class="col-md-6 mb-2">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="hedef_kitleler[]" 
+                                        id="hedef-kitle-{{ $hedefKitle->id }}" value="{{ $hedefKitle->id }}"
+                                        {{ in_array($hedefKitle->id, old('hedef_kitleler', [])) ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="hedef-kitle-{{ $hedefKitle->id }}">
+                                        {{ $hedefKitle->name }}
+                                    </label>
+                                </div>
+                            </div>
+                            @endforeach
                         </div>
                     </div>
                 </div>

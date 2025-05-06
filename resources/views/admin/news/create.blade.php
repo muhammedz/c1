@@ -946,6 +946,32 @@
                     </div>
                 </div>
                 
+                <!-- Hedef Kitleler -->
+                <div class="card mb-4">
+                    <div class="card-header d-flex align-items-center">
+                        <i class="fas fa-users me-2 text-primary"></i>
+                        <h5 class="mb-0">Hedef Kitleler</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-muted mb-3">Bu haberin hitap ettiği hedef kitleleri seçin:</p>
+                        
+                        <div class="row">
+                            @foreach($hedefKitleler as $hedefKitle)
+                            <div class="col-md-6 mb-2">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="hedef_kitleler[]" 
+                                        id="hedef-kitle-{{ $hedefKitle->id }}" value="{{ $hedefKitle->id }}"
+                                        {{ in_array($hedefKitle->id, old('hedef_kitleler', [])) ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="hedef-kitle-{{ $hedefKitle->id }}">
+                                        {{ $hedefKitle->name }}
+                                    </label>
+                                </div>
+                            </div>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+                
                 <!-- Kaydet -->
                 <div class="card">
                     <div class="card-body">

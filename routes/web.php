@@ -19,6 +19,7 @@ use App\Http\Controllers\Admin\PageSettingController;
 use App\Http\Controllers\Admin\AnnouncementController;
 use App\Http\Controllers\Admin\TestController;
 use App\Http\Controllers\Admin\TestDepartmentController;
+use App\Http\Controllers\Admin\HedefKitleController;
 use App\Http\Controllers\AnnouncementFrontController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\FrontController;
@@ -62,17 +63,23 @@ Route::prefix('haberler')->name('news.')->group(function () {
 // Başkan Sayfası (Özel rotaları wildcard rotalardan önce tanımlıyoruz)
 Route::get('/baskan', [App\Http\Controllers\FrontController::class, 'baskan'])->name('front.baskan');
 
+// Ön Yüz Hedef Kitle Rotaları
+Route::prefix('hedef-kitleler')->name('hedefkitleler.')->group(function () {
+    Route::get('/', [App\Http\Controllers\Front\HedefKitleController::class, 'index'])->name('index');
+    Route::get('/{slug}', [App\Http\Controllers\Front\HedefKitleController::class, 'show'])->name('show');
+});
+
 // Kurumsal Kadro Frontend Route'ları
 Route::get('/kurumsal-kadro', [App\Http\Controllers\CorporateController::class, 'index'])->name('corporate.index');
 
 // Kurumsal Kadro Kategori ve Üye Rotaları - Daha spesifik rotaları önce tanımla
 Route::get('/{categorySlug}/{memberSlug}', [App\Http\Controllers\CorporateController::class, 'showMember'])
     ->name('corporate.member')
-    ->where('categorySlug', '^(?!admin|login|register|password|kurumsal-kadro|projeler|etkinlikler|hizmetler|sayfalar|baskan).*$');
+    ->where('categorySlug', '^(?!admin|login|register|password|kurumsal-kadro|projeler|etkinlikler|hizmetler|sayfalar|baskan|hedefkitleler).*$');
 
 Route::get('/{categorySlug}', [App\Http\Controllers\CorporateController::class, 'showCategory'])
     ->name('corporate.category')
-    ->where('categorySlug', '^(?!admin|login|register|password|kurumsal-kadro|projeler|etkinlikler|hizmetler|sayfalar|baskan).*$');
+    ->where('categorySlug', '^(?!admin|login|register|password|kurumsal-kadro|projeler|etkinlikler|hizmetler|sayfalar|baskan|hedefkitleler).*$');
 
 // Proje Detay Sayfaları
 Route::get('/projeler', [App\Http\Controllers\FrontController::class, 'projects'])->name('front.projects');
@@ -126,6 +133,11 @@ Route::middleware(['auth', 'role:admin'])->name('admin.')->prefix('admin')->grou
     Route::resource('news-tags', NewsTagController::class)->names('news-tags');
     Route::get('/news-tags/cleanup', [NewsTagController::class, 'cleanup'])->name('news-tags.cleanup');
     Route::get('/news-tags/search', [NewsTagController::class, 'search'])->name('news-tags.search');
+    
+    // Hedef Kitle Yönetimi
+    Route::resource('hedef-kitleler', HedefKitleController::class)->parameters(['hedef-kitleler' => 'hedefKitle'])->names('hedef-kitleler');
+    Route::post('/hedef-kitleler/update-order', [HedefKitleController::class, 'updateOrder'])->name('hedef-kitleler.update-order');
+    Route::get('/hedef-kitleler/{hedefKitle}/get-news', [HedefKitleController::class, 'getNews'])->name('hedef-kitleler.get-news');
     
     // Kullanıcı Yönetimi
     Route::resource('users', UserController::class);

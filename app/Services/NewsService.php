@@ -147,6 +147,14 @@ class NewsService
                 'all_data' => $data
             ]);
             
+            // Veritabanında olmayan alanları çıkar
+            if (isset($data['filemanagersystem_image_alt'])) {
+                unset($data['filemanagersystem_image_alt']);
+            }
+            if (isset($data['filemanagersystem_image_title'])) {
+                unset($data['filemanagersystem_image_title']);
+            }
+            
             // Yayın tarihi
             if (isset($data['published_at']) && $data['published_at']) {
                 $data['is_scheduled'] = strtotime($data['published_at']) > time();
@@ -229,6 +237,8 @@ class NewsService
                 $errorDetail = 'Veritabanı işlemi sırasında genel bir hata oluştu. Lütfen form verilerini kontrol edin.';
             } elseif (strpos($e->getMessage(), 'Call to a member function') !== false) {
                 $errorDetail = 'Uygulama hatası: Geçersiz nesne referansı. Lütfen daha sonra tekrar deneyin.';
+            } elseif (strpos($e->getMessage(), 'SQLSTATE[42S22]') !== false && strpos($e->getMessage(), 'Column not found') !== false) {
+                $errorDetail = 'Veritabanı şeması güncel değil. Yöneticiye başvurun.';
             }
             
             Log::error('Kullanıcıya gösterilen hata: ' . $errorDetail);

@@ -595,6 +595,13 @@ return [
                 ],
             ],
         ],
+        // Hedef Kitleler Modülü
+        [
+            'text'    => 'Hedef Kitleler',
+            'icon'    => 'fas fa-bullseye',
+            'url'     => 'admin/hedef-kitleler',
+            'active'  => ['admin/hedef-kitleler', 'admin/hedef-kitleler/*'],
+        ],
     ],
 
     /*

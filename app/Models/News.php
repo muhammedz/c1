@@ -71,6 +71,13 @@ class News extends Model
                    ->withTimestamps();
     }
     
+    // Hedef Kitleler
+    public function hedefKitleler()
+    {
+        return $this->belongsToMany(HedefKitle::class, 'hedef_kitle_news', 'news_id', 'hedef_kitle_id')
+                   ->withTimestamps();
+    }
+    
     // Kapsamlar (Scopes)
     
     // Yayında olan haberler

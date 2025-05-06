@@ -7,10 +7,13 @@ use App\Http\Requests\Admin\StoreNewsRequest;
 use App\Http\Requests\Admin\UpdateNewsRequest;
 use App\Models\News;
 use App\Models\NewsCategory;
+use App\Models\HedefKitle;
+use App\Models\NewsTag;
 use App\Services\NewsService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 
 class NewsController extends Controller
 {
@@ -58,11 +61,16 @@ class NewsController extends Controller
      */
     public function create()
     {
-        $headlineCount = News::where('is_headline', true)->count();
-        $maxHeadlinesReached = $headlineCount >= 4;
-        $newsCategories = NewsCategory::where('is_active', true)->orderBy('name')->get();
+        // Manşet haberi limiti kontrolü
+        $maxHeadlinesReached = News::where('is_headline', true)->count() >= 4;
         
-        return view('admin.news.create', compact('maxHeadlinesReached', 'newsCategories'));
+        // Kategorileri al
+        $newsCategories = NewsCategory::orderBy('name')->get();
+        
+        // Hedef kitleleri al
+        $hedefKitleler = HedefKitle::where('is_active', true)->orderBy('name')->get();
+        
+        return view('admin.news.create', compact('maxHeadlinesReached', 'newsCategories', 'hedefKitleler'));
     }
 
     /**
@@ -72,6 +80,28 @@ class NewsController extends Controller
     {
         try {
             $news = $this->newsService->createNews($request->validated());
+            
+            // Validasyon başarılı, haber oluşturuluyor
+            DB::beginTransaction();
+
+            // Haber etiketlerini ekle
+            if ($request->has('tags') && !empty($request->tags)) {
+                $tagNames = explode(',', $request->tags);
+                foreach ($tagNames as $tagName) {
+                    $tagName = trim($tagName);
+                    if (!empty($tagName)) {
+                        $tag = NewsTag::firstOrCreate(['name' => $tagName, 'slug' => Str::slug($tagName)]);
+                        $news->tags()->attach($tag->id);
+                    }
+                }
+            }
+            
+            // Hedef kitleleri ekle
+            if ($request->has('hedef_kitleler')) {
+                $news->hedefKitleler()->sync($request->hedef_kitleler);
+            }
+
+            DB::commit();
             
             return redirect()->route('admin.news.index')->with('success', 'Haber başarıyla oluşturuldu.');
         } catch (\Exception $e) {
@@ -133,20 +163,53 @@ class NewsController extends Controller
         $newsCategories = NewsCategory::where('is_active', true)->orderBy('name')->get();
         $selectedCategories = $news->categories->pluck('id')->toArray();
         $tags = $news->tags->pluck('name')->implode(',');
+        $hedefKitleler = HedefKitle::orderBy('name')->get();
         
-        return view('admin.news.edit', compact('news', 'maxHeadlinesReached', 'newsCategories', 'selectedCategories', 'tags'));
+        return view('admin.news.edit', compact('news', 'maxHeadlinesReached', 'newsCategories', 'selectedCategories', 'tags', 'hedefKitleler'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateNewsRequest $request, $id)
+    public function update(Request $request, News $news)
     {
         try {
-            $result = $this->newsService->updateNews($request->validated(), $id);
+            // Validasyon başarılı, haber güncelleniyor
+            DB::beginTransaction();
             
+            // NewsService üzerinden haberi güncelle
+            $result = $this->newsService->updateNews($request->all(), $news->id);
+
+            // Haber etiketlerini güncelle
+            if ($request->has('tags')) {
+                $news->tags()->sync([]);
+                if (!empty($request->tags)) {
+                    $tagNames = explode(',', $request->tags);
+                    foreach ($tagNames as $tagName) {
+                        $tagName = trim($tagName);
+                        if (!empty($tagName)) {
+                            $tag = NewsTag::firstOrCreate(['name' => $tagName, 'slug' => Str::slug($tagName)]);
+                            $news->tags()->attach($tag->id);
+                        }
+                    }
+                }
+            }
+            
+            // Hedef kitleleri güncelle
+            if ($request->has('hedef_kitleler')) {
+                $news->hedefKitleler()->sync($request->hedef_kitleler);
+            } else {
+                $news->hedefKitleler()->sync([]);
+            }
+
+            DB::commit();
+            
+            // Başarılı ise anasayfaya yönlendir
             return redirect()->route('admin.news.index')->with('success', 'Haber başarıyla güncellendi.');
+            
         } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Haber güncelleme hatası: ' . $e->getMessage());
             return redirect()->back()
                 ->withInput()
                 ->with('error', $e->getMessage());

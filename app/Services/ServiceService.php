@@ -276,10 +276,32 @@ class ServiceService
     public function toggleStatus(Service $service)
     {
         try {
-            $service->status = $service->status == 'published' ? 'draft' : 'published';
+            $service->status = $service->status === 'published' ? 'draft' : 'published';
             return $service->save();
         } catch (\Exception $e) {
             Log::error('Yayın durumu değiştirme hatası: ' . $e->getMessage());
+            return false;
+        }
+    }
+    
+    /**
+     * Etiketleri senkronize et
+     * 
+     * @param Service $service
+     * @param string|null $tags
+     * @return bool
+     */
+    public function syncServiceTags(Service $service, ?string $tags = '')
+    {
+        try {
+            if ($tags === null) {
+                $tags = '';
+            }
+            
+            $this->serviceRepository->syncTags($service, $tags);
+            return true;
+        } catch (\Exception $e) {
+            Log::error('Etiket senkronizasyon hatası: ' . $e->getMessage());
             return false;
         }
     }
