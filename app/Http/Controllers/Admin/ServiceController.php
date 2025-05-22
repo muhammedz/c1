@@ -56,6 +56,8 @@ class ServiceController extends Controller
      */
     public function create()
     {
+        $maxHeadlinesReached = Service::where('is_headline', true)->count() >= 4;
+        
         $categories = ServiceCategory::where('is_active', true)
             ->orderBy('name')
             ->get();
@@ -67,7 +69,7 @@ class ServiceController extends Controller
             ->orderBy('order')
             ->get();
             
-        return view('admin.services.create', compact('categories', 'tags', 'hedefKitleler'));
+        return view('admin.services.create', compact('categories', 'tags', 'hedefKitleler', 'maxHeadlinesReached'));
     }
 
     /**
