@@ -5,22 +5,13 @@
         <nav class="container max-w-7xl h-full mx-auto px-4">
             <div class="flex items-center justify-between h-24">
                 <!-- Logo Alanı -->
-                <div class="flex items-center text-[#00352b] space-x-10">
+                <div class="flex items-center text-[#00352b] space-x-10 md:space-x-10 space-x-2">
                     <div class="text-xl font-bold">
                         <a href="/">
-                            <img src="{{ asset('images/logo-cankaya.png') }}" alt="Çankaya Belediyesi Logo" class="h-16">
+                            <img src="{{ asset('images/logo-cankaya.png') }}" alt="Çankaya Belediyesi Logo" class="h-16 md:h-16 h-12">
                         </a>
                     </div>
-                    <div class="text-xl font-bold relative h-full flex items-end pb-1">
-                        <img src="{{ asset('images/simge.png') }}" alt="Atatürk" class="h-24">
-                    </div>
                 </div>
-
-                <!-- Mobil Menü Butonu -->
-                <button class="md:hidden text-gray-600 hover:text-gray-900 focus:outline-none"
-                    id="mobileMenuButton">
-                    <span class="material-icons">menu</span>
-                </button>
 
                 <!-- Desktop Menü -->
                 <div class="hidden md:flex items-center h-full space-x-1">
@@ -192,14 +183,27 @@
                     @endif
                 </div>
                 
-                <!-- Arama İkonu ve Slogan -->
-                <div class="flex items-center space-x-4">
-                    <button id="searchButton"   
-                        class="w-10 h-10 bg-gray-50 rounded-lg flex items-center justify-center hover:text-white hover:bg-[#00352b] transition-colors">
-                        <span class="material-icons hover:text-white group-hover:text-white">search</span>
+                <!-- Arama İkonu, Slogan ve Atatürk Simgesi -->
+                <div class="flex items-center md:space-x-4 space-x-2">
+                    <!-- Arama butonu - sadece desktop'ta görünür -->
+                    <button id="searchButton" class="hidden md:flex w-11 h-11 bg-[#007b32] rounded-full items-center justify-center text-white shadow-md hover:bg-[#00352b] hover:scale-105 transition-all">
+                        <span class="material-icons text-white text-xl">search</span>
                     </button>
-                    <div class="text-md text-[#00352b] font-bold">
+                    
+                    <!-- Slogan - sadece desktop'ta görünür -->
+                    <div class="text-md text-[#00352b] font-bold hidden md:block">
                         <img src="{{ asset('images/slogan.png') }}" alt="Çankaya Belediyesi Slogan" class="h-12">
+                    </div>
+                    
+                    <!-- Mobil Menü Butonu - sadece mobilde görünür -->
+                    <button class="md:hidden flex items-center justify-center bg-gray-100 rounded-md p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-200 focus:outline-none transition-all"
+                        id="mobileMenuButton">
+                        <span class="material-icons">menu</span>
+                    </button>
+                    
+                    <!-- Atatürk simgesi - her zaman görünür, mobilde menünün sağında -->
+                    <div class="text-xl font-bold relative flex items-end pb-1 z-10">
+                        <img src="{{ asset('images/simge.png') }}" alt="Atatürk" class="md:h-24 h-20">
                     </div>
                 </div>
             </div>
@@ -207,7 +211,7 @@
     </div>
 
     <!-- Mobil Menü (Küçük ekranlarda görünür) -->
-    <div class="md:hidden hidden w-full z-50 absolute bg-white shadow-lg" id="mobileMenu">
+    <div class="md:hidden hidden w-full z-50 absolute bg-white shadow-lg rounded-b-lg" id="mobileMenu">
         <!-- Mobil Menü İçeriği -->
         <div class="px-4 py-2">
             @if(isset($mainMenuItems) && $mainMenuItems->count() > 0)
@@ -222,11 +226,11 @@
                     @else
                         <!-- Büyük menü için dropdown göster -->
                         <div class="group border-b border-gray-200">
-                            <a href="#" class="py-3 px-2 block text-gray-800 font-medium flex justify-between items-center">
+                            <a href="#" class="py-3 px-2 block text-gray-800 font-medium flex justify-between items-center mobile-dropdown-toggle">
                                 {{ $menu->name }}
                                 <span class="material-icons text-sm">expand_more</span>
                             </a>
-                            <div class="quick-menu-dropdown hidden">
+                            <div class="quick-menu-dropdown bg-gray-50 rounded-md p-2 hidden">
                                 @if($menu->type == 3)
                                 <!-- Minimal Mobil Buton Menü -->
                                 <div class="grid grid-cols-1 gap-1 p-2">
@@ -349,7 +353,7 @@
         /* Yeşil çizgi */
         .w-full.h-1.bg-\[\#007b32\] {
             position: relative;
-            z-index: 100;
+            z-index: 50;
         }
         
         /* Yatay buton hover efekti */
@@ -367,6 +371,53 @@
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
+        }
+        
+        /* Atatürk simgesi pozisyonu */
+        .text-xl.font-bold.relative.flex.items-end.pb-1.z-10 {
+            position: relative;
+            bottom: -10px;
+        }
+        
+        /* Atatürk simgesi için ayrı stil */
+        .text-xl.font-bold.relative.flex.items-end.pb-1.z-10 img {
+            height: 80px;
+        }
+
+        @media (max-width: 768px) {
+            .header-section, .head {
+                height: 90px !important; /* Daha geniş header */
+            }
+            
+            .flex.items-center.justify-between {
+                height: 90px !important; /* Daha geniş header */
+            }
+            
+            /* Mobil dropdown animasyonu */
+            .quick-menu-dropdown {
+                max-height: 0;
+                overflow: hidden;
+                transition: max-height 0.3s ease;
+            }
+            
+            .quick-menu-dropdown.open {
+                max-height: 1000px; /* Yeterince büyük bir değer */
+            }
+            
+            /* Mobil Atatürk simgesi */
+            .text-xl.font-bold.relative.flex.items-end.pb-1.z-10 {
+                bottom: -10px; /* Biraz daha aşağıda */
+                padding-right: 5px; /* Sağ tarafta biraz boşluk */
+            }
+            
+            .text-xl.font-bold.relative.flex.items-end.pb-1.z-10 img {
+                height: 70px; /* Biraz daha büyük */
+            }
+            
+            /* Mobil menü butonu ve Atatürk arasındaki boşluk */
+            #mobileMenuButton {
+                margin-right: 5px;
+            }
         }
     </style>
 </section>
@@ -429,24 +480,31 @@
         const mobileMenu = document.getElementById('mobileMenu');
         
         if (mobileMenuButton && mobileMenu) {
-            mobileMenuButton.addEventListener('click', () => {
+            mobileMenuButton.addEventListener('click', function() {
                 mobileMenu.classList.toggle('hidden');
             });
             
-            // Mobil menü dropdown'ları
-            const mobileDropdownButtons = document.querySelectorAll('.quick-menu-dropdown');
-            mobileDropdownButtons.forEach(dropdown => {
-                const parent = dropdown.previousElementSibling;
-                if (parent) {
-                    parent.addEventListener('click', (e) => {
-                        e.preventDefault();
-                        dropdown.classList.toggle('hidden');
-                    });
-                }
+            // Mobil dropdown toggle
+            const mobileDropdownToggles = document.querySelectorAll('.mobile-dropdown-toggle');
+            
+            mobileDropdownToggles.forEach(toggle => {
+                toggle.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const dropdown = this.nextElementSibling;
+                    dropdown.classList.toggle('hidden');
+                    
+                    // İkon değiştirme
+                    const icon = this.querySelector('.material-icons');
+                    if (dropdown.classList.contains('hidden')) {
+                        icon.textContent = 'expand_more';
+                    } else {
+                        icon.textContent = 'expand_less';
+                    }
+                });
             });
         }
     });
 </script>
 
 <!-- Yeşil sınır çizgisi - Navbar altı, slider üstü -->
-<div class="w-full h-1 bg-[#007b32]" style="position: relative; z-index: 100;"></div> 
+<div class="w-full h-1 bg-[#007b32]" style="position: relative; z-index: 50;"></div> 

@@ -193,6 +193,8 @@
     z-index: 50;
     background-color: white;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    max-height: 80vh;
+    overflow-y: auto;
 }
 
 .mobile-menu-toggle, .mobile-category-toggle {
@@ -205,6 +207,15 @@
 
 .mobile-category-items {
     padding-left: 1rem;
+}
+
+/* Mobil dropdown için animasyonlu oklar */
+.mobile-dropdown-toggle .material-icons {
+    transition: transform 0.3s ease;
+}
+
+.mobile-dropdown-toggle.active .material-icons {
+    transform: rotate(180deg);
 }
 
 /* Responsive */
@@ -223,6 +234,58 @@
         min-width: auto;
         box-shadow: none;
         border: none;
+    }
+    
+    /* Mobil header için ek düzenlemeler */
+    .header-section, .head {
+        height: 90px !important;
+    }
+    
+    #mobileMenuButton {
+        padding: 10px;
+        margin-right: 8px;
+        margin-left: 0;
+    }
+    
+    /* Logo boyutunu küçültme */
+    .header-section .flex.items-center.text-\[\#00352b\].space-x-10 {
+        gap: 0.5rem !important;
+    }
+    
+    .header-section .flex.items-center.text-\[\#00352b\].space-x-10 img {
+        height: 50px;
+    }
+    
+    /* Atatürk simgesi mobil görünüm ayarı */
+    .flex.items-center.md\:space-x-4.space-x-2 .text-xl.font-bold.relative.flex.items-end.pb-1.z-10 img {
+        height: 70px !important;
+        margin-right: 0;
+        margin-left: 0;
+    }
+    
+    /* Mobil görünümde arama alanı ve elemanlar arası boşluk */
+    .flex.items-center.md\:space-x-4.space-x-2 {
+        gap: 0.5rem !important;
+        justify-content: flex-end;
+    }
+    
+    /* Mobil menü öğeleri için daha fazla stil */
+    .group.border-b.border-gray-200 a {
+        padding: 12px 10px;
+        font-size: 16px;
+    }
+    
+    .quick-menu-dropdown {
+        margin-left: 10px;
+        margin-right: 5px;
+        margin-bottom: 10px;
+        border-radius: 8px;
+    }
+    
+    /* Mobil menü için daha fazla boşluk */
+    .px-4.py-2 {
+        padding-top: 5px;
+        padding-bottom: 15px;
     }
 }
 

@@ -36,6 +36,8 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\PasswordProtectionController;
 use App\Http\Controllers\Auth\UpdatePasswordController;
+use App\Http\Controllers\SearchController;
+use App\Http\Controllers\SearchPageController;
 
 /*
 |--------------------------------------------------------------------------
@@ -47,6 +49,42 @@ use App\Http\Controllers\Auth\UpdatePasswordController;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
+
+Route::get('/basittest', function() {
+    return 'Bu basit test sayfası çalışıyor!';
+});
+
+Route::get('/arama', function() {
+    $query = request()->input('q');
+    $results = [];
+    
+    if ($query) {
+        // Arama sorgusunu küçük harfe çevir ve Türkçe karakterleri değiştir
+        $searchQuery = mb_strtolower($query, 'UTF-8');
+        $searchQuery = str_replace(['ı', 'ğ', 'ü', 'ş', 'ö', 'ç'], ['i', 'g', 'u', 's', 'o', 'c'], $searchQuery);
+        
+        // Önce Hizmetleri Ara
+        $services = \App\Models\Service::search($searchQuery)
+            ->where('status', 'published')
+            ->get();
+            
+        // Sonra Haberleri Ara
+        $news = \App\Models\News::search($searchQuery)
+            ->where('status', 'published')
+            ->get();
+            
+        $results = [
+            'services' => $services,
+            'news' => $news,
+            'total' => $services->count() + $news->count()
+        ];
+    }
+    
+    return view('search.index', [
+        'query' => $query,
+        'results' => $results
+    ]);
+})->name('search');
 
 Route::get('/', [App\Http\Controllers\FrontController::class, 'index'])->name('front.home');
 
@@ -89,6 +127,12 @@ Route::get('/projeler-kategori/{slug}', [App\Http\Controllers\FrontController::c
 Auth::routes();
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+
+// Arama Rotası - Yeni spesifik isimle - şimdilik devre dışı
+// Route::get('/search-page', [App\Http\Controllers\SearchController::class, 'index'])->name('search');
+
+// Arama Test Rotası - şimdilik devre dışı
+// Route::get('/arama-test', [App\Http\Controllers\SearchPageController::class, 'index'])->name('search.test');
 
 // Admin Panel Route Tanımlamaları
 Route::middleware(['auth', 'role:admin'])->name('admin.')->prefix('admin')->group(function () {
@@ -518,4 +562,26 @@ Route::post('/check-site-password', [App\Http\Controllers\PasswordProtectionCont
 
 // Şifre Değiştirme Route
 Route::post('/update-password', [App\Http\Controllers\Auth\UpdatePasswordController::class, 'update'])->name('profile.password.update');
+
+// Admin Panel Arama Ayarları Routes
+Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->group(function () {
+    // Ana Arama Ayarları
+    Route::get('/search-settings', [App\Http\Controllers\Admin\SearchSettingController::class, 'index'])->name('search-settings.index');
+    Route::post('/search-settings', [App\Http\Controllers\Admin\SearchSettingController::class, 'update'])->name('search-settings.update');
+    
+    // Hızlı Aramalar
+    Route::resource('/search-quick-links', App\Http\Controllers\Admin\SearchQuickLinkController::class)->parameters([
+        'search-quick-links' => 'quickLink'
+    ])->except(['show']);
+    Route::post('/search-quick-links/order', [App\Http\Controllers\Admin\SearchQuickLinkController::class, 'updateOrder'])->name('search-quick-links.order');
+    Route::patch('/search-quick-links/{quickLink}/toggle-active', [App\Http\Controllers\Admin\SearchQuickLinkController::class, 'toggleActive'])->name('search-quick-links.toggle-active');
+    
+    // Popüler Aramalar
+    Route::resource('/search-popular-queries', App\Http\Controllers\Admin\SearchPopularQueryController::class)->parameters([
+        'search-popular-queries' => 'popularQuery'
+    ])->except(['show']);
+    Route::post('/search-popular-queries/order', [App\Http\Controllers\Admin\SearchPopularQueryController::class, 'updateOrder'])->name('search-popular-queries.order');
+    Route::patch('/search-popular-queries/{popularQuery}/toggle-active', [App\Http\Controllers\Admin\SearchPopularQueryController::class, 'toggleActive'])->name('search-popular-queries.toggle-active');
+    Route::get('/search-icons', [App\Http\Controllers\Admin\SearchPopularQueryController::class, 'getIcons'])->name('search-icons');
+});
 

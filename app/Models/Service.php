@@ -6,10 +6,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
+use Laravel\Scout\Searchable;
 
 class Service extends Model
 {
-    use HasFactory;
+    use HasFactory, Searchable;
 
     protected $table = 'services';
     
@@ -253,5 +254,40 @@ class Service extends Model
         } else {
             $this->attributes['features'] = json_encode([]);
         }
+    }
+
+    /**
+     * Scout için aranabilir alanların listesi
+     */
+    public function toSearchableArray()
+    {
+        // Türkçe karakterlerin normalize edilmesi için
+        $title = $this->title ? mb_strtolower($this->title, 'UTF-8') : '';
+        $title = str_replace(['ı', 'ğ', 'ü', 'ş', 'ö', 'ç'], ['i', 'g', 'u', 's', 'o', 'c'], $title);
+        
+        $summary = $this->summary ? mb_strtolower($this->summary, 'UTF-8') : '';
+        $summary = str_replace(['ı', 'ğ', 'ü', 'ş', 'ö', 'ç'], ['i', 'g', 'u', 's', 'o', 'c'], $summary);
+        
+        $content = $this->content ? mb_strtolower($this->content, 'UTF-8') : '';
+        $content = str_replace(['ı', 'ğ', 'ü', 'ş', 'ö', 'ç'], ['i', 'g', 'u', 's', 'o', 'c'], $content);
+        
+        return [
+            'id' => $this->id,
+            'title' => $title,
+            'original_title' => $this->title, // Orjinal başlık
+            'slug' => $this->slug,
+            'summary' => $summary,
+            'content' => $content,
+            'type' => 'service', // Tür bilgisi ekledik
+            'status' => $this->status,
+        ];
+    }
+
+    /**
+     * Scout için kullanılacak model adı
+     */
+    public function searchableAs()
+    {
+        return 'services_index';
     }
 }

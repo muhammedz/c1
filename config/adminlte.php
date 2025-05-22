@@ -474,6 +474,12 @@ return [
                 ],
             ],
         ],
+        [
+            'text'    => 'Arama Ayarları',
+            'icon'    => 'fas fa-fw fa-search',
+            'url'     => 'admin/search-settings',
+            'active'  => ['admin/search-settings', 'admin/search-quick-links/*', 'admin/search-popular-queries/*'],
+        ],
         ['header' => 'KULLANICI YÖNETİMİ'],
         [
             'text'    => 'Kullanıcılar',

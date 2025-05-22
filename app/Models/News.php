@@ -7,10 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Laravel\Scout\Searchable;
 
 class News extends Model
 {
-    use HasFactory;
+    use HasFactory, Searchable;
 
     protected $table = 'news';
     
@@ -267,5 +268,40 @@ class News extends Model
     public function scopeActive($query)
     {
         return $query->where('status', 'published');
+    }
+
+    /**
+     * Scout için aranabilir alanların listesi
+     */
+    public function toSearchableArray()
+    {
+        // Türkçe karakterlerin normalize edilmesi için
+        $title = $this->title ? mb_strtolower($this->title, 'UTF-8') : '';
+        $title = str_replace(['ı', 'ğ', 'ü', 'ş', 'ö', 'ç'], ['i', 'g', 'u', 's', 'o', 'c'], $title);
+        
+        $summary = $this->summary ? mb_strtolower($this->summary, 'UTF-8') : '';
+        $summary = str_replace(['ı', 'ğ', 'ü', 'ş', 'ö', 'ç'], ['i', 'g', 'u', 's', 'o', 'c'], $summary);
+        
+        $content = $this->content ? mb_strtolower($this->content, 'UTF-8') : '';
+        $content = str_replace(['ı', 'ğ', 'ü', 'ş', 'ö', 'ç'], ['i', 'g', 'u', 's', 'o', 'c'], $content);
+        
+        return [
+            'id' => $this->id,
+            'title' => $title,
+            'original_title' => $this->title, // Orjinal başlık
+            'slug' => $this->slug,
+            'summary' => $summary,
+            'content' => $content,
+            'type' => 'news', // Tür bilgisi ekledik
+            'status' => $this->status,
+        ];
+    }
+
+    /**
+     * Scout için kullanılacak model adı
+     */
+    public function searchableAs()
+    {
+        return 'news_index';
     }
 }

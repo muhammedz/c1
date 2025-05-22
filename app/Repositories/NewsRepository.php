@@ -76,7 +76,7 @@ class NewsRepository extends BaseRepository
         $sortDirection = $filters['direction'] ?? 'desc';
         $query->orderBy($sortField, $sortDirection);
         
-        return $query->paginate(15)->appends($filters);
+        return $query->paginate(40)->appends($filters);
     }
     
     /**
