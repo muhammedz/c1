@@ -15,6 +15,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
+use App\Models\ServicesUnit;
 
 class ServiceController extends Controller
 {
@@ -69,7 +70,10 @@ class ServiceController extends Controller
             ->orderBy('order')
             ->get();
             
-        return view('admin.services.create', compact('categories', 'tags', 'hedefKitleler', 'maxHeadlinesReached'));
+        $serviceCategories = ServiceCategory::where('is_active', true)->orderBy('name')->get();
+        $units = ServicesUnit::where('status', true)->orderBy('name')->get();
+        
+        return view('admin.services.create', compact('categories', 'tags', 'hedefKitleler', 'maxHeadlinesReached', 'serviceCategories', 'units'));
     }
 
     /**
@@ -164,7 +168,9 @@ class ServiceController extends Controller
             ->orderBy('order')
             ->get();
         
-        return view('admin.services.edit', compact('service', 'maxHeadlinesReached', 'categories', 'selectedCategories', 'tags', 'hedefKitleler'));
+        $units = ServicesUnit::where('status', true)->orderBy('name')->get();
+        
+        return view('admin.services.edit', compact('service', 'maxHeadlinesReached', 'categories', 'selectedCategories', 'tags', 'hedefKitleler', 'units'));
     }
 
     /**
@@ -466,10 +472,50 @@ class ServiceController extends Controller
         return view('admin.services.debug', compact('serviceRoutes', 'views', 'debugRoutes'));
     }
 
-    private function prepareServiceData($data, $service = null)
+    private function prepareServiceData(array $data, ?Service $service = null)
     {
-        // Boş array değerlerini temizle
-        $features = array_filter($data['features'] ?? []);
+        // Başlangıç features array'i
+        $features = $service ? $service->features : [];
+        
+        // Details array'inden gelen değerleri features array'ine ekle
+        if (isset($data['details'])) {
+            foreach ($data['details'] as $key => $value) {
+                // Boolean değerleri doğru şekilde işle
+                if (str_starts_with($key, 'is_') && str_ends_with($key, '_visible')) {
+                    $features[$key] = filter_var($value, FILTER_VALIDATE_BOOLEAN);
+                } 
+                // Tablo verilerini işle
+                else if (in_array($key, ['processing_times', 'fees', 'payment_options'])) {
+                    // Eğer value array değilse boş array olarak ayarla
+                    if (!is_array($value)) {
+                        $features[$key] = [];
+                        continue;
+                    }
+                    
+                    // Array'i filtrele ve boş olmayan değerleri koru
+                    $filteredArray = [];
+                    foreach ($value as $index => $item) {
+                        if (is_array($item)) {
+                            $hasValue = false;
+                            foreach ($item as $field) {
+                                if (!empty($field)) {
+                                    $hasValue = true;
+                                    break;
+                                }
+                            }
+                            if ($hasValue) {
+                                $filteredArray[] = $item;
+                            }
+                        }
+                    }
+                    $features[$key] = $filteredArray;
+                }
+                // Diğer değerleri olduğu gibi kaydet
+                else {
+                    $features[$key] = $value;
+                }
+            }
+        }
         
         // URL'deki yinelenen /storage/ yolunu düzelt
         if (isset($data['image']) && !empty($data['image'])) {
@@ -504,21 +550,13 @@ class ServiceController extends Controller
         $baseSlug = $data['slug'];
         $counter = 1;
         
-        while ($service && $service::where('slug', $data['slug'])->exists()) {
+        while ($service && Service::where('slug', $data['slug'])->where('id', '!=', $service->id)->exists()) {
             $data['slug'] = $baseSlug . '-' . $counter;
             $counter++;
         }
         
-        // Özellikler dizisini ekleyelim
+        // Features dizisini ekleyelim
         $data['features'] = $features;
-        
-        // Detay sayfası içeriğini ekle
-        $details = $data['details'] ?? [];
-        if (!empty($details)) {
-            foreach ($details as $key => $value) {
-                $data['features'][$key] = $value;
-            }
-        }
         
         // Yayınlanma durumu ile ilgili özel ayarlar
         $data['is_scheduled'] = !empty($data['end_date']);
@@ -526,6 +564,9 @@ class ServiceController extends Controller
         // Varsayılan değerleri ata
         $data['view_count'] = $service ? $service->view_count : 0;
         $data['status'] = $data['status'] ?? 'published'; // Varsayılan olarak yayında
+        
+        // Birim ID'sini ekle
+        $data['services_unit_id'] = $data['services_unit_id'] ?? null;
         
         return $data;
     }

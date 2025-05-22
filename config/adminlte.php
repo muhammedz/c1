@@ -573,31 +573,31 @@ return [
         // Hizmetler Modülü
         [
             'text'    => 'Hizmetler',
-            'icon'    => 'fas fa-concierge-bell',
+            'icon'    => 'fas fa-fw fa-concierge-bell',
             'submenu' => [
                 [
                     'text' => 'Tüm Hizmetler',
                     'url'  => 'admin/services',
-                    'icon' => 'fas fa-list',
-                    'active' => ['admin/services', 'admin/services/*/edit'],
+                    'icon' => 'fas fa-fw fa-list',
+                    'active' => ['admin/services', 'admin/services/create', 'admin/services/*/edit']
                 ],
                 [
-                    'text' => 'Yeni Hizmet Ekle',
-                    'url'  => 'admin/services/create',
-                    'icon' => 'fas fa-plus',
-                    'active' => ['admin/services/create'],
+                    'text' => 'Birimler',
+                    'url'  => 'admin/services/units',
+                    'icon' => 'fas fa-fw fa-building',
+                    'active' => ['admin/services/units', 'admin/services/units/*']
                 ],
                 [
                     'text' => 'Kategoriler',
                     'url'  => 'admin/service-categories',
-                    'icon' => 'fas fa-tags',
-                    'active' => ['admin/service-categories', 'admin/service-categories/*'],
+                    'icon' => 'fas fa-fw fa-tags',
+                    'active' => ['admin/service-categories', 'admin/service-categories/*']
                 ],
                 [
                     'text' => 'Etiketler',
                     'url'  => 'admin/service-tags',
-                    'icon' => 'fas fa-tag',
-                    'active' => ['admin/service-tags', 'admin/service-tags/*'],
+                    'icon' => 'fas fa-fw fa-tag',
+                    'active' => ['admin/service-tags', 'admin/service-tags/*']
                 ],
             ],
         ],

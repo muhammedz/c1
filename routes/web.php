@@ -38,6 +38,7 @@ use App\Http\Controllers\PasswordProtectionController;
 use App\Http\Controllers\Auth\UpdatePasswordController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\SearchPageController;
+use App\Http\Controllers\Admin\ServicesUnitController;
 
 /*
 |--------------------------------------------------------------------------
@@ -244,12 +245,29 @@ Route::middleware(['auth', 'role:admin'])->name('admin.')->prefix('admin')->grou
     Route::post('/projects/toggle-module-visibility', [ProjectManagerController::class, 'toggleProjectModuleVisibility'])->name('projects.toggle-module-visibility');
     
     // Hizmetler Yönetimi
-    Route::resource('services', ServiceController::class);
-    Route::post('/services/{service}/toggle-headline', [ServiceController::class, 'toggleHeadline'])->name('services.toggle-headline');
-    Route::post('/services/{service}/toggle-featured', [ServiceController::class, 'toggleFeatured'])->name('services.toggle-featured');
-    Route::post('/services/{service}/toggle-status', [ServiceController::class, 'toggleStatus'])->name('services.toggle-status');
-    Route::post('/services/update-headline-order', [ServiceController::class, 'updateHeadlineOrder'])->name('services.update-headline-order');
-    Route::post('/services/upload-gallery-image', [ServiceController::class, 'uploadGalleryImage'])->name('services.upload-gallery-image');
+    Route::prefix('services')->name('services.')->group(function () {
+        Route::get('/', [ServiceController::class, 'index'])->name('index');
+        Route::get('/create', [ServiceController::class, 'create'])->name('create');
+        Route::post('/', [ServiceController::class, 'store'])->name('store');
+        Route::get('/{service}/edit', [ServiceController::class, 'edit'])->name('edit');
+        Route::put('/{service}', [ServiceController::class, 'update'])->name('update');
+        Route::delete('/{service}', [ServiceController::class, 'destroy'])->name('destroy');
+        Route::post('/update-order', [ServiceController::class, 'updateOrder'])->name('update-order');
+        Route::post('/{service}/toggle-headline', [ServiceController::class, 'toggleHeadline'])->name('toggle-headline');
+        Route::post('/{service}/toggle-featured', [ServiceController::class, 'toggleFeatured'])->name('toggle-featured');
+        Route::post('/{service}/toggle-archive', [ServiceController::class, 'toggleArchive'])->name('toggle-archive');
+        Route::post('/{service}/toggle-status', [ServiceController::class, 'toggleStatus'])->name('toggle-status');
+        Route::post('/upload-gallery-image', [ServiceController::class, 'uploadGalleryImage'])->name('upload-gallery-image');
+
+        // Birimler route'ları
+        Route::get('/units', [ServicesUnitController::class, 'index'])->name('units.index');
+        Route::get('/units/create', [ServicesUnitController::class, 'create'])->name('units.create');
+        Route::post('/units', [ServicesUnitController::class, 'store'])->name('units.store');
+        Route::get('/units/{unit}/edit', [ServicesUnitController::class, 'edit'])->name('units.edit');
+        Route::put('/units/{unit}', [ServicesUnitController::class, 'update'])->name('units.update');
+        Route::delete('/units/{unit}', [ServicesUnitController::class, 'destroy'])->name('units.destroy');
+        Route::post('/units/update-order', [ServicesUnitController::class, 'updateOrder'])->name('units.update-order');
+    });
     
     // Hizmet Kategorileri Yönetimi
     Route::resource('service-categories', ServiceCategoryController::class)->names('service-categories');
@@ -583,5 +601,29 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     Route::post('/search-popular-queries/order', [App\Http\Controllers\Admin\SearchPopularQueryController::class, 'updateOrder'])->name('search-popular-queries.order');
     Route::patch('/search-popular-queries/{popularQuery}/toggle-active', [App\Http\Controllers\Admin\SearchPopularQueryController::class, 'toggleActive'])->name('search-popular-queries.toggle-active');
     Route::get('/search-icons', [App\Http\Controllers\Admin\SearchPopularQueryController::class, 'getIcons'])->name('search-icons');
+});
+
+Route::prefix('services')->name('services.')->group(function () {
+    Route::get('/', [ServiceController::class, 'index'])->name('index');
+    Route::get('/create', [ServiceController::class, 'create'])->name('create');
+    Route::post('/', [ServiceController::class, 'store'])->name('store');
+    Route::get('/{service}/edit', [ServiceController::class, 'edit'])->name('edit');
+    Route::put('/{service}', [ServiceController::class, 'update'])->name('update');
+    Route::delete('/{service}', [ServiceController::class, 'destroy'])->name('destroy');
+    Route::post('/update-order', [ServiceController::class, 'updateOrder'])->name('update-order');
+    Route::post('/{service}/toggle-headline', [ServiceController::class, 'toggleHeadline'])->name('toggle-headline');
+    Route::post('/{service}/toggle-featured', [ServiceController::class, 'toggleFeatured'])->name('toggle-featured');
+    Route::post('/{service}/toggle-archive', [ServiceController::class, 'toggleArchive'])->name('toggle-archive');
+    Route::post('/{service}/toggle-status', [ServiceController::class, 'toggleStatus'])->name('toggle-status');
+    Route::post('/upload-gallery-image', [ServiceController::class, 'uploadGalleryImage'])->name('upload-gallery-image');
+
+    // Birimler route'ları
+    Route::get('/units', [ServicesUnitController::class, 'index'])->name('units.index');
+    Route::get('/units/create', [ServicesUnitController::class, 'create'])->name('units.create');
+    Route::post('/units', [ServicesUnitController::class, 'store'])->name('units.store');
+    Route::get('/units/{unit}/edit', [ServicesUnitController::class, 'edit'])->name('units.edit');
+    Route::put('/units/{unit}', [ServicesUnitController::class, 'update'])->name('units.update');
+    Route::delete('/units/{unit}', [ServicesUnitController::class, 'destroy'])->name('units.destroy');
+    Route::post('/units/update-order', [ServicesUnitController::class, 'updateOrder'])->name('units.update-order');
 });
 

@@ -254,7 +254,13 @@
                         Ücretler
                     </a>
                     @endif
-                    @if(isset($service->features['is_additional_info_visible']) && $service->features['is_additional_info_visible'])
+                    @if(isset($service->features['is_payment_options_visible']) && $service->features['is_payment_options_visible'])
+                    <a href="#odeme-secenekleri" class="flex items-center px-4 py-2 rounded-lg text-gray-600 hover:bg-[#00352b]/10 hover:text-[#00352b] font-medium transition-colors">
+                        <i class="material-icons mr-3 text-lg">payment</i>
+                        Ödeme Seçenekleri
+                    </a>
+                    @endif
+                    @if(!isset($service->features['is_additional_info_visible']) || $service->features['is_additional_info_visible'])
                     <a href="#diger-bilgiler" class="flex items-center px-4 py-2 rounded-lg text-gray-600 hover:bg-[#00352b]/10 hover:text-[#00352b] font-medium transition-colors">
                         <i class="material-icons mr-3 text-lg">info</i>
                         Diğer Bilgiler
@@ -386,8 +392,41 @@
             </section>
             @endif
             
+            <!-- Ödeme Seçenekleri -->
+            @if(isset($service->features['is_payment_options_visible']) && $service->features['is_payment_options_visible'])
+            <section id="odeme-secenekleri" class="service-content-section">
+                <h2>Ödeme Seçenekleri</h2>
+                @if(isset($service->features['payment_options']) && is_array($service->features['payment_options']) && !empty($service->features['payment_options']))
+                    <p class="mb-5">{{ $service->title }} hizmetimiz için ödeme seçenekleri aşağıda belirtilmiştir:</p>
+                    
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full bg-white border border-gray-200 rounded-lg">
+                            <thead>
+                                <tr>
+                                    <th class="px-6 py-4 bg-[#00352b]/5 text-left text-sm font-semibold text-gray-700 border-b">Ödeme Yöntemi</th>
+                                    <th class="px-6 py-4 bg-[#00352b]/5 text-left text-sm font-semibold text-gray-700 border-b">Vade</th>
+                                    <th class="px-6 py-4 bg-[#00352b]/5 text-left text-sm font-semibold text-gray-700 border-b">Açıklama</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($service->features['payment_options'] as $option)
+                                <tr class="hover:bg-gray-50 transition-colors">
+                                    <td class="px-6 py-4 border-b text-sm font-medium text-gray-800">{{ $option['method'] ?? '' }}</td>
+                                    <td class="px-6 py-4 border-b text-sm text-gray-700">{{ $option['term'] ?? '' }}</td>
+                                    <td class="px-6 py-4 border-b text-sm text-gray-700">{{ $option['description'] ?? '' }}</td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                @else
+                    <p class="mb-4">Buraya içerik ekleyin veya görünümünü gizli yapın.</p>
+                @endif
+            </section>
+            @endif
+            
             <!-- Diğer Bilgiler -->
-            @if(isset($service->features['is_additional_info_visible']) && $service->features['is_additional_info_visible'])
+            @if(!isset($service->features['is_additional_info_visible']) || $service->features['is_additional_info_visible'])
             <section id="diger-bilgiler" class="service-content-section">
                 <h2>Diğer Bilgiler</h2>
                 @if(isset($service->features['additional_info']) && !empty($service->features['additional_info']))
@@ -399,7 +438,7 @@
             @endif
             
             <!-- Standart Formlar -->
-            @if(isset($service->features['is_standard_forms_visible']) && $service->features['is_standard_forms_visible'])
+            @if(!isset($service->features['is_standard_forms_visible']) || $service->features['is_standard_forms_visible'])
             <section id="standart-formlar" class="service-content-section">
                 <h2>Standart Formlar</h2>
                 @if(isset($service->features['standard_forms']) && !empty($service->features['standard_forms']))

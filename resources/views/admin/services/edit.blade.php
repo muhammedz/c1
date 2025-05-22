@@ -429,12 +429,28 @@
                     </div>
                 </div>
                 
-                <!-- Kategoriler -->
+                <!-- Kategoriler ve Etiketler -->
                 <div class="card mb-4">
                     <div class="card-header">
-                        <h5 class="mb-0">Kategoriler ve Etiketler</h5>
+                        <h5 class="mb-0">Kategoriler ve Birim</h5>
                     </div>
                     <div class="card-body">
+                        <!-- Birim Seçimi -->
+                        <div class="mb-4">
+                            <label for="services_unit_id" class="form-label">Birim</label>
+                            <select class="form-select @error('services_unit_id') is-invalid @enderror" id="services_unit_id" name="services_unit_id">
+                                <option value="">Birim Seçin</option>
+                                @foreach($units as $unit)
+                                    <option value="{{ $unit->id }}" {{ old('services_unit_id', $service->services_unit_id) == $unit->id ? 'selected' : '' }}>
+                                        {{ $unit->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('services_unit_id')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+
                         <!-- Kategoriler -->
                         <div class="card mb-3">
                             <div class="card-header bg-light d-flex align-items-center">
@@ -459,7 +475,7 @@
                                         <div class="category-item d-flex align-items-center py-1 px-2 mb-1 rounded hover-bg-light">
                                             <div class="form-check mb-0 w-100">
                                                 <label class="d-flex align-items-center gap-1">
-                                                    <input type="checkbox" name="categories[]" value="{{ $category->id }}" class="form-check-input me-1" {{ in_array($category->id, old('categories', $service->categories->pluck('id')->toArray())) ? 'checked' : '' }}>
+                                                    <input type="checkbox" name="category_ids[]" value="{{ $category->id }}" class="form-check-input me-1" {{ in_array($category->id, old('category_ids', $service->categories->pluck('id')->toArray())) ? 'checked' : '' }}>
                                                     @if(isset($category->icon))
                                                         <i class="{{ $category->icon }}" style="margin-right: 3px; font-size: 0.9em;"></i>
                                                     @endif
@@ -758,9 +774,18 @@
                 <div class="mb-4">
                     <label class="form-label d-flex justify-content-between align-items-center">
                         <span>Ödeme Seçenekleri Tablosu</span>
-                        <button type="button" class="btn btn-sm btn-primary" id="add-payment-option-row">
-                            <i class="fas fa-plus"></i> Seçenek Ekle
-                        </button>
+                        <div class="d-flex align-items-center">
+                            <div class="form-check form-switch me-3">
+                                <input class="form-check-input" type="checkbox" role="switch" id="is_payment_options_visible" name="details[is_payment_options_visible]" value="1" {{ old('details.is_payment_options_visible', isset($service->features['is_payment_options_visible']) && $service->features['is_payment_options_visible']) ? 'checked' : '' }}>
+                                <label class="form-check-label" for="is_payment_options_visible">
+                                    <span class="text-success" id="payment_options_visible_text">Görünür</span>
+                                    <span class="text-danger d-none" id="payment_options_hidden_text">Gizli</span>
+                                </label>
+                            </div>
+                            <button type="button" class="btn btn-sm btn-primary" id="add-payment-option-row">
+                                <i class="fas fa-plus"></i> Seçenek Ekle
+                            </button>
+                        </div>
                     </label>
                     
                     <div class="table-responsive">
@@ -775,7 +800,7 @@
                             </thead>
                             <tbody>
                                 @if(old('details.payment_options', isset($service->features['payment_options']) ? $service->features['payment_options'] : []))
-                                    @foreach(old('details.payment_options', isset($service->features['payment_options']) ? $service->features['payment_options'] : []) as $index => $option)
+                                    @foreach(old('details.payment_options', $service->features['payment_options']) as $index => $option)
                                     <tr>
                                         <td>
                                             <input type="text" class="form-control" name="details[payment_options][{{ $index }}][method]" value="{{ is_array($option) && array_key_exists('method', $option) ? $option['method'] : '' }}" placeholder="Ödeme yöntemi">

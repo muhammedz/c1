@@ -33,7 +33,8 @@ class Service extends Model
         'meta_title',
         'meta_description',
         'published_at',
-        'end_date'
+        'end_date',
+        'services_unit_id'
     ];
     
     protected $casts = [
@@ -47,6 +48,12 @@ class Service extends Model
     ];
     
     // İlişkiler
+    
+    // Birim
+    public function unit()
+    {
+        return $this->belongsTo(ServicesUnit::class, 'services_unit_id');
+    }
     
     // Kategoriler
     public function categories()
