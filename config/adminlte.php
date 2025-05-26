@@ -306,6 +306,14 @@ return [
             'topnav_right' => true,
         ],
         [
+            'text'         => 'SİTEYİ GÖR',
+            'url'          => '/',
+            'icon'         => 'fas fa-fw fa-external-link-alt',
+            'topnav_right' => true,
+            'target'       => '_blank',
+            'classes'      => 'btn btn-success btn-sm mr-2',
+        ],
+        [
             'type'         => 'fullscreen-widget',
             'topnav_right' => true,
         ],
@@ -607,6 +615,50 @@ return [
             'icon'    => 'fas fa-bullseye',
             'url'     => 'admin/hedef-kitleler',
             'active'  => ['admin/hedef-kitleler', 'admin/hedef-kitleler/*'],
+        ],
+        // Çankaya Evleri Modülü
+        [
+            'text'    => 'Çankaya Evleri',
+            'icon'    => 'fas fa-home',
+            'submenu' => [
+                [
+                    'text' => 'Tüm Çankaya Evleri',
+                    'url'  => 'admin/cankaya-houses',
+                    'icon' => 'fas fa-list',
+                    'active' => ['admin/cankaya-houses', 'admin/cankaya-houses/*/edit', 'admin/cankaya-houses/*/show']
+                ],
+                [
+                    'text' => 'Yeni Çankaya Evi',
+                    'url'  => 'admin/cankaya-houses/create',
+                    'icon' => 'fas fa-plus',
+                    'active' => ['admin/cankaya-houses/create']
+                ],
+                [
+                    'text' => 'Kurslar',
+                    'url'  => 'admin/cankaya-house-courses',
+                    'icon' => 'fas fa-graduation-cap',
+                    'active' => ['admin/cankaya-house-courses', 'admin/cankaya-house-courses/*']
+                ],
+            ],
+        ],
+        // İhaleler Modülü
+        [
+            'text'    => 'İhaleler',
+            'icon'    => 'fas fa-gavel',
+            'submenu' => [
+                [
+                    'text' => 'Tüm İhaleler',
+                    'url'  => 'admin/tenders',
+                    'icon' => 'fas fa-list',
+                    'active' => ['admin/tenders', 'admin/tenders/*/edit', 'admin/tenders/*/show']
+                ],
+                [
+                    'text' => 'Yeni İhale',
+                    'url'  => 'admin/tenders/create',
+                    'icon' => 'fas fa-plus',
+                    'active' => ['admin/tenders/create']
+                ],
+            ],
         ],
     ],
 

@@ -108,17 +108,31 @@ Route::prefix('hedef-kitleler')->name('hedefkitleler.')->group(function () {
     Route::get('/{slug}', [App\Http\Controllers\Front\HedefKitleController::class, 'show'])->name('show');
 });
 
+// İhaleler için frontend rotaları - Wildcard route'lardan önce tanımlanmalı
+Route::prefix('ihaleler')->name('tenders.')->group(function () {
+    Route::get('/', [App\Http\Controllers\Front\TenderController::class, 'index'])->name('index');
+    Route::get('/tamamlananlar', [App\Http\Controllers\Front\TenderController::class, 'completed'])->name('completed');
+    Route::get('/iptal-edilenler', [App\Http\Controllers\Front\TenderController::class, 'cancelled'])->name('cancelled');
+    Route::get('/{slug}', [App\Http\Controllers\Front\TenderController::class, 'show'])->name('show');
+});
+
+// Çankaya Evleri Frontend Route'ları
+Route::prefix('cankaya-evleri')->name('cankaya-houses.')->group(function () {
+    Route::get('/', [App\Http\Controllers\Front\CankayaHouseController::class, 'index'])->name('index');
+    Route::get('/{cankayaHouse}', [App\Http\Controllers\Front\CankayaHouseController::class, 'show'])->name('show');
+});
+
 // Kurumsal Kadro Frontend Route'ları
 Route::get('/kurumsal-kadro', [App\Http\Controllers\CorporateController::class, 'index'])->name('corporate.index');
 
 // Kurumsal Kadro Kategori ve Üye Rotaları - Daha spesifik rotaları önce tanımla
 Route::get('/{categorySlug}/{memberSlug}', [App\Http\Controllers\CorporateController::class, 'showMember'])
     ->name('corporate.member')
-    ->where('categorySlug', '^(?!admin|login|register|password|kurumsal-kadro|projeler|etkinlikler|hizmetler|sayfalar|baskan|hedefkitleler).*$');
+    ->where('categorySlug', '^(?!admin|login|register|password|kurumsal-kadro|projeler|etkinlikler|hizmetler|sayfalar|baskan|hedefkitleler|ihaleler).*$');
 
 Route::get('/{categorySlug}', [App\Http\Controllers\CorporateController::class, 'showCategory'])
     ->name('corporate.category')
-    ->where('categorySlug', '^(?!admin|login|register|password|kurumsal-kadro|projeler|etkinlikler|hizmetler|sayfalar|baskan|hedefkitleler).*$');
+    ->where('categorySlug', '^(?!admin|login|register|password|kurumsal-kadro|projeler|etkinlikler|hizmetler|sayfalar|baskan|hedefkitleler|ihaleler).*$');
 
 // Proje Detay Sayfaları
 Route::get('/projeler', [App\Http\Controllers\FrontController::class, 'projects'])->name('front.projects');
@@ -145,6 +159,10 @@ Route::middleware(['auth', 'role:admin'])->name('admin.')->prefix('admin')->grou
     // Test Sayfası
     Route::get('/test', [TestController::class, 'index'])->name('test.index');
     Route::get('/test-departments', [TestDepartmentController::class, 'index'])->name('test-departments.index');
+    
+    // İhaleler Yönetimi
+    Route::resource('tenders', App\Http\Controllers\Admin\TenderController::class);
+    Route::post('tenders/{id}/toggle-status', [App\Http\Controllers\Admin\TenderController::class, 'toggleStatus'])->name('tenders.toggle-status');
     
     // Sayfa Ayarları
     Route::get('pages/settings', [PageSettingController::class, 'edit'])->name('pages.settings.edit');
@@ -305,6 +323,16 @@ Route::middleware(['auth', 'role:admin'])->name('admin.')->prefix('admin')->grou
         Route::delete('members/{member}', [App\Http\Controllers\Admin\CorporateMemberController::class, 'destroy'])->name('members.destroy');
         Route::post('members/order', [App\Http\Controllers\Admin\CorporateMemberController::class, 'order'])->name('members.order');
     });
+
+    // Çankaya Evleri Yönetimi
+    Route::resource('cankaya-houses', App\Http\Controllers\Admin\CankayaHouseController::class)->names('cankaya-houses');
+    Route::post('cankaya-houses/{cankayaHouse}/toggle-status', [App\Http\Controllers\Admin\CankayaHouseController::class, 'toggleStatus'])->name('cankaya-houses.toggle-status');
+    Route::delete('cankaya-houses/{cankayaHouse}/remove-image', [App\Http\Controllers\Admin\CankayaHouseController::class, 'removeImage'])->name('cankaya-houses.remove-image');
+    
+    // Çankaya Evi Kursları Yönetimi
+    Route::resource('cankaya-house-courses', App\Http\Controllers\Admin\CankayaHouseCourseController::class)->names('cankaya-house-courses');
+    Route::post('cankaya-house-courses/{cankayaHouseCourse}/toggle-status', [App\Http\Controllers\Admin\CankayaHouseCourseController::class, 'toggleStatus'])->name('cankaya-house-courses.toggle-status');
+    Route::get('cankaya-houses/{cankayaHouse}/courses', [App\Http\Controllers\Admin\CankayaHouseCourseController::class, 'getCoursesByHouse'])->name('cankaya-houses.courses');
 
     // Menü Sistemi Rotaları
     Route::prefix('menusystem')->as('menusystem.')->group(function () {
@@ -626,4 +654,6 @@ Route::prefix('services')->name('services.')->group(function () {
     Route::delete('/units/{unit}', [ServicesUnitController::class, 'destroy'])->name('units.destroy');
     Route::post('/units/update-order', [ServicesUnitController::class, 'updateOrder'])->name('units.update-order');
 });
+
+
 

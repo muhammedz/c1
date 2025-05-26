@@ -1,3 +1,0 @@
-@echo off
-php artisan make:migration add_order_to_filemanagersystem_media_relations --table=filemanagersystem_media_relations
-pause 
