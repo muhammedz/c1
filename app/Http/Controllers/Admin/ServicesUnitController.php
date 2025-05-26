@@ -39,7 +39,19 @@ class ServicesUnitController extends Controller
 
         $unit = new ServicesUnit();
         $unit->name = $request->name;
-        $unit->slug = Str::slug($request->name);
+        
+        // Slug oluştur
+        $baseSlug = Str::slug($request->name);
+        $slug = $baseSlug;
+        $counter = 1;
+        
+        // Eğer bu slug zaten varsa, benzersiz olana kadar sayı ekle
+        while (ServicesUnit::where('slug', $slug)->exists()) {
+            $slug = $baseSlug . '-' . $counter;
+            $counter++;
+        }
+        
+        $unit->slug = $slug;
         $unit->description = $request->description;
         $unit->status = $request->has('status');
         $unit->order = ServicesUnit::max('order') + 1;
@@ -69,7 +81,19 @@ class ServicesUnitController extends Controller
         ]);
 
         $unit->name = $request->name;
-        $unit->slug = Str::slug($request->name);
+        
+        // Slug oluştur
+        $baseSlug = Str::slug($request->name);
+        $slug = $baseSlug;
+        $counter = 1;
+        
+        // Eğer bu slug zaten varsa ve farklı bir ID'ye aitse, benzersiz olana kadar sayı ekle
+        while (ServicesUnit::where('slug', $slug)->where('id', '!=', $unit->id)->exists()) {
+            $slug = $baseSlug . '-' . $counter;
+            $counter++;
+        }
+        
+        $unit->slug = $slug;
         $unit->description = $request->description;
         $unit->status = $request->has('status');
         $unit->save();
