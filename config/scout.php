@@ -226,7 +226,6 @@ return [
         'asYouType' => false, // Yazarken arama özelliği
         'searchBoolean' => env('TNTSEARCH_BOOLEAN', false), // Boolean arama modu
         'maxDocs' => env('TNTSEARCH_MAX_DOCS', 500), // İşlenecek maksimum belge sayısı
-        'tokenizer' => \TeamTNT\TNTSearch\Tokenizer\SimpleTokenizer::class, // Simple tokenizer'a geri döndüm
         'stemmer' => \TeamTNT\TNTSearch\Stemmer\NoStemmer::class, 
         'lowercase' => true, // Büyük küçük harf duyarlılığını kaldır
         'charset' => 'utf8', // Türkçe karakterler için UTF-8 karakter seti

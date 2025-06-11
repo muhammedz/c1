@@ -319,6 +319,42 @@
                     </div>
                 </div>
             </div>
+            
+            <!-- Haber Kategorileri -->
+            <div class="card mb-4">
+                <div class="card-header d-flex align-items-center">
+                    <i class="fas fa-newspaper me-2 text-primary"></i>
+                    <h5 class="mb-0">İlgili Haber Kategorileri</h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted mb-3">Bu hizmetle ilgili haberlerin gösterileceği kategorileri seçin:</p>
+                    
+                    <div class="row">
+                        @foreach($newsCategories as $newsCategory)
+                        <div class="col-md-6 mb-2">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="news_category_ids[]" 
+                                    id="news-category-{{ $newsCategory->id }}" value="{{ $newsCategory->id }}"
+                                    {{ in_array($newsCategory->id, $selectedNewsCategories) ? 'checked' : '' }}>
+                                <label class="form-check-label" for="news-category-{{ $newsCategory->id }}">
+                                    @if($newsCategory->icon)
+                                        <i class="{{ $newsCategory->icon }} me-1"></i>
+                                    @endif
+                                    {{ $newsCategory->name }}
+                                </label>
+                            </div>
+                        </div>
+                        @endforeach
+                    </div>
+                    
+                    @if($newsCategories->isEmpty())
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Henüz haber kategorisi bulunmamaktadır. <a href="{{ route('admin.news-categories.create') }}" target="_blank">Yeni kategori ekleyin</a>.
+                    </div>
+                    @endif
+                </div>
+            </div>
 
             <!-- Sistem Bilgileri -->
             <div class="card mb-4">

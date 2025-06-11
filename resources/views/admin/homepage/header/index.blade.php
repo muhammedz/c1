@@ -48,7 +48,7 @@
                         </li>
                     </ul>
 
-                    <a href="{{ route('admin.homepage.header.menu.index') }}" class="btn btn-primary btn-block">
+                    <a href="{{ route('admin.menusystem.index') }}" class="btn btn-primary btn-block">
                         <i class="fas fa-bars mr-1"></i> Menü Yönetimi
                     </a>
                 </div>

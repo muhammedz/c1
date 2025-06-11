@@ -18,10 +18,22 @@ class ServiceController extends Controller
      */
     public function index(Request $request)
     {
-        $services = Service::with(['categories', 'tags'])
-            ->published()
-            ->orderBy('published_at', 'desc')
-            ->paginate(12);
+        $query = Service::with(['categories', 'tags'])->published();
+        
+        // Arama işlevi
+        if ($request->filled('search')) {
+            $searchTerm = $request->get('search');
+            $query->where(function($q) use ($searchTerm) {
+                $q->where('title', 'like', '%' . $searchTerm . '%')
+                  ->orWhere('summary', 'like', '%' . $searchTerm . '%')
+                  ->orWhere('content', 'like', '%' . $searchTerm . '%');
+            });
+        }
+        
+        // Varsayılan sıralama
+        $query->orderBy('published_at', 'desc');
+        
+        $services = $query->get();
             
         $categories = ServiceCategory::where('is_active', true)
             ->withCount(['services' => function($query) {
@@ -55,7 +67,7 @@ class ServiceController extends Controller
         $services = $category->services()
             ->published()
             ->orderBy('published_at', 'desc')
-            ->paginate(12);
+            ->get();
             
         $categories = ServiceCategory::where('is_active', true)
             ->withCount(['services' => function($query) {
@@ -84,6 +96,7 @@ class ServiceController extends Controller
     {
         $service = Service::where('slug', $slug)
             ->published()
+            ->with(['newsCategories'])
             ->firstOrFail();
             
         // Görüntülenme sayısını artır
@@ -91,6 +104,12 @@ class ServiceController extends Controller
         
         // İlgili hizmetleri getir
         $relatedServices = $service->getRelatedServices(4);
+        
+        // İlgili haberleri getir (seçilen kategorilerdeki haberler)
+        $relatedNews = collect();
+        if ($service->newsCategories->count() > 0) {
+            $relatedNews = $service->relatedNews()->limit(6)->get();
+        }
         
         $categories = ServiceCategory::where('is_active', true)
             ->withCount(['services' => function($query) {
@@ -106,6 +125,6 @@ class ServiceController extends Controller
             ->limit(20)
             ->get();
             
-        return view('front.services.show', compact('service', 'relatedServices', 'categories', 'tags'));
+        return view('front.services.show', compact('service', 'relatedServices', 'relatedNews', 'categories', 'tags'));
     }
 } 

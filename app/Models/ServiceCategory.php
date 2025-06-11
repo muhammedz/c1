@@ -52,6 +52,13 @@ class ServiceCategory extends Model
                     ->withTimestamps();
     }
     
+    // Müdürlükler ile many-to-many ilişki
+    public function mudurlukler()
+    {
+        return $this->belongsToMany(Mudurluk::class, 'mudurluk_service_category', 'service_category_id', 'mudurluk_id')
+                   ->withTimestamps();
+    }
+    
     // Yardımcı metodlar
     
     // Aktif kategorileri getir

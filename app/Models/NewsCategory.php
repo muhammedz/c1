@@ -62,6 +62,13 @@ class NewsCategory extends Model
         return $this->belongsToMany(News::class, 'news_category', 'category_id', 'news_id');
     }
     
+    // Hizmetler ile many-to-many ilişki
+    public function services()
+    {
+        return $this->belongsToMany(Service::class, 'service_news_category', 'news_category_id', 'service_id')
+                   ->withTimestamps();
+    }
+    
     // Yardımcı metodlar
     
     // Aktif kategorileri getir

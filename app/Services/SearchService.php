@@ -1,0 +1,296 @@
+<?php
+
+namespace App\Services;
+
+use App\Models\Service;
+use App\Models\News;
+use Illuminate\Support\Collection;
+
+class SearchService
+{
+    /**
+     * Gelişmiş arama işlemi
+     * 
+     * @param string $query
+     * @return array
+     */
+    public function search(string $query): array
+    {
+        if (empty($query)) {
+            return [
+                'services' => collect(),
+                'news' => collect(),
+                'total' => 0
+            ];
+        }
+
+        // Arama sorgusunu normalize et
+        $normalizedQuery = $this->normalizeQuery($query);
+        
+        // Farklı arama stratejileri uygula
+        $services = $this->searchServices($normalizedQuery, $query);
+        $news = $this->searchNews($normalizedQuery, $query);
+        
+        return [
+            'services' => $services,
+            'news' => $news,
+            'total' => $services->count() + $news->count()
+        ];
+    }
+    
+    /**
+     * Sorguyu normalize et (Türkçe karakterler, küçük harf)
+     * 
+     * @param string $query
+     * @return string
+     */
+    private function normalizeQuery(string $query): string
+    {
+        $normalized = mb_strtolower($query, 'UTF-8');
+        $normalized = str_replace(['ı', 'ğ', 'ü', 'ş', 'ö', 'ç'], ['i', 'g', 'u', 's', 'o', 'c'], $normalized);
+        return trim($normalized);
+    }
+    
+    /**
+     * Hizmetlerde arama yap
+     * 
+     * @param string $normalizedQuery
+     * @param string $originalQuery
+     * @return Collection
+     */
+    private function searchServices(string $normalizedQuery, string $originalQuery): Collection
+    {
+        $results = collect();
+        
+        // 1. Scout ile tam arama
+        try {
+            $scoutResults = Service::search($normalizedQuery)
+                ->where('status', 'published')
+                ->get();
+            $results = $results->merge($scoutResults);
+        } catch (\Exception $e) {
+            // Scout hatası durumunda devam et
+        }
+        
+        // 2. Veritabanında LIKE ile arama (sadece başlık)
+        $likeResults = Service::where('status', 'published')
+            ->where(function($q) use ($originalQuery, $normalizedQuery) {
+                $q->where('title', 'LIKE', "%{$originalQuery}%")
+                  ->orWhere('title', 'LIKE', "%{$normalizedQuery}%");
+            })
+            ->get();
+        
+        // Tekrarları önleyerek birleştir
+        $existingIds = $results->pluck('id')->toArray();
+        $additionalResults = $likeResults->whereNotIn('id', $existingIds);
+        $results = $results->merge($additionalResults);
+        
+        // 3. Kelime kelime arama
+        $words = explode(' ', $normalizedQuery);
+        if (count($words) > 1) {
+            foreach ($words as $word) {
+                if (strlen($word) > 2) {
+                    $wordResults = Service::where('status', 'published')
+                        ->where('title', 'LIKE', "%{$word}%")
+                        ->get();
+                    
+                    $existingIds = $results->pluck('id')->toArray();
+                    $additionalResults = $wordResults->whereNotIn('id', $existingIds);
+                    $results = $results->merge($additionalResults);
+                }
+            }
+        }
+        
+        // 4. Fuzzy matching (benzer kelimeler) - sadece çok az sonuç varsa
+        if ($results->count() < 2) {
+            $fuzzyResults = $this->fuzzySearchServices($normalizedQuery);
+            $existingIds = $results->pluck('id')->toArray();
+            $additionalResults = $fuzzyResults->whereNotIn('id', $existingIds);
+            $results = $results->merge($additionalResults);
+        }
+        
+        return $results;
+    }
+    
+    /**
+     * Haberlerde arama yap
+     * 
+     * @param string $normalizedQuery
+     * @param string $originalQuery
+     * @return Collection
+     */
+    private function searchNews(string $normalizedQuery, string $originalQuery): Collection
+    {
+        $results = collect();
+        
+        // 1. Scout ile tam arama
+        try {
+            $scoutResults = News::search($normalizedQuery)
+                ->where('status', 'published')
+                ->get();
+            $results = $results->merge($scoutResults);
+        } catch (\Exception $e) {
+            // Scout hatası durumunda devam et
+        }
+        
+        // 2. Veritabanında LIKE ile arama (sadece başlık)
+        $likeResults = News::where('status', 'published')
+            ->where(function($q) use ($originalQuery, $normalizedQuery) {
+                $q->where('title', 'LIKE', "%{$originalQuery}%")
+                  ->orWhere('title', 'LIKE', "%{$normalizedQuery}%");
+            })
+            ->get();
+        
+        $existingIds = $results->pluck('id')->toArray();
+        $additionalResults = $likeResults->whereNotIn('id', $existingIds);
+        $results = $results->merge($additionalResults);
+        
+        // 3. Kelime kelime arama
+        $words = explode(' ', $normalizedQuery);
+        if (count($words) > 1) {
+            foreach ($words as $word) {
+                if (strlen($word) > 2) {
+                    $wordResults = News::where('status', 'published')
+                        ->where('title', 'LIKE', "%{$word}%")
+                        ->get();
+                    
+                    $existingIds = $results->pluck('id')->toArray();
+                    $additionalResults = $wordResults->whereNotIn('id', $existingIds);
+                    $results = $results->merge($additionalResults);
+                }
+            }
+        }
+        
+        // 4. Fuzzy matching - sadece çok az sonuç varsa
+        if ($results->count() < 2) {
+            $fuzzyResults = $this->fuzzySearchNews($normalizedQuery);
+            $existingIds = $results->pluck('id')->toArray();
+            $additionalResults = $fuzzyResults->whereNotIn('id', $existingIds);
+            $results = $results->merge($additionalResults);
+        }
+        
+        return $results;
+    }
+    
+    /**
+     * Hizmetler için fuzzy search
+     * 
+     * @param string $query
+     * @return Collection
+     */
+    private function fuzzySearchServices(string $query): Collection
+    {
+        $results = collect();
+        
+        // Tek karakter toleransı ile arama
+        $variations = $this->generateQueryVariations($query);
+        
+        foreach ($variations as $variation) {
+            $variationResults = Service::where('status', 'published')
+                ->where('title', 'LIKE', "%{$variation}%")
+                ->limit(5)
+                ->get();
+            
+            $existingIds = $results->pluck('id')->toArray();
+            $additionalResults = $variationResults->whereNotIn('id', $existingIds);
+            $results = $results->merge($additionalResults);
+            
+            if ($results->count() >= 10) break;
+        }
+        
+        return $results;
+    }
+    
+    /**
+     * Haberler için fuzzy search
+     * 
+     * @param string $query
+     * @return Collection
+     */
+    private function fuzzySearchNews(string $query): Collection
+    {
+        $results = collect();
+        
+        $variations = $this->generateQueryVariations($query);
+        
+        foreach ($variations as $variation) {
+            $variationResults = News::where('status', 'published')
+                ->where('title', 'LIKE', "%{$variation}%")
+                ->limit(5)
+                ->get();
+            
+            $existingIds = $results->pluck('id')->toArray();
+            $additionalResults = $variationResults->whereNotIn('id', $existingIds);
+            $results = $results->merge($additionalResults);
+            
+            if ($results->count() >= 10) break;
+        }
+        
+        return $results;
+    }
+    
+    /**
+     * Sorgu varyasyonları oluştur (typo toleransı için)
+     * 
+     * @param string $query
+     * @return array
+     */
+    private function generateQueryVariations(string $query): array
+    {
+        $variations = [];
+        
+        // Orijinal sorgu
+        $variations[] = $query;
+        
+        // Yaygın Türkçe yazım hataları
+        $commonMistakes = [
+            'egitim' => ['eğitim', 'egitim'],
+            'eğitim' => ['egitim', 'eğitim'],
+            'eğitin' => ['eğitim', 'egitim'], // eğitin -> eğitim
+            'egtin' => ['eğitim', 'egitim'],   // egtin -> eğitim
+            'saglik' => ['sağlık', 'saglik'],
+            'sağlık' => ['saglik', 'sağlık'],
+            'kultur' => ['kültür', 'kultur'],
+            'kültür' => ['kultur', 'kültür'],
+            'spor' => ['spor'],
+            'sosyal' => ['sosyal'],
+            'hizmet' => ['hizmet'],
+            'destek' => ['destek'],
+            'yardim' => ['yardım', 'yardim'],
+            'yardım' => ['yardim', 'yardım']
+        ];
+        
+        foreach ($commonMistakes as $mistake => $corrections) {
+            if (strpos($query, $mistake) !== false) {
+                foreach ($corrections as $correction) {
+                    $variations[] = str_replace($mistake, $correction, $query);
+                }
+            }
+        }
+        
+        // Tek karakter eksik/fazla varyasyonları (sadece son karakter için)
+        if (strlen($query) >= 5 && strlen($query) <= 8) {
+            // Sadece son karakteri çıkar (ilk karakteri çıkarmayı kaldırdık)
+            $variations[] = substr($query, 0, -1);
+            
+            // Yaygın son ekler
+            $variations[] = $query . 'i';
+            $variations[] = $query . 'ı';
+            $variations[] = $query . 'e';
+            $variations[] = $query . 'a';
+            $variations[] = $query . 'm'; // eğitin + m = eğitim
+        }
+        
+        // Levenshtein distance ile benzer kelimeler (daha sıkı kontrol)
+        if (strlen($query) >= 5) {
+            $commonWords = ['eğitim', 'egitim', 'sağlık', 'saglik', 'kültür', 'kultur', 'sosyal', 'hizmet'];
+            foreach ($commonWords as $word) {
+                if (levenshtein($query, $word) <= 1 && strlen($query) >= strlen($word) - 1) { // En fazla 1 karakter fark ve uzunluk kontrolü
+                    $variations[] = $word;
+                }
+            }
+        }
+        
+        return array_unique($variations);
+    }
+} 

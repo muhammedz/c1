@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Slider;
 use App\Models\QuickMenuCategory;
 use App\Models\QuickMenuItem;
+use App\Models\HeaderSetting;
 use App\Services\MediaService;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
@@ -767,5 +768,54 @@ class HomepageController extends Controller
                 'error' => $e->getMessage()
             ]);
         }
+    }
+
+    /**
+     * Header Yönetimi
+     */
+    
+    /**
+     * Header ayarları sayfası
+     */
+    public function header()
+    {
+        $headerSettings = HeaderSetting::getSettings();
+        $mainMenuCount = 0; // Bu değer menü sistemi ile entegre edilecek
+        $activeMenuCount = 0; // Bu değer menü sistemi ile entegre edilecek
+        
+        return view('admin.homepage.header.index', compact('headerSettings', 'mainMenuCount', 'activeMenuCount'));
+    }
+    
+    /**
+     * Header ayarlarını güncelle
+     */
+    public function updateHeaderSettings(Request $request)
+    {
+        $request->validate([
+            'logo_path' => 'nullable|string|max:255',
+            'secondary_logo_path' => 'nullable|string|max:255',
+            'slogan_path' => 'nullable|string|max:255',
+            'show_search_button' => 'nullable|boolean',
+            'header_bg_color' => 'nullable|string|max:20',
+            'header_text_color' => 'nullable|string|max:20',
+            'header_height' => 'nullable|integer|min:50|max:200',
+            'sticky_header' => 'nullable|boolean',
+            'custom_css' => 'nullable|string',
+            'additional_scripts' => 'nullable|string',
+            'custom_header_html' => 'nullable|string',
+            'mobile_logo_path' => 'nullable|string|max:255',
+        ]);
+
+        $headerSettings = HeaderSetting::getSettings();
+        
+        // Boolean değerleri düzelt
+        $data = $request->all();
+        $data['show_search_button'] = $request->has('show_search_button') ? 1 : 0;
+        $data['sticky_header'] = $request->has('sticky_header') ? 1 : 0;
+        
+        $headerSettings->update($data);
+
+        return redirect()->route('admin.homepage.header')
+            ->with('success', 'Header ayarları başarıyla güncellendi.');
     }
 }

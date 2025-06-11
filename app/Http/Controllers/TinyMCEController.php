@@ -31,14 +31,6 @@ class TinyMCEController extends Controller
             
             // Benzersiz dosya adı oluştur
             $filename = $this->createUniqueFilename($uploadPath, $originalFilename, $extension);
-            
-            // log
-            Log::channel('daily')->debug('TinyMCE Upload Attempt:', [
-                'filename' => $filename,
-                'original_name' => $file->getClientOriginalName(),
-                'size' => $file->getSize(),
-                'mime' => $file->getMimeType(),
-            ]);
 
             // Dosyayı public/uploads/tinymce klasörüne kaydet
             $file->move(public_path($uploadPath), $filename);
@@ -47,18 +39,12 @@ class TinyMCEController extends Controller
             // Asset fonksiyonu ile URL oluştur
             $url = FileManagerHelper::getFileUrl($path);
 
-            Log::channel('daily')->debug('TinyMCE Upload Success:', [
-                'path' => $path,
-                'url' => $url
-            ]);
-
             return response()->json([
                 'location' => $url
             ]);
         } catch (\Exception $e) {
             Log::error('TinyMCE Upload Failed:', [
                 'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
             ]);
 
             return response()->json([

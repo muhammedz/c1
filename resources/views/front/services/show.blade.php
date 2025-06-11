@@ -266,10 +266,12 @@
                         Diğer Bilgiler
                     </a>
                     @endif
+                    @if($relatedNews->count() > 0)
                     <a href="#ilgili-haberler" class="flex items-center px-4 py-2 rounded-lg text-gray-600 hover:bg-[#00352b]/10 hover:text-[#00352b] font-medium transition-colors">
                         <i class="material-icons mr-3 text-lg">article</i>
                         İlgili Haberler
                     </a>
+                    @endif
                 </nav>
             </div>
         </div>
@@ -477,10 +479,37 @@
             @endif
             
             <!-- İlgili Haberler -->
+            @if($relatedNews->count() > 0)
             <section id="ilgili-haberler" class="service-content-section">
                 <h2>İlgili Haberler</h2>
-                <p class="mb-4">Buraya içerik ekleyin veya görünümünü gizli yapın.</p>
+                <p class="mb-5">{{ $service->title }} hizmetimizle ilgili güncel haberler ve duyurular:</p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    @foreach($relatedNews as $news)
+                    <div class="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-all">
+                        <div class="p-5 flex flex-col h-full">
+                            <div class="flex items-center mb-3">
+                                <span class="material-icons text-[#00352b] mr-2">article</span>
+                                <h3 class="font-semibold text-gray-800">{{ $news->title }}</h3>
+                            </div>
+                            @if($news->summary)
+                            <p class="text-sm text-gray-600 mb-4 flex-grow">{{ Str::limit($news->summary, 120) }}</p>
+                            @endif
+                            <div class="mt-auto flex items-center justify-between">
+                                <a href="{{ route('news.show', $news->slug) }}" class="inline-flex items-center text-[#00352b] hover:text-[#20846c] transition-colors">
+                                    <span class="text-sm font-medium">Haberi Oku</span>
+                                    <span class="material-icons ml-1 text-sm">arrow_forward</span>
+                                </a>
+                                @if($news->published_at)
+                                <span class="text-xs text-gray-500">{{ $news->published_at->format('d.m.Y') }}</span>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                    @endforeach
+                </div>
             </section>
+            @endif
         </div>
     </div>
 </div>

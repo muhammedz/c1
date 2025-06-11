@@ -70,10 +70,15 @@ class ServiceController extends Controller
             ->orderBy('order')
             ->get();
             
+        // Haber kategorilerini ekle
+        $newsCategories = \App\Models\NewsCategory::where('is_active', true)
+            ->orderBy('name')
+            ->get();
+            
         $serviceCategories = ServiceCategory::where('is_active', true)->orderBy('name')->get();
         $units = ServicesUnit::where('status', true)->orderBy('name')->get();
         
-        return view('admin.services.create', compact('categories', 'tags', 'hedefKitleler', 'maxHeadlinesReached', 'serviceCategories', 'units'));
+        return view('admin.services.create', compact('categories', 'tags', 'hedefKitleler', 'newsCategories', 'maxHeadlinesReached', 'serviceCategories', 'units'));
     }
 
     /**
@@ -109,6 +114,11 @@ class ServiceController extends Controller
             // Hedef kitleleri ekle
             if ($request->has('hedef_kitleler')) {
                 $service->hedefKitleler()->sync($request->hedef_kitleler);
+            }
+            
+            // Haber kategorilerini ekle
+            if ($request->has('news_category_ids')) {
+                $service->newsCategories()->sync($request->news_category_ids);
             }
             
             DB::commit();
@@ -168,9 +178,15 @@ class ServiceController extends Controller
             ->orderBy('order')
             ->get();
         
+        // Haber kategorilerini ekle
+        $newsCategories = \App\Models\NewsCategory::where('is_active', true)
+            ->orderBy('name')
+            ->get();
+        $selectedNewsCategories = $service->newsCategories->pluck('id')->toArray();
+        
         $units = ServicesUnit::where('status', true)->orderBy('name')->get();
         
-        return view('admin.services.edit', compact('service', 'maxHeadlinesReached', 'categories', 'selectedCategories', 'tags', 'hedefKitleler', 'units'));
+        return view('admin.services.edit', compact('service', 'maxHeadlinesReached', 'categories', 'selectedCategories', 'tags', 'hedefKitleler', 'newsCategories', 'selectedNewsCategories', 'units'));
     }
 
     /**
@@ -210,6 +226,13 @@ class ServiceController extends Controller
                 $service->hedefKitleler()->sync($request->hedef_kitleler);
             } else {
                 $service->hedefKitleler()->detach();
+            }
+            
+            // Haber kategorilerini güncelle
+            if ($request->has('news_category_ids')) {
+                $service->newsCategories()->sync($request->news_category_ids);
+            } else {
+                $service->newsCategories()->detach();
             }
             
             DB::commit();

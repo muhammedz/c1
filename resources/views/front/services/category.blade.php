@@ -6,23 +6,40 @@
 
 @section('content')
 <!-- Hero Bölümü - Yeniden Tasarlandı -->
-<section class="relative bg-[#00352b] pt-28 pb-16 overflow-hidden">
-    <!-- Arka Plan Desenleri -->
-    <div class="absolute inset-0 overflow-hidden opacity-10">
-        <div class="absolute -right-10 -top-10 w-64 h-64 rounded-full bg-white"></div>
-        <div class="absolute left-1/3 bottom-0 w-96 h-96 rounded-full bg-white"></div>
+<div class="relative bg-gradient-to-r from-[#00352b] to-[#20846c] overflow-hidden">
+    <div class="absolute inset-0 opacity-20">
+        <!-- Pattern overlay -->
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-full h-full" preserveAspectRatio="none">
+            <defs>
+                <pattern id="hero-pattern" width="40" height="40" patternUnits="userSpaceOnUse">
+                    <path d="M0 20 L40 20 M20 0 L20 40" stroke="currentColor" stroke-width="1" fill="none" />
+                </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#hero-pattern)" />
+        </svg>
     </div>
     
-    <div class="container max-w-7xl mx-auto px-4 relative z-10">
-        <div class="flex flex-col md:flex-row justify-between gap-8 items-center">
-            <!-- Sol Taraf: Başlık ve Açıklama -->
-            <div class="md:w-1/2">
-                <h1 class="text-3xl md:text-5xl font-bold mb-4 text-white leading-tight">{{ $category->name }}</h1>
-                <p class="text-lg text-white/80 mb-6 max-w-xl">{{ $category->description ?? 'Bu kategorideki hizmetlerimizi inceleyebilirsiniz' }}</p>
+    <!-- Dekoratif şekiller -->
+    <div class="absolute -right-20 -bottom-20 w-64 h-64 rounded-full bg-[#e6a23c]/10 blur-3xl"></div>
+    <div class="absolute -left-10 top-10 w-40 h-40 rounded-full bg-white/5 blur-2xl"></div>
+    
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-10 relative z-10">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 items-center">
+            <div class="md:col-span-2">
+                <div class="inline-block bg-white/10 backdrop-blur-sm px-4 py-1 rounded-full text-white/90 text-sm mb-3 border border-white/10">
+                    @if($category->icon)
+                        <i class="{{ $category->icon }} text-xs align-middle mr-1"></i>
+                    @else
+                        <span class="material-icons text-xs align-middle mr-1">category</span>
+                    @endif
+                    <span>Hizmet Kategorisi</span>
+                </div>
+                <h1 class="text-3xl md:text-4xl font-bold text-white mb-4">{{ $category->name }}</h1>
+                <p class="text-white/80 text-lg mb-5">{{ $category->description ?? 'Bu kategorideki hizmetlerimizi inceleyebilir, ihtiyacınız olan hizmeti bulabilirsiniz.' }}</p>
                 
                 <!-- Modern Arama Kutusu -->
-                <form action="{{ route('services.category', $category->slug) }}" method="GET" class="mt-8">
-                    <div class="bg-white/10 backdrop-blur-md rounded-xl p-1 flex items-center shadow-lg hover:bg-white/20 transition duration-300 border border-white/20">
+                <form action="{{ route('services.category', $category->slug) }}" method="GET" class="mt-6">
+                    <div class="bg-white/10 backdrop-blur-sm rounded-lg p-1 flex items-center shadow-lg hover:bg-white/20 transition duration-300 border border-white/20">
                         <input 
                             type="text" 
                             name="search" 
@@ -30,7 +47,7 @@
                             class="w-full bg-transparent px-4 py-3 text-white placeholder-white/70 outline-none"
                             value="{{ request()->get('search') }}"
                         >
-                        <button type="submit" class="bg-white hover:bg-gray-100 text-[#00352b] font-medium px-6 py-3 rounded-lg transition duration-300 flex items-center">
+                        <button type="submit" class="bg-[#e6a23c] hover:bg-[#e6a23c]/90 text-white font-medium px-6 py-3 rounded-md transition duration-300 flex items-center shadow-lg shadow-[#e6a23c]/20">
                             <span class="material-icons mr-1">search</span>
                             Ara
                         </button>
@@ -38,71 +55,38 @@
                 </form>
             </div>
             
-            <!-- Sağ Taraf: İstatistikler veya Görsel -->
-            <div class="md:w-1/2 flex justify-end">
-                <div class="bg-white/10 backdrop-blur-md p-6 rounded-xl border border-white/20 shadow-lg">
-                    <div class="grid grid-cols-2 gap-6">
+            <!-- Sağ Taraf: İstatistikler -->
+            <div class="hidden md:flex justify-end">
+                <div class="bg-white/10 backdrop-blur-sm p-6 rounded-lg border border-white/20 shadow-lg">
+                    <div class="grid grid-cols-2 gap-4">
                         <div class="text-center">
-                            <div class="text-3xl font-bold text-white mb-1">{{ $services->total() }}</div>
-                            <div class="text-white/70 text-sm">Aktif Hizmet</div>
+                            <div class="text-2xl font-bold text-white mb-1">{{ $services->count() }}</div>
+                            <div class="text-white/70 text-xs">Aktif Hizmet</div>
                         </div>
                         <div class="text-center">
-                            <div class="text-3xl font-bold text-white mb-1">{{ $categories->count() }}</div>
-                            <div class="text-white/70 text-sm">Hizmet Kategorisi</div>
+                            <div class="text-2xl font-bold text-white mb-1">{{ $categories->count() }}</div>
+                            <div class="text-white/70 text-xs">Kategori</div>
                         </div>
                         <div class="text-center">
-                            <div class="text-3xl font-bold text-white mb-1">100%</div>
-                            <div class="text-white/70 text-sm">Müşteri Memnuniyeti</div>
+                            <div class="text-2xl font-bold text-white mb-1">100%</div>
+                            <div class="text-white/70 text-xs">Memnuniyet</div>
                         </div>
                         <div class="text-center">
-                            <div class="text-3xl font-bold text-white mb-1">7/24</div>
-                            <div class="text-white/70 text-sm">Destek</div>
+                            <div class="text-2xl font-bold text-white mb-1">7/24</div>
+                            <div class="text-white/70 text-xs">Destek</div>
+                        </div>
+                    </div>
+                    <div class="mt-4 pt-4 border-t border-white/10">
+                        <div class="flex items-center justify-center text-[#e6a23c]">
+                            <span class="material-icons mr-2">phone</span>
+                            <span class="font-bold">444 1 234</span>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</section>
-
-<!-- Kategori Filtreleme - Geliştirilmiş Tasarım -->
-<section class="py-5 bg-gradient-to-r from-white to-slate-50 shadow-md border-b border-slate-200">
-    <div class="container max-w-7xl mx-auto px-4">
-        <div class="flex items-center justify-between">
-            <div class="flex items-center">
-                <span class="hidden md:inline-block text-[#00352b] font-semibold mr-4">Kategoriler:</span>
-            </div>
-            
-            <div class="overflow-x-auto scrollbar-hide flex-grow">
-                <div class="flex items-center space-x-3 min-w-max py-1">
-                    <a href="{{ route('services.index') }}" 
-                        class="relative px-5 py-2.5 rounded-lg flex items-center {{ request()->routeIs('services.index') && !request()->query('search') ? 'bg-gradient-to-r from-[#00352b] to-[#005540] text-white font-medium shadow-md' : 'bg-white hover:bg-slate-50 text-gray-700 border border-slate-200 hover:border-[#00352b]/30' }} transition-all duration-300 group">
-                        <i class="fas fa-layer-group {{ request()->routeIs('services.index') && !request()->query('search') ? 'text-white' : 'text-[#00352b] group-hover:text-[#00352b]' }} mr-2"></i>
-                        <span class="font-medium">Tüm Hizmetler</span>
-                        
-                        @if(request()->routeIs('services.index') && !request()->query('search'))
-                        <span class="absolute top-0 right-0 h-2 w-2 bg-white rounded-full transform -translate-y-1 translate-x-1 shadow"></span>
-                        @endif
-                    </a>
-                    
-                    @foreach($categories as $cat)
-                    <a href="{{ route('services.category', $cat->slug) }}" 
-                        class="relative px-5 py-2.5 rounded-lg flex items-center {{ $cat->id == $category->id ? 'bg-gradient-to-r from-[#00352b] to-[#005540] text-white font-medium shadow-md' : 'bg-white hover:bg-slate-50 text-gray-700 border border-slate-200 hover:border-[#00352b]/30' }} transition-all duration-300 group">
-                        @if($cat->icon)
-                            <i class="{{ $cat->icon }} {{ $cat->id == $category->id ? 'text-white' : 'text-[#00352b] group-hover:text-[#00352b]' }} mr-2"></i>
-                        @endif
-                        <span class="font-medium">{{ $cat->name }}</span>
-                        
-                        @if($cat->id == $category->id)
-                        <span class="absolute top-0 right-0 h-2 w-2 bg-white rounded-full transform -translate-y-1 translate-x-1 shadow"></span>
-                        @endif
-                    </a>
-                    @endforeach
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
+</div>
 
 <!-- Ana İçerik - Mevcut tasarıma uygun kart yapısı -->
 <section class="py-12 bg-slate-100">
@@ -114,49 +98,46 @@
                 <p class="text-gray-600">Lütfen daha sonra tekrar kontrol ediniz veya başka bir kategori seçiniz.</p>
             </div>
         @else
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Hizmet Sayısı Bilgisi -->
+            <div class="mb-6">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-xl font-bold text-gray-800">{{ $category->name }} Hizmetleri</h2>
+                    <span class="text-sm text-gray-600 bg-white px-3 py-1 rounded-full border border-gray-200">
+                        {{ $services->count() }} hizmet bulundu
+                    </span>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 @foreach($services as $service)
-                <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-                    <!-- Görsel -->
-                    <div class="h-48 overflow-hidden">
-                        @if($service->image)
-                            <img src="{{ asset('storage/' . str_replace('/storage/', '', $service->image)) }}" alt="{{ $service->title }}" class="w-full h-full object-cover">
+                <a href="{{ route('services.show', $service->slug) }}" class="service-card-modern group relative overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100 hover:from-gray-100 hover:to-gray-150 border-gray-200 flex items-center p-3 rounded-lg border-2 shadow-sm hover:shadow-md transition-all duration-300 transform hover:scale-102 hover:-translate-y-0.5">
+                    <!-- İkon -->
+                    <div class="icon-container w-10 h-10 flex items-center justify-center rounded-full mr-3 flex-shrink-0 bg-white/80 group-hover:bg-white transition-all duration-300 group-hover:rotate-3 group-hover:scale-105 shadow-sm">
+                        @if($service->categories->isNotEmpty() && $service->categories->first()->icon)
+                            <i class="{{ $service->categories->first()->icon }} text-[#007b32] text-lg group-hover:text-[#00352b] transition-colors duration-300"></i>
                         @else
-                            <div class="w-full h-full flex items-center justify-center bg-slate-100">
-                                <span class="material-icons text-gray-400 text-4xl">extension</span>
-                            </div>
+                            <span class="material-icons text-[#007b32] text-lg group-hover:text-[#00352b] transition-colors duration-300">extension</span>
                         @endif
                     </div>
                     
-                    <!-- İçerik -->
-                    <div class="p-5">
-                        <h3 class="text-xl font-bold text-gray-800 mb-2">{{ $service->title }}</h3>
-                        <p class="text-gray-600 mb-4 line-clamp-2">{{ $service->summary }}</p>
-                        
-                        <!-- Kategoriler -->
-                        @if($service->categories->isNotEmpty())
-                        <div class="mb-4 flex flex-wrap gap-2">
-                            @foreach($service->categories as $cat)
-                            <a href="{{ route('services.category', $cat->slug) }}" class="text-xs bg-slate-100 hover:bg-[#00352b] hover:text-white px-3 py-1 rounded-full transition-colors text-gray-700 {{ $cat->id == $category->id ? 'bg-[#00352b] text-white' : '' }}">
-                                {{ $cat->name }}
-                            </a>
-                            @endforeach
-                        </div>
-                        @endif
-                        
-                        <!-- Detay Butonu -->
-                        <a href="{{ route('services.show', $service->slug) }}" class="inline-flex items-center text-[#00352b] hover:underline">
-                            Detaylı Bilgi
-                            <span class="material-icons text-sm ml-1">arrow_forward</span>
-                        </a>
+                    <!-- Başlık ve Açıklama -->
+                    <div class="flex flex-col flex-1 min-w-0">
+                        <h3 class="font-semibold text-[#00352b] text-sm group-hover:text-[#007b32] transition-colors duration-300 leading-tight mb-0.5">{{ $service->title }}</h3>
+                        <p class="text-xs text-gray-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300 line-clamp-1">{{ Str::limit($service->summary, 50) }}</p>
                     </div>
-                </div>
+                    
+                    <!-- Sağ Ok İkonu -->
+                    <div class="ml-2 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-1 group-hover:translate-x-0">
+                        <span class="material-icons text-[#007b32] text-base">arrow_forward</span>
+                    </div>
+                    
+                    <!-- Hover overlay efekti -->
+                    <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/15 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform -skew-x-12 translate-x-full group-hover:translate-x-[-100%] transition-transform duration-700"></div>
+                    
+                    <!-- Sol kenar vurgu çizgisi -->
+                    <div class="absolute left-0 top-0 bottom-0 w-0 bg-[#007b32] group-hover:w-1 transition-all duration-300 rounded-l-lg"></div>
+                </a>
                 @endforeach
-            </div>
-            
-            <!-- Sayfalama -->
-            <div class="mt-12">
-                {{ $services->links() }}
             </div>
         @endif
     </div>

@@ -13,6 +13,7 @@ use Illuminate\Support\Str;
 use Intervention\Image\ImageManager;
 use Intervention\Image\Drivers\Gd\Driver;
 use App\Helpers\FileManagerHelper;
+use Intervention\Image\Image;
 
 class MediaPickerController extends Controller
 {
@@ -27,25 +28,13 @@ class MediaPickerController extends Controller
             $type = $request->input('type'); // Tip parametresi (image, document, audio vb.)
             $filter = $request->input('filter', 'related');
             
-            \Log::debug('MediaPicker Açılıyor', [
-                'related_type' => $relatedType,
-                'related_id' => $relatedId,
-                'type' => $type,
-                'filter' => $filter,
-                'user_agent' => $request->userAgent(),
-                'ip' => $request->ip(),
-                'url' => $request->fullUrl()
-            ]);
-            
             return view('filemanagersystem.mediapicker.index', compact('relatedType', 'relatedId', 'type', 'filter'));
         } catch (\Exception $e) {
             \Log::error('MediaPicker açılırken hata oluştu: ' . $e->getMessage(), [
                 'file' => $e->getFile(),
-                'line' => $e->getLine(),
-                'trace' => $e->getTraceAsString()
+                'line' => $e->getLine()
             ]);
             
-            // Hata durumunda basit bir hata sayfası göster
             return response()->view('filemanagersystem.mediapicker.error', [
                 'error' => 'Medya seçici açılırken bir hata oluştu: ' . $e->getMessage()
             ], 500);
@@ -58,272 +47,52 @@ class MediaPickerController extends Controller
     public function listMedia(Request $request)
     {
         try {
-            \Log::debug('MediaPicker ListMedia başladı', [
-                'request_params' => $request->all(),
-                'url' => $request->fullUrl()
-            ]);
-            
             $relatedType = $request->input('related_type', 'general');
             $relatedId = $request->input('related_id');
-            $filter = $request->input('filter', 'related'); // 'related', 'all'
+            $filter = $request->input('filter', 'related');
             $page = $request->input('page', 1);
-            $type = $request->input('type'); // Tip parametresi (image, document, audio vb.)
-            
-            // DETAYLI DEBUG: Gelen parametreleri logla
-            $debugLog = [
-                'params' => [
-                    'related_type' => $relatedType,
-                    'related_id' => $relatedId,
-                    'filter' => $filter,
-                    'page' => $page,
-                    'type' => $type
-                ],
-                'logs' => []
-            ];
-            \Log::debug('### MediaPicker İstek Parametreleri ###', $debugLog['params']);
+            $type = $request->input('type');
             
             // İlgili dosyaları getir
             $query = Media::query();
             
-            // DETAYLI DEBUG: İlk sorgu
-            $sql1 = $query->toSql();
-            \Log::debug('MediaPicker Başlangıç Sorgusu', ['sql' => $sql1]);
-            $debugLog['logs'][] = ['tip' => 'başlangıç_sorgusu', 'sql' => $sql1];
-            
             // İlişki filtresi
             if ($filter === 'related') {
-                \Log::debug('MediaPicker İlişkili Dosya Filtresi Aktif', [
-                    'related_type' => $relatedType,
-                    'related_id' => $relatedId
-                ]);
-                $debugLog['logs'][] = ['tip' => 'ilişki_filtresi_aktif', 'related_type' => $relatedType, 'related_id' => $relatedId];
-                
-                // DETAYLI DEBUG: İlişki tablosunu kontrol et
-                $relations = MediaRelation::where('related_type', $relatedType)
-                    ->where('related_id', $relatedId)
-                    ->get();
-                
-                \Log::debug('MediaPicker İlişki Kayıtları', [
-                    'ilişki_sayısı' => $relations->count(),
-                    'ilişkili_medya_idleri' => $relations->pluck('media_id')->toArray(),
-                    'ilişki_detayları' => $relations->map(function($item) {
-                        return [
-                            'id' => $item->id,
-                            'media_id' => $item->media_id,
-                            'related_type' => $item->related_type,
-                            'related_id' => $item->related_id,
-                            'field_name' => $item->field_name,
-                            'created_at' => $item->created_at,
-                        ];
-                    })->toArray()
-                ]);
-                $debugLog['logs'][] = [
-                    'tip' => 'ilişki_kayıtları', 
-                    'ilişki_sayısı' => $relations->count(),
-                    'ilişkili_medya_idleri' => $relations->pluck('media_id')->toArray(),
-                    'ilişki_detayları' => $relations->map(function($item) {
-                        return [
-                            'id' => $item->id,
-                            'media_id' => $item->media_id,
-                            'related_type' => $item->related_type,
-                            'related_id' => $item->related_id,
-                            'field_name' => $item->field_name,
-                            'created_at' => $item->created_at,
-                        ];
-                    })->toArray()
-                ];
-                
-                // İlişkili medya varsa detaylarını logla
-                if ($relations->count() > 0) {
-                    $mediaIds = $relations->pluck('media_id')->toArray();
-                    $mediaDetails = Media::whereIn('id', $mediaIds)->get();
-                    
-                    \Log::debug('İlişkili Medya Detayları', [
-                        'medya_sayısı' => $mediaDetails->count(),
-                        'medya_detayları' => $mediaDetails->map(function($item) {
-                            return [
-                                'id' => $item->id,
-                                'name' => $item->name,
-                                'url' => $item->url,
-                                'mime_type' => $item->mime_type,
-                            ];
-                        })->toArray()
-                    ]);
-                    
-                    $debugLog['logs'][] = [
-                        'tip' => 'ilişkili_medya_detayları',
-                        'medya_sayısı' => $mediaDetails->count(),
-                        'medya_detayları' => $mediaDetails->map(function($item) {
-                            return [
-                                'id' => $item->id,
-                                'name' => $item->name,
-                                'url' => $item->url,
-                                'mime_type' => $item->mime_type,
-                            ];
-                        })->toArray()
-                    ];
-                }
-                
                 if ($relatedId != null && $relatedId != '') {
                     $query->whereHas('relations', function($q) use ($relatedType, $relatedId) {
                         $q->where('related_type', $relatedType)
                           ->where('related_id', $relatedId);
                     });
-                    
-                    // İlişki SQL sorgusunu logla
-                    $relationsSql = (clone $query)->toSql();
-                    $relationsBindings = (clone $query)->getBindings();
-                    \Log::debug('İlişki SQL Sorgusu', [
-                        'sql' => $relationsSql, 
-                        'bindings' => $relationsBindings
-                    ]);
-                    $debugLog['logs'][] = [
-                        'tip' => 'ilişki_sql_sorgusu', 
-                        'sql' => $relationsSql, 
-                        'bindings' => $relationsBindings
-                    ];
-                    
                 } else {
-                    // İlişki ID'si yoksa ve ilişkili filtre seçildiyse, hiçbir sonuç gösterme
-                    $query->where('id', 0); // ID'si 0 olan hiçbir dosya olmadığı için boş sonuç dönecek
+                    $query->where('id', 0); // Boş sonuç
                 }
             } elseif ($filter === 'type-related') {
-                // Belirli içerik tipine ait tüm dosyalar (örn. tüm sliderlar)
-                \Log::debug('MediaPicker Tür İlişkili Dosya Filtresi Aktif', [
-                    'related_type' => $relatedType
-                ]);
-                $debugLog['logs'][] = ['tip' => 'tür_ilişki_filtresi_aktif', 'related_type' => $relatedType];
-                
-                // İlişki tablosunu kontrol et
-                $typeRelations = MediaRelation::where('related_type', $relatedType)
-                    ->get();
-                
-                \Log::debug('MediaPicker Tür İlişki Kayıtları', [
-                    'ilişki_sayısı' => $typeRelations->count(),
-                    'ilişkili_medya_idleri' => $typeRelations->pluck('media_id')->toArray()
-                ]);
-                $debugLog['logs'][] = [
-                    'tip' => 'tür_ilişki_kayıtları', 
-                    'ilişki_sayısı' => $typeRelations->count(),
-                    'ilişkili_medya_idleri' => $typeRelations->pluck('media_id')->toArray()
-                ];
-                
                 $query->whereHas('relations', function($q) use ($relatedType) {
                     $q->where('related_type', $relatedType);
                 });
-            } else {
-                \Log::debug('MediaPicker Tüm Dosyalar Filtresi Aktif');
-                $debugLog['logs'][] = ['tip' => 'tüm_dosyalar_filtresi_aktif'];
             }
             
             // Dosya türüne göre filtreleme
             if ($type === 'image') {
                 $query->where('mime_type', 'LIKE', 'image/%');
-                $debugLog['logs'][] = ['tip' => 'tür_filtresi', 'tür' => 'image'];
             } elseif ($type === 'document') {
                 $docMimeTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 
-                                'application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 
-                                'application/vnd.ms-powerpoint', 'application/vnd.openxmlformats-officedocument.presentationml.presentation', 
-                                'text/plain'];
-                $query->where(function($q) use ($docMimeTypes) {
-                    foreach ($docMimeTypes as $mimeType) {
-                        $q->orWhere('mime_type', 'LIKE', $mimeType);
-                    }
-                });
-                $debugLog['logs'][] = ['tip' => 'tür_filtresi', 'tür' => 'document'];
+                               'application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'];
+                $query->whereIn('mime_type', $docMimeTypes);
             } elseif ($type === 'video') {
                 $query->where('mime_type', 'LIKE', 'video/%');
-                $debugLog['logs'][] = ['tip' => 'tür_filtresi', 'tür' => 'video'];
             } elseif ($type === 'audio') {
                 $query->where('mime_type', 'LIKE', 'audio/%');
-                $debugLog['logs'][] = ['tip' => 'tür_filtresi', 'tür' => 'audio'];
             }
             
-            // Sıralama
-            $query->orderBy('created_at', 'desc');
-            
-            // SQL'i log'a yaz
-            $bindings = $query->getBindings();
-            $sql = $query->toSql();
-            $sqlWithBindings = preg_replace_callback('/\?/', function() use (&$bindings) {
-                return "'" . array_shift($bindings) . "'";
-            }, $sql);
-            \Log::debug('MediaPicker Final SQL', ['sql' => $sqlWithBindings]);
-            $debugLog['logs'][] = ['tip' => 'final_sql', 'sql' => $sqlWithBindings];
-            
-            // Sayfalama
-            $media = $query->paginate(12);
-            
-            // DETAYLI DEBUG: Media-Relations ilişkisini kontrol et
-            $mediaIds = $media->pluck('id')->toArray();
-            \Log::debug('MediaPicker Dönüş Sonuçları', [
-                'toplam_sonuç' => $media->total(),
-                'dönen_medya_idleri' => $mediaIds
-            ]);
-            $debugLog['logs'][] = [
-                'tip' => 'dönüş_sonuçları', 
-                'toplam_sonuç' => $media->total(),
-                'dönen_medya_idleri' => $mediaIds
-            ];
-            
-            // İlişki tablosunu kontrol et - bu medyaların ilişkileri var mı?
-            $mediaRelations = MediaRelation::whereIn('media_id', $mediaIds)->get();
-            \Log::debug('MediaPicker Sonuç İlişkileri', [
-                'ilişki_sayısı' => $mediaRelations->count(),
-                'ilişki_detayları' => $mediaRelations->map(function($item) {
-                    return [
-                        'media_id' => $item->media_id,
-                        'related_type' => $item->related_type,
-                        'related_id' => $item->related_id,
-                    ];
-                })->toArray()
-            ]);
-            $debugLog['logs'][] = [
-                'tip' => 'sonuç_ilişkileri', 
-                'ilişki_sayısı' => $mediaRelations->count(),
-                'ilişki_detayları' => $mediaRelations->map(function($item) {
-                    return [
-                        'media_id' => $item->media_id,
-                        'related_type' => $item->related_type,
-                        'related_id' => $item->related_id,
-                    ];
-                })->toArray()
-            ];
-            
-            // Media modelindeki relations() metodu çalışıyor mu kontrol et
-            $relationTests = [];
-            foreach($media->take(3) as $mediaItem) {
-                $relationInfo = [
-                    'media_id' => $mediaItem->id,
-                    'ilişki_sayısı' => $mediaItem->relations()->count(),
-                    'ilişki_listesi' => $mediaItem->relations()->get()->map(function($item) {
-                        return [
-                            'related_type' => $item->related_type,
-                            'related_id' => $item->related_id,
-                        ];
-                    })->toArray()
-                ];
-                $relationTests[] = $relationInfo;
-                \Log::debug('MediaPicker Media İlişki Kontrolü', $relationInfo);
-            }
-            $debugLog['logs'][] = ['tip' => 'media_ilişki_kontrolü', 'örnekler' => $relationTests];
-            
-            // Media modeli tablo adını kontrol et
-            $modelTableName = (new Media())->getTable();
-            $relationModelTableName = (new MediaRelation())->getTable();
-            $debugLog['logs'][] = [
-                'tip' => 'model_tablo_adları', 
-                'media_tablo' => $modelTableName,
-                'relation_tablo' => $relationModelTableName
-            ];
-            \Log::debug('Model tablo adları', [
-                'media_tablo' => $modelTableName,
-                'relation_tablo' => $relationModelTableName
-            ]);
+            // Sayfalama ve sıralama
+            $perPage = 20;
+            $media = $query->with(['relations', 'folder', 'category'])
+                          ->orderBy('created_at', 'desc')
+                          ->paginate($perPage, ['*'], 'page', $page);
             
             return response()->json([
                 'success' => true,
-                'debug' => $debugLog,
                 'html' => view('filemanagersystem.mediapicker.partials.grid', compact('media', 'type'))->render(),
                 'pagination' => view('filemanagersystem.mediapicker.partials.pagination', [
                     'paginator' => $media,
@@ -358,8 +127,47 @@ class MediaPickerController extends Controller
      */
     public function upload(Request $request)
     {
+        // Güçlendirilmiş validation kuralları
         $request->validate([
-            'file' => 'required|file|max:50000', // 50MB
+            'file' => [
+                'required',
+                'file',
+                'max:10240', // 10MB (kilobyte cinsinden)
+                function ($attribute, $value, $fail) {
+                    // Dosya uzantısı kontrolü
+                    $allowedExtensions = config('filemanagersystem.security.allowed_extensions', []);
+                    $extension = strtolower($value->getClientOriginalExtension());
+                    
+                    if (!in_array($extension, $allowedExtensions)) {
+                        $fail('Bu dosya uzantısı desteklenmiyor: ' . $extension);
+                    }
+                    
+                    // MIME type kontrolü
+                    $allowedMimeTypes = config('filemanagersystem.security.allowed_mime_types', []);
+                    $mimeType = $value->getMimeType();
+                    
+                    if (!in_array($mimeType, $allowedMimeTypes)) {
+                        $fail('Bu dosya türü desteklenmiyor: ' . $mimeType);
+                    }
+                    
+                    // Dosya adı güvenlik kontrolü
+                    $filename = $value->getClientOriginalName();
+                    if (strpos($filename, '../') !== false || strpos($filename, '..\\') !== false) {
+                        $fail('Güvenli olmayan dosya adı.');
+                    }
+                    
+                    // Null byte kontrolü
+                    if (strpos($filename, "\0") !== false) {
+                        $fail('Geçersiz dosya adı.');
+                    }
+                    
+                    // Executable dosya kontrolü
+                    $blockedExtensions = config('filemanagersystem.security.blocked_extensions', []);
+                    if (in_array($extension, $blockedExtensions)) {
+                        $fail('Bu dosya türü güvenlik nedeniyle engellenmiştir.');
+                    }
+                }
+            ],
             'related_type' => 'nullable|string',
             'related_id' => 'nullable|string'
         ]);
@@ -368,24 +176,27 @@ class MediaPickerController extends Controller
         $relatedType = $request->input('related_type');
         $relatedId = $request->input('related_id');
         
-        // DETAYLI DEBUG: Parametreleri logla
-        \Log::debug('MediaPicker Upload Parametreler', [
-            'has_file' => $request->hasFile('file'),
-            'related_type' => $relatedType,
-            'related_id' => $relatedId,
-            'all_params' => $request->all()
-        ]);
-        
         try {
+            // Dosya güvenlik kontrolü
+            if (!$this->validateFileSecurely($file, $request)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Dosya güvenlik kontrolünden geçemedi'
+                ], 422);
+            }
+            
             // Dosya bilgilerini al
             $originalName = $file->getClientOriginalName();
             $extension = strtolower($file->getClientOriginalExtension());
             $mimeType = $file->getMimeType();
             $originalSize = $file->getSize();
-            $fileName = Str::random(40);
+            
+            // Güvenli dosya adı oluştur
+            $fileName = $this->generateSecureFileName($originalName, $extension);
             
             // WebP dönüşümü - Eğer görsel dosyası ise
             $isImage = strpos($mimeType, 'image/') === 0;
+            $isSvg = $extension === 'svg';
             $width = 0;
             $height = 0;
             
@@ -398,60 +209,47 @@ class MediaPickerController extends Controller
                 mkdir($fullPath, 0755, true);
             }
             
-            // Görsel dosyası ise WebP'ye dönüştür
-            if ($isImage && $extension != 'svg') {
+            // Resim sıkıştırma ve WebP dönüştürme işlemi
+            if ($isImage && !$isSvg && in_array($extension, ['jpg', 'jpeg', 'png'])) {
                 try {
-                    // Orijinal dosya adı ve WebP dosya adı
-                    $fileNameOrig = $fileName . '.' . $extension;
-                    $fileNameWebp = $fileName . '.webp';
+                    $fileNameOrig = $fileName;
+                    $fileNameWebp = pathinfo($fileName, PATHINFO_FILENAME) . '.webp';
+                    
                     $savePathOrig = $folderPath . '/' . $fileNameOrig;
                     $savePathWebp = $folderPath . '/' . $fileNameWebp;
+                    
                     $fullSavePathOrig = public_path('uploads/' . $savePathOrig);
                     $fullSavePathWebp = public_path('uploads/' . $savePathWebp);
                     
                     // Önce orijinal dosyayı kaydet
                     $file->storeAs($folderPath, $fileNameOrig, 'uploads');
                     
-                    // ImageManager ile görüntüyü yükle
-                    $manager = new ImageManager(new Driver());
-                    $image = $manager->read($file);
+                    // Image sınıfıyla resmi yükle
+                    $image = Image::read($fullSavePathOrig);
                     
-                    // Görüntü boyutlarını kaydet
-                    $width = $image->width();
-                    $height = $image->height();
+                    // Boyut kontrolü ve yeniden boyutlandırma
+                    $currentWidth = $image->width();
+                    $currentHeight = $image->height();
                     
-                    // Boyutlandırma gerekliyse - çok büyük resimler için
-                    $maxWidth = 2560; // Maksimum genişlik
-                    $maxHeight = 1440; // Maksimum yükseklik
+                    $maxWidth = 1920;
+                    $maxHeight = 1080;
                     
-                    if ($width > $maxWidth || $height > $maxHeight) {
-                        // En-boy oranını koru (aspect ratio)
-                        $aspectRatio = $width / $height;
+                    if ($currentWidth > $maxWidth || $currentHeight > $maxHeight) {
+                        $newWidth = $currentWidth;
+                        $newHeight = $currentHeight;
                         
-                        if ($width > $height) {
-                            // Yatay görsel
-                            $newWidth = min($width, $maxWidth);
-                            $newHeight = (int)($newWidth / $aspectRatio);
-                            
-                            // Yüksekliği kontrol et
-                            if ($newHeight > $maxHeight) {
-                                $newHeight = $maxHeight;
-                                $newWidth = (int)($newHeight * $aspectRatio);
-                            }
-                        } else {
-                            // Dikey görsel
-                            $newHeight = min($height, $maxHeight);
-                            $newWidth = (int)($newHeight * $aspectRatio);
-                            
-                            // Genişliği kontrol et
-                            if ($newWidth > $maxWidth) {
-                                $newWidth = $maxWidth;
-                                $newHeight = (int)($newWidth / $aspectRatio);
-                            }
+                        if ($currentWidth > $maxWidth) {
+                            $ratio = $maxWidth / $currentWidth;
+                            $newWidth = $maxWidth;
+                            $newHeight = $currentHeight * $ratio;
                         }
                         
-                        // Boyutlandır
-                        $image->resize($newWidth, $newHeight);
+                        if ($newHeight > $maxHeight) {
+                            $ratio = $maxHeight / $newHeight;
+                            $newHeight = $maxHeight;
+                            $newWidth = $newWidth * $ratio;
+                        }
+                        
                         $width = $newWidth;
                         $height = $newHeight;
                     }
@@ -463,13 +261,6 @@ class MediaPickerController extends Controller
                     $origSize = filesize($fullSavePathOrig);
                     $webpSize = filesize($fullSavePathWebp);
                     
-                    \Log::debug('Dosya boyut karşılaştırması', [
-                        'original_size' => $origSize,
-                        'webp_size' => $webpSize,
-                        'difference' => $origSize - $webpSize,
-                        'percent' => round(($origSize - $webpSize) / $origSize * 100, 2) . '%'
-                    ]);
-                    
                     // Hangi format daha küçükse onu kullan
                     if ($webpSize < $origSize) {
                         // WebP daha küçük, dosya bilgilerini WebP için güncelle
@@ -478,17 +269,12 @@ class MediaPickerController extends Controller
                         $extension = 'webp';
                         $mimeType = 'image/webp';
                         $newSize = $webpSize;
+                        $fileName = $fileNameWebp;
                         
                         // Orijinal dosyayı sil
                         if (file_exists($fullSavePathOrig)) {
                             unlink($fullSavePathOrig);
                         }
-                        
-                        \Log::debug('WebP formatı kullanılıyor (daha küçük)', [
-                            'webp_size' => $webpSize,
-                            'original_size' => $origSize,
-                            'saved' => round(($origSize - $webpSize) / $origSize * 100, 2) . '%'
-                        ]);
                     } else {
                         // Orijinal dosya daha küçük, WebP'yi sil
                         if (file_exists($fullSavePathWebp)) {
@@ -498,22 +284,16 @@ class MediaPickerController extends Controller
                         $path = $savePathOrig;
                         $url = FileManagerHelper::getFileUrl('uploads/' . $path);
                         $newSize = $origSize;
-                        
-                        \Log::debug('Orijinal format kullanılıyor (daha küçük)', [
-                            'original_size' => $origSize,
-                            'webp_size' => $webpSize
-                        ]);
+                        $fileName = $fileNameOrig;
                     }
                 } catch (\Exception $e) {
                     // Dönüşüm hatası, orijinal dosyayı kullan
                     \Log::error('Görsel işleme hatası: ' . $e->getMessage(), [
                         'file' => $originalName,
-                        'error' => $e->getMessage(),
-                        'trace' => $e->getTraceAsString()
+                        'error' => $e->getMessage()
                     ]);
                     
                     // Orijinal dosya adı ve uzantısı ile kaydet
-                    $fileName = $fileName . '.' . $extension;
                     $path = $file->storeAs($folderPath, $fileName, 'uploads');
                     $fullPath = public_path('uploads/' . $path);
                     $url = FileManagerHelper::getFileUrl('uploads/' . $path);
@@ -531,7 +311,6 @@ class MediaPickerController extends Controller
                 }
             } else {
                 // Görsel olmayan dosyalar veya SVG için normal kaydetme
-                $fileName = $fileName . '.' . $extension;
                 $path = $file->storeAs($folderPath, $fileName, 'uploads');
                 $fullPath = public_path('uploads/' . $path);
                 $url = FileManagerHelper::getFileUrl('uploads/' . $path);
@@ -568,12 +347,6 @@ class MediaPickerController extends Controller
                 try {
                     // Geçici ID kontrolü (temp_ ile başlıyorsa ilişkilendirme yapma)
                     if (is_string($relatedId) && strpos($relatedId, 'temp_') === 0) {
-                        \Log::debug('MediaPicker Geçici ID tespit edildi, ilişkilendirme yapılmadı', [
-                            'media_id' => $media->id,
-                            'related_type' => $relatedType,
-                            'related_id' => $relatedId
-                        ]);
-                        
                         // Geçici ID ile ilişkilendirme yapılmaz, direkt resim URL'sini döndür
                         return response()->json([
                             'success' => true,
@@ -582,14 +355,6 @@ class MediaPickerController extends Controller
                             'html' => view('filemanagersystem.mediapicker.partials.media-item', ['item' => $media])->render()
                         ]);
                     }
-                    
-                    // DETAYLI DEBUG: İlişkilendirme öncesi kontrol
-                    \Log::debug('MediaPicker İlişkilendirme Öncesi', [
-                        'media_id' => $media->id,
-                        'related_type' => $relatedType,
-                        'related_id' => $relatedId,
-                        'related_id_type' => gettype($relatedId)
-                    ]);
                     
                     // İlişki var mı kontrol et
                     $existingRelation = MediaRelation::where('media_id', $media->id)
@@ -608,22 +373,7 @@ class MediaPickerController extends Controller
                         $relation->save();
                         
                         $relationCreated = true;
-                        
-                        // Log oluştur
-                        Log::info('Medya ilişkisi oluşturuldu', [
-                            'media_id' => $media->id,
-                            'related_type' => $relatedType,
-                            'related_id' => $relatedId,
-                            'relation_id' => $relation->id
-                        ]);
                     } else {
-                        // İlişki zaten var
-                        \Log::info('Medya ilişkisi zaten mevcut', [
-                            'media_id' => $media->id,
-                            'related_type' => $relatedType,
-                            'related_id' => $relatedId,
-                            'relation_id' => $existingRelation->id
-                        ]);
                         $relationCreated = true;
                     }
                 } catch (\Exception $e) {
@@ -632,19 +382,9 @@ class MediaPickerController extends Controller
                         'media_id' => $media->id,
                         'related_type' => $relatedType,
                         'related_id' => $relatedId,
-                        'error' => $e->getMessage(),
-                        'file' => $e->getFile(),
-                        'line' => $e->getLine()
+                        'error' => $e->getMessage()
                     ]);
                 }
-            } else {
-                // DETAYLI DEBUG: İlişkilendirme atlandı
-                \Log::debug('MediaPicker İlişkilendirme Atlandı', [
-                    'reason' => (!$relatedType ? 'related_type boş' : '') . (!$relatedId ? 'related_id boş' : ''),
-                    'related_type' => $relatedType,
-                    'related_id' => $relatedId,
-                    'media_id' => $media->id
-                ]);
             }
             
             // Başarılı sonuç döndür
@@ -661,7 +401,8 @@ class MediaPickerController extends Controller
                 'file' => $originalName ?? 'unknown',
                 'related_type' => $relatedType,
                 'related_id' => $relatedId,
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
+                'ip' => $request->ip()
             ]);
             
             return response()->json([
@@ -669,6 +410,132 @@ class MediaPickerController extends Controller
                 'message' => 'Dosya yüklenirken bir hata oluştu: ' . $e->getMessage()
             ], 500);
         }
+    }
+    
+    /**
+     * Dosya güvenlik kontrolü
+     */
+    private function validateFileSecurely($file, $request)
+    {
+        try {
+            // 1. Dosya varlık kontrolü
+            if (!$file || !$file->isValid()) {
+                Log::warning('MediaPicker: Geçersiz dosya yükleme denemesi', [
+                    'ip' => $request->ip(),
+                    'user_agent' => $request->userAgent()
+                ]);
+                return false;
+            }
+
+            $originalName = $file->getClientOriginalName();
+            $extension = strtolower($file->getClientOriginalExtension());
+            $mimeType = $file->getMimeType();
+            $size = $file->getSize();
+
+            // 2. Yasaklı uzantılar kontrolü
+            $blockedExtensions = config('filemanagersystem.security.blocked_extensions', []);
+            if (in_array($extension, $blockedExtensions)) {
+                Log::warning('MediaPicker: Yasaklı dosya uzantısı', [
+                    'extension' => $extension,
+                    'filename' => $originalName,
+                    'ip' => $request->ip()
+                ]);
+                return false;
+            }
+
+            // 3. Dosya içeriği kontrolü (executable dosya kontrolü)
+            $filePath = $file->getRealPath();
+            $content = file_get_contents($filePath, false, null, 0, 1024); // İlk 1KB
+
+            $dangerousPatterns = [
+                '/<\?php/i',
+                '/<script/i',
+                '/eval\s*\(/i',
+                '/exec\s*\(/i',
+                '/system\s*\(/i',
+                '/shell_exec\s*\(/i'
+            ];
+
+            foreach ($dangerousPatterns as $pattern) {
+                if (preg_match($pattern, $content)) {
+                    Log::warning('MediaPicker: Executable dosya tespit edildi', [
+                        'filename' => $originalName,
+                        'pattern' => $pattern,
+                        'ip' => $request->ip()
+                    ]);
+                    return false;
+                }
+            }
+
+            // 4. Magic number kontrolü
+            if (config('filemanagersystem.security.validate_magic_numbers', true)) {
+                $actualMimeType = mime_content_type($filePath);
+                if (!$this->isMimeTypeCompatible($actualMimeType, $mimeType)) {
+                    Log::warning('MediaPicker: MIME türü uyumsuzluğu', [
+                        'declared_mime' => $mimeType,
+                        'actual_mime' => $actualMimeType,
+                        'filename' => $originalName,
+                        'ip' => $request->ip()
+                    ]);
+                    return false;
+                }
+            }
+
+            return true;
+
+        } catch (\Exception $e) {
+            Log::error('MediaPicker: Dosya güvenlik kontrolü hatası: ' . $e->getMessage(), [
+                'filename' => $originalName ?? 'unknown',
+                'ip' => $request->ip()
+            ]);
+            return false;
+        }
+    }
+
+    /**
+     * Güvenli dosya adı oluştur
+     */
+    private function generateSecureFileName($originalName, $extension)
+    {
+        // Dosya adını temizle
+        $baseName = pathinfo($originalName, PATHINFO_FILENAME);
+        $baseName = preg_replace('/[^a-zA-Z0-9\-_]/', '_', $baseName);
+        $baseName = trim($baseName, '_');
+        
+        // Boş ise varsayılan ad ver
+        if (empty($baseName)) {
+            $baseName = 'file';
+        }
+        
+        // Benzersiz ID ekle
+        $uniqueId = Str::random(8);
+        $timestamp = time();
+        
+        return $baseName . '_' . $timestamp . '_' . $uniqueId . '.' . $extension;
+    }
+
+    /**
+     * MIME türü uyumluluğunu kontrol eder
+     */
+    private function isMimeTypeCompatible($actual, $declared)
+    {
+        // Tam eşleşme
+        if ($actual === $declared) {
+            return true;
+        }
+
+        // Bilinen uyumlu türler
+        $compatibleTypes = [
+            'image/jpeg' => ['image/jpg'],
+            'image/jpg' => ['image/jpeg'],
+            'text/plain' => ['text/csv'],
+        ];
+
+        if (isset($compatibleTypes[$declared])) {
+            return in_array($actual, $compatibleTypes[$declared]);
+        }
+
+        return false;
     }
     
     /**
@@ -689,13 +556,6 @@ class MediaPickerController extends Controller
         try {
             // Geçici ID kontrolü (temp_ ile başlıyorsa ilişkilendirme yapma)
             if (is_string($relatedId) && strpos($relatedId, 'temp_') === 0) {
-                \Log::debug('MediaPicker Geçici ID tespit edildi, ilişkilendirme yapılmadı', [
-                    'media_id' => $mediaId,
-                    'related_type' => $relatedType,
-                    'related_id' => $relatedId
-                ]);
-                
-                // Geçici ID ile ilişkilendirme yapmadan başarılı döndür
                 return response()->json([
                     'success' => true,
                     'message' => 'Geçici ID ile ilişkilendirme atlandı'
@@ -717,14 +577,6 @@ class MediaPickerController extends Controller
                 $relation->field_name = $request->input('field_name', 'default');
                 $relation->order = $request->input('order', 0);
                 $relation->save();
-                
-                \Log::debug('MediaPicker İlişki Oluşturuldu', [
-                    'media_id' => $mediaId,
-                    'related_type' => $relatedType,
-                    'related_id' => $relatedId,
-                    'field_name' => $relation->field_name,
-                    'order' => $relation->order
-                ]);
             }
             
             return response()->json([
@@ -747,17 +599,9 @@ class MediaPickerController extends Controller
         try {
             $mediaId = $request->input('media_id');
             
-            \Log::debug('MediaPicker getMediaUrl Çağrıldı', [
-                'media_id' => $mediaId
-            ]);
-            
             $media = Media::find($mediaId);
             
             if (!$media) {
-                \Log::error('MediaPicker getMediaUrl: Medya bulunamadı', [
-                    'media_id' => $mediaId
-                ]);
-                
                 return response()->json([
                     'success' => false,
                     'message' => 'Medya bulunamadı'
@@ -767,12 +611,6 @@ class MediaPickerController extends Controller
             // URL ve path değerlerini al
             $url = $media->url;
             $path = $media->path;
-            
-            \Log::debug('MediaPicker getMediaUrl: Medya bulundu', [
-                'media_id' => $mediaId,
-                'url' => $url,
-                'path' => $path
-            ]);
             
             return response()->json([
                 'success' => true,
@@ -788,8 +626,7 @@ class MediaPickerController extends Controller
         } catch (\Exception $e) {
             \Log::error('MediaPicker getMediaUrl Hatası: ' . $e->getMessage(), [
                 'file' => $e->getFile(),
-                'line' => $e->getLine(),
-                'trace' => $e->getTraceAsString()
+                'line' => $e->getLine()
             ]);
             
             return response()->json([

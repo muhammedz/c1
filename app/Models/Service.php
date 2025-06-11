@@ -83,6 +83,24 @@ class Service extends Model
                    ->withTimestamps();
     }
     
+    // Haber Kategorileri
+    public function newsCategories()
+    {
+        return $this->belongsToMany(NewsCategory::class, 'service_news_category', 'service_id', 'news_category_id')
+                   ->withTimestamps();
+    }
+    
+    // İlgili Haberler (seçilen kategorilerdeki tüm haberler)
+    public function relatedNews()
+    {
+        return News::whereHas('categories', function($query) {
+            $query->whereIn('news_categories.id', $this->newsCategories()->pluck('news_categories.id'));
+        })
+        ->where('status', 'published')
+        ->with(['categories'])
+        ->orderBy('published_at', 'desc');
+    }
+    
     // Kapsamlar (Scopes)
     
     // Yayında olan hizmetler
@@ -264,7 +282,7 @@ class Service extends Model
     }
 
     /**
-     * Scout için aranabilir alanların listesi
+     * Scout için aranabilir alanların listesi - Sadece başlık
      */
     public function toSearchableArray()
     {
@@ -272,19 +290,11 @@ class Service extends Model
         $title = $this->title ? mb_strtolower($this->title, 'UTF-8') : '';
         $title = str_replace(['ı', 'ğ', 'ü', 'ş', 'ö', 'ç'], ['i', 'g', 'u', 's', 'o', 'c'], $title);
         
-        $summary = $this->summary ? mb_strtolower($this->summary, 'UTF-8') : '';
-        $summary = str_replace(['ı', 'ğ', 'ü', 'ş', 'ö', 'ç'], ['i', 'g', 'u', 's', 'o', 'c'], $summary);
-        
-        $content = $this->content ? mb_strtolower($this->content, 'UTF-8') : '';
-        $content = str_replace(['ı', 'ğ', 'ü', 'ş', 'ö', 'ç'], ['i', 'g', 'u', 's', 'o', 'c'], $content);
-        
         return [
             'id' => $this->id,
             'title' => $title,
             'original_title' => $this->title, // Orjinal başlık
             'slug' => $this->slug,
-            'summary' => $summary,
-            'content' => $content,
             'type' => 'service', // Tür bilgisi ekledik
             'status' => $this->status,
         ];

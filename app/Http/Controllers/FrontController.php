@@ -49,20 +49,11 @@ class FrontController extends Controller
         if ($eventSettings->is_active) {
             $limit = $eventSettings->homepage_limit ?? 6;
             
-            // Sorunu tanılamak için alternatif sorgu kullanıyorum
-            // Sorgulama yöntemini değiştirip etkinlikleri getirme işlemini log'layarak
-            \Illuminate\Support\Facades\Log::info('Etkinlikler getiriliyor', [
-                'settings' => $eventSettings->toArray()
-            ]);
-
             try {
-                // Önce tüm etkinlikleri getirelim ve ileride sıralama yapalım
                 $upcomingEvents = Event::active()
                     ->orderBy('start_date', 'asc')
                     ->limit($limit)
                     ->get();
-
-                \Illuminate\Support\Facades\Log::info('Getirilen etkinlik sayısı: ' . count($upcomingEvents));
             } catch (\Exception $e) {
                 \Illuminate\Support\Facades\Log::error('Etkinlik getirme hatası: ' . $e->getMessage());
                 $upcomingEvents = [];

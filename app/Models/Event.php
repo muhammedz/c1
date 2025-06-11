@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Log;
 
 class Event extends Model
 {
@@ -64,42 +63,12 @@ class Event extends Model
             if (empty($event->slug)) {
                 $event->slug = Str::slug($event->title);
             }
-            
-            // Etkinlik oluşturma öncesinde loglama
-            Log::info('Etkinlik oluşturuluyor', [
-                'event_title' => $event->title,
-                'cover_image' => $event->cover_image,
-                'cover_image_type' => gettype($event->cover_image),
-                'cover_image_empty' => empty($event->cover_image)
-            ]);
         });
 
         static::updating(function ($event) {
             if (empty($event->slug)) {
                 $event->slug = Str::slug($event->title);
             }
-            
-            // Etkinlik güncelleme öncesinde loglama
-            Log::info('Etkinlik güncelleniyor', [
-                'event_id' => $event->id,
-                'event_title' => $event->title,
-                'cover_image' => $event->cover_image,
-                'cover_image_type' => gettype($event->cover_image),
-                'cover_image_empty' => empty($event->cover_image),
-                'dirty' => $event->isDirty('cover_image') ? 'evet' : 'hayır',
-                'original' => $event->getOriginal('cover_image')
-            ]);
-        });
-        
-        static::created(function ($event) {
-            // Etkinlik oluşturma sonrasında loglama
-            Log::info('Etkinlik oluşturuldu', [
-                'event_id' => $event->id,
-                'event_title' => $event->title,
-                'cover_image' => $event->cover_image,
-                'cover_image_type' => gettype($event->cover_image),
-                'cover_image_empty' => empty($event->cover_image)
-            ]);
         });
     }
 
@@ -124,29 +93,19 @@ class Event extends Model
      */
     public function getCoverImageUrlAttribute()
     {
-        Log::info('getCoverImageUrlAttribute çağrıldı - Event ID: ' . $this->id);
-        
         if (!$this->cover_image) {
-            Log::info('cover_image değeri boş, varsayılan görsel döndürülüyor');
             return asset('images/no-image.jpg');
         }
         
-        Log::info('cover_image değeri işleniyor', [
-            'cover_image' => $this->cover_image,
-            'cover_image_type' => gettype($this->cover_image),
-            'is_absolute_url' => Str::startsWith($this->cover_image, ['http://', 'https://'])
-        ]);
-        
         // Mutlak URL ise doğrudan döndür
         if (Str::startsWith($this->cover_image, ['http://', 'https://'])) {
-            Log::info('Mutlak URL döndürülüyor');
             return $this->cover_image;
         }
         
         // İmaj dosyasının adını al
         $filename = basename($this->cover_image);
         
-        // Tüm olası yolları kontrol edelim
+        // Tüm olası yolları kontrol et
         $possiblePaths = [
             // 1. 'events/' ile başlıyorsa web.php route ile dön
             'url' => Str::startsWith($this->cover_image, 'events/') ? url('/events/' . $filename) : null,
@@ -164,25 +123,14 @@ class Event extends Model
             'storage_asset' => asset('storage/' . $this->cover_image)
         ];
         
-        Log::info('Olası görsel yolları kontrol ediliyor', [
-            'original_path' => $this->cover_image,
-            'filename' => $filename,
-            'possible_paths' => $possiblePaths
-        ]);
-        
         // İlk çalışan yolu döndür
         foreach ($possiblePaths as $type => $url) {
             if ($url && $type != 'storage_asset') {
-                Log::info("Görsel bulundu: $type yolu kullanılıyor", ['url' => $url]);
                 return $url;
             }
         }
         
         // Hiçbir path bulunamadıysa, storage URL'i döndür
-        Log::info('Görsel fiziksel olarak bulunamadı, varsayılan storage yolu döndürülüyor', [
-            'url' => $possiblePaths['storage_asset']
-        ]);
-        
         return $possiblePaths['storage_asset'];
     }
 

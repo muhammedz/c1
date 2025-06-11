@@ -64,33 +64,75 @@ class FilemanagersystemMediaController extends Controller
      */
     public function store(Request $request)
     {
+        // Güçlendirilmiş validation kuralları
         $request->validate([
-            'files' => 'required|array',
-            'files.*' => 'required|file|max:10485760', // 10MB
+            'files' => 'required|array|max:10', // Maksimum 10 dosya
+            'files.*' => [
+                'required',
+                'file',
+                'max:10240', // 10MB (kilobyte cinsinden)
+                function ($attribute, $value, $fail) {
+                    // Dosya uzantısı kontrolü
+                    $allowedExtensions = config('filemanagersystem.security.allowed_extensions', []);
+                    $extension = strtolower($value->getClientOriginalExtension());
+                    
+                    if (!in_array($extension, $allowedExtensions)) {
+                        $fail('Bu dosya uzantısı desteklenmiyor: ' . $extension);
+                    }
+                    
+                    // MIME type kontrolü
+                    $allowedMimeTypes = config('filemanagersystem.security.allowed_mime_types', []);
+                    $mimeType = $value->getMimeType();
+                    
+                    if (!in_array($mimeType, $allowedMimeTypes)) {
+                        $fail('Bu dosya türü desteklenmiyor: ' . $mimeType);
+                    }
+                    
+                    // Dosya adı güvenlik kontrolü
+                    $filename = $value->getClientOriginalName();
+                    if (strpos($filename, '../') !== false || strpos($filename, '..\\') !== false) {
+                        $fail('Güvenli olmayan dosya adı.');
+                    }
+                    
+                    // Null byte kontrolü
+                    if (strpos($filename, "\0") !== false) {
+                        $fail('Geçersiz dosya adı.');
+                    }
+                }
+            ],
             'folder_id' => 'nullable|exists:filemanagersystem_folders,id',
             'is_public' => 'boolean',
         ]);
         
         $uploadedFiles = [];
+        $errors = [];
         
-        foreach ($request->file('files') as $file) {
-            $originalName = $file->getClientOriginalName();
-            $extension = strtolower($file->getClientOriginalExtension());
-            $mimeType = $file->getMimeType();
-            $originalSize = $file->getSize();
-            $fileName = Str::random(40) . '.' . $extension;
-            
-            // Dosya türüne göre klasör belirleme
-            $folderPath = $this->getMainFolderByMimeType($mimeType);
-            
-            // Klasör yoksa oluştur
-            $fullPath = public_path('uploads/' . $folderPath);
-            if (!file_exists($fullPath)) {
-                mkdir($fullPath, 0755, true);
-            }
-            
+        foreach ($request->file('files') as $index => $file) {
             try {
-                // Dosyayı basitçe kaydet, önce sıkıştırma yapmadan direkt kaydet
+                // Dosya güvenlik kontrolü
+                if (!$this->validateFileSecurely($file)) {
+                    $errors[] = "Dosya güvenlik kontrolünden geçemedi: " . $file->getClientOriginalName();
+                    continue;
+                }
+                
+                $originalName = $file->getClientOriginalName();
+                $extension = strtolower($file->getClientOriginalExtension());
+                $mimeType = $file->getMimeType();
+                $originalSize = $file->getSize();
+                
+                // Güvenli dosya adı oluştur
+                $fileName = $this->generateSecureFileName($originalName, $extension);
+                
+                // Dosya türüne göre klasör belirleme
+                $folderPath = $this->getMainFolderByMimeType($mimeType);
+                
+                // Klasör yoksa oluştur
+                $fullPath = public_path('uploads/' . $folderPath);
+                if (!file_exists($fullPath)) {
+                    mkdir($fullPath, 0755, true);
+                }
+                
+                // Dosyayı güvenli şekilde kaydet
                 $path = $file->storeAs($folderPath, $fileName, 'uploads');
                 $fullPath = public_path('uploads/' . $path);
                 $url = FileManagerHelper::getFileUrl('uploads/' . $path);
@@ -100,7 +142,21 @@ class FilemanagersystemMediaController extends Controller
                 $isImage = strpos($mimeType, 'image/') === 0;
                 
                 if ($isImage) {
-                    // Resmi sıkıştır - ÖNEMLİ: resize parametresi false olarak gönderiyoruz (çözünürlüğü korumak için)
+                    // Resim boyutlarını kontrol et
+                    $imageInfo = getimagesize($fullPath);
+                    if ($imageInfo) {
+                        $maxWidth = config('filemanagersystem.image_compression.max_dimensions.width', 4096);
+                        $maxHeight = config('filemanagersystem.image_compression.max_dimensions.height', 4096);
+                        
+                        if ($imageInfo[0] > $maxWidth || $imageInfo[1] > $maxHeight) {
+                            // Dosyayı sil ve hata ver
+                            unlink($fullPath);
+                            $errors[] = "Resim boyutu çok büyük: " . $originalName . " (Max: {$maxWidth}x{$maxHeight})";
+                            continue;
+                        }
+                    }
+                    
+                    // Resmi sıkıştır
                     $compressionInfo = $this->compressImage(
                         $fullPath, 
                         $mimeType, 
@@ -112,7 +168,7 @@ class FilemanagersystemMediaController extends Controller
                     );
                 }
                 
-                // Temel veritabanı kaydı oluştur
+                // Veritabanı kaydı oluştur
                 $media = new Media();
                 $media->name = $fileName;
                 $media->original_name = $originalName;
@@ -126,7 +182,7 @@ class FilemanagersystemMediaController extends Controller
                 $media->folder_id = $request->folder_id;
                 $media->is_public = $request->has('is_public') ? $request->is_public : false;
                 
-                // Resim ise
+                // Resim ise ek bilgileri kaydet
                 if ($isImage && $compressionInfo) {
                     $media->width = $compressionInfo['width'] ?? 0;
                     $media->height = $compressionInfo['height'] ?? 0;
@@ -136,29 +192,151 @@ class FilemanagersystemMediaController extends Controller
                     $media->compression_rate = $compressionInfo['compression_rate'] ?? 0;
                 }
                 
-                // Değişiklikleri kaydet
                 $media->save();
+                
+                // Güvenlik logu
+                Log::info('Dosya başarıyla yüklendi', [
+                    'user_id' => Auth::id(),
+                    'filename' => $originalName,
+                    'mime_type' => $mimeType,
+                    'size' => $originalSize,
+                    'ip' => $request->ip()
+                ]);
                 
                 $uploadedFiles[] = $media;
                 
             } catch (\Exception $e) {
                 Log::error('Dosya yükleme hatası: ' . $e->getMessage(), [
-                    'file_name' => $originalName,
-                    'mime_type' => $mimeType,
+                    'file_name' => $originalName ?? 'unknown',
+                    'mime_type' => $mimeType ?? 'unknown',
+                    'user_id' => Auth::id(),
                     'error' => $e->getMessage(),
                     'trace' => $e->getTraceAsString()
                 ]);
+                
+                $errors[] = "Dosya yükleme hatası: " . ($originalName ?? 'Bilinmeyen dosya');
             }
         }
         
-        // Eğer hiç dosya yüklenmediyse
-        if (empty($uploadedFiles)) {
+        // Sonuç mesajı
+        $successCount = count($uploadedFiles);
+        $errorCount = count($errors);
+        
+        if ($successCount > 0 && $errorCount === 0) {
+            return redirect()->route('admin.filemanagersystem.media.index', ['folder_id' => $request->folder_id])
+                ->with('success', $successCount . ' adet dosya başarıyla yüklendi.');
+        } elseif ($successCount > 0 && $errorCount > 0) {
+            return redirect()->route('admin.filemanagersystem.media.index', ['folder_id' => $request->folder_id])
+                ->with('warning', $successCount . ' dosya yüklendi, ' . $errorCount . ' dosyada hata oluştu.')
+                ->with('errors', $errors);
+        } else {
             return redirect()->route('admin.filemanagersystem.media.create')
-                ->with('error', 'Dosya yükleme işlemi sırasında bir hata oluştu. Lütfen logları kontrol edin.');
+                ->with('error', 'Hiçbir dosya yüklenemedi.')
+                ->with('errors', $errors);
+        }
+    }
+
+    /**
+     * Dosya güvenlik kontrolü
+     */
+    private function validateFileSecurely($file)
+    {
+        try {
+            // 1. Dosya varlık kontrolü
+            if (!$file || !$file->isValid()) {
+                return false;
+            }
+
+            $originalName = $file->getClientOriginalName();
+            $extension = strtolower($file->getClientOriginalExtension());
+            $mimeType = $file->getMimeType();
+            $size = $file->getSize();
+
+            // 2. Yasaklı uzantılar kontrolü
+            $blockedExtensions = config('filemanagersystem.security.blocked_extensions', []);
+            if (in_array($extension, $blockedExtensions)) {
+                return false;
+            }
+
+            // 3. Dosya içeriği kontrolü (executable dosya kontrolü)
+            $filePath = $file->getRealPath();
+            $content = file_get_contents($filePath, false, null, 0, 1024); // İlk 1KB
+
+            $dangerousPatterns = [
+                '/<\?php/i',
+                '/<script/i',
+                '/eval\s*\(/i',
+                '/exec\s*\(/i',
+                '/system\s*\(/i',
+                '/shell_exec\s*\(/i'
+            ];
+
+            foreach ($dangerousPatterns as $pattern) {
+                if (preg_match($pattern, $content)) {
+                    return false;
+                }
+            }
+
+            // 4. Magic number kontrolü
+            if (config('filemanagersystem.security.validate_magic_numbers', true)) {
+                $actualMimeType = mime_content_type($filePath);
+                if (!$this->isMimeTypeCompatible($actualMimeType, $mimeType)) {
+                    return false;
+                }
+            }
+
+            return true;
+
+        } catch (\Exception $e) {
+            Log::error('Dosya güvenlik kontrolü hatası: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Güvenli dosya adı oluştur
+     */
+    private function generateSecureFileName($originalName, $extension)
+    {
+        // Dosya adını temizle
+        $baseName = pathinfo($originalName, PATHINFO_FILENAME);
+        $baseName = preg_replace('/[^a-zA-Z0-9\-_]/', '_', $baseName);
+        $baseName = trim($baseName, '_');
+        
+        // Boş ise varsayılan ad ver
+        if (empty($baseName)) {
+            $baseName = 'file';
         }
         
-        return redirect()->route('admin.filemanagersystem.media.index', ['folder_id' => $request->folder_id])
-            ->with('success', count($uploadedFiles) . ' adet dosya başarıyla yüklendi.');
+        // Benzersiz ID ekle
+        $uniqueId = Str::random(8);
+        $timestamp = time();
+        
+        return $baseName . '_' . $timestamp . '_' . $uniqueId . '.' . $extension;
+    }
+
+    /**
+     * MIME türü uyumluluğunu kontrol eder
+     */
+    private function isMimeTypeCompatible($actual, $declared)
+    {
+        // Tam eşleşme
+        if ($actual === $declared) {
+            return true;
+        }
+
+        // Bilinen uyumlu türler
+        $compatibleTypes = [
+            'image/jpeg' => ['image/jpg'],
+            'image/jpg' => ['image/jpeg'],
+            'text/plain' => ['text/csv'],
+        ];
+
+        if (isset($compatibleTypes[$declared])) {
+            return in_array($actual, $compatibleTypes[$declared]);
+        }
+
+        return false;
     }
 
     /**

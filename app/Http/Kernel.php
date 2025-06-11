@@ -73,6 +73,7 @@ class Kernel extends HttpKernel
         'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
         'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
         'api.key' => \App\Http\Middleware\ApiKeyMiddleware::class,
+        'filemanagersystem.upload.security' => \App\Http\Middleware\FilemanagersystemUploadSecurity::class,
     ];
 
     /**

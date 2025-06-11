@@ -480,6 +480,12 @@ return [
                     'icon' => 'fas fa-fw fa-tags',
                     'active' => ['admin/filemanagersystem/categories', 'admin/filemanagersystem/categories/*']
                 ],
+                [
+                    'text' => 'Arşivler',
+                    'url' => 'admin/archives',
+                    'icon' => 'fas fa-fw fa-archive',
+                    'active' => ['admin/archives', 'admin/archives/*']
+                ],
             ],
         ],
         [
@@ -657,6 +663,25 @@ return [
                     'url'  => 'admin/tenders/create',
                     'icon' => 'fas fa-plus',
                     'active' => ['admin/tenders/create']
+                ],
+            ],
+        ],
+        // Müdürlükler Modülü
+        [
+            'text'    => 'Müdürlükler',
+            'icon'    => 'fas fa-building',
+            'submenu' => [
+                [
+                    'text' => 'Tüm Müdürlükler',
+                    'url'  => 'admin/mudurlukler',
+                    'icon' => 'fas fa-list',
+                    'active' => ['admin/mudurlukler', 'admin/mudurlukler/*/edit', 'admin/mudurlukler/*/show']
+                ],
+                [
+                    'text' => 'Yeni Müdürlük',
+                    'url'  => 'admin/mudurlukler/create',
+                    'icon' => 'fas fa-plus',
+                    'active' => ['admin/mudurlukler/create']
                 ],
             ],
         ],

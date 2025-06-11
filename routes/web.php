@@ -20,6 +20,8 @@ use App\Http\Controllers\Admin\AnnouncementController;
 use App\Http\Controllers\Admin\TestController;
 use App\Http\Controllers\Admin\TestDepartmentController;
 use App\Http\Controllers\Admin\HedefKitleController;
+use App\Http\Controllers\Admin\ArchiveController;
+use App\Http\Controllers\Admin\ArchiveDocumentController;
 use App\Http\Controllers\AnnouncementFrontController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\FrontController;
@@ -57,29 +59,10 @@ Route::get('/basittest', function() {
 
 Route::get('/arama', function() {
     $query = request()->input('q');
-    $results = [];
     
-    if ($query) {
-        // Arama sorgusunu küçük harfe çevir ve Türkçe karakterleri değiştir
-        $searchQuery = mb_strtolower($query, 'UTF-8');
-        $searchQuery = str_replace(['ı', 'ğ', 'ü', 'ş', 'ö', 'ç'], ['i', 'g', 'u', 's', 'o', 'c'], $searchQuery);
-        
-        // Önce Hizmetleri Ara
-        $services = \App\Models\Service::search($searchQuery)
-            ->where('status', 'published')
-            ->get();
-            
-        // Sonra Haberleri Ara
-        $news = \App\Models\News::search($searchQuery)
-            ->where('status', 'published')
-            ->get();
-            
-        $results = [
-            'services' => $services,
-            'news' => $news,
-            'total' => $services->count() + $news->count()
-        ];
-    }
+    // Yeni SearchService'i kullan
+    $searchService = new \App\Services\SearchService();
+    $results = $searchService->search($query ?? '');
     
     return view('search.index', [
         'query' => $query,
@@ -125,19 +108,22 @@ Route::prefix('cankaya-evleri')->name('cankaya-houses.')->group(function () {
 // Kurumsal Kadro Frontend Route'ları
 Route::get('/kurumsal-kadro', [App\Http\Controllers\CorporateController::class, 'index'])->name('corporate.index');
 
-// Kurumsal Kadro Kategori ve Üye Rotaları - Daha spesifik rotaları önce tanımla
-Route::get('/{categorySlug}/{memberSlug}', [App\Http\Controllers\CorporateController::class, 'showMember'])
-    ->name('corporate.member')
-    ->where('categorySlug', '^(?!admin|login|register|password|kurumsal-kadro|projeler|etkinlikler|hizmetler|sayfalar|baskan|hedefkitleler|ihaleler).*$');
-
-Route::get('/{categorySlug}', [App\Http\Controllers\CorporateController::class, 'showCategory'])
-    ->name('corporate.category')
-    ->where('categorySlug', '^(?!admin|login|register|password|kurumsal-kadro|projeler|etkinlikler|hizmetler|sayfalar|baskan|hedefkitleler|ihaleler).*$');
+// Kurumsal Kadro Kategori ve Üye Rotaları - Güvenli prefix ile
+Route::prefix('kurumsal')->name('corporate.')->group(function () {
+    Route::get('/{categorySlug}/{memberSlug}', [App\Http\Controllers\CorporateController::class, 'showMember'])->name('member');
+    Route::get('/{categorySlug}', [App\Http\Controllers\CorporateController::class, 'showCategory'])->name('category');
+});
 
 // Proje Detay Sayfaları
 Route::get('/projeler', [App\Http\Controllers\FrontController::class, 'projects'])->name('front.projects');
 Route::get('/projeler/{slug}', [App\Http\Controllers\FrontController::class, 'projectDetail'])->name('front.projects.detail');
 Route::get('/projeler-kategori/{slug}', [App\Http\Controllers\FrontController::class, 'projectCategory'])->name('front.projects.category');
+
+// Ön Yüz Arşiv Rotaları
+Route::prefix('arsivler')->name('archives.')->group(function () {
+    Route::get('/', [App\Http\Controllers\Front\ArchiveController::class, 'index'])->name('index');
+    Route::get('/{slug}', [App\Http\Controllers\Front\ArchiveController::class, 'show'])->name('show');
+});
 
 Auth::routes();
 
@@ -160,9 +146,28 @@ Route::middleware(['auth', 'role:admin'])->name('admin.')->prefix('admin')->grou
     Route::get('/test', [TestController::class, 'index'])->name('test.index');
     Route::get('/test-departments', [TestDepartmentController::class, 'index'])->name('test-departments.index');
     
+    // Arşivler Yönetimi
+    Route::resource('archives', ArchiveController::class);
+    Route::post('archives/bulk-action', [ArchiveController::class, 'bulkAction'])->name('archives.bulk-action');
+    Route::post('archives/{archive}/restore', [ArchiveController::class, 'restore'])->name('archives.restore');
+    Route::delete('archives/{archive}/force-delete', [ArchiveController::class, 'forceDelete'])->name('archives.force-delete');
+    
+    // Arşiv Belgeleri Yönetimi
+    Route::post('archives/{archive}/documents', [ArchiveDocumentController::class, 'store'])->name('archives.documents.store');
+    Route::put('archive-documents/{document}', [ArchiveDocumentController::class, 'update'])->name('archive-documents.update');
+    Route::delete('archive-documents/{document}', [ArchiveDocumentController::class, 'destroy'])->name('archive-documents.destroy');
+    Route::post('archives/{archive}/documents/sort', [ArchiveDocumentController::class, 'updateSortOrder'])->name('archives.documents.sort');
+    Route::post('archive-documents/{document}/toggle-status', [ArchiveDocumentController::class, 'toggleStatus'])->name('archive-documents.toggle-status');
+    
     // İhaleler Yönetimi
     Route::resource('tenders', App\Http\Controllers\Admin\TenderController::class);
     Route::post('tenders/{id}/toggle-status', [App\Http\Controllers\Admin\TenderController::class, 'toggleStatus'])->name('tenders.toggle-status');
+    
+    // Müdürlükler Yönetimi
+    Route::resource('mudurlukler', App\Http\Controllers\Admin\MudurlukController::class)->parameters(['mudurlukler' => 'mudurluk']);
+    Route::delete('/mudurlukler/remove-file/{file}', [App\Http\Controllers\Admin\MudurlukController::class, 'removeFile'])->name('mudurlukler.remove-file');
+    Route::patch('/mudurlukler/toggle-file/{file}', [App\Http\Controllers\Admin\MudurlukController::class, 'toggleFileStatus'])->name('mudurlukler.toggle-file');
+    Route::post('/mudurlukler/reorder-files', [App\Http\Controllers\Admin\MudurlukController::class, 'reorderFiles'])->name('mudurlukler.reorder-files');
     
     // Sayfa Ayarları
     Route::get('pages/settings', [PageSettingController::class, 'edit'])->name('pages.settings.edit');
@@ -179,14 +184,14 @@ Route::middleware(['auth', 'role:admin'])->name('admin.')->prefix('admin')->grou
     Route::post('tinymce/upload', [TinyMCEController::class, 'upload'])->name('tinymce.upload');
     
     // Haberler Yönetimi
-    Route::resource('news', App\Http\Controllers\Admin\NewsController::class);
-    Route::post('/news/{news}/toggle-headline', [App\Http\Controllers\Admin\NewsController::class, 'toggleHeadline'])->name('news.toggle-headline');
-    Route::post('/news/{news}/toggle-featured', [App\Http\Controllers\Admin\NewsController::class, 'toggleFeatured'])->name('news.toggle-featured');
-    Route::post('/news/{news}/toggle-status', [App\Http\Controllers\Admin\NewsController::class, 'toggleStatus'])->name('news.toggle-status');
-    Route::post('/news/update-headline-order', [App\Http\Controllers\Admin\NewsController::class, 'updateHeadlineOrder'])->name('news.update-headline-order');
-    Route::get('/news/{news}/toggle-archive', [App\Http\Controllers\Admin\NewsController::class, 'toggleArchive'])->name('news.toggle-archive');
-    Route::post('/news/upload-gallery-image', [App\Http\Controllers\Admin\NewsController::class, 'uploadGalleryImage'])->name('news.upload-gallery-image');
-    Route::post('/news/bulk-action', [App\Http\Controllers\Admin\NewsController::class, 'bulkAction'])->name('news.bulk-action');
+    Route::resource('news', NewsController::class);
+    Route::post('/news/{news}/toggle-headline', [NewsController::class, 'toggleHeadline'])->name('news.toggle-headline');
+    Route::post('/news/{news}/toggle-featured', [NewsController::class, 'toggleFeatured'])->name('news.toggle-featured');
+    Route::post('/news/{news}/toggle-status', [NewsController::class, 'toggleStatus'])->name('news.toggle-status');
+    Route::post('/news/update-headline-order', [NewsController::class, 'updateHeadlineOrder'])->name('news.update-headline-order');
+    Route::get('/news/{news}/toggle-archive', [NewsController::class, 'toggleArchive'])->name('news.toggle-archive');
+    Route::post('/news/upload-gallery-image', [NewsController::class, 'uploadGalleryImage'])->name('news.upload-gallery-image');
+    Route::post('/news/bulk-action', [NewsController::class, 'bulkAction'])->name('news.bulk-action');
     
     // Kategori Yönetimi
     Route::resource('news-categories', NewsCategoryController::class)->names('news-categories');
@@ -375,19 +380,19 @@ Route::middleware(['auth', 'role:admin'])->name('admin.')->prefix('admin')->grou
         Route::post('/menu-categories/update-status', [App\Http\Controllers\Admin\MenuCategoryController::class, 'updateStatus'])->name('categories.update-status');
         
         // Menu Item routes (menusystem altında)
-        Route::get('/menu-items', [App\Http\Controllers\Admin\MenuItemController::class, 'index'])->name('items.index');
-        Route::get('/menu-items/create', [App\Http\Controllers\Admin\MenuItemController::class, 'create'])->name('items.create');
-        Route::post('/menu-items', [App\Http\Controllers\Admin\MenuItemController::class, 'store'])->name('items.store');
-        Route::get('/menu-items/{item}/edit', [App\Http\Controllers\Admin\MenuItemController::class, 'edit'])->name('items.edit');
-        Route::put('/menu-items/{item}', [App\Http\Controllers\Admin\MenuItemController::class, 'update'])->name('items.update');
-        Route::delete('/menu-items/{item}', [App\Http\Controllers\Admin\MenuItemController::class, 'destroy'])->name('items.destroy');
-        Route::post('/menu-items/order', [App\Http\Controllers\Admin\MenuItemController::class, 'updateOrder'])->name('items.order');
-        Route::get('/menu-items/icons', [App\Http\Controllers\Admin\MenuItemController::class, 'getIcons'])->name('items.icons');
+        Route::get('/menu-items', [App\Http\Controllers\Admin\MenuItemController::class, 'index'])->name('menu-items.index');
+        Route::get('/menu-items/create', [App\Http\Controllers\Admin\MenuItemController::class, 'create'])->name('menu-items.create');
+        Route::post('/menu-items', [App\Http\Controllers\Admin\MenuItemController::class, 'store'])->name('menu-items.store');
+        Route::get('/menu-items/{item}/edit', [App\Http\Controllers\Admin\MenuItemController::class, 'edit'])->name('menu-items.edit');
+        Route::put('/menu-items/{item}', [App\Http\Controllers\Admin\MenuItemController::class, 'update'])->name('menu-items.update');
+        Route::delete('/menu-items/{item}', [App\Http\Controllers\Admin\MenuItemController::class, 'destroy'])->name('menu-items.destroy');
+        Route::post('/menu-items/order', [App\Http\Controllers\Admin\MenuItemController::class, 'updateOrder'])->name('menu-items.order');
+        Route::get('/menu-items/icons', [App\Http\Controllers\Admin\MenuItemController::class, 'getIcons'])->name('menu-items.icons');
     });
 });
 
 // Etkinlik Yönetimi Rotaları
-Route::prefix('admin/events')->name('admin.events.')->middleware(['auth'])->group(function () {
+Route::prefix('admin/events')->name('admin.events.')->middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/', [App\Http\Controllers\Admin\EventManagerController::class, 'index'])->name('index');
     Route::get('/create', [App\Http\Controllers\Admin\EventManagerController::class, 'create'])->name('create');
     Route::post('/store', [App\Http\Controllers\Admin\EventManagerController::class, 'store'])->name('store');
@@ -440,8 +445,15 @@ Route::prefix('hizmetler')->name('services.')->group(function () {
     Route::get('/{slug}', [App\Http\Controllers\Front\ServiceController::class, 'show'])->name('show');
 });
 
-// Doğrudan hizmet route'u ekle
+// Doğrudan hizmet route'u - prefix ile güvenli hale getirildi
 Route::get('/hizmet/{slug}', [App\Http\Controllers\Front\ServiceController::class, 'show'])->name('hizmet');
+
+// Ön Yüz Müdürlükler Rotaları
+Route::prefix('mudurlukler')->name('mudurlukler.')->group(function () {
+    Route::get('/', [App\Http\Controllers\Front\MudurlukController::class, 'index'])->name('index');
+    Route::get('/{slug}', [App\Http\Controllers\Front\MudurlukController::class, 'show'])->name('show');
+    Route::get('/{slug}/download/{file}', [App\Http\Controllers\Front\MudurlukController::class, 'downloadFile'])->name('download-file');
+});
 
 // Ön Yüz Sayfa Rotaları
 Route::prefix('sayfalar')->name('pages.')->group(function () {
@@ -451,8 +463,12 @@ Route::prefix('sayfalar')->name('pages.')->group(function () {
 });
 
 // Anasayfa Yönetimi Rotaları
-Route::prefix('admin/homepage')->name('admin.homepage.')->middleware(['auth'])->group(function () {
+Route::prefix('admin/homepage')->name('admin.homepage.')->middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/', [App\Http\Controllers\Admin\HomepageController::class, 'index'])->name('index');
+    
+    // Header Yönetimi
+    Route::get('/header', [App\Http\Controllers\Admin\HomepageController::class, 'header'])->name('header');
+    Route::post('/header/settings/update', [App\Http\Controllers\Admin\HomepageController::class, 'updateHeaderSettings'])->name('header.settings.update');
     
     // Slider Yönetimi
     Route::get('/sliders', [App\Http\Controllers\Admin\HomepageController::class, 'sliders'])->name('sliders');
@@ -487,48 +503,7 @@ Route::prefix('admin/homepage')->name('admin.homepage.')->middleware(['auth'])->
     });
 });
 
-// Etkinlik Yönetimi
-Route::group(['prefix' => 'events', 'as' => 'events.'], function () {
-    Route::get('/', [EventManagerController::class, 'index'])->name('index');
-    Route::get('/create', [EventManagerController::class, 'create'])->name('create');
-    Route::post('/', [EventManagerController::class, 'store'])->name('store');
-    Route::get('/{event}/edit', [EventManagerController::class, 'edit'])->name('edit');
-    Route::put('/{event}', [EventManagerController::class, 'update'])->name('update');
-    Route::delete('/{event}', [EventManagerController::class, 'destroy'])->name('destroy');
-    
-    // Etkinlik görünürlüğünü değiştir
-    Route::post('/{event}/toggle', [EventManagerController::class, 'toggle'])->name('toggle');
-    Route::post('/{event}/toggle-homepage', [EventManagerController::class, 'toggleHomepage'])->name('toggle.homepage');
-    Route::post('/{event}/toggle-featured', [EventManagerController::class, 'toggleFeatured'])->name('toggle.featured');
-    
-    // Etkinlik kategorileri
-    Route::get('/categories', [EventManagerController::class, 'categories'])->name('categories');
-    Route::post('/categories', [EventManagerController::class, 'storeCategory'])->name('categories.store');
-    Route::put('/categories/{id}', [EventManagerController::class, 'updateCategory'])->name('categories.update');
-    Route::delete('/categories/{id}', [EventManagerController::class, 'deleteCategory'])->name('categories.delete');
-    Route::post('/categories/{id}/toggle', [EventManagerController::class, 'toggleCategoryVisibility'])->name('categories.toggle');
-    Route::post('/categories/order', [EventManagerController::class, 'updateCategoryOrder'])->name('categories.order');
-    
-    // Etkinlik ayarları
-    Route::get('/settings', [EventManagerController::class, 'settings'])->name('settings');
-    Route::post('/settings', [EventManagerController::class, 'updateSettings'])->name('settings.update');
-    
-    // Etkinlik tarama ve veri çekme
-    Route::get('/check', [EventManagerController::class, 'checkEvents'])->name('check');
-    Route::post('/scrape', [EventManagerController::class, 'scrapeEvents'])->name('scrape');
-    
-    // Etkinlik görselleri için GET route
-    Route::get('/{filename}', function($filename) {
-        $path = storage_path('app/public/events/' . $filename);
-        if (file_exists($path)) {
-            return response()->file($path);
-        }
-        
-        return response()->json(['error' => 'Görsel bulunamadı'], 404);
-    })->where('filename', '.*\.(?:jpg|jpeg|png|gif|webp)$');
-});
-
-// Etkinlik görselleri için route
+// Etkinlik görselleri için route (tekrar eden route kaldırıldı)
 Route::get('/events/{filename}', function($filename) {
     $path = storage_path('app/public/events/' . $filename);
     if (file_exists($path)) {
@@ -547,7 +522,7 @@ Route::post('/announcements/mark-viewed', [AnnouncementFrontController::class, '
 |--------------------------------------------------------------------------
 */
 
-Route::prefix('admin/filemanagersystem')->name('admin.filemanagersystem.')->middleware(['auth'])->group(function () {
+Route::prefix('admin/filemanagersystem')->name('admin.filemanagersystem.')->middleware(['auth', 'role:admin'])->group(function () {
     // Ana controller
     Route::get('/', [FilemanagersystemController::class, 'index'])->name('index');
     Route::get('/picker', [FilemanagersystemController::class, 'picker'])->name('picker');
@@ -561,7 +536,9 @@ Route::prefix('admin/filemanagersystem')->name('admin.filemanagersystem.')->midd
     // MediaPicker Routes
     Route::get('/mediapicker', [MediaPickerController::class, 'index'])->name('mediapicker.index');
     Route::get('/mediapicker/list', [MediaPickerController::class, 'listMedia'])->name('mediapicker.list');
-    Route::post('/mediapicker/upload', [MediaPickerController::class, 'upload'])->name('mediapicker.upload');
+    Route::post('/mediapicker/upload', [MediaPickerController::class, 'upload'])
+        ->middleware('filemanagersystem.upload.security')
+        ->name('mediapicker.upload');
     Route::post('/mediapicker/relate', [MediaPickerController::class, 'relateMedia'])->name('mediapicker.relate');
     Route::get('/mediapicker/get-media-url', [MediaPickerController::class, 'getMediaUrl'])->name('mediapicker.get-media-url');
     Route::get('/media/preview/{id}', [MediaPickerController::class, 'mediaPreview'])->name('mediapicker.preview');
@@ -581,7 +558,9 @@ Route::prefix('admin/filemanagersystem')->name('admin.filemanagersystem.')->midd
     Route::prefix('media')->name('media.')->group(function () {
         Route::get('/', [FilemanagersystemMediaController::class, 'index'])->name('index');
         Route::get('/create', [FilemanagersystemMediaController::class, 'create'])->name('create');
-        Route::post('/', [FilemanagersystemMediaController::class, 'store'])->name('store');
+        Route::post('/', [FilemanagersystemMediaController::class, 'store'])
+            ->middleware('filemanagersystem.upload.security')
+            ->name('store');
         Route::get('/get-file-path/{id}', [FilemanagersystemMediaController::class, 'getFilePath'])->name('get-file-path');
         Route::get('/{media}', [FilemanagersystemMediaController::class, 'show'])->name('show');
         Route::get('/{media}/edit', [FilemanagersystemMediaController::class, 'edit'])->name('edit');
@@ -631,29 +610,17 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     Route::get('/search-icons', [App\Http\Controllers\Admin\SearchPopularQueryController::class, 'getIcons'])->name('search-icons');
 });
 
-Route::prefix('services')->name('services.')->group(function () {
-    Route::get('/', [ServiceController::class, 'index'])->name('index');
-    Route::get('/create', [ServiceController::class, 'create'])->name('create');
-    Route::post('/', [ServiceController::class, 'store'])->name('store');
-    Route::get('/{service}/edit', [ServiceController::class, 'edit'])->name('edit');
-    Route::put('/{service}', [ServiceController::class, 'update'])->name('update');
-    Route::delete('/{service}', [ServiceController::class, 'destroy'])->name('destroy');
-    Route::post('/update-order', [ServiceController::class, 'updateOrder'])->name('update-order');
-    Route::post('/{service}/toggle-headline', [ServiceController::class, 'toggleHeadline'])->name('toggle-headline');
-    Route::post('/{service}/toggle-featured', [ServiceController::class, 'toggleFeatured'])->name('toggle-featured');
-    Route::post('/{service}/toggle-archive', [ServiceController::class, 'toggleArchive'])->name('toggle-archive');
-    Route::post('/{service}/toggle-status', [ServiceController::class, 'toggleStatus'])->name('toggle-status');
-    Route::post('/upload-gallery-image', [ServiceController::class, 'uploadGalleryImage'])->name('upload-gallery-image');
+// Duplicate services route'u kaldırıldı - admin içindeki yeterli
 
-    // Birimler route'ları
-    Route::get('/units', [ServicesUnitController::class, 'index'])->name('units.index');
-    Route::get('/units/create', [ServicesUnitController::class, 'create'])->name('units.create');
-    Route::post('/units', [ServicesUnitController::class, 'store'])->name('units.store');
-    Route::get('/units/{unit}/edit', [ServicesUnitController::class, 'edit'])->name('units.edit');
-    Route::put('/units/{unit}', [ServicesUnitController::class, 'update'])->name('units.update');
-    Route::delete('/units/{unit}', [ServicesUnitController::class, 'destroy'])->name('units.destroy');
-    Route::post('/units/update-order', [ServicesUnitController::class, 'updateOrder'])->name('units.update-order');
-});
+/*
+|--------------------------------------------------------------------------
+| WILDCARD ROUTES - EN SONDA OLMALI!
+|--------------------------------------------------------------------------
+| Bu route'lar en genel olanlar olduğu için en sona konulmuştur.
+| Üstteki spesifik route'lar önce kontrol edilir.
+*/
+
+// UYARI: Bu route'lar çok genel olduğu için en sonda tanımlanmalıdır!
 
 
 

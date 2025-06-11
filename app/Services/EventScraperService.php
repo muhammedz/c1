@@ -89,8 +89,6 @@ class EventScraperService
                             $newEvents . ' yeni etkinlik eklendi, ' . 
                             $newCategories . ' yeni kategori oluşturuldu.';
         
-        Log::info('Etkinlik çekme işlemi tamamlandı', $results);
-        
         return $results;
     }
 
@@ -99,8 +97,6 @@ class EventScraperService
      */
     public function scrapePage($url, $page = 1)
     {
-        Log::info('Etkinlik sayfası çekiliyor', ['url' => $url, 'page' => $page]);
-        
         try {
             // Sayfayı HTTP ile çek - SSL doğrulamasını devre dışı bırak
             $response = Http::withOptions([
@@ -117,8 +113,6 @@ class EventScraperService
             // Sayfa yapısını analiz et
             $eventNodes = $xpath->query('//div[contains(@class, "event-card")]');
             $eventCount = $eventNodes->length;
-            
-            Log::info('Etkinlikler bulundu', ['count' => $eventCount, 'page' => $page]);
             
             $processedEvents = 0;
             $newEvents = 0;
@@ -197,24 +191,18 @@ class EventScraperService
      */
     protected function extractEventData($eventNode, $xpath)
     {
-        // Debug için tüm kartın HTML çıktısını logla
-        $fullHtml = $eventNode->ownerDocument->saveHTML($eventNode);
-        Log::info('Etkinlik kartı HTML yapısı', [
-            'html' => $fullHtml
-        ]);
-        
-        // Başlık - birden fazla alternatif sorgu deneyelim
+        // Başlık - birden fazla alternatif sorgu dene
         $titleNode = null;
         $titleSelectors = [
-            './/h3[contains(@class, "card-title")]',  // Kart başlık stilinde h3
-            './/div[contains(@class, "card-title")]', // Kart başlık stilinde div
-            './/h2[@class="etkinlik-adi"]',           // Özel class ile h2
-            './/div[contains(@class, "title")]',      // title sınıfı içeren div
-            './/h4',                                  // h4 elementi
-            './/h3',                                  // herhangi bir h3
-            './/h2',                                  // herhangi bir h2
-            './/strong',                              // kalın yazı
-            './/b',                                   // kalın yazı (alternatif)
+            './/h3[contains(@class, "card-title")]',
+            './/div[contains(@class, "card-title")]',
+            './/h2[@class="etkinlik-adi"]',
+            './/div[contains(@class, "title")]',
+            './/h4',
+            './/h3',
+            './/h2',
+            './/strong',
+            './/b',
         ];
         
         // Her bir seçici ile başlık elementini bulmaya çalış
@@ -222,26 +210,13 @@ class EventScraperService
             $node = $xpath->query($selector, $eventNode)->item(0);
             if ($node) {
                 $titleNode = $node;
-                Log::info('Başlık elementi bulundu', [
-                    'selector' => $selector,
-                    'text' => trim($node->textContent)
-                ]);
                 break;
             }
         }
 
-        // Başlık bulunamadıysa, alternatif yöntem dene - belki sayfadaki tüm metinleri kontrol et
+        // Başlık bulunamadıysa, alternatif yöntem dene
         if (!$titleNode) {
-            // Olası başlık olabilecek tüm metinleri içeren elementleri bul
             $textNodes = $xpath->query('.//*[not(self::script) and not(self::style)]', $eventNode);
-            foreach ($textNodes as $node) {
-                $text = trim($node->textContent);
-                if (strlen($text) > 5 && strlen($text) < 100) {
-                    Log::info('Olası başlık metni', ['text' => $text]);
-                }
-            }
-            
-            // Son çare - ilk anlamlı metin
             $titleNode = $textNodes->item(0);
         }
         
@@ -253,17 +228,13 @@ class EventScraperService
         
         // Başlığı ilk harfleri büyük olacak şekilde düzenle
         $title = mb_convert_case($title, MB_CASE_TITLE, "UTF-8");
-        Log::info('Başlık düzenlendi: İlk harfler büyük yapıldı', [
-            'original' => trim($titleNode->textContent),
-            'formatted' => $title
-        ]);
         
         // Çok kısa başlıkları atla
         if (strlen($title) < 3) {
             $title = 'Etkinlik ' . time() . rand(100, 999);
         }
         
-        // Kategori (tür) - bu kısmı olduğu gibi bırak
+        // Kategori (tür)
         $categoryNode = $xpath->query('.//span[contains(@class, "event-category")]', $eventNode)->item(0);
         if (!$categoryNode) {
             $categoryNode = $xpath->query('.//h3[@class="etkinlik-tur"]', $eventNode)->item(0);
@@ -399,16 +370,6 @@ class EventScraperService
         // Benzersiz bir slug oluştur - başlık, tarih ve rastgele string kombinasyonu
         $uniqueSlug = Str::slug($title) . '-' . date('Ymd') . '-' . Str::random(5);
         
-        Log::info('Etkinlik verisi çıkarıldı', [
-            'title' => $title,
-            'category' => $category,
-            'dateText' => $dateText,
-            'timeText' => $timeText,
-            'location' => $location,
-            'imageUrl' => $imageUrl,
-            'detailUrl' => $detailUrl
-        ]);
-        
         return [
             'title' => $title,
             'slug' => $uniqueSlug, // Benzersiz slug kullan
@@ -537,71 +498,30 @@ class EventScraperService
      */
     protected function createEvent($eventData, $categoryId)
     {
-        // Log başlangıcı
-        Log::info('createEvent metoduna giriş - Etkinlik oluşturma başlıyor', [
-            'event_title' => $eventData['title'],
-            'category_id' => $categoryId
-        ]);
-        
         // Görsel URL'sinden görseli indir
         $coverImage = null;
         if (!empty($eventData['image_url'])) {
-            Log::info('Etkinlik için görsel indirme başlıyor', [
-                'event_title' => $eventData['title'],
-                'image_url' => $eventData['image_url'],
-                'image_url_type' => gettype($eventData['image_url']),
-                'image_url_empty' => empty($eventData['image_url']) ? 'evet' : 'hayır'
-            ]);
-            
             // Görsel URL'sini kontrol et - base64 vb. değilse indir
-            if (strpos($eventData['image_url'], 'data:image') === 0) {
-                Log::warning('Base64 kodlu görsel, indirme atlanıyor', [
-                    'image_url_prefix' => substr($eventData['image_url'], 0, 30) . '...'
-                ]);
-            } else {
+            if (strpos($eventData['image_url'], 'data:image') !== 0) {
                 // Tüm boşlukları kodla ve URL'yi temizle
                 $cleanImageUrl = str_replace(' ', '%20', trim($eventData['image_url']));
                 
                 // Mükerrer domain kontrolü
                 if (strpos($cleanImageUrl, 'https://kultursanat.cankaya.bel.tr/https://') !== false) {
-                    $originalUrl = $cleanImageUrl;
                     $cleanImageUrl = str_replace('https://kultursanat.cankaya.bel.tr/https://', 'https://', $cleanImageUrl);
-                    
-                    Log::info('Mükerrer domain temizlendi', [
-                        'original' => $originalUrl,
-                        'cleaned' => $cleanImageUrl
-                    ]);
                 }
                 
                 $coverImage = $this->downloadImage($cleanImageUrl);
-                
-                if ($coverImage) {
-                    Log::info('Görsel başarıyla indirildi ve kaydedildi', [
-                        'relative_path' => $coverImage
-                    ]);
-                } else {
-                    Log::warning('Görsel indirilemedi veya kaydedilemedi, URL olduğu gibi kullanılacak', [
-                        'image_url' => $cleanImageUrl
-                    ]);
-                }
             }
-        } else {
-            Log::warning('Etkinlik için görsel URL\'i bulunamadı', [
-                'event_title' => $eventData['title']
-            ]);
         }
 
         // Slug'ı benzersiz hale getir - başlıkla beraber tarih ve rastgele karakter ekle
         $uniqueSlug = Str::slug($eventData['title']) . '-' . date('Ymd') . '-' . Str::random(5);
-        Log::info('Benzersiz slug oluşturuldu', [
-            'original_slug' => $eventData['slug'] ?? Str::slug($eventData['title']),
-            'unique_slug' => $uniqueSlug
-        ]);
 
         try {
             $event = new Event();
             $event->title = $eventData['title'];
-            $event->slug = $uniqueSlug; // Benzersiz slug kullan
+            $event->slug = $uniqueSlug;
             $event->description = $eventData['description'] ?? 'Etkinlik detayları için tıklayınız.';
             $event->category_id = $categoryId;
             $event->start_date = $eventData['start_date'] ?? now();
@@ -617,34 +537,13 @@ class EventScraperService
             $event->is_featured = false;
             $event->register_required = false;
             
-            // Kaydetmeden önce verileri logla
-            Log::info('Etkinlik veritabanına kaydediliyor', [
-                'title' => $event->title,
-                'slug' => $event->slug,
-                'category_id' => $event->category_id,
-                'start_date' => $event->start_date->toDateTimeString(),
-                'end_date' => $event->end_date ? $event->end_date->toDateTimeString() : null,
-                'location' => $event->location,
-                'cover_image' => $event->cover_image,
-                'cover_image_type' => gettype($event->cover_image)
-            ]);
-            
             $event->save();
-            
-            Log::info('Etkinlik başarıyla kaydedildi', [
-                'event_id' => $event->id,
-                'event_title' => $event->title,
-                'cover_image' => $event->cover_image,
-                'cover_image_type' => gettype($event->cover_image),
-                'cover_image_empty' => empty($event->cover_image) ? 'evet' : 'hayır'
-            ]);
             
             return $event;
             
         } catch (\Exception $e) {
             Log::error('Etkinlik kaydedilirken hata oluştu', [
                 'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
                 'title' => $eventData['title'],
                 'category_id' => $categoryId
             ]);
@@ -668,16 +567,8 @@ class EventScraperService
     protected function generateRandomColor()
     {
         $colors = [
-            '#3490dc', // Mavi
-            '#38c172', // Yeşil
-            '#e3342f', // Kırmızı
-            '#f6993f', // Turuncu
-            '#9561e2', // Mor
-            '#f66d9b', // Pembe
-            '#6cb2eb', // Açık Mavi
-            '#ffed4a', // Sarı
-            '#4dc0b5', // Turkuaz
-            '#6574cd', // İndigo
+            '#3490dc', '#38c172', '#e3342f', '#f6993f', '#9561e2',
+            '#f66d9b', '#6cb2eb', '#ffed4a', '#4dc0b5', '#6574cd',
         ];
         
         return $colors[array_rand($colors)];
@@ -707,7 +598,6 @@ class EventScraperService
                 }
             }
             
-            // Sayfalama bulunamazsa veya beklenen formatta değilse 1 döndür
             return 1;
         } catch (\Exception $e) {
             Log::error('Toplam sayfa sayısı belirlenirken hata oluştu', [
@@ -724,13 +614,11 @@ class EventScraperService
     {
         // URL boşsa null dön
         if (empty($imageUrl)) {
-            Log::warning('Resim URL\'i boş, indirme atlanıyor');
             return null;
         }
         
         // Data URI (base64) görsel ise atla
         if (strpos($imageUrl, 'data:image') === 0) {
-            Log::warning('Base64 kodlu görsel, indirme atlanıyor');
             return null;
         }
         
@@ -738,120 +626,68 @@ class EventScraperService
             // URL'i temizle ve normalize et
             $imageUrl = trim($imageUrl);
             
-            // Debug için URL'yi logla
-            Log::info('İndirmeye çalışılan resim URL', [
-                'url' => $imageUrl,
-                'length' => strlen($imageUrl)
-            ]);
-            
-            // Mükerrer domain kontrolü: https://kultursanat.cankaya.bel.tr/https://
+            // Mükerrer domain kontrolü
             if (strpos($imageUrl, 'https://kultursanat.cankaya.bel.tr/https://') !== false) {
-                $originalUrl = $imageUrl;
                 $imageUrl = str_replace('https://kultursanat.cankaya.bel.tr/https://', 'https://', $imageUrl);
-                
-                Log::info('Mükerrer domain tespit edildi ve düzeltildi', [
-                    'original' => $originalUrl,
-                    'corrected' => $imageUrl
-                ]);
             }
             
-            // Görsel indirme başlat
-            Log::info('Görsel indirme başladı', ['url' => $imageUrl]);
+            // URL encode karakterleri düzelt
+            $imageUrl = str_replace(['%2F', '%3A'], ['/', ':'], $imageUrl);
             
-            // URL kodlamaları düzelt (boşlukları %20 ile değiştir)
-            $imageUrl = str_replace(' ', '%20', $imageUrl);
-            Log::info('URL kodlamaları düzeltildi', ['encoded_url' => $imageUrl]);
+            // HTTP isteği gönder
+            $response = Http::timeout(30)->get($imageUrl);
             
-            // HTTP isteği yaparak görseli indir - SSL doğrulamasını devre dışı bırak
-            Log::info('Görsel indirme HTTP isteği başlatılıyor');
-            $response = Http::withOptions([
-                'verify' => false,
-                'timeout' => 30
-            ])->get($imageUrl);
-            
-            // İndirme başarısız olursa log kaydı oluştur ve null dön
-            if ($response->failed()) {
+            if ($response->status() !== 200) {
                 Log::error('Görsel indirilemedi - HTTP hatası', [
                     'url' => $imageUrl,
-                    'status_code' => $response->status(),
-                    'reason' => $response->reason()
+                    'status' => $response->status()
                 ]);
                 return null;
             }
             
             $imageContent = $response->body();
-            $contentLength = strlen($imageContent);
+            
+            if (empty($imageContent)) {
+                return null;
+            }
+            
+            // Content-Type kontrolü
             $contentType = $response->header('Content-Type');
-            
-            Log::info('Görsel içeriği alındı', [
-                'url' => $imageUrl,
-                'content_length' => $contentLength,
-                'content_type' => $contentType
-            ]);
-            
-            // İçerik türü kontrolü - HTML geliyorsa resim değildir
-            if ($contentType && strpos($contentType, 'text/html') !== false) {
+            if (!$contentType || strpos($contentType, 'image/') !== 0) {
                 Log::error('İndirilen içerik bir görsel değil', [
-                    'url' => $imageUrl, 
-                    'content_type' => $contentType,
-                    'content_start' => substr($imageContent, 0, 100)
+                    'url' => $imageUrl,
+                    'content_type' => $contentType
                 ]);
                 return null;
             }
             
-            // Dosya adı oluştur
-            $extension = 'jpg'; // Varsayılan uzantı
-            if ($contentType) {
-                if (strpos($contentType, 'image/jpeg') !== false || strpos($contentType, 'image/jpg') !== false) {
-                    $extension = 'jpg';
-                } elseif (strpos($contentType, 'image/png') !== false) {
-                    $extension = 'png';
-                } elseif (strpos($contentType, 'image/gif') !== false) {
-                    $extension = 'gif';
-                } elseif (strpos($contentType, 'image/webp') !== false) {
-                    $extension = 'webp';
-                }
+            // Dosya uzantısını belirle
+            $extension = 'jpg';
+            if (strpos($contentType, 'image/png') !== false) {
+                $extension = 'png';
+            } elseif (strpos($contentType, 'image/gif') !== false) {
+                $extension = 'gif';
+            } elseif (strpos($contentType, 'image/webp') !== false) {
+                $extension = 'webp';
             }
             
+            // Dosya adı oluştur
             $filename = 'event_' . time() . '_' . Str::random(10) . '.' . $extension;
-            Log::info('Dosya adı oluşturuldu', ['filename' => $filename, 'extension' => $extension]);
             
-            // Public dizinin var olup olmadığını kontrol et
+            // Public dizinini kontrol et
             $publicPath = public_path('events');
             if (!file_exists($publicPath)) {
-                $mkdirResult = mkdir($publicPath, 0755, true);
-                Log::info('Public dizini oluşturma', [
-                    'path' => $publicPath, 
-                    'result' => $mkdirResult ? 'başarılı' : 'başarısız'
-                ]);
-            } else {
-                Log::info('Public events dizini zaten var', ['path' => $publicPath]);
+                mkdir($publicPath, 0755, true);
             }
             
             // Dosyayı kaydet
             $filePath = $publicPath . '/' . $filename;
-            $writeResult = file_put_contents($filePath, $imageContent);
-            
-            if ($writeResult === false) {
+            if (!file_put_contents($filePath, $imageContent)) {
                 Log::error('Dosya kaydedilemedi', ['path' => $filePath]);
                 return null;
             }
             
-            Log::info('Dosya public dizine kaydedildi', [
-                'path' => $filePath,
-                'result' => 'başarılı',
-                'bytes_written' => $writeResult
-            ]);
-            
-            // Başarılı bir şekilde kaydedildiyse, relative path döndür
-            $relativePath = 'events/' . $filename;
-            Log::info('Resim public dizine başarıyla kaydedildi', [
-                'path' => $filePath,
-                'relative_path' => $relativePath,
-                'url' => url($relativePath)
-            ]);
-            
-            return $relativePath;
+            return 'events/' . $filename;
             
         } catch (\Exception $e) {
             Log::error('Görsel indirme ve kaydetme işlemi başarısız', [
@@ -863,111 +699,73 @@ class EventScraperService
     }
 
     /**
-     * Önizlemeden gelen tek bir etkinliği ekler
+     * Tekil etkinlik ekleme
      */
     public function addSingleEventFromData($eventData)
     {
         try {
-            // Verileri kontrol et
-            if (empty($eventData['title'])) {
-                return [
-                    'success' => false,
-                    'message' => 'Etkinlik başlığı bulunamadı'
-                ];
-            }
-
-            // Başlığı ilk harfleri büyük olacak şekilde düzenle
-            if (!empty($eventData['title'])) {
-                $originalTitle = $eventData['title'];
-                $eventData['title'] = mb_convert_case($eventData['title'], MB_CASE_TITLE, "UTF-8");
-                Log::info('addSingleEventFromData: Başlık formatı düzenlendi', [
-                    'original' => $originalTitle,
-                    'formatted' => $eventData['title']
-                ]);
-            }
-
-            // Kategoriyi kontrol et
-            $category = $this->findOrCreateCategory($eventData['category'] ?? 'Genel');
-            
-            // Tarihi işle
-            $parsedDate = null;
-            
-            // Öncelikle direkt dateText ve timeText varsa onları kullan
-            if (!empty($eventData['dateText'])) {
-                $parsedDate = $this->parseDate($eventData['dateText'], $eventData['timeText'] ?? '');
+            // Başlık formatı düzenle
+            if (isset($eventData['title'])) {
+                $eventData['title'] = mb_convert_case(trim($eventData['title']), MB_CASE_TITLE, "UTF-8");
+                $eventData['title'] = preg_replace('/\s+/', ' ', $eventData['title']);
             }
             
-            // Eğer geçerli bir tarih elde edemediyse, şimdiyi kullan
-            if (!$parsedDate || !($parsedDate instanceof \Carbon\Carbon)) {
-                $parsedDate = now();
-            }
+            // Kategori kontrolü
+            $categoryName = $eventData['category'] ?? 'Genel';
+            $category = $this->findOrCreateCategory($categoryName);
             
-            $eventData['start_date'] = $parsedDate;
-            $eventData['end_date'] = (clone $parsedDate)->addHours(2);
+            // Slug oluştur
+            $baseSlug = Str::slug($eventData['title'] ?? 'etkinlik');
+            $uniqueSlug = $baseSlug . '-' . date('Ymd') . '-' . Str::random(5);
             
-            // Benzersiz slug oluştur
-            $eventData['slug'] = Str::slug($eventData['title']) . '-' . date('Ymd') . '-' . Str::random(5);
-            Log::info('addSingleEventFromData: Benzersiz slug oluşturuldu', [
-                'title' => $eventData['title'],
-                'slug' => $eventData['slug']
-            ]);
-            
-            // Açıklama kontrolü
-            if (empty($eventData['description'])) {
-                $eventData['description'] = 'Etkinlik detayları için tıklayınız.';
-            }
-            
-            // Resim URL'si kontrolü - imageUrl parametresini image_url'e taşı
-            if (!empty($eventData['imageUrl'])) {
-                Log::info('imageUrl parametresi image_url parametresine taşınıyor', [
-                    'imageUrl' => $eventData['imageUrl']
-                ]);
+            // imageUrl parametresi varsa image_url'ye taşı
+            if (isset($eventData['imageUrl']) && !isset($eventData['image_url'])) {
                 $eventData['image_url'] = $eventData['imageUrl'];
+                unset($eventData['imageUrl']);
             }
             
-            // Görsel URL'sini kontrol et ve düzelt
-            if (!empty($eventData['image_url']) && strpos($eventData['image_url'], 'data:image') !== 0) {
-                // Mükerrer domain ve URL formatı düzeltme işlemleri
-                if (strpos($eventData['image_url'], 'https://kultursanat.cankaya.bel.tr/https://') !== false) {
-                    $eventData['image_url'] = str_replace('https://kultursanat.cankaya.bel.tr/https://', 'https://', $eventData['image_url']);
-                }
-                
-                // URL'deki boşlukları kodla
-                if (strpos($eventData['image_url'], ' ') !== false) {
-                    $eventData['image_url'] = str_replace(' ', '%20', $eventData['image_url']);
-                }
-            }
+            // Event verilerini hazırla
+            $processedData = [
+                'title' => $eventData['title'] ?? 'İsimsiz Etkinlik',
+                'description' => $eventData['description'] ?? 'Etkinlik açıklaması belirtilmemiş.',
+                'start_date' => isset($eventData['start_date']) ? Carbon::parse($eventData['start_date']) : now(),
+                'end_date' => isset($eventData['end_date']) ? Carbon::parse($eventData['end_date']) : null,
+                'location' => $eventData['location'] ?? 'Belirtilmemiş',
+                'image_url' => $eventData['image_url'] ?? null,
+                'slug' => $uniqueSlug,
+                'category' => $categoryName
+            ];
             
-            // Etkinliğin mevcut olup olmadığını kontrol et
-            $existingEvent = $this->checkExistingEvent($eventData);
+            // Mevcut etkinlik kontrolü
+            $existingEvent = $this->checkExistingEvent($processedData);
             
             if ($existingEvent) {
                 return [
-                    'success' => false, 
-                    'message' => 'Bu etkinlik zaten sisteme eklenmiş',
-                    'event_id' => $existingEvent->id
+                    'success' => false,
+                    'message' => 'Bu etkinlik zaten mevcut.',
+                    'event' => $existingEvent
                 ];
             }
             
-            // Etkinliği oluştur
-            $event = $this->createEvent($eventData, $category->id);
+            // Etkinlik oluştur
+            $event = $this->createEvent($processedData, $category->id);
             
             return [
                 'success' => true,
-                'message' => 'Etkinlik başarıyla eklendi',
-                'event_id' => $event->id,
-                'event_title' => $event->title
+                'message' => 'Etkinlik başarıyla eklendi.',
+                'event' => $event
             ];
             
         } catch (\Exception $e) {
             Log::error('Tek etkinlik ekleme hatası', [
                 'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
+                'event_data' => $eventData
             ]);
             
             return [
                 'success' => false,
-                'message' => 'Sistem hatası: ' . $e->getMessage()
+                'message' => 'Etkinlik eklenirken hata oluştu: ' . $e->getMessage(),
+                'event' => null
             ];
         }
     }
