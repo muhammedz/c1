@@ -91,7 +91,7 @@
                     <div class="w-full">
                         <div class="aspect-square w-full overflow-hidden bg-gray-100 flex items-center justify-center">
                             @if($member->image)
-                            <img src="{{ asset('storage/' . $member->image) }}" alt="{{ $member->name }}" class="w-full h-full object-cover">
+                            <img src="{{ asset($member->image) }}" alt="{{ $member->name }}" class="w-full h-full object-cover">
                             @else
                             <span class="material-icons text-gray-300 text-7xl">person</span>
                             @endif

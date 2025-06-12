@@ -65,9 +65,7 @@ class CorporateMemberController extends Controller
             'website' => 'nullable|string|max:255',
             'email' => 'nullable|email|max:255',
             'order' => 'nullable|integer',
-            'filemanagersystem_image' => 'nullable|string',
-            'filemanagersystem_image_alt' => 'nullable|string|max:255',
-            'filemanagersystem_image_title' => 'nullable|string|max:255',
+            'profile_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'show_detail' => 'nullable',
             'use_custom_link' => 'nullable',
             'custom_link' => 'nullable|url|max:500',
@@ -88,61 +86,17 @@ class CorporateMemberController extends Controller
         // use_custom_link checkbox'ından gelmiyorsa false yap
         $data['use_custom_link'] = $request->has('use_custom_link') ? 1 : 0;
 
-        // FileManagerSystem ile ilişki kurma
-        $filemanagersystemImage = $request->filemanagersystem_image;
-        $mediaId = null;
-
-        if ($request->filled('filemanagersystem_image')) {
-            // URL formatını kontrol et
+        // Profile image upload
+        if ($request->hasFile('profile_image')) {
+            $image = $request->file('profile_image');
+            $imageName = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
             
-            // 1. /uploads/media/123 formatı
-            if (preg_match('#^/uploads/media/(\d+)$#', $filemanagersystemImage, $matches)) {
-                $mediaId = $matches[1];
-            }
-            // 2. /admin/filemanagersystem/media/preview/123 formatı
-            elseif (preg_match('#/media/preview/(\d+)#', $filemanagersystemImage, $matches)) {
-                $mediaId = $matches[1];
-            }
-            // Diğer URL formatlarını işleme
-            else {
-                // URL'yi olduğu gibi kullan ancak medya ilişkisi kurmayı dene
-                $mediaId = null;
-                
-                // Tam URL veya yol olup olmadığını kontrol et
-                $media = \App\Models\FileManagerSystem\Media::where('url', $filemanagersystemImage)
-                    ->orWhere('path', $filemanagersystemImage)
-                    ->first();
-                
-                if ($media) {
-                    $mediaId = $media->id;
-                } else {
-                    // Eğer medya bulunamazsa, yeni bir medya kaydı oluşturabilirsin
-                    $newMedia = \App\Models\FileManagerSystem\Media::create([
-                        'name' => 'Corporate Member Image',
-                        'original_name' => 'Corporate_Member_Image_' . date('YmdHis'),
-                        'url' => $filemanagersystemImage,
-                        'path' => 'external/url-' . time(),
-                        'type' => 'image',
-                        'mime_type' => 'image/jpeg',
-                        'size' => 0,
-                    ]);
-                    $mediaId = $newMedia->id;
-                }
-            }
-            
-            // filemanagersystem_image için URL'yi ayarla
-            $data['filemanagersystem_image'] = $filemanagersystemImage;
+            // /uploads dizinine kaydet
+            $imagePath = $image->move(public_path('uploads'), $imageName);
+            $data['image'] = 'uploads/' . $imageName;
         }
 
         $member = CorporateMember::create($data);
-
-        // MediaRelation ilişkisi kur
-        if (isset($mediaId) && $mediaId) {
-            $member->mediaRelations()->create([
-                'media_id' => $mediaId,
-                'field_name' => 'filemanagersystem_image',
-            ]);
-        }
 
         return redirect()->route('admin.corporate.members.index', $category)
             ->with('success', 'Kurumsal kadro üyesi başarıyla oluşturuldu.');
@@ -185,9 +139,7 @@ class CorporateMemberController extends Controller
             'website' => 'nullable|string|max:255',
             'email' => 'nullable|email|max:255',
             'order' => 'nullable|integer',
-            'filemanagersystem_image' => 'nullable|string',
-            'filemanagersystem_image_alt' => 'nullable|string|max:255',
-            'filemanagersystem_image_title' => 'nullable|string|max:255',
+            'profile_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'show_detail' => 'nullable',
             'use_custom_link' => 'nullable',
             'custom_link' => 'nullable|url|max:500',
@@ -208,65 +160,22 @@ class CorporateMemberController extends Controller
         // use_custom_link checkbox'ından gelmiyorsa false yap
         $data['use_custom_link'] = $request->has('use_custom_link') ? 1 : 0;
 
-        // FileManagerSystem ilişkisini güncelle
-        $filemanagersystemImage = $request->filemanagersystem_image;
-        $mediaId = null;
-
-        if ($request->filled('filemanagersystem_image')) {
-            // URL formatını kontrol et
-            
-            // 1. /uploads/media/123 formatı
-            if (preg_match('#^/uploads/media/(\d+)$#', $filemanagersystemImage, $matches)) {
-                $mediaId = $matches[1];
-            }
-            // 2. /admin/filemanagersystem/media/preview/123 formatı
-            elseif (preg_match('#/media/preview/(\d+)#', $filemanagersystemImage, $matches)) {
-                $mediaId = $matches[1];
-            }
-            // Diğer URL formatlarını işleme
-            else {
-                // URL'yi olduğu gibi kullan ancak medya ilişkisi kurmayı dene
-                $mediaId = null;
-                
-                // Tam URL veya yol olup olmadığını kontrol et
-                $media = \App\Models\FileManagerSystem\Media::where('url', $filemanagersystemImage)
-                    ->orWhere('path', $filemanagersystemImage)
-                    ->first();
-                
-                if ($media) {
-                    $mediaId = $media->id;
-                } else {
-                    // Eğer medya bulunamazsa, yeni bir medya kaydı oluşturabilirsin
-                    $newMedia = \App\Models\FileManagerSystem\Media::create([
-                        'name' => 'Corporate Member Image',
-                        'original_name' => 'Corporate_Member_Image_' . date('YmdHis'),
-                        'url' => $filemanagersystemImage,
-                        'path' => 'external/url-' . time(),
-                        'type' => 'image',
-                        'mime_type' => 'image/jpeg',
-                        'size' => 0,
-                    ]);
-                    $mediaId = $newMedia->id;
-                }
+        // Profile image upload
+        if ($request->hasFile('profile_image')) {
+            // Eski resmi sil
+            if ($member->image && file_exists(public_path($member->image))) {
+                unlink(public_path($member->image));
             }
             
-            // filemanagersystem_image için URL'yi ayarla
-            $data['filemanagersystem_image'] = $filemanagersystemImage;
+            $image = $request->file('profile_image');
+            $imageName = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
+            
+            // /uploads dizinine kaydet
+            $imagePath = $image->move(public_path('uploads'), $imageName);
+            $data['image'] = 'uploads/' . $imageName;
         }
 
         $member->update($data);
-
-        // MediaRelation ilişkisini güncelle
-        if (isset($mediaId) && $mediaId) {
-            // Önceki ilişkiyi kaldır
-            $member->mediaRelations()->where('field_name', 'filemanagersystem_image')->delete();
-            
-            // Yeni ilişki oluştur
-            $member->mediaRelations()->create([
-                'media_id' => $mediaId,
-                'field_name' => 'filemanagersystem_image',
-            ]);
-        }
 
         return redirect()->route('admin.corporate.members.index', $request->corporate_category_id)
             ->with('success', 'Kurumsal kadro üyesi başarıyla güncellendi.');
@@ -280,8 +189,10 @@ class CorporateMemberController extends Controller
         $member = CorporateMember::findOrFail($id);
         $categoryId = $member->corporate_category_id;
 
-        // FileManagerSystem ilişkisini sil
-        $member->mediaRelations()->delete();
+        // Eski resmi sil
+        if ($member->image && file_exists(public_path($member->image))) {
+            unlink(public_path($member->image));
+        }
 
         $member->delete();
 

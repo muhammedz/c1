@@ -15,7 +15,7 @@
 
 @section('content')
 <div class="container-fluid">
-    <form action="{{ route('admin.corporate.members.update', $member->id) }}" method="POST">
+    <form action="{{ route('admin.corporate.members.update', $member->id) }}" method="POST" enctype="multipart/form-data">
         @csrf
         @method('PUT')
         
@@ -318,16 +318,8 @@
                     <div class="card-body">
                         <div class="text-center mb-3">
                             <div id="image_preview" style="width: 200px; height: 200px; margin: 0 auto 15px; border-radius: 5px; border: 1px solid #ddd; display: flex; align-items: center; justify-content: center; overflow: hidden; background-color: #f8f9fa;">
-                                @if($member->filemanagersystem_image)
-                                    <img src="{{ asset($member->filemanagersystem_image_url ?? $member->filemanagersystem_image) }}" style="max-width: 100%; max-height: 100%;">
-                                @elseif($member->image)
-                                    @php
-                                        $imagePath = $member->image;
-                                        if (!Str::startsWith($imagePath, ['http://', 'https://']) && !Str::startsWith($imagePath, '/storage/')) {
-                                            $imagePath = '/storage/' . $imagePath;
-                                        }
-                                    @endphp
-                                    <img src="{{ $imagePath }}" style="max-width: 100%; max-height: 100%;">
+                                @if($member->image)
+                                    <img src="{{ asset($member->image) }}" style="max-width: 100%; max-height: 100%;">
                                 @else
                                     <div class="text-center">
                                         <i class="fas fa-user fa-4x text-secondary mb-2"></i>
@@ -337,48 +329,28 @@
                             </div>
                         </div>
 
-                        <!-- FileManagerSystem Görsel -->
+                        <!-- Direct File Upload -->
                         <div class="form-group">
-                            <label for="filemanagersystem_image">Profil Görseli</label>
+                            <label for="profile_image">Profil Görseli</label>
                             <div class="input-group">
-                                <input type="hidden" id="filemanagersystem_image" name="filemanagersystem_image" value="{{ old('filemanagersystem_image', $member->filemanagersystem_image) }}">
-                                <input type="text" class="form-control" id="filemanagersystem_image_display" value="{{ asset($member->filemanagersystem_image_url ?? $member->filemanagersystem_image) }}" readonly>
-                                <div class="input-group-append">
-                                    <button type="button" class="btn btn-primary" id="filemanagersystem_image_button">
-                                        <i class="fas fa-image"></i> Görsel Seç
-                                    </button>
+                                <div class="custom-file">
+                                    <input type="file" class="custom-file-input @error('profile_image') is-invalid @enderror" id="profile_image" name="profile_image" accept="image/*">
+                                    <label class="custom-file-label" for="profile_image">
+                                        @if($member->image)
+                                            Mevcut görsel var - Değiştirmek için yeni görsel seç
+                                        @else
+                                            Görsel Seç...
+                                        @endif
+                                    </label>
                                 </div>
                             </div>
-                            <div id="filemanagersystem_image_preview" class="mt-2" style="{{ $member->filemanagersystem_image ? '' : 'display: none;' }}">
-                                <img src="{{ asset($member->filemanagersystem_image_url ?? $member->filemanagersystem_image) }}" alt="Önizleme" class="img-thumbnail" style="max-height: 200px;">
-                            </div>
-                            @error('filemanagersystem_image')
+                            <small class="form-text text-muted">JPG, PNG, GIF formatları desteklenir. Maksimum 2MB. Boş bırakırsanız mevcut görsel korunur.</small>
+                            @error('profile_image')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
 
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="filemanagersystem_image_alt">Görsel Alt Metni</label>
-                                    <input type="text" class="form-control @error('filemanagersystem_image_alt') is-invalid @enderror" id="filemanagersystem_image_alt" name="filemanagersystem_image_alt" value="{{ old('filemanagersystem_image_alt', $member->filemanagersystem_image_alt) }}">
-                                    <small class="text-muted">Görsel yüklenemediğinde gösterilecek metin.</small>
-                                    @error('filemanagersystem_image_alt')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="filemanagersystem_image_title">Görsel Başlığı</label>
-                                    <input type="text" class="form-control @error('filemanagersystem_image_title') is-invalid @enderror" id="filemanagersystem_image_title" name="filemanagersystem_image_title" value="{{ old('filemanagersystem_image_title', $member->filemanagersystem_image_title) }}">
-                                    <small class="text-muted">Görsel üzerine gelindiğinde gösterilecek metin.</small>
-                                    @error('filemanagersystem_image_title')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-                        </div>
+
                     </div>
                 </div>
                 
@@ -423,22 +395,7 @@
     </form>
 </div>
 
-<!-- MediaPicker Modal -->
-<div class="modal fade" id="mediapickerModal" tabindex="-1" role="dialog" aria-labelledby="mediapickerModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl" role="document" style="max-width: 90%;">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="mediapickerModalLabel">Medya Seçici</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Kapat">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body p-0">
-                <iframe id="mediapickerFrame" style="width: 100%; height: 80vh; border: none;"></iframe>
-            </div>
-        </div>
-    </div>
-</div>
+
 @stop
 
 @section('css')
@@ -525,200 +482,38 @@
                 }
             });
             
-            // FileManagerSystem entegrasyonu
-            $('#filemanagersystem_image_button').on('click', function() {
-                try {
-                    const input = $('#filemanagersystem_image');
-                    const displayInput = $('#filemanagersystem_image_display');
-                    const preview = $('#filemanagersystem_image_preview');
-                    const previewImg = preview.find('img');
-                    
-                    console.log('🔍 MediaPicker açılıyor...');
-                    
-                    // Önemli: MediaPicker özel parametreleri
-                    const memberId = {{ $member->id }};
-                    const relatedType = 'corporate_member';
-                    
-                    // MediaPicker URL - ID ve tip parametreleri ile
-                    const mediapickerUrl = '/admin/filemanagersystem/mediapicker?type=image&related_type=' + 
-                        encodeURIComponent(relatedType) + '&related_id=' + encodeURIComponent(memberId);
-                    
-                    console.log('🔍 MediaPicker URL:', mediapickerUrl);
-                    
-                    // Modal açma ve iframe yükleme
-                    $('#mediapickerModal').modal('show');
-                    $('#mediapickerFrame').attr('src', mediapickerUrl);
-                    
-                    // Önceki mesaj dinleyiciyi temizleme
-                    window.removeEventListener('message', handleMediaPickerMessage);
-                    
-                    // Medya seçici mesaj dinleme fonksiyonu
-                    function handleMediaPickerMessage(event) {
-                        try {
-                            console.log('🔍 Medya mesajı alındı:');
-                            console.log('- Kaynak origin:', event.origin);
-                            console.log('- Ham veri:', event.data);
-                            
-                            // Boş mesaj kontrolü
-                            if (!event.data) {
-                                console.log('❌ Boş mesaj - işlenmedi');
-                                return;
-                            }
-                            
-                            // Medya mesajı türüne göre işlem
-                            if (event.data.type === 'mediaSelected') {
-                                console.log('✅ Medya seçildi:', event.data);
-                                
-                                // Media ID veya URL kontrolü
-                                let mediaValue = '';
-                                let previewUrl = '';
-                                
-                                // Önce mediaUrl kontrolü yap, bu en doğrudan yol
-                                if (event.data.mediaUrl) {
-                                    console.log('🔗 Medya URL alındı:', event.data.mediaUrl);
-                                    mediaValue = event.data.mediaUrl.trim();
-                                    previewUrl = mediaValue;
-                                    processMedia(true);
-                                } 
-                                // MediaID ile işlem yap
-                                else if (event.data.mediaId) {
-                                    console.log('📋 Medya ID alındı:', event.data.mediaId);
-                                    const mediaId = event.data.mediaId;
-                                    
-                                    // MediaID'den gerçek dosya yolunu almak için AJAX isteği
-                                    // ancak hızlı çalışması için önce aşağıdaki kontrolü yapalım
-                                    
-                                    // Eğer mediaRealPath varsa onu kullanalım (en doğrudan yol)
-                                    if (event.data.mediaRealPath) {
-                                        mediaValue = event.data.mediaRealPath;
-                                        previewUrl = event.data.mediaRealPath;
-                                        processMedia(true);
-                                    } 
-                                    // Dosya adı varsa dosya adını kullanıyoruz
-                                    else if (event.data.mediaFileName) {
-                                        mediaValue = '/uploads/images/' + event.data.mediaFileName;
-                                        previewUrl = '/uploads/images/' + event.data.mediaFileName;
-                                        processMedia(true);
-                                    } 
-                                    // Hiçbiri yoksa AJAX isteği yapalım
-                                    else {
-                                        // AJAX ile sorgulamaya çalış
-                                        $.ajax({
-                                            url: '/admin/filemanagersystem/media/get-file-path/' + mediaId,
-                                            type: 'GET',
-                                            success: function(response) {
-                                                if (response.success && response.file_path) {
-                                                    mediaValue = response.file_path;
-                                                    previewUrl = response.file_path;
-                                                    processMedia(true);
-                                                } else {
-                                                    // AJAX başarılı oldu ama dosya yolu alınamadı
-                                                    console.error('❌ AJAX ile dosya yolu alınamadı');
-                                                    
-                                                    // ID'yi olduğu gibi kullan
-                                                    mediaValue = mediaId;
-                                                    previewUrl = '/uploads/images/media-' + mediaId + '.webp';
-                                                    processMedia(true);
-                                                }
-                                            },
-                                            error: function(xhr, status, error) {
-                                                console.error('❌ AJAX hatası:', status, error);
-                                                
-                                                // ID'yi olduğu gibi kullan
-                                                mediaValue = mediaId;
-                                                previewUrl = '/uploads/images/media-' + mediaId + '.webp';
-                                                processMedia(true);
-                                            }
-                                        });
-                                    }
-                                } 
-                                // Son olarak, hiçbir bilgi yok mu kontrol et
-                                else {
-                                    console.error('❌ Medya bilgisi bulunamadı');
-                                    alert('Medya bilgisi alınamadı. Lütfen tekrar deneyin.');
-                                }
-                                
-                                // Değerleri işleyip DOM'a uygulayan fonksiyon
-                                function processMedia(skipError) {
-                                    // Medya değeri yoksa işlem yapma
-                                    if (!mediaValue) {
-                                        if (!skipError) {
-                                            console.error('❌ Medya değeri alınamadı');
-                                            alert('Medya bilgisi alınamadı. Lütfen tekrar deneyin.');
-                                        }
-                                        return;
-                                    }
-                                    
-                                    // URL string değilse ya da göreceli bir URL ise, tam URL haline getir
-                                    let fullUrl = previewUrl;
-                                    if (fullUrl && !fullUrl.startsWith('http')) {
-                                        // Göreceli URL'yi tam URL'ye çevir
-                                        const baseUrl = window.location.origin;
-                                        if (!fullUrl.startsWith('/')) {
-                                            fullUrl = '/' + fullUrl;
-                                        }
-                                        fullUrl = baseUrl + fullUrl;
-                                    }
-                                    
-                                    // Değerleri güncelle
-                                    input.val(mediaValue);
-                                    displayInput.val(fullUrl);
-                                    
-                                    // Önizleme göster
-                                    previewImg.attr('src', fullUrl);
-                                    preview.show();
-                                    
-                                    // Ana önizleme alanını da güncelle
-                                    $('#image_preview').empty().html(`<img src="${fullUrl}" style="max-width: 100%; max-height: 100%;">`);
-                                    
-                                    console.log('✓ Medya değeri işlendi:', mediaValue);
-                                    console.log('✓ Tam görsel URL:', fullUrl);
-                                    
-                                    // İşlem tamam, modalı kapat
-                                    $('#mediapickerModal').modal('hide');
-                                }
-                            }
-                            // Hata mesajı
-                            else if (event.data.type === 'mediapickerError') {
-                                console.error('❌ Medya seçici hatası:', event.data);
-                                alert('Medya seçici hatası: ' + (event.data.message || 'Bilinmeyen hata'));
-                                $('#mediapickerModal').modal('hide');
-                            }
-                            // Diğer mesaj türleri
-                            else if (event.data.type === 'mediapickerLoaded') {
-                                console.log('ℹ️ Medya seçici yüklendi');
-                            } else {
-                                console.log('ℹ️ Bilinmeyen medya mesajı:', event.data);
-                            }
-                        } catch (error) {
-                            console.error('❌ Mesaj işleme hatası:', error.message);
-                            alert('Medya işleme hatası: ' + error.message);
-                        }
+            // File input preview sistemi
+            $('#profile_image').on('change', function() {
+                const file = this.files[0];
+                const preview = $('#image_preview');
+                
+                if (file) {
+                    // Dosya türü kontrolü
+                    if (!file.type.startsWith('image/')) {
+                        alert('Lütfen sadece görsel dosyaları seçin.');
+                        $(this).val('');
+                        return;
                     }
                     
-                    // Mesaj dinleyiciyi ekle
-                    window.addEventListener('message', handleMediaPickerMessage);
+                    // Dosya boyutu kontrolü (2MB)
+                    if (file.size > 2 * 1024 * 1024) {
+                        alert('Görsel dosyası 2MB\'den küçük olmalıdır.');
+                        $(this).val('');
+                        return;
+                    }
                     
-                    // iframe yükleme olayları
-                    $('#mediapickerFrame')
-                        .off('load error') // Önceki olayları temizle
-                        .on('load', function() {
-                            console.log('🟢 Medya iframe yüklendi');
-                        })
-                        .on('error', function(error) {
-                            console.error('🔴 Medya iframe yüklenme hatası:', error);
-                            alert('Medya yüklenirken hata oluştu!');
-                            $('#mediapickerModal').modal('hide');
-                        });
+                    // Dosya adını göster
+                    $('.custom-file-label').text(file.name);
                     
-                    // Modal kapatıldığında temizlik
-                    $('#mediapickerModal').off('hidden.bs.modal').on('hidden.bs.modal', function() {
-                        $('#mediapickerFrame').attr('src', 'about:blank');
-                        console.log('🔴 Medya seçici kapatıldı');
-                    });
-                } catch (error) {
-                    console.error('❌ Medya seçici hatası:', error.message);
-                    alert('Medya seçici hatası: ' + error.message);
+                    // Önizleme göster
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        preview.html('<img src="' + e.target.result + '" style="max-width: 100%; max-height: 100%; border-radius: 5px;">');
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    // Dosya seçilmemişse eski etiket metnini geri getir
+                    $('.custom-file-label').text('{{ $member->image ? "Mevcut görsel var - Değiştirmek için yeni görsel seç" : "Görsel Seç..." }}');
                 }
             });
             

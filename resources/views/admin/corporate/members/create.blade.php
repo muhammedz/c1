@@ -13,7 +13,7 @@
 
 @section('content')
 <div class="container-fluid">
-    <form action="{{ route('admin.corporate.members.store', $selectedCategory ?: 1) }}" method="POST">
+    <form action="{{ route('admin.corporate.members.store', $selectedCategory ?: 1) }}" method="POST" enctype="multipart/form-data">
         @csrf
         <input type="hidden" name="corporate_category_id" value="{{ $selectedCategory ?: old('corporate_category_id') }}">
         
@@ -338,48 +338,22 @@
                             </div>
                         </div>
 
-                        <!-- FileManagerSystem Görsel -->
+                        <!-- Direct File Upload -->
                         <div class="form-group">
-                            <label for="filemanagersystem_image">Profil Görseli</label>
+                            <label for="profile_image">Profil Görseli</label>
                             <div class="input-group">
-                                <input type="hidden" id="filemanagersystem_image" name="filemanagersystem_image" value="{{ old('filemanagersystem_image') }}">
-                                <input type="text" class="form-control" id="filemanagersystem_image_display" value="Görsel seçilmemiş" readonly>
-                                <div class="input-group-append">
-                                    <button type="button" class="btn btn-primary" id="filemanagersystem_image_button">
-                                        <i class="fas fa-image"></i> Görsel Seç
-                                    </button>
+                                <div class="custom-file">
+                                    <input type="file" class="custom-file-input @error('profile_image') is-invalid @enderror" id="profile_image" name="profile_image" accept="image/*">
+                                    <label class="custom-file-label" for="profile_image">Görsel Seç...</label>
                                 </div>
                             </div>
-                            <div id="filemanagersystem_image_preview" class="mt-2" style="display: none;">
-                                <img src="" alt="Önizleme" class="img-thumbnail" style="max-height: 200px;">
-                            </div>
-                            @error('filemanagersystem_image')
+                            <small class="form-text text-muted">JPG, PNG, GIF formatları desteklenir. Maksimum 2MB.</small>
+                            @error('profile_image')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
 
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="filemanagersystem_image_alt">Görsel Alt Metni</label>
-                                    <input type="text" class="form-control @error('filemanagersystem_image_alt') is-invalid @enderror" id="filemanagersystem_image_alt" name="filemanagersystem_image_alt" value="{{ old('filemanagersystem_image_alt') }}">
-                                    <small class="text-muted">Görsel yüklenemediğinde gösterilecek metin.</small>
-                                    @error('filemanagersystem_image_alt')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="filemanagersystem_image_title">Görsel Başlığı</label>
-                                    <input type="text" class="form-control @error('filemanagersystem_image_title') is-invalid @enderror" id="filemanagersystem_image_title" name="filemanagersystem_image_title" value="{{ old('filemanagersystem_image_title') }}">
-                                    <small class="text-muted">Görsel üzerine gelindiğinde gösterilecek metin.</small>
-                                    @error('filemanagersystem_image_title')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-                        </div>
+
                     </div>
                 </div>
                 
@@ -427,22 +401,7 @@
     </form>
 </div>
 
-<!-- MediaPicker Modal -->
-<div class="modal fade" id="mediapickerModal" tabindex="-1" role="dialog" aria-labelledby="mediapickerModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl" role="document" style="max-width: 90%;">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="mediapickerModalLabel">Medya Seçici</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Kapat">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body p-0">
-                <iframe id="mediapickerFrame" style="width: 100%; height: 80vh; border: none;"></iframe>
-            </div>
-        </div>
-    </div>
-</div>
+
 @stop
 
 @section('css')
@@ -569,127 +528,39 @@
                 }
             });
 
-            // FileManagerSystem entegrasyonu
-            $('#filemanagersystem_image_button').on('click', function() {
-                try {
-                    const input = $('#filemanagersystem_image');
-                    const displayInput = $('#filemanagersystem_image_display');
-                    const preview = $('#filemanagersystem_image_preview');
-                    const previewImg = preview.find('img');
-                    
-                    console.log('🔍 MediaPicker açılıyor...');
-                    
-                    // Geçici bir ID oluştur - bu sistemde temp_ ile başlayan ID'ler özel işlenir
-                    const tempId = 'temp_' + Date.now();
-                    const relatedType = 'corporate_member';
-                    
-                    // Medya seçici URL - geçici ID ile oluştur
-                    const mediapickerUrl = '/admin/filemanagersystem/mediapicker?type=image&related_type=' + 
-                        encodeURIComponent(relatedType) + '&related_id=' + encodeURIComponent(tempId);
-                    
-                    console.log('🔍 MediaPicker URL:', mediapickerUrl);
-                    
-                    // Modal açılıp iframe yüklenmesi
-                    $('#mediapickerModal').modal('show');
-                    $('#mediapickerFrame').attr('src', mediapickerUrl);
-                    
-                    // iframe'den mesaj dinleme ve hata yakalama
-                    function handleMediaSelection(event) {
-                        try {
-                            console.log('🔍 Medya mesajı alındı:');
-                            console.log('- Kaynak origin:', event.origin);
-                            console.log('- Ham veri:', event.data);
-                            
-                            if (!event.data) {
-                                console.log('❌ Boş mesaj - işlenmedi');
-                                return;
-                            }
-                            
-                            // Medya mesajı türüne göre işlem
-                            if (event.data.type === 'mediaSelected') {
-                                console.log('✅ Medya seçildi:', event.data);
-                                
-                                // Media ID veya URL kontrolü
-                                let mediaValue = '';
-                                let previewUrl = '';
-                                let displayText = '';
-                                
-                                if (event.data.mediaId) {
-                                    console.log('📋 Medya ID alındı:', event.data.mediaId);
-                                    mediaValue = event.data.mediaId;
-                                    previewUrl = '/admin/filemanagersystem/media/preview/' + event.data.mediaId;
-                                    displayText = 'Profil Görseli (ID: ' + event.data.mediaId + ')';
-                                }
-                                else if (event.data.mediaUrl) {
-                                    console.log('🔗 Medya URL alındı:', event.data.mediaUrl);
-                                    mediaValue = event.data.mediaUrl.trim();
-                                    previewUrl = mediaValue;
-                                    // URL'i kısaltarak göster (çok uzun olmasın)
-                                    let shortUrl = event.data.mediaUrl;
-                                    if (shortUrl.length > 40) {
-                                        shortUrl = shortUrl.substring(0, 20) + '...' + shortUrl.substring(shortUrl.length - 20);
-                                    }
-                                    displayText = 'URL: ' + shortUrl;
-                                }
-                                
-                                if (mediaValue) {
-                                    // Gizli input'a değeri kaydet, görünen input'a kullanıcı dostu metin göster 
-                                    input.val(mediaValue);
-                                    displayInput.val('Seçilen görsel: ' + displayText);
-                                    
-                                    // Önizleme göster
-                                    previewImg.attr('src', previewUrl);
-                                    preview.show();
-                                    
-                                    // Default image kısmını temizle ve yeni görsel ekle
-                                    $('#image_preview').empty();
-                                    $('#image_preview').html(`<img src="${previewUrl}" style="max-width: 100%; max-height: 100%;">`);
-                                    
-                                    console.log('✓ Medya değeri işlendi:', mediaValue);
-                                } else {
-                                    console.error('❌ Medya değeri alınamadı');
-                                    alert('Medya bilgisi alınamadı. Lütfen tekrar deneyin.');
-                                }
-                                
-                                // Modalı kapat
-                                $('#mediapickerModal').modal('hide');
-                            } else if (event.data.type === 'mediapickerError') {
-                                // Medya seçicide bir hata oluştu
-                                console.error('❌ Medya seçici hatası:', event.data);
-                                alert('Medya seçici hatası: ' + (event.data.message || 'Bilinmeyen hata'));
-                                $('#mediapickerModal').modal('hide');
-                            } else if (event.data.type === 'mediapickerLoaded') {
-                                console.log('ℹ️ Medya seçici yüklendi');
-                            } else {
-                                console.log('ℹ️ Bilinmeyen medya mesajı:', event.data);
-                            }
-                        } catch (error) {
-                            console.error('❌ Medya seçimi işlenirken hata oluştu:', error);
-                            alert('Medya seçimi işlenirken bir hata oluştu: ' + error.message);
-                        }
+            // File input preview sistemi
+            $('#profile_image').on('change', function() {
+                const file = this.files[0];
+                const preview = $('#image_preview');
+                
+                if (file) {
+                    // Dosya türü kontrolü
+                    if (!file.type.startsWith('image/')) {
+                        alert('Lütfen sadece görsel dosyaları seçin.');
+                        $(this).val('');
+                        return;
                     }
                     
-                    // Mevcut event listener'ı kaldır ve yenisini ekle
-                    window.removeEventListener('message', handleMediaSelection);
-                    window.addEventListener('message', handleMediaSelection);
+                    // Dosya boyutu kontrolü (2MB)
+                    if (file.size > 2 * 1024 * 1024) {
+                        alert('Görsel dosyası 2MB\'den küçük olmalıdır.');
+                        $(this).val('');
+                        return;
+                    }
                     
-                    // Iframe yüklenmesini kontrol et
-                    $('#mediapickerFrame').on('load', function() {
-                        console.log('🟢 Medya iframe yüklendi');
-                    }).on('error', function(error) {
-                        console.error('🔴 MediaPicker iframe yüklenirken hata oluştu:', error);
-                        alert('Medya seçici yüklenirken bir hata oluştu. Lütfen sayfayı yenileyip tekrar deneyin.');
-                        $('#mediapickerModal').modal('hide');
-                    });
+                    // Dosya adını göster
+                    $('.custom-file-label').text(file.name);
                     
-                    // Modal kapatıldığında iframe kaynağını temizle
-                    $('#mediapickerModal').on('hidden.bs.modal', function() {
-                        console.log('🔴 Medya seçici kapatıldı');
-                        $('#mediapickerFrame').attr('src', 'about:blank');
-                    });
-                } catch (error) {
-                    console.error('❌ Medya seçici açılırken hata oluştu:', error);
-                    alert('Medya seçici açılırken bir hata oluştu: ' + error.message);
+                    // Önizleme göster
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        preview.html('<img src="' + e.target.result + '" style="max-width: 100%; max-height: 100%; border-radius: 5px;">');
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    // Dosya seçilmemişse
+                    $('.custom-file-label').text('Görsel Seç...');
+                    preview.html('<div class="text-center" id="default_image"><i class="fas fa-user fa-4x text-secondary mb-2"></i><p class="text-muted">Görsel seçilmemiş</p></div>');
                 }
             });
         });

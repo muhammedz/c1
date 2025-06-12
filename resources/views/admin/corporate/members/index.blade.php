@@ -78,10 +78,8 @@
                             <tr data-id="{{ $member->id }}" class="member-row">
                                 <td>{{ $loop->iteration }}</td>
                                 <td>
-                                    @if($member->filemanagersystem_image)
-                                    <img src="{{ $member->filemanagersystem_image_url ?? $member->filemanagersystem_image }}" class="img-thumbnail" alt="{{ $member->name }}" style="max-width: 50px;">
-                                    @elseif($member->image)
-                                    <img src="{{ asset('storage/' . $member->image) }}" class="img-thumbnail" alt="{{ $member->name }}" style="max-width: 50px;">
+                                    @if($member->image)
+                                    <img src="{{ asset($member->image) }}" class="img-thumbnail" alt="{{ $member->name }}" style="max-width: 50px;">
                                     @else
                                     <span class="text-muted">Görsel yok</span>
                                     @endif
