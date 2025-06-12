@@ -103,7 +103,7 @@ class Mudurluk extends Model
     }
 
     /**
-     * Hizmet kategorileri ile many-to-many ilişki
+     * Müdürlük kategorileri ile many-to-many ilişki
      */
     public function serviceCategories()
     {

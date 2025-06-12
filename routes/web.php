@@ -41,6 +41,7 @@ use App\Http\Controllers\Auth\UpdatePasswordController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\SearchPageController;
 use App\Http\Controllers\Admin\ServicesUnitController;
+use App\Http\Controllers\Admin\ServiceTopicController;
 
 /*
 |--------------------------------------------------------------------------
@@ -292,14 +293,24 @@ Route::middleware(['auth', 'role:admin'])->name('admin.')->prefix('admin')->grou
         Route::post('/units/update-order', [ServicesUnitController::class, 'updateOrder'])->name('units.update-order');
     });
     
-    // Hizmet Kategorileri Yönetimi
-    Route::resource('service-categories', ServiceCategoryController::class)->names('service-categories');
-    Route::post('/service-categories/update-order', [ServiceCategoryController::class, 'updateOrder'])->name('service-categories.update-order');
+    // Müdürlükler Kategorisi Yönetimi
+    Route::resource('mudurlukler-kategorisi', ServiceCategoryController::class)->names('service-categories');
+    Route::post('/mudurlukler-kategorisi/update-order', [ServiceCategoryController::class, 'updateOrder'])->name('service-categories.update-order');
     
     // Hizmet Etiketleri Yönetimi
     Route::resource('service-tags', ServiceTagController::class)->names('service-tags');
     Route::get('/service-tags/cleanup', [ServiceTagController::class, 'cleanup'])->name('service-tags.cleanup');
     Route::get('/service-tags/search', [ServiceTagController::class, 'search'])->name('service-tags.search');
+    
+    // Hizmet Konuları Yönetimi
+    Route::get('hizmet-konulari', [App\Http\Controllers\Admin\ServiceTopicController::class, 'index'])->name('service-topics.index');
+    Route::get('hizmet-konulari/create', [App\Http\Controllers\Admin\ServiceTopicController::class, 'create'])->name('service-topics.create');
+    Route::post('hizmet-konulari', [App\Http\Controllers\Admin\ServiceTopicController::class, 'store'])->name('service-topics.store');
+    Route::get('hizmet-konulari/{serviceTopic}', [App\Http\Controllers\Admin\ServiceTopicController::class, 'show'])->name('service-topics.show');
+    Route::get('hizmet-konulari/{serviceTopic}/edit', [App\Http\Controllers\Admin\ServiceTopicController::class, 'edit'])->name('service-topics.edit');
+    Route::put('hizmet-konulari/{serviceTopic}', [App\Http\Controllers\Admin\ServiceTopicController::class, 'update'])->name('service-topics.update');
+    Route::delete('hizmet-konulari/{serviceTopic}', [App\Http\Controllers\Admin\ServiceTopicController::class, 'destroy'])->name('service-topics.destroy');
+    Route::post('/hizmet-konulari/update-order', [App\Http\Controllers\Admin\ServiceTopicController::class, 'updateOrder'])->name('service-topics.update-order');
     
     // Sayfa Kategorileri Yönetimi
     Route::resource('page-categories', App\Http\Controllers\Admin\PageCategoryController::class)->names('page-categories');
@@ -441,6 +452,8 @@ Route::prefix('etkinlikler')->name('events.')->group(function () {
 // Ön Yüz Hizmet Rotaları
 Route::prefix('hizmetler')->name('services.')->group(function () {
     Route::get('/', [App\Http\Controllers\Front\ServiceController::class, 'index'])->name('index');
+    Route::get('/kategoriler', [App\Http\Controllers\ServiceTopicController::class, 'index'])->name('topics.index');
+    Route::get('/kategoriler/{slug}', [App\Http\Controllers\ServiceTopicController::class, 'show'])->name('topics.show');
     Route::get('/kategori/{slug}', [App\Http\Controllers\Front\ServiceController::class, 'category'])->name('category');
     Route::get('/{slug}', [App\Http\Controllers\Front\ServiceController::class, 'show'])->name('show');
 });

@@ -45,7 +45,7 @@ class MudurlukController extends Controller
         // Görüntülenme sayısını artır
         $mudurluk->incrementViews();
 
-        // Dosyaları ve hizmet kategorilerini yükle
+        // Dosyaları ve müdürlük kategorilerini yükle
         $mudurluk->load([
             'files' => function($query) {
                 $query->where('is_active', true)->orderBy('type')->orderBy('order_column');

@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\DB;
 class ServiceCategoryController extends Controller
 {
     /**
-     * Hizmet Kategorileri listesi
+     * Müdürlükler Kategorisi listesi
      */
     public function index()
     {
@@ -23,7 +23,7 @@ class ServiceCategoryController extends Controller
     }
     
     /**
-     * Yeni hizmet kategorisi oluşturma formu
+     * Yeni müdürlük kategorisi oluşturma formu
      */
     public function create()
     {
@@ -32,7 +32,7 @@ class ServiceCategoryController extends Controller
     }
     
     /**
-     * Hizmet kategorisi kaydetme
+     * Müdürlük kategorisi kaydetme
      */
     public function store(Request $request)
     {
@@ -93,8 +93,8 @@ class ServiceCategoryController extends Controller
                 'category' => $serviceCategory->toArray()
             ]);
             
-            return redirect()->route('admin.service-categories.index')
-                ->with('success', 'Hizmet kategorisi başarıyla oluşturuldu.');
+                    return redirect()->route('admin.service-categories.index')
+            ->with('success', 'Müdürlük kategorisi başarıyla oluşturuldu.');
         } catch (\Illuminate\Validation\ValidationException $e) {
             \Illuminate\Support\Facades\Log::error('Validasyon hatası', [
                 'errors' => $e->errors(),
@@ -188,18 +188,18 @@ class ServiceCategoryController extends Controller
         ]);
         
         return redirect()->route('admin.service-categories.index')
-            ->with('success', 'Hizmet kategorisi başarıyla güncellendi.');
+            ->with('success', 'Müdürlük kategorisi başarıyla güncellendi.');
     }
     
     /**
-     * Hizmet kategorisi silme
+     * Müdürlük kategorisi silme
      */
     public function destroy(ServiceCategory $serviceCategory)
     {
         // İlişkili hizmet kontrolü
         if ($serviceCategory->services()->count() > 0) {
             return redirect()->back()
-                ->with('error', 'Bu hizmet kategorisine ait hizmetler bulunduğu için silinemez. Önce hizmetleri başka kategorilere taşıyın veya silin.');
+                ->with('error', 'Bu müdürlük kategorisine ait hizmetler bulunduğu için silinemez. Önce hizmetleri başka kategorilere taşıyın veya silin.');
         }
         
         // Alt kategorileri ana kategoriye taşı
@@ -209,11 +209,11 @@ class ServiceCategoryController extends Controller
         $serviceCategory->delete();
         
         return redirect()->route('admin.service-categories.index')
-            ->with('success', 'Hizmet kategorisi başarıyla silindi.');
+            ->with('success', 'Müdürlük kategorisi başarıyla silindi.');
     }
     
     /**
-     * Hizmet kategorisi sıralama
+     * Müdürlük kategorisi sıralama
      */
     public function updateOrder(Request $request)
     {
@@ -230,7 +230,7 @@ class ServiceCategoryController extends Controller
     }
     
     /**
-     * Bir hizmet kategorisinin tüm alt kategori id'lerini recursive olarak getir
+     * Bir müdürlük kategorisinin tüm alt kategori id'lerini recursive olarak getir
      */
     private function getAllChildIds(ServiceCategory $serviceCategory, array $ids = [])
     {

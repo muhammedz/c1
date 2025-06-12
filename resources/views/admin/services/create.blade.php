@@ -711,6 +711,62 @@
                             </div>
                         </div>
                         
+                        <!-- Hizmet Konuları -->
+                        <div class="card mb-3">
+                            <div class="card-header bg-light d-flex align-items-center">
+                                <i class="fas fa-list-ul me-2 text-primary"></i>
+                                <h5 class="mb-0">Hizmet Konuları</h5>
+                                <span class="badge bg-success ms-2 topic-count">0</span>
+                            </div>
+                            <div class="card-body">
+                                <div class="topic-wrapper">
+                                    <!-- Açıklama -->
+                                    <div class="alert alert-info mb-3">
+                                        <i class="fas fa-info-circle me-1"></i>
+                                        Bu hizmetin hangi konularda yer alacağını seçin. Hizmet, seçilen konuların sayfalarında görüntülenecektir.
+                                    </div>
+                                    
+                                    <!-- Arama ve Tümünü Seç -->
+                                    <div class="d-flex align-items-center mb-3">
+                                        <div class="ms-auto">
+                                            <button type="button" class="btn btn-light btn-sm border" id="select-all-topics" style="font-size: 0.8rem; padding: 0.25rem 0.5rem;">
+                                                <i class="fas fa-check-square me-1"></i>Tümü
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <!-- Konu Listesi -->
+                                    <div class="topic-list mb-3" style="max-height: 300px; overflow-y: auto; border: 1px solid #dee2e6; border-radius: 4px;">
+                                        @foreach($serviceTopics as $topic)
+                                        <div class="topic-item d-flex align-items-center py-2 px-3 mb-1 rounded hover-bg-light">
+                                            <div class="form-check mb-0 w-100">
+                                                <label class="d-flex align-items-center gap-2">
+                                                    <input type="checkbox" name="service_topic_ids[]" value="{{ $topic->id }}" class="form-check-input me-1" {{ in_array($topic->id, old('service_topic_ids', [])) ? 'checked' : '' }}>
+                                                    @if($topic->icon)
+                                                        <i class="{{ $topic->icon }}" style="color: {{ $topic->color }}; font-size: 1.1em;"></i>
+                                                    @endif
+                                                    <span class="topic-name fw-medium">{{ $topic->name }}</span>
+                                                    @if($topic->description)
+                                                        <i class="fas fa-info-circle ms-1 text-muted" style="font-size: 0.85em;" data-bs-toggle="tooltip" title="{{ $topic->description }}"></i>
+                                                    @endif
+                                                    <span class="badge bg-light text-muted ms-auto" style="font-size: 0.7em;">{{ $topic->services_count }} hizmet</span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                        @endforeach
+                                    </div>
+
+                                    <!-- Seçili Konular -->
+                                    <div class="selected-topics">
+                                        <label class="form-label text-muted mb-2">
+                                            <i class="fas fa-list-ul me-1"></i> Seçili Konular
+                                        </label>
+                                        <div class="d-flex flex-wrap gap-2" id="selected-topics-list"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
                         <!-- Etiketler -->
                         <div class="card tag-card mb-3">
                             <div class="card-header bg-light d-flex align-items-center">
@@ -1352,6 +1408,62 @@
                 toastr.success('Yeni URL kodu oluşturuldu!', 'Başarılı', {timeOut: 2000});
             }
         });
+        
+        // Hizmet Konuları İşlemleri
+        // Konu seçim değişikliklerini izle
+        $('input[name="service_topic_ids[]"]').on('change', function() {
+            updateSelectedTopics();
+            updateTopicCount();
+        });
+        
+        // Tüm konuları seç/kaldır
+        $('#select-all-topics').on('click', function() {
+            const allChecked = $('input[name="service_topic_ids[]"]:checked').length === $('input[name="service_topic_ids[]"]').length;
+            $('input[name="service_topic_ids[]"]').prop('checked', !allChecked);
+            updateSelectedTopics();
+            updateTopicCount();
+        });
+        
+        // Seçili konuları güncelle
+        function updateSelectedTopics() {
+            const selectedTopicsList = $('#selected-topics-list');
+            selectedTopicsList.empty();
+            
+            $('input[name="service_topic_ids[]"]:checked').each(function() {
+                const topicId = $(this).val();
+                const topicName = $(this).closest('label').find('.topic-name').text();
+                const topicIcon = $(this).closest('label').find('i').first().attr('class');
+                const topicColor = $(this).closest('label').find('i').first().css('color');
+                
+                const badge = $(`
+                    <span class="badge bg-light text-dark border d-flex align-items-center gap-1" style="font-size: 0.85em;">
+                        ${topicIcon ? `<i class="${topicIcon}" style="color: ${topicColor};"></i>` : ''}
+                        ${topicName}
+                        <button type="button" class="btn-close btn-close-sm ms-1" data-topic-id="${topicId}" style="font-size: 0.6em;"></button>
+                    </span>
+                `);
+                
+                selectedTopicsList.append(badge);
+            });
+        }
+        
+        // Seçili konuları kaldırma
+        $(document).on('click', '#selected-topics-list .btn-close', function() {
+            const topicId = $(this).data('topic-id');
+            $(`input[name="service_topic_ids[]"][value="${topicId}"]`).prop('checked', false);
+            updateSelectedTopics();
+            updateTopicCount();
+        });
+        
+        // Konu sayısını güncelle
+        function updateTopicCount() {
+            const count = $('input[name="service_topic_ids[]"]:checked').length;
+            $('.topic-count').text(count);
+        }
+        
+        // Sayfa yüklendiğinde seçili konuları göster
+        updateSelectedTopics();
+        updateTopicCount();
         
         // Kategori seçimi - DOM yüklendikten sonra seçimi kur
         var selectedCategories = [];

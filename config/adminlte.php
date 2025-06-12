@@ -602,16 +602,22 @@ return [
                     'active' => ['admin/services/units', 'admin/services/units/*']
                 ],
                 [
-                    'text' => 'Kategoriler',
-                    'url'  => 'admin/service-categories',
+                    'text' => 'Müdürlükler Kategorisi',
+                    'url'  => 'admin/mudurlukler-kategorisi',
                     'icon' => 'fas fa-fw fa-tags',
-                    'active' => ['admin/service-categories', 'admin/service-categories/*']
+                    'active' => ['admin/mudurlukler-kategorisi', 'admin/mudurlukler-kategorisi/*']
                 ],
                 [
                     'text' => 'Etiketler',
                     'url'  => 'admin/service-tags',
                     'icon' => 'fas fa-fw fa-tag',
                     'active' => ['admin/service-tags', 'admin/service-tags/*']
+                ],
+                [
+                    'text' => 'Hizmet Konuları',
+                    'url'  => 'admin/hizmet-konulari',
+                    'icon' => 'fas fa-fw fa-list-ul',
+                    'active' => ['admin/hizmet-konulari', 'admin/hizmet-konulari/*']
                 ],
             ],
         ],

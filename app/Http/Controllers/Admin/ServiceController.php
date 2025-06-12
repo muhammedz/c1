@@ -78,7 +78,13 @@ class ServiceController extends Controller
         $serviceCategories = ServiceCategory::where('is_active', true)->orderBy('name')->get();
         $units = ServicesUnit::where('status', true)->orderBy('name')->get();
         
-        return view('admin.services.create', compact('categories', 'tags', 'hedefKitleler', 'newsCategories', 'maxHeadlinesReached', 'serviceCategories', 'units'));
+        // Hizmet konularını ekle
+        $serviceTopics = \App\Models\ServiceTopic::where('is_active', true)
+            ->orderBy('order')
+            ->withCount('services')
+            ->get();
+        
+        return view('admin.services.create', compact('categories', 'tags', 'hedefKitleler', 'newsCategories', 'maxHeadlinesReached', 'serviceCategories', 'units', 'serviceTopics'));
     }
 
     /**
@@ -119,6 +125,11 @@ class ServiceController extends Controller
             // Haber kategorilerini ekle
             if ($request->has('news_category_ids')) {
                 $service->newsCategories()->sync($request->news_category_ids);
+            }
+            
+            // Hizmet konularını ekle
+            if ($request->has('service_topic_ids')) {
+                $service->serviceTopics()->sync($request->service_topic_ids);
             }
             
             DB::commit();
@@ -186,7 +197,13 @@ class ServiceController extends Controller
         
         $units = ServicesUnit::where('status', true)->orderBy('name')->get();
         
-        return view('admin.services.edit', compact('service', 'maxHeadlinesReached', 'categories', 'selectedCategories', 'tags', 'hedefKitleler', 'newsCategories', 'selectedNewsCategories', 'units'));
+        // Hizmet konularını ekle
+        $serviceTopics = \App\Models\ServiceTopic::where('is_active', true)
+            ->orderBy('order')
+            ->withCount('services')
+            ->get();
+        
+        return view('admin.services.edit', compact('service', 'maxHeadlinesReached', 'categories', 'selectedCategories', 'tags', 'hedefKitleler', 'newsCategories', 'selectedNewsCategories', 'units', 'serviceTopics'));
     }
 
     /**
@@ -233,6 +250,13 @@ class ServiceController extends Controller
                 $service->newsCategories()->sync($request->news_category_ids);
             } else {
                 $service->newsCategories()->detach();
+            }
+            
+            // Hizmet konularını güncelle
+            if ($request->has('service_topic_ids')) {
+                $service->serviceTopics()->sync($request->service_topic_ids);
+            } else {
+                $service->serviceTopics()->detach();
             }
             
             DB::commit();

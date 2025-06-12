@@ -1,13 +1,13 @@
 @extends('adminlte::page')
 
-@section('title', 'Yeni Hizmet Kategorisi')
+@section('title', 'Yeni Müdürlük Kategorisi')
 
 @section('content')
 <div class="container-fluid py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h1 class="h3 mb-2 text-gray-800">Yeni Hizmet Kategorisi</h1>
-            <p class="mb-0 text-muted">Hizmetleriniz için yeni bir kategori oluşturun</p>
+            <h1 class="h3 mb-2 text-gray-800">Yeni Müdürlük Kategorisi</h1>
+            <p class="mb-0 text-muted">Müdürlükleriniz için yeni bir kategori oluşturun</p>
         </div>
         <a href="{{ route('admin.service-categories.index') }}" class="btn btn-outline-secondary">
             <i class="fas fa-arrow-left mr-1"></i> Listeye Dön
@@ -43,7 +43,7 @@
                                 id="name" name="name" value="{{ old('name') }}" 
                                 placeholder="Örn: Web Tasarım" required>
                             <small class="form-text text-muted">
-                                Kategori adı, hizmetlerinizi sınıflandırmak için kullanılır. Net ve anlaşılır bir isim seçin.
+                                Kategori adı, müdürlüklerinizi sınıflandırmak için kullanılır. Net ve anlaşılır bir isim seçin.
                             </small>
                             @error('name')
                                 <div class="invalid-feedback">{{ $message }}</div>
@@ -59,7 +59,7 @@
                                 id="description" name="description" rows="3" 
                                 placeholder="Kategori hakkında kısa bir açıklama (isteğe bağlı)">{{ old('description') }}</textarea>
                             <small class="form-text text-muted">
-                                Bu açıklama, kategorinin amacını ve içerdiği hizmet türlerini tanımlar.
+                                Bu açıklama, kategorinin amacını ve içerdiği müdürlük türlerini tanımlar.
                             </small>
                             @error('description')
                                 <div class="invalid-feedback">{{ $message }}</div>
@@ -167,7 +167,7 @@
                                 <i class="fas fa-times mr-1"></i> İptal
                             </a>
                             <button type="submit" class="btn btn-primary" id="submitBtn">
-                                <i class="fas fa-save mr-1"></i> Kategoriyi Kaydet
+                                <i class="fas fa-save mr-1"></i> Müdürlük Kategorisini Kaydet
                             </button>
                         </div>
                     </div>
@@ -187,7 +187,7 @@
                 <div class="card-body">
                     <div class="callout callout-info">
                         <h5><i class="fas fa-info mr-1"></i> Bilgi</h5>
-                        <p class="mb-0">Kategoriler, hizmetlerinizi düzenli şekilde gruplandırmanızı sağlar. Mantıklı bir kategori yapısı, ziyaretçilerin ilgilendikleri hizmetleri daha kolay bulmasına yardımcı olur.</p>
+                        <p class="mb-0">Kategoriler, müdürlüklerinizi düzenli şekilde gruplandırmanızı sağlar. Mantıklı bir kategori yapısı, ziyaretçilerin ilgilendikleri müdürlükleri daha kolay bulmasına yardımcı olur.</p>
                     </div>
                     
                     <div class="callout callout-warning">

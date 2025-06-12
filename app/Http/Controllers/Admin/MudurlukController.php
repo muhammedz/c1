@@ -81,7 +81,7 @@ class MudurlukController extends Controller
 
             $mudurluk = Mudurluk::create($data);
 
-            // Hizmet kategorilerini ekle
+            // Müdürlük kategorilerini ekle
             if ($request->has('service_category_ids')) {
                 $mudurluk->serviceCategories()->sync($request->service_category_ids);
             }
@@ -157,7 +157,7 @@ class MudurlukController extends Controller
 
             $mudurluk->update($data);
 
-            // Hizmet kategorilerini güncelle
+            // Müdürlük kategorilerini güncelle
             if ($request->has('service_category_ids')) {
                 $mudurluk->serviceCategories()->sync($request->service_category_ids);
             } else {

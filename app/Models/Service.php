@@ -90,6 +90,13 @@ class Service extends Model
                    ->withTimestamps();
     }
     
+    // Hizmet Konuları
+    public function serviceTopics()
+    {
+        return $this->belongsToMany(ServiceTopic::class, 'service_service_topic', 'service_id', 'service_topic_id')
+                   ->withTimestamps();
+    }
+    
     // İlgili Haberler (seçilen kategorilerdeki tüm haberler)
     public function relatedNews()
     {

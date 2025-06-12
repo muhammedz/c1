@@ -1,19 +1,19 @@
 @extends('adminlte::page')
 
-@section('title', 'Hizmet Kategorisi Düzenle')
+@section('title', 'Müdürlük Kategorisi Düzenle')
 
 @section('content')
 <div class="container-fluid px-4">
-    <h1 class="mt-4">Hizmet Kategorisi Düzenle</h1>
+    <h1 class="mt-4">Müdürlük Kategorisi Düzenle</h1>
     <ol class="breadcrumb mb-4">
         <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
-        <li class="breadcrumb-item"><a href="{{ route('admin.service-categories.index') }}">Hizmet Kategorileri</a></li>
-        <li class="breadcrumb-item active">Hizmet Kategorisi Düzenle</li>
+        <li class="breadcrumb-item"><a href="{{ route('admin.service-categories.index') }}">Müdürlükler Kategorisi</a></li>
+        <li class="breadcrumb-item active">Müdürlük Kategorisi Düzenle</li>
     </ol>
     
     <div class="card mb-4">
         <div class="card-header">
-            <i class="fas fa-edit me-1"></i> {{ $serviceCategory->name }} Hizmet Kategorisini Düzenle
+            <i class="fas fa-edit me-1"></i> {{ $serviceCategory->name }} Müdürlük Kategorisini Düzenle
         </div>
         <div class="card-body">
             @if(session('success'))
@@ -35,7 +35,7 @@
                 <div class="row mb-3">
                     <div class="col-md-6">
                         <div class="mb-3">
-                            <label for="name" class="form-label">Hizmet Kategorisi Adı <span class="text-danger">*</span></label>
+                            <label for="name" class="form-label">Müdürlük Kategorisi Adı <span class="text-danger">*</span></label>
                             <input type="text" class="form-control @error('name') is-invalid @enderror" id="name" name="name" value="{{ old('name', $serviceCategory->name) }}" required>
                             @error('name')
                                 <div class="invalid-feedback">{{ $message }}</div>
@@ -69,9 +69,9 @@
                 <div class="row mb-3">
                     <div class="col-md-6">
                         <div class="mb-3">
-                            <label for="parent_id" class="form-label">Üst Hizmet Kategorisi</label>
+                            <label for="parent_id" class="form-label">Üst Müdürlük Kategorisi</label>
                             <select class="form-select @error('parent_id') is-invalid @enderror" id="parent_id" name="parent_id">
-                                <option value="">Ana Hizmet Kategorisi</option>
+                                <option value="">Ana Müdürlük Kategorisi</option>
                                 @foreach($serviceCategories as $cat)
                                     <option value="{{ $cat->id }}" {{ old('parent_id', $serviceCategory->parent_id) == $cat->id ? 'selected' : '' }}>{{ $cat->name }}</option>
                                 @endforeach
@@ -141,7 +141,7 @@
                                 @endif
                             @else
                                 <div class="alert alert-info mb-0">
-                                    Bu hizmet kategorisine ait hizmet bulunmamaktadır.
+                                    Bu müdürlük kategorisine ait hizmet bulunmamaktadır.
                                 </div>
                             @endif
                         </div>

@@ -355,14 +355,14 @@
                     </div>
                 </div>
 
-                <!-- Hizmet Kategorileri -->
+                <!-- Müdürlükler Kategorisi -->
                 <div class="card">
                     <div class="card-header">
-                        <h5><i class="fas fa-tags"></i> Hizmet Kategorileri</h5>
+                        <h5><i class="fas fa-tags"></i> Müdürlükler Kategorisi</h5>
                     </div>
                     <div class="card-body">
                         <div class="mb-3">
-                            <label for="service_category_ids" class="form-label">İlgili Hizmet Kategorileri</label>
+                            <label for="service_category_ids" class="form-label">İlgili Müdürlükler Kategorisi</label>
                             <div class="category-list" style="max-height: 300px; overflow-y: auto; border: 1px solid #dee2e6; border-radius: 4px; padding: 10px;">
                                 @foreach($serviceCategories as $category)
                                 <div class="form-check mb-2">
@@ -383,7 +383,7 @@
                                 @endforeach
                             </div>
                             <small class="form-text text-muted">
-                                Bu müdürlükle ilişkili hizmet kategorilerini seçin. Seçilen kategorilerdeki hizmetler müdürlük sayfasında görüntülenecektir.
+                                Bu müdürlükle ilişkili müdürlük kategorilerini seçin. Seçilen kategorilerdeki hizmetler müdürlük sayfasında görüntülenecektir.
                             </small>
                             @error('service_category_ids')
                                 <div class="invalid-feedback d-block">{{ $message }}</div>

@@ -65,7 +65,7 @@
                                                                 <!-- Modern Kategori Buton Tasarımı -->
                                                                 <a href="{{ $item->url ?? '#' }}" class="category-button-modern group relative overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100 hover:from-gray-100 hover:to-gray-150 border-gray-200 flex items-center p-3 rounded-lg border-2 shadow-sm hover:shadow-md transition-all duration-300 transform hover:scale-102 hover:-translate-y-0.5">
                                                                     <div class="icon-container w-10 h-10 flex items-center justify-center rounded-full mr-3 flex-shrink-0 bg-white/70 group-hover:bg-white/90 transition-all duration-300 group-hover:rotate-3 group-hover:scale-105">
-                                                                        <span class="material-icons text-[#007b32] text-lg group-hover:text-[#00352b] transition-colors duration-300">{{ $item->icon ?? $iconMapping[$item->title] ?? 'article' }}</span>
+                                                                        <i class="{{ $item->icon ?? 'fas fa-file-alt' }} text-[#007b32] text-lg group-hover:text-[#00352b] transition-colors duration-300"></i>
                                                                     </div>
                                                                     <div class="flex flex-col flex-1 min-w-0">
                                                                         <span class="font-semibold text-[#00352b] text-sm group-hover:text-[#007b32] transition-colors duration-300 leading-tight">{{ $item->title }}</span>
@@ -75,7 +75,7 @@
                                                                     <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform -skew-x-12 translate-x-full group-hover:translate-x-[-100%] transition-transform duration-700"></div>
                                                                     <!-- Sağ ok ikonu -->
                                                                     <div class="ml-2 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-1 group-hover:translate-x-0">
-                                                                        <span class="material-icons text-[#007b32] text-base">arrow_forward</span>
+                                                                        <i class="fas fa-arrow-right text-[#007b32] text-base"></i>
                                                                     </div>
                                                                 </a>
                                                             @endforeach
@@ -96,7 +96,7 @@
                                                                             @foreach($item->children as $subItem)
                                                                                 <li>
                                                                                     <a href="{{ $subItem->url ?? '#' }}" class="mega-menu-link" {{ $subItem->new_tab ? 'target="_blank"' : '' }}>
-                                                                                        <span class="material-icons mega-menu-link-icon">{{ $subItem->icon ?? 'person' }}</span>
+                                                                                        <i class="{{ $subItem->icon ?? 'fas fa-user' }} mega-menu-link-icon"></i>
                                                                                         <span>{{ $subItem->title }}</span>
                                                                                     </a>
                                                                                 </li>
@@ -114,7 +114,7 @@
                                                         <p class="text-xs text-gray-500">{{ $menu->description ?? $menu->footer_text ?? 'Açıklama Yazısı' }}</p>
                                                         <a href="{{ $menu->footer_link ?? '#' }}" class="text-[#00352b] hover:text-[#007b32] text-sm font-medium flex items-center gap-1 transition-all hover:gap-2">
                                                             {{ $menu->name }} 
-                                                            <span class="material-icons text-sm">arrow_forward</span>
+                                                            <i class="fas fa-arrow-right text-sm"></i>
                                                         </a>
                                                     </div>
                                                 </div>
@@ -152,7 +152,7 @@
                             <a href="#"
                                 class="text-[#00352b] h-full px-3 font-semibold hover:text-gray-900 text-md flex items-center">
                                 Menü Adı
-                                <span class="material-icons text-sm ml-1">expand_more</span>
+                                <i class="fas fa-chevron-down text-sm ml-1"></i>
                             </a>
                             <div class="mega-menu">
                                 <div class="mega-menu-content mega-menu-kurumsal">
@@ -166,7 +166,7 @@
                                                         <ul class="space-y-0.5">
                                                             <li>
                                                                 <a href="#" class="mega-menu-link">
-                                                                    <span class="material-icons mega-menu-link-icon">person</span>
+                                                                    <i class="fas fa-user mega-menu-link-icon"></i>
                                                                     <span>Alt Menü 1</span>
                                                                 </a>
                                                             </li>
@@ -181,7 +181,7 @@
                                                 <p class="text-xs text-gray-500">Örnek açıklama yazısı</p>
                                                 <a href="#" class="text-[#00352b] hover:text-[#007b32] text-sm font-medium flex items-center gap-1 transition-all hover:gap-2">
                                                     Menü Adı 
-                                                    <span class="material-icons text-sm">arrow_forward</span>
+                                                    <i class="fas fa-arrow-right text-sm"></i>
                                                 </a>
                                             </div>
                                         </div>
@@ -196,7 +196,7 @@
                 <div class="flex items-center md:space-x-4 space-x-2">
                     <!-- Arama butonu - sadece desktop'ta görünür -->
                     <button id="searchButton" class="hidden md:flex w-11 h-11 bg-[#007b32] rounded-full items-center justify-center text-white shadow-md hover:bg-[#00352b] hover:scale-105 transition-all">
-                        <span class="material-icons text-white text-xl">search</span>
+                        <i class="fas fa-search text-white text-xl"></i>
                     </button>
                     
                     <!-- Slogan - sadece desktop'ta görünür -->
@@ -207,7 +207,7 @@
                     <!-- Mobil Menü Butonu - sadece mobilde görünür -->
                     <button class="md:hidden flex items-center justify-center bg-gray-100 rounded-md p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-200 focus:outline-none transition-all"
                         id="mobileMenuButton">
-                        <span class="material-icons">menu</span>
+                        <i class="fas fa-bars"></i>
                     </button>
                     
                     <!-- Atatürk simgesi - her zaman görünür, mobilde menünün sağında -->
@@ -237,7 +237,7 @@
                         <div class="group border-b border-gray-200">
                             <a href="#" class="py-3 px-2 block text-gray-800 font-medium flex justify-between items-center mobile-dropdown-toggle">
                                 {{ $menu->name }}
-                                <span class="material-icons text-sm">expand_more</span>
+                                <i class="fas fa-chevron-down text-sm"></i>
                             </a>
                             <div class="quick-menu-dropdown bg-gray-50 rounded-md p-2 hidden">
                                 @if($menu->type == 3)
@@ -266,12 +266,12 @@
                                     @foreach($menuItems as $index => $item)
                                         <a href="{{ $item->url ?? '#' }}" class="mobile-category-button bg-gradient-to-r from-gray-50 to-gray-100 border-gray-200 flex items-center p-2.5 rounded-lg border-2 shadow-sm active:scale-95 transition-all duration-200">
                                             <div class="w-8 h-8 flex items-center justify-center rounded-full mr-3 bg-white/80 flex-shrink-0">
-                                                <span class="material-icons text-[#007b32] text-base">{{ $item->icon ?? $iconMapping[$item->title] ?? 'article' }}</span>
+                                                <i class="{{ $item->icon ?? 'fas fa-file-alt' }} text-[#007b32] text-base"></i>
                                             </div>
                                             <div class="flex-1 min-w-0">
                                                 <span class="font-medium text-[#00352b] text-sm leading-tight block">{{ $item->title }}</span>
                                             </div>
-                                            <span class="material-icons text-[#007b32] text-base ml-2">chevron_right</span>
+                                            <i class="fas fa-chevron-right text-[#007b32] text-base ml-2"></i>
                                         </a>
                                     @endforeach
                                 </div>
