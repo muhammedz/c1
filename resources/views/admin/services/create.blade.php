@@ -1175,6 +1175,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/locales/bootstrap-datepicker.tr.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/js/tom-select.complete.min.js"></script>
+<script src="{{ asset('js/slug-helper.js') }}"></script>
 <script>
     $(function() {
         // TinyMCE Editör
@@ -1307,14 +1308,9 @@
             $('#image-preview').hide().find('img').attr('src', '');
         });
 
-        // Slug oluşturma
+        // Slug oluşturma - SlugHelper kullanımı
         function slugify(text) {
-            return text.toString().toLowerCase()
-                .replace(/\s+/g, '-')
-                .replace(/[^\w\-]+/g, '')
-                .replace(/\-\-+/g, '-')
-                .replace(/^-+/, '')
-                .replace(/-+$/, '');
+            return SlugHelper.create(text);
         }
         
         $('#title').on('keyup', function() {

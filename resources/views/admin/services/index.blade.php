@@ -129,7 +129,7 @@
                 </div>
                 <!-- /.card-body -->
                 <div class="card-footer">
-                    {{ $services->links() }}
+                    {{ $services->links('custom.pagination') }}
                 </div>
             </div>
             <!-- /.card -->

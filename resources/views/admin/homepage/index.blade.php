@@ -71,6 +71,11 @@
                                 <i class="fas fa-bars mr-2"></i> Hızlı Menü Yönetimi
                             </a>
                         </div>
+                        <div class="col-md-4">
+                            <a href="{{ route('admin.menusystem.index') }}" class="btn btn-warning btn-lg btn-block mb-3">
+                                <i class="fas fa-sitemap mr-2"></i> Menü Sistemi
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>

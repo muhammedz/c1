@@ -195,7 +195,7 @@ class MenuSystemController extends Controller
             $menu = MenuSystem::findOrFail($id);
             
             // Menü tipine göre işlem yap
-            if ($menu->type == 2) {
+            if ($menu->type == 2 || $menu->type == 3) {
                 // Menüye ait öğeleri sil
                 MenuSystemItem::where('menu_id', $menu->id)->delete();
             }
@@ -208,10 +208,10 @@ class MenuSystemController extends Controller
             // Header menü cache'ini temizle
             app(\App\Services\HeaderService::class)->clearCache();
             
-            return redirect()->route('admin.menusystem.index')->with('success', 'Menü başarıyla silindi');
+            return response()->json(['success' => true, 'message' => 'Menü başarıyla silindi']);
         } catch (\Exception $e) {
             DB::rollBack();
-            return redirect()->back()->with('error', 'Menü silinirken bir hata oluştu: ' . $e->getMessage());
+            return response()->json(['success' => false, 'message' => 'Menü silinirken bir hata oluştu: ' . $e->getMessage()], 500);
         }
     }
 

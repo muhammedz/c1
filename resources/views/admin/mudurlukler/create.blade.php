@@ -408,6 +408,7 @@
 
 @section('js')
 <script src="{{ asset('vendor/tinymce/tinymce.min.js') }}"></script>
+<script src="{{ asset('js/slug-helper.js') }}"></script>
 <script>
     let fileCounters = {
         hizmet_standartlari: 0,
@@ -418,24 +419,8 @@
         // TinyMCE başlat
         initTinyMCE();
         
-        // Slug otomatik oluşturma
-        $('#name').on('input', function() {
-            if ($('#slug').val() === '') {
-                let slug = $(this).val()
-                    .toLowerCase()
-                    .replace(/ğ/g, 'g')
-                    .replace(/ü/g, 'u')
-                    .replace(/ş/g, 's')
-                    .replace(/ı/g, 'i')
-                    .replace(/ö/g, 'o')
-                    .replace(/ç/g, 'c')
-                    .replace(/[^a-z0-9\s-]/g, '')
-                    .replace(/\s+/g, '-')
-                    .replace(/-+/g, '-')
-                    .trim('-');
-                $('#slug').val(slug);
-            }
-        });
+        // Slug otomatik oluşturma - SlugHelper kullanımı
+        SlugHelper.autoSlug('#name', '#slug');
     });
 
     function initTinyMCE() {

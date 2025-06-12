@@ -149,7 +149,12 @@
 </div>
 @endsection
 
-@section('scripts')
+@section('css')
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+@endsection
+
+@section('js')
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     $(document).ready(function() {
         // Durum değiştirme
@@ -198,22 +203,28 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     $.ajax({
-                        url: '{{ route("admin.menusystem.destroy", "") }}/' + menuId,
+                        url: '/admin/menusystem/' + menuId,
                         method: 'DELETE',
                         data: {
                             _token: '{{ csrf_token() }}'
                         },
                         success: function(response) {
-                            if (response.success) {
-                                toastr.success('Menü başarıyla silindi');
+                            Swal.fire(
+                                'Silindi!',
+                                'Menü başarıyla silindi.',
+                                'success'
+                            ).then(() => {
                                 // Sayfayı yenile
                                 window.location.reload();
-                            } else {
-                                toastr.error('Menü silinirken hata oluştu');
-                            }
+                            });
                         },
-                        error: function() {
-                            toastr.error('Menü silinirken hata oluştu');
+                        error: function(xhr, status, error) {
+                            console.log('Ajax Error: ', xhr.responseText);
+                            Swal.fire(
+                                'Hata!',
+                                'Menü silinirken hata oluştu: ' + (xhr.responseJSON?.message || 'Bilinmeyen hata'),
+                                'error'
+                            );
                         }
                     });
                 }
@@ -221,4 +232,4 @@
         });
     });
 </script>
-@endsection 
+@endsection

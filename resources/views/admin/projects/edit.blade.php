@@ -605,6 +605,7 @@
     <!-- TinyMCE Editör -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/6.4.2/tinymce.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/js/tom-select.complete.min.js"></script>
+    <script src="{{ asset('js/slug-helper.js') }}"></script>
     
     <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -871,23 +872,9 @@
         const slugRegenerateBtn = document.getElementById('slug-regenerate');
         let slugIsManual = true; // Düzenleme sayfasında mevcut slug varsa, manuel değiştirilmiş sayılır
         
-        // Slug oluşturma fonksiyonu
+        // Slug oluşturma fonksiyonu - SlugHelper kullanımı
         function createSlug(text) {
-            const trMap = {
-                'ğ': 'g', 'Ğ': 'G', 'ü': 'u', 'Ü': 'U', 'ş': 's', 'Ş': 'S', 'ı': 'i', 'İ': 'I',
-                'ö': 'o', 'Ö': 'O', 'ç': 'c', 'Ç': 'C'
-            };
-
-            for (let key in trMap) {
-                text = text.replace(new RegExp(key, 'g'), trMap[key]);
-            }
-
-            return text
-                .toLowerCase()
-                .trim()
-                .replace(/[^a-z0-9-]/g, '-')
-                .replace(/-+/g, '-')
-                .replace(/^-|-$/g, '');
+            return SlugHelper.create(text);
         }
         
         // Başlık yazıldığında otomatik slug oluşturma

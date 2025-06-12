@@ -151,20 +151,11 @@
 @stop
 
 @section('js')
+<script src="{{ asset('js/slug-helper.js') }}"></script>
 <script>
     $(document).ready(function () {
-        // Slug oluşturucu
-        $('#name').on('blur', function () {
-            const name = $(this).val();
-            const slug = $('#slug').val();
-            
-            if (!slug && name) {
-                const slugified = name.toLowerCase()
-                    .replace(/[^\w ]+/g, '')
-                    .replace(/ +/g, '-');
-                $('#slug').val(slugified);
-            }
-        });
+        // Slug oluşturucu - Turkish character desteği ile
+        SlugHelper.autoSlug('#name', '#slug');
         
         // Input file görselleştirme
         bsCustomFileInput.init();

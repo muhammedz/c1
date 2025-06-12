@@ -316,6 +316,7 @@
 @stop
 
 @section('js')
+    <script src="{{ asset('js/slug-helper.js') }}"></script>
     <!-- Laravel FileManager kaldırıldı -->
     <!-- <script src="/vendor/laravel-filemanager/js/stand-alone-button.js"></script> -->
     <script>
@@ -422,21 +423,8 @@
                 $(`#gallery-item-${id}`).remove();
             });
             
-            // Slug oluşturma
-            $('#title').on('blur', function() {
-                if ($('#slug').val() === '') {
-                    const slug = $(this).val()
-                        .toString()
-                        .toLowerCase()
-                        .replace(/\s+/g, '-')
-                        .replace(/[^\w\-]+/g, '')
-                        .replace(/\-\-+/g, '-')
-                        .replace(/^-+/, '')
-                        .replace(/-+$/, '');
-                    
-                    $('#slug').val(slug);
-                }
-            });
+            // Slug oluşturma - SlugHelper kullanımı
+            SlugHelper.autoSlug('#title', '#slug');
             
             // Kayıt gerektiren alanları göster/gizle
             function toggleRegisterSettings() {

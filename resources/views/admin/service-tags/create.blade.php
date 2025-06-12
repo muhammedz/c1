@@ -42,27 +42,11 @@
 @stop
 
 @section('js')
-    <script>
-        $(function() {
-            $('#name').on('blur', function() {
-                const name = $(this).val();
-                if ($('#slug').val() === '') {
-                    const slug = name.toString().toLowerCase()
-                        .replace(/\s+/g, '-')           // Boşlukları tire ile değiştir
-                        .replace(/[ğ]/g, 'g')           // Türkçe karakterleri dönüştür
-                        .replace(/[ü]/g, 'u')
-                        .replace(/[ş]/g, 's')
-                        .replace(/[ı]/g, 'i')
-                        .replace(/[ö]/g, 'o')
-                        .replace(/[ç]/g, 'c')
-                        .replace(/[^a-z0-9\-]/g, '')    // Alfanümerik ve tire dışındaki karakterleri kaldır
-                        .replace(/\-\-+/g, '-')         // Birden fazla tireyi tek tireye dönüştür
-                        .replace(/^-+/, '')             // Baştaki tireleri kaldır
-                        .replace(/-+$/, '');            // Sondaki tireleri kaldır
-                    
-                    $('#slug').val(slug);
-                }
-            });
-        });
-    </script>
+<script src="{{ asset('js/slug-helper.js') }}"></script>
+<script>
+    $(function() {
+        // Slug oluşturucu - Turkish character desteği ile
+        SlugHelper.autoSlug('#name', '#slug');
+    });
+</script>
 @stop 

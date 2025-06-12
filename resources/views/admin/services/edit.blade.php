@@ -1011,6 +1011,7 @@
 <script src="{{ asset('vendor/tinymce/tinymce.min.js') }}"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/locales/bootstrap-datepicker.tr.min.js"></script>
+<script src="{{ asset('js/slug-helper.js') }}"></script>
 
 <script>
     $(document).ready(function() {
@@ -1260,23 +1261,9 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Slug oluşturma fonksiyonu
+    // Slug oluşturma fonksiyonu - SlugHelper kullanımı
     function createSlug(text) {
-        return text
-            .toString()
-            .toLowerCase()
-            .trim()
-            .replace(/\s+/g, '-')           // Boşlukları tire ile değiştir
-            .replace(/[ğ]/g, 'g')           // Türkçe karakterleri değiştir
-            .replace(/[ç]/g, 'c')
-            .replace(/[ş]/g, 's')
-            .replace(/[ı]/g, 'i')
-            .replace(/[ö]/g, 'o')
-            .replace(/[ü]/g, 'u')
-            .replace(/[^a-z0-9\-]/g, '')    // Alfanümerik ve tire dışındaki karakterleri kaldır
-            .replace(/\-\-+/g, '-')         // Birden fazla tireyi tek tireye dönüştür
-            .replace(/^-+/, '')             // Baştaki tireleri kaldır
-            .replace(/-+$/, '');            // Sondaki tireleri kaldır
+        return SlugHelper.create(text);
     }
     
     // Başlık değiştiğinde slug'ı güncelle

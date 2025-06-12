@@ -1030,6 +1030,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/6.4.2/tinymce.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/js/tom-select.complete.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+<script src="{{ asset('js/slug-helper.js') }}"></script>
 
 <script>
     $(document).ready(function() {
@@ -1327,27 +1328,9 @@
         language: 'tr'
     });
 
-    // Slug Oluşturma Fonksiyonu
+    // Slug Oluşturma Fonksiyonu - SlugHelper kullanımı
     function slugify(text) {
-        // Türkçe karakterleri değiştir
-        const turkishChars = {
-            'ı': 'i', 'ğ': 'g', 'ü': 'u', 'ş': 's', 'ö': 'o', 'ç': 'c',
-            'İ': 'I', 'Ğ': 'G', 'Ü': 'U', 'Ş': 'S', 'Ö': 'O', 'Ç': 'C'
-        };
-        
-        // Türkçe karakterleri değiştir
-        for (const [turkishChar, latinChar] of Object.entries(turkishChars)) {
-            text = text.replace(new RegExp(turkishChar, 'g'), latinChar);
-        }
-        
-        return text
-            .toString()                   // String'e dönüştür
-            .toLowerCase()                // Küçük harfe dönüştür
-            .replace(/\s+/g, '-')         // Boşlukları tire ile değiştir
-            .replace(/[^\w\-]+/g, '')     // Alfanümerik olmayan karakterleri kaldır
-            .replace(/\-\-+/g, '-')       // Birden fazla tireyi tek tireye dönüştür
-            .replace(/^-+/, '')           // Baştaki tireyi kaldır
-            .replace(/-+$/, '');          // Sondaki tireyi kaldır
+        return SlugHelper.create(text);
     }
     
     // Başlık alanı değiştiğinde slug oluştur

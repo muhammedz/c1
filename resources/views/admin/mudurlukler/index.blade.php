@@ -82,11 +82,6 @@
                                 <td>{{ $mudurluk->created_at->format('d.m.Y H:i') }}</td>
                                 <td>
                                     <div class="btn-group">
-                                        @if($mudurluk->slug && $mudurluk->is_active)
-                                            <a href="{{ route('mudurlukler.show', $mudurluk->slug) }}" class="btn btn-sm btn-success" title="Sitede Gör" target="_blank">
-                                                <i class="fas fa-external-link-alt"></i>
-                                            </a>
-                                        @endif
                                         <a href="{{ route('admin.mudurlukler.show', $mudurluk->id) }}" class="btn btn-sm btn-secondary" title="Görüntüle">
                                             <i class="fas fa-eye"></i>
                                         </a>
@@ -135,7 +130,7 @@
                 </div>
                 <!-- /.card-body -->
                 <div class="card-footer">
-                    {{ $mudurlukler->links() }}
+                    {{ $mudurlukler->links('custom.pagination') }}
                 </div>
             </div>
             <!-- /.card -->
