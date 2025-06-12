@@ -80,9 +80,13 @@ class CankayaHouse extends Model
         return $this->images ? count($this->images) : 0;
     }
 
-    // Route model binding için
+    // Route model binding için - Frontend için slug, admin için id
     public function getRouteKeyName()
     {
+        // Admin route'larında id kullan, frontend'te slug kullan
+        if (request()->is('admin/*')) {
+            return 'id';
+        }
         return 'slug';
     }
 }

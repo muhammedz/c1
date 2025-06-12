@@ -202,7 +202,7 @@ function deleteHouse(id) {
             // Form oluştur ve gönder
             let form = document.createElement('form');
             form.method = 'POST';
-            form.action = '{{ route("admin.cankaya-houses.destroy", ":id") }}'.replace(':id', id);
+            form.action = '/admin/cankaya-houses/' + id;
             
             let csrfToken = document.createElement('input');
             csrfToken.type = 'hidden';
