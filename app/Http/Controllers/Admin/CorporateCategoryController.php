@@ -7,6 +7,7 @@ use App\Models\CorporateCategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use App\Helpers\SlugHelper;
 
 class CorporateCategoryController extends Controller
 {
@@ -47,7 +48,7 @@ class CorporateCategoryController extends Controller
         
         // Slug oluştur
         if (empty($data['slug'])) {
-            $data['slug'] = Str::slug($data['name']);
+            $data['slug'] = SlugHelper::createUnique($data['name'], CorporateCategory::class);
         }
         
         // Görsel işleme
@@ -151,7 +152,7 @@ class CorporateCategoryController extends Controller
         
         // Slug oluştur
         if (empty($data['slug'])) {
-            $data['slug'] = Str::slug($data['name']);
+            $data['slug'] = SlugHelper::createUnique($data['name'], CorporateCategory::class, 'slug', $id);
         }
         
         // Görsel işleme

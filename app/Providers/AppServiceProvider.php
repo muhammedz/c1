@@ -8,6 +8,7 @@ use App\Models\News;
 use App\Observers\NewsObserver;
 use Illuminate\Support\Facades\Blade;
 use App\Helpers\ImageHelper;
+use App\Helpers\SlugHelper;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class AppServiceProvider extends ServiceProvider
@@ -33,6 +34,15 @@ class AppServiceProvider extends ServiceProvider
         // fixImageUrl fonksiyonunu Blade içinde kullanılabilir hale getir
         Blade::directive('fixImageUrl', function ($expression) {
             return "<?php echo App\Helpers\ImageHelper::fixImageUrl($expression); ?>";
+        });
+        
+        // Slug helper için Blade directive'leri
+        Blade::directive('slugHelper', function () {
+            return "<?php echo App\Helpers\SlugHelper::getJsSlugFunction(); ?>";
+        });
+        
+        Blade::directive('turkishCharMap', function () {
+            return "<?php echo App\Helpers\SlugHelper::getTurkishCharMapForJs(); ?>";
         });
 
         // NOTE: Laravel File Manager kodları kaldırıldı

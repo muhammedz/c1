@@ -443,7 +443,7 @@
 
 @section('js')
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/slugify@1.6.5/slugify.min.js"></script>
+    <script src="{{ asset('js/slug-helper.js') }}"></script>
     
     <!-- TinyMCE Editör -->
     <script src="{{ asset('js/tinymce/tinymce.min.js') }}" referrerpolicy="origin"></script>
@@ -455,16 +455,8 @@
                 theme: "bootstrap"
             });
             
-            // Slug oluşturma
-            $('#name').change(function() {
-                if($('#slug').val() == '') {
-                    $('#slug').val(slugify($(this).val(), {
-                        lower: true,
-                        locale: 'tr',
-                        remove: /[*+~.()'"!:@]/g
-                    }));
-                }
-            });
+            // Slug oluşturma - Yeni SlugHelper kullanımı
+            SlugHelper.autoSlug('#name', '#slug');
             
             // TinyMCE için düzenleyici ayarları
             tinymce.init({

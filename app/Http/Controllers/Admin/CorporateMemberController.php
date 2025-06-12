@@ -8,6 +8,7 @@ use App\Models\CorporateMember;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use App\Helpers\SlugHelper;
 
 class CorporateMemberController extends Controller
 {
@@ -65,7 +66,7 @@ class CorporateMemberController extends Controller
         ]);
 
         if (empty($request->slug)) {
-            $request->merge(['slug' => Str::slug($request->name)]);
+            $request->merge(['slug' => SlugHelper::createUnique($request->name, CorporateMember::class)]);
         }
 
         $data = $request->except(['_token']);
@@ -180,7 +181,7 @@ class CorporateMemberController extends Controller
         ]);
 
         if (empty($request->slug)) {
-            $request->merge(['slug' => Str::slug($request->name)]);
+            $request->merge(['slug' => SlugHelper::createUnique($request->name, CorporateMember::class, 'slug', $member->id)]);
         }
 
         $data = $request->except(['_token', '_method']);
