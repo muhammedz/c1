@@ -13,7 +13,7 @@
 
 @section('content')
 <div class="container-fluid">
-    <form action="{{ route('admin.corporate.members.store') }}" method="POST">
+    <form action="{{ route('admin.corporate.members.store', $selectedCategory ?: 1) }}" method="POST">
         @csrf
         <input type="hidden" name="corporate_category_id" value="{{ $selectedCategory ?: old('corporate_category_id') }}">
         

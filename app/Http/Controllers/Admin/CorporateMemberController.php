@@ -14,13 +14,13 @@ class CorporateMemberController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request, $category_id = null)
+    public function index(Request $request, $category = null)
     {
         $query = CorporateMember::with('category')->orderBy('order', 'asc');
         
-        if ($category_id) {
-            $query->where('corporate_category_id', $category_id);
-            $category = CorporateCategory::findOrFail($category_id);
+        if ($category) {
+            $query->where('corporate_category_id', $category);
+            $category = CorporateCategory::findOrFail($category);
             $members = $query->get();
             return view('admin.corporate.members.index', compact('members', 'category'));
         } else {
@@ -32,17 +32,17 @@ class CorporateMemberController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create($category_id = null)
+    public function create($category)
     {
         $categories = CorporateCategory::orderBy('name', 'asc')->pluck('name', 'id');
-        $selectedCategory = $category_id;
+        $selectedCategory = $category;
         return view('admin.corporate.members.create', compact('categories', 'selectedCategory'));
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(Request $request, $category)
     {
         $request->validate([
             'name' => 'required|string|max:255',
@@ -132,7 +132,7 @@ class CorporateMemberController extends Controller
             ]);
         }
 
-        return redirect()->route('admin.corporate.members.index', $request->corporate_category_id)
+        return redirect()->route('admin.corporate.members.index', $category)
             ->with('success', 'Kurumsal kadro üyesi başarıyla oluşturuldu.');
     }
 
