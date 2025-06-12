@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('corporate_category_id')->constrained('corporate_categories')->onDelete('cascade');
             $table->string('name');
             $table->string('slug')->unique();
-            $table->string('title');
+            $table->string('title')->nullable();
             $table->string('image')->nullable();
             $table->text('short_description')->nullable();
             $table->longText('biography')->nullable();
