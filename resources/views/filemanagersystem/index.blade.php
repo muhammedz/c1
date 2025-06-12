@@ -162,7 +162,11 @@
                                         <p class="card-text small text-muted">
                                             {{ $file->getHumanReadableSizeAttribute() }}
                                             @if($file->isImage() && $file->has_webp)
-                                                <br><span class="badge badge-success">WebP: {{ $file->formattedWebpSize ?? round(filesize(public_path('uploads/' . $file->webp_path)) / 1024, 2) . ' KB' }}</span>
+                                                @php
+                                                    $webpFilePath = public_path('uploads/' . $file->webp_path);
+                                                    $webpSize = file_exists($webpFilePath) ? round(filesize($webpFilePath) / 1024, 2) . ' KB' : 'Dosya bulunamadı';
+                                                @endphp
+                                                <br><span class="badge badge-success">WebP: {{ $file->formattedWebpSize ?? $webpSize }}</span>
                                             @endif
                                         </p>
                                         <div class="btn-group">

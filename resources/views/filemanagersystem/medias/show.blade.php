@@ -160,8 +160,13 @@
                                                     <a href="{{ $media->webp_url }}" target="_blank" class="btn btn-xs btn-outline-secondary">
                                                         <i class="fas fa-external-link-alt"></i>
                                                     </a>
-                                                    @if(file_exists(public_path('uploads/' . $media->webp_path)))
-                                                    <br><small class="text-muted">Boyut: {{ round(filesize(public_path('uploads/' . $media->webp_path)) / 1024, 2) }} KB</small>
+                                                    @php
+                                                        $webpFilePath = public_path('uploads/' . $media->webp_path);
+                                                    @endphp
+                                                    @if(file_exists($webpFilePath))
+                                                    <br><small class="text-muted">Boyut: {{ round(filesize($webpFilePath) / 1024, 2) }} KB</small>
+                                                    @else
+                                                    <br><small class="text-muted text-warning">WebP dosya bulunamadı</small>
                                                     @endif
                                                 </td>
                                             </tr>
