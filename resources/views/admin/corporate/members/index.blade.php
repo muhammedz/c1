@@ -1,8 +1,8 @@
 @extends('adminlte::page')
 
 @section('title')
-    @isset($category)
-        "{{ $category->name }}" Kategorisi Üyeleri
+    @isset($categoryObject)
+        "{{ $categoryObject->name }}" Kategorisi Üyeleri
     @else
         Tüm Kurumsal Kadro Üyeleri
     @endisset
@@ -10,8 +10,8 @@
 
 @section('content_header')
     <h1>
-        @isset($category)
-            "{{ $category->name }}" Kategorisi Üyeleri
+        @isset($categoryObject)
+            "{{ $categoryObject->name }}" Kategorisi Üyeleri
         @else
             Tüm Kurumsal Kadro Üyeleri
         @endisset
@@ -25,15 +25,15 @@
             <div class="card">
                 <div class="card-header">
                     <h3 class="card-title">
-                        @isset($category)
-                            "{{ $category->name }}" Kategorisi Üyeleri
+                        @isset($categoryObject)
+                            "{{ $categoryObject->name }}" Kategorisi Üyeleri
                         @else
                             Tüm Kurumsal Kadro Üyeleri
                         @endisset
                     </h3>
                     <div class="card-tools">
-                        @isset($category)
-                        <a href="{{ route('admin.corporate.members.create', $category->id) }}" class="btn btn-primary btn-sm">
+                        @isset($categoryObject)
+                        <a href="{{ route('admin.corporate.members.create', $categoryObject->id) }}" class="btn btn-primary btn-sm">
                             <i class="fas fa-plus"></i> Yeni Üye Ekle
                         </a>
                         <a href="{{ route('admin.corporate.categories.index') }}" class="btn btn-default btn-sm ml-2">
@@ -116,8 +116,8 @@
                     @else
                     <div class="alert alert-info m-3">
                         Henüz kayıtlı üye bulunmamaktadır.
-                        @isset($category)
-                        <a href="{{ route('admin.corporate.members.create', $category->id) }}" class="btn btn-primary btn-sm ml-2">
+                        @isset($categoryObject)
+                        <a href="{{ route('admin.corporate.members.create', $categoryObject->id) }}" class="btn btn-primary btn-sm ml-2">
                             <i class="fas fa-plus"></i> Yeni Üye Ekle
                         </a>
                         @endisset

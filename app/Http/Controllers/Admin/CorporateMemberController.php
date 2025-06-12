@@ -17,17 +17,23 @@ class CorporateMemberController extends Controller
      */
     public function index(Request $request, $category = null)
     {
-        $query = CorporateMember::with('category')->orderBy('order', 'asc');
-        
+        $query = CorporateMember::with('category');
+
+        $categoryObject = null;
         if ($category) {
             $query->where('corporate_category_id', $category);
-            $category = CorporateCategory::findOrFail($category);
-            $members = $query->get();
-            return view('admin.corporate.members.index', compact('members', 'category'));
-        } else {
-            $members = $query->get();
-            return view('admin.corporate.members.index', compact('members'));
+            $categoryObject = CorporateCategory::findOrFail($category);
         }
+
+        // Arama işlevi
+        if ($request->filled('search')) {
+            $query->where('name', 'like', '%' . $request->search . '%');
+        }
+
+        $members = $query->orderBy('order', 'asc')->orderBy('created_at', 'desc')->paginate(20);
+        $categories = CorporateCategory::orderBy('name', 'asc')->pluck('name', 'id');
+
+        return view('admin.corporate.members.index', compact('members', 'categories', 'category', 'categoryObject'));
     }
 
     /**
@@ -62,7 +68,9 @@ class CorporateMemberController extends Controller
             'filemanagersystem_image' => 'nullable|string',
             'filemanagersystem_image_alt' => 'nullable|string|max:255',
             'filemanagersystem_image_title' => 'nullable|string|max:255',
-            'show_detail' => 'nullable|boolean',
+            'show_detail' => 'nullable',
+            'use_custom_link' => 'nullable',
+            'custom_link' => 'nullable|url|max:500',
         ]);
 
         if (empty($request->slug)) {
@@ -76,6 +84,9 @@ class CorporateMemberController extends Controller
         
         // show_detail checkbox'ından gelmiyorsa false yap
         $data['show_detail'] = $request->has('show_detail') ? 1 : 0;
+        
+        // use_custom_link checkbox'ından gelmiyorsa false yap
+        $data['use_custom_link'] = $request->has('use_custom_link') ? 1 : 0;
 
         // FileManagerSystem ile ilişki kurma
         $filemanagersystemImage = $request->filemanagersystem_image;
@@ -177,7 +188,9 @@ class CorporateMemberController extends Controller
             'filemanagersystem_image' => 'nullable|string',
             'filemanagersystem_image_alt' => 'nullable|string|max:255',
             'filemanagersystem_image_title' => 'nullable|string|max:255',
-            'show_detail' => 'nullable|boolean',
+            'show_detail' => 'nullable',
+            'use_custom_link' => 'nullable',
+            'custom_link' => 'nullable|url|max:500',
         ]);
 
         if (empty($request->slug)) {
@@ -191,6 +204,9 @@ class CorporateMemberController extends Controller
         
         // show_detail checkbox'ından gelmiyorsa false yap
         $data['show_detail'] = $request->has('show_detail') ? 1 : 0;
+        
+        // use_custom_link checkbox'ından gelmiyorsa false yap
+        $data['use_custom_link'] = $request->has('use_custom_link') ? 1 : 0;
 
         // FileManagerSystem ilişkisini güncelle
         $filemanagersystemImage = $request->filemanagersystem_image;

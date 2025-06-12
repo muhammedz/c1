@@ -28,6 +28,8 @@ class CorporateMember extends Model
         'status',
         'order',
         'show_detail',
+        'use_custom_link',
+        'custom_link',
         'filemanagersystem_image',
         'filemanagersystem_image_alt',
         'filemanagersystem_image_title'
@@ -36,6 +38,7 @@ class CorporateMember extends Model
     protected $casts = [
         'status' => 'boolean',
         'show_detail' => 'boolean',
+        'use_custom_link' => 'boolean',
     ];
 
     /**

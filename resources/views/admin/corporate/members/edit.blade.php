@@ -261,6 +261,34 @@
                                             <small class="form-text text-muted">Kapalı olursa üye kartına tıklandığında detay sayfası açılmaz</small>
                                         </div>
                                     </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="d-block">Manuel Link</label>
+                                            <div class="custom-control custom-switch custom-switch-lg mt-2">
+                                                <input type="checkbox" class="custom-control-input" id="use_custom_link" name="use_custom_link" {{ old('use_custom_link', $member->use_custom_link) ? 'checked' : '' }}>
+                                                <label class="custom-control-label" for="use_custom_link">Özel link kullan</label>
+                                            </div>
+                                            <small class="form-text text-muted">Aktif olursa varsayılan detay sayfası yerine custom link açılır</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="row" id="custom_link_row" style="{{ old('use_custom_link', $member->use_custom_link) ? '' : 'display: none;' }}">
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label for="custom_link">Özel Link URL</label>
+                                            <div class="input-group">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text"><i class="fas fa-external-link-alt"></i></span>
+                                                </div>
+                                                <input type="url" class="form-control @error('custom_link') is-invalid @enderror" id="custom_link" name="custom_link" value="{{ old('custom_link', $member->custom_link) }}" placeholder="https://...">
+                                            </div>
+                                            <small class="form-text text-muted">Üye kartına tıklandığında açılacak link. Örn: https://example.com/detay-sayfa</small>
+                                            @error('custom_link')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+                                    </div>
                                 </div>
                                 
                                 <div class="alert alert-info mt-3">
@@ -714,6 +742,16 @@
                 var scrollmem = $('body').scrollTop();
                 window.location.hash = this.hash;
                 $('html,body').scrollTop(scrollmem);
+                        });
+            
+            // Custom link toggle işlevi
+            $('#use_custom_link').on('change', function() {
+                if ($(this).is(':checked')) {
+                    $('#custom_link_row').show();
+                } else {
+                    $('#custom_link_row').hide();
+                    $('#custom_link').val('');
+                }
             });
         });
     </script>

@@ -77,7 +77,11 @@
         @if(count($members) > 0)
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5">
             @foreach($members as $member)
-                @if($member->show_detail)
+                @if($member->use_custom_link && $member->custom_link)
+                <a href="{{ $member->custom_link }}" 
+                   @if(filter_var($member->custom_link, FILTER_VALIDATE_URL) && parse_url($member->custom_link, PHP_URL_HOST) !== request()->getHost()) target="_blank" rel="noopener noreferrer" @endif
+                   class="member-card bg-white rounded-sm shadow-sm flex flex-col h-full transition hover:shadow-md">
+                @elseif($member->show_detail)
                 <a href="{{ route('corporate.member', ['categorySlug' => $category->slug, 'memberSlug' => $member->slug]) }}" 
                    class="member-card bg-white rounded-sm shadow-sm flex flex-col h-full transition hover:shadow-md">
                 @else
@@ -101,7 +105,9 @@
                         <span class="text-gray-700 text-sm block">{{ $member->title }}</span>
                         @endif
                     </div>
-                @if($member->show_detail)
+                @if($member->use_custom_link && $member->custom_link)
+                </a>
+                @elseif($member->show_detail)
                 </a>
                 @else
                 </div>
