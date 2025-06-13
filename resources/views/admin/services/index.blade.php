@@ -31,64 +31,90 @@
                 </div>
                 <!-- /.card-header -->
                 <div class="card-body table-responsive p-0">
-                    <table class="table table-hover text-nowrap">
-                        <thead>
+                    <table class="table table-hover">
+                        <thead class="thead-light">
                             <tr>
-                                <th>ID</th>
-                                <th>Görsel</th>
-                                <th>Başlık</th>
-                                <th>Slug</th>
-                                <th>Durum</th>
-                                <th>Görüntülenme</th>
-                                <th>Öne Çıkan</th>
-                                <th>Manşet</th>
-                                <th>Oluşturulma Tarihi</th>
-                                <th>İşlemler</th>
+                                <th style="width: 60px;">ID</th>
+                                <th style="width: 250px;">Başlık</th>
+                                <th style="width: 180px;">Kategoriler</th>
+                                <th style="width: 150px;">Birim</th>
+                                <th style="width: 200px;">Hizmet Konuları</th>
+                                <th style="width: 180px;">Hedef Kitleler</th>
+                                <th style="width: 200px;">İlgili Haber Kategorileri</th>
+                                <th style="width: 120px;">İşlemler</th>
                             </tr>
                         </thead>
                         <tbody>
                             @forelse($services as $service)
                             <tr>
-                                <td>{{ $service->id }}</td>
-                                <td>
-                                    @if($service->image)
-                                        <img src="{{ asset(str_replace('/storage/', '', $service->image)) }}" alt="{{ $service->title }}" width="50" height="50" class="img-thumbnail">
-                                    @else
-                                        <span class="badge badge-secondary">Görsel Yok</span>
-                                    @endif
-                                </td>
-                                <td>{{ $service->title }}</td>
-                                <td>{{ $service->slug }}</td>
-                                <td>
-                                    @if($service->status == 'published')
-                                        <span class="badge badge-success">Yayında</span>
-                                    @else
-                                        <span class="badge badge-warning">Taslak</span>
-                                    @endif
-                                </td>
-                                <td>{{ $service->view_count ?? 0 }}</td>
-                                <td>
-                                    @if($service->is_featured)
-                                        <span class="badge badge-info"><i class="fas fa-check"></i></span>
-                                    @else
-                                        <span class="badge badge-secondary"><i class="fas fa-times"></i></span>
-                                    @endif
+                                <td class="text-center">
+                                    <span class="badge badge-light">{{ $service->id }}</span>
                                 </td>
                                 <td>
-                                    @if($service->is_headline)
-                                        <span class="badge badge-primary"><i class="fas fa-check"></i></span>
+                                    <div class="service-title">
+                                        <strong>{{ Str::limit($service->title, 40) }}</strong>
+                                        <br>
+                                        <small class="text-muted">{{ Str::limit($service->slug, 35) }}</small>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="badge-container">
+                                        @if($service->categories->count() > 0)
+                                            @foreach($service->categories as $category)
+                                                <span class="badge badge-primary badge-sm mb-1">{{ $category->name }}</span>
+                                            @endforeach
+                                        @else
+                                            <span class="text-muted small">Kategori yok</span>
+                                        @endif
+                                    </div>
+                                </td>
+                                <td>
+                                    @if($service->unit)
+                                        <span class="badge badge-info badge-sm">{{ $service->unit->name }}</span>
                                     @else
-                                        <span class="badge badge-secondary"><i class="fas fa-times"></i></span>
+                                        <span class="text-muted small">Birim yok</span>
                                     @endif
                                 </td>
-                                <td>{{ $service->created_at->format('d.m.Y H:i') }}</td>
                                 <td>
-                                    <div class="btn-group">
-                                        <a href="{{ route('admin.services.edit', $service->id) }}" class="btn btn-sm btn-info">
-                                            <i class="fas fa-edit"></i> Düzenle
+                                    <div class="badge-container">
+                                        @if($service->serviceTopics->count() > 0)
+                                            @foreach($service->serviceTopics as $topic)
+                                                <span class="badge badge-success badge-sm mb-1">{{ Str::limit($topic->name, 20) }}</span>
+                                            @endforeach
+                                        @else
+                                            <span class="text-muted small">Konu yok</span>
+                                        @endif
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="badge-container">
+                                        @if($service->hedefKitleler->count() > 0)
+                                            @foreach($service->hedefKitleler as $hedefKitle)
+                                                <span class="badge badge-warning badge-sm mb-1">{{ Str::limit($hedefKitle->name, 15) }}</span>
+                                            @endforeach
+                                        @else
+                                            <span class="text-muted small">Hedef yok</span>
+                                        @endif
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="badge-container">
+                                        @if($service->newsCategories->count() > 0)
+                                            @foreach($service->newsCategories as $newsCategory)
+                                                <span class="badge badge-secondary badge-sm mb-1">{{ Str::limit($newsCategory->name, 15) }}</span>
+                                            @endforeach
+                                        @else
+                                            <span class="text-muted small">Haber yok</span>
+                                        @endif
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="btn-group-vertical btn-group-sm">
+                                        <a href="{{ route('admin.services.edit', $service->id) }}" class="btn btn-info btn-sm mb-1" title="Düzenle">
+                                            <i class="fas fa-edit"></i>
                                         </a>
-                                        <button type="button" class="btn btn-sm btn-danger" data-toggle="modal" data-target="#modal-delete-{{ $service->id }}">
-                                            <i class="fas fa-trash"></i> Sil
+                                        <button type="button" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#modal-delete-{{ $service->id }}" title="Sil">
+                                            <i class="fas fa-trash"></i>
                                         </button>
                                     </div>
                                     
@@ -121,7 +147,7 @@
                             </tr>
                             @empty
                             <tr>
-                                <td colspan="10" class="text-center">Henüz hizmet bulunmamaktadır.</td>
+                                <td colspan="8" class="text-center">Henüz hizmet bulunmamaktadır.</td>
                             </tr>
                             @endforelse
                         </tbody>
@@ -141,10 +167,79 @@
 @section('css')
 <style>
     .table th, .table td {
-        vertical-align: middle;
+        vertical-align: top;
+        padding: 12px 8px;
     }
-    .img-thumbnail {
-        object-fit: cover;
+    
+    .table thead th {
+        background-color: #f8f9fa;
+        border-bottom: 2px solid #dee2e6;
+        font-weight: 600;
+        color: #495057;
+    }
+    
+    .badge-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 2px;
+        align-items: flex-start;
+    }
+    
+    .badge-sm {
+        font-size: 0.7em;
+        padding: 0.25em 0.5em;
+        margin-right: 2px;
+        margin-bottom: 2px;
+        line-height: 1.2;
+    }
+    
+    .service-title {
+        line-height: 1.3;
+    }
+    
+    .service-title strong {
+        color: #2c3e50;
+        font-size: 0.9em;
+    }
+    
+    .service-title small {
+        font-size: 0.75em;
+        color: #6c757d;
+    }
+    
+    .table-responsive {
+        border-radius: 0.375rem;
+    }
+    
+    .table tr:hover {
+        background-color: #f8f9fa;
+    }
+    
+    .btn-group-vertical .btn {
+        width: 35px;
+        height: 30px;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .text-muted.small {
+        font-size: 0.75em;
+        font-style: italic;
+    }
+    
+    /* Responsive düzenlemeler */
+    @media (max-width: 1200px) {
+        .table th, .table td {
+            font-size: 0.85em;
+            padding: 8px 6px;
+        }
+        
+        .badge-sm {
+            font-size: 0.65em;
+            padding: 0.2em 0.4em;
+        }
     }
 </style>
 @stop
@@ -154,6 +249,6 @@
     $(function() {
         // Flash mesajı için otomatik kapanma
         $('.alert').delay(3000).fadeOut(500);
-    });
-</script>
+          });
+  </script>
 @stop 

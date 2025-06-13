@@ -13,7 +13,6 @@ use Illuminate\Support\Str;
 use Intervention\Image\ImageManager;
 use Intervention\Image\Drivers\Gd\Driver;
 use App\Helpers\FileManagerHelper;
-use Intervention\Image\Image;
 
 class MediaPickerController extends Controller
 {
@@ -224,8 +223,9 @@ class MediaPickerController extends Controller
                     // Önce orijinal dosyayı kaydet
                     $file->storeAs($folderPath, $fileNameOrig, 'uploads');
                     
-                    // Image sınıfıyla resmi yükle
-                    $image = Image::read($fullSavePathOrig);
+                    // ImageManager ile resmi yükle
+                    $manager = new ImageManager(new Driver());
+                    $image = $manager->read($fullSavePathOrig);
                     
                     // Boyut kontrolü ve yeniden boyutlandırma
                     $currentWidth = $image->width();
@@ -249,6 +249,9 @@ class MediaPickerController extends Controller
                             $newHeight = $maxHeight;
                             $newWidth = $newWidth * $ratio;
                         }
+                        
+                        // Resmi yeniden boyutlandır
+                        $image->resize($newWidth, $newHeight);
                         
                         $width = $newWidth;
                         $height = $newHeight;

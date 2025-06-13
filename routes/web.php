@@ -241,7 +241,7 @@ Route::middleware(['auth', 'role:admin'])->name('admin.')->prefix('admin')->grou
     Route::get('/projects', [ProjectManagerController::class, 'index'])->name('projects.index');
     Route::get('/projects/categories', [ProjectManagerController::class, 'categories'])->name('projects.categories');
     Route::get('/projects/settings', [ProjectManagerController::class, 'settings'])->name('projects.settings');
-    Route::get('/projects/create', [ProjectManagerController::class, 'createProject'])->name('projects.create');
+    Route::get('/projects/create', [ProjectManagerController::class, 'create'])->name('projects.create');
     Route::get('/projects/{id}/edit', [ProjectManagerController::class, 'editProject'])->name('projects.edit');
     
     // Proje Kategori İşlemleri
@@ -252,21 +252,17 @@ Route::middleware(['auth', 'role:admin'])->name('admin.')->prefix('admin')->grou
     Route::post('/projects/categories/{id}/toggle-visibility', [ProjectManagerController::class, 'toggleCategoryVisibility'])->name('projects.categories.toggle-visibility');
     
     // Proje İşlemleri
-    Route::post('/projects', [ProjectManagerController::class, 'storeProject'])->name('projects.store');
+    Route::post('/projects', [ProjectManagerController::class, 'store'])->name('projects.store');
     Route::get('/projects/{id}', [ProjectManagerController::class, 'show'])->name('projects.show');
     Route::put('/projects/{id}', [ProjectManagerController::class, 'updateProject'])->name('projects.update');
-    Route::delete('/projects/{id}', [ProjectManagerController::class, 'deleteProject'])->name('projects.delete');
-    Route::post('/projects/update-order', [ProjectManagerController::class, 'updateProjectOrder'])->name('projects.update-order');
-    Route::post('/projects/{id}/toggle-visibility', [ProjectManagerController::class, 'toggleProjectVisibility'])->name('projects.toggle-visibility');
-    Route::post('/projects/{id}/toggle-homepage', [ProjectManagerController::class, 'toggleProjectHomepageVisibility'])->name('projects.toggle-homepage');
-    
-    // Proje Görselleri İşlemleri
-    Route::delete('/project-images/{id}', [ProjectManagerController::class, 'deleteProjectImage'])->name('projects.images.delete');
-    Route::post('/project-images/update-order', [ProjectManagerController::class, 'updateProjectImagesOrder'])->name('projects.images.update-order');
+    Route::delete('/projects/{id}', [ProjectManagerController::class, 'delete'])->name('projects.delete');
+    Route::post('/projects/update-order', [ProjectManagerController::class, 'updateOrder'])->name('projects.update-order');
+    Route::post('/projects/{id}/toggle-visibility', [ProjectManagerController::class, 'toggleVisibility'])->name('projects.toggle-visibility');
+    Route::post('/projects/{id}/toggle-homepage', [ProjectManagerController::class, 'toggleHomepage'])->name('projects.toggle-homepage');
     
     // Proje Ayarları
     Route::post('/projects/settings', [ProjectManagerController::class, 'updateSettings'])->name('projects.settings.update');
-    Route::post('/projects/toggle-module-visibility', [ProjectManagerController::class, 'toggleProjectModuleVisibility'])->name('projects.toggle-module-visibility');
+    Route::post('/projects/toggle-module-visibility', [ProjectManagerController::class, 'toggleModuleVisibility'])->name('projects.toggle-module-visibility');
     
     // Hizmetler Yönetimi
     Route::prefix('services')->name('services.')->group(function () {
@@ -306,6 +302,7 @@ Route::middleware(['auth', 'role:admin'])->name('admin.')->prefix('admin')->grou
     Route::get('hizmet-konulari', [App\Http\Controllers\Admin\ServiceTopicController::class, 'index'])->name('service-topics.index');
     Route::get('hizmet-konulari/create', [App\Http\Controllers\Admin\ServiceTopicController::class, 'create'])->name('service-topics.create');
     Route::post('hizmet-konulari', [App\Http\Controllers\Admin\ServiceTopicController::class, 'store'])->name('service-topics.store');
+    Route::get('hizmet-konulari/cleanup', [App\Http\Controllers\Admin\ServiceTopicController::class, 'cleanup'])->name('service-topics.cleanup');
     Route::get('hizmet-konulari/{serviceTopic}', [App\Http\Controllers\Admin\ServiceTopicController::class, 'show'])->name('service-topics.show');
     Route::get('hizmet-konulari/{serviceTopic}/edit', [App\Http\Controllers\Admin\ServiceTopicController::class, 'edit'])->name('service-topics.edit');
     Route::put('hizmet-konulari/{serviceTopic}', [App\Http\Controllers\Admin\ServiceTopicController::class, 'update'])->name('service-topics.update');

@@ -77,9 +77,13 @@
                         </div>
                     </div>
                     <div class="mt-4 pt-4 border-t border-white/10">
-                        <div class="flex items-center justify-center text-[#e6a23c]">
-                            <span class="material-icons mr-2">phone</span>
-                            <span class="font-bold">444 1 234</span>
+                        <div class="text-center">
+                            <h4 class="text-white font-semibold mb-2">Hizmet Bilgilendirme</h4>
+                            <p class="text-white/80 text-sm mb-3">Bu konudaki hizmetlerimiz hakkında detaylı bilgi almak ve başvuru süreçleri için uzman ekibimizle iletişime geçebilirsiniz.</p>
+                            <div class="flex items-center justify-center text-[#e6a23c]">
+                                <span class="material-icons mr-2">support_agent</span>
+                                <span class="font-bold">Destek Hattı</span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -141,39 +145,58 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 @foreach($services as $service)
-                <a href="{{ route('services.show', $service->slug) }}" class="group bg-white p-4 rounded-lg border hover:shadow-md transition-all duration-300">
-                    <h3 class="font-semibold text-[#00352b] group-hover:text-[#007b32]">{{ $service->title }}</h3>
-                    <p class="text-sm text-gray-600 mt-1">{{ Str::limit($service->summary, 50) }}</p>
+                <a href="{{ route('services.show', $service->slug) }}" class="group bg-white p-6 rounded-xl border border-gray-200 hover:border-[#00352b]/20 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
+                    <div class="flex items-start space-x-3">
+                        <div class="flex-shrink-0 w-10 h-10 bg-gradient-to-br from-[#00352b] to-[#20846c] rounded-lg flex items-center justify-center">
+                            <span class="material-icons text-white text-sm">description</span>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <h3 class="font-semibold text-[#00352b] group-hover:text-[#007b32] transition-colors duration-300 line-clamp-2">{{ $service->title }}</h3>
+                            <p class="text-sm text-gray-600 mt-2 line-clamp-2">{{ Str::limit($service->summary, 80) }}</p>
+                            <div class="flex items-center mt-3 text-xs text-gray-500">
+                                <span class="material-icons text-xs mr-1">schedule</span>
+                                <span>Hızlı İşlem</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-4 pt-4 border-t border-gray-100">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs text-gray-500">Detayları görüntüle</span>
+                            <span class="material-icons text-[#00352b] group-hover:text-[#007b32] group-hover:translate-x-1 transition-all duration-300 text-sm">arrow_forward</span>
+                        </div>
+                    </div>
                 </a>
                 @endforeach
             </div>
             
-            <!-- Diğer konular önerisi -->
+            <!-- Diğer hizmetlerimiz önerisi -->
             @if($serviceTopics->where('id', '!=', $serviceTopic->id)->count() > 0)
-            <div class="mt-8 bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-                <h3 class="text-lg font-bold text-gray-800 mb-4">Diğer Hizmet Konuları</h3>
-                <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
-                    @foreach($serviceTopics->where('id', '!=', $serviceTopic->id)->take(5) as $otherTopic)
-                    <a href="{{ route('services.topics.show', $otherTopic->slug) }}" class="group flex flex-col items-center p-4 border border-gray-200 rounded-lg hover:border-gray-300 hover:shadow-sm transition-all duration-300">
-                        <div class="w-10 h-10 rounded-full mb-2 flex items-center justify-center group-hover:scale-110 transition-transform duration-300" style="background-color: {{ $otherTopic->color }}20;">
+            <div class="mt-12 bg-gradient-to-r from-gray-50 to-white p-4 rounded-xl border border-gray-100">
+                <div class="flex items-center justify-between mb-3">
+                    <h3 class="text-base font-semibold text-gray-700 flex items-center">
+                        <span class="material-icons text-sm mr-2 text-[#00352b]">explore</span>
+                        Diğer Hizmetlerimiz
+                    </h3>
+                    <a href="{{ route('services.topics.index') }}" class="text-xs text-[#00352b] hover:text-[#007b32] font-medium transition-colors duration-300">
+                        Tümünü Gör →
+                    </a>
+                </div>
+                <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
+                    @foreach($serviceTopics->where('id', '!=', $serviceTopic->id)->take(6) as $otherTopic)
+                    <a href="{{ route('services.topics.show', $otherTopic->slug) }}" class="group flex flex-col items-center p-3 border border-gray-100 rounded-lg hover:border-[#00352b]/20 hover:bg-white hover:shadow-sm transition-all duration-300">
+                        <div class="w-8 h-8 rounded-full mb-2 flex items-center justify-center group-hover:scale-105 transition-transform duration-300" style="background-color: {{ $otherTopic->color }}15;">
                             @if($otherTopic->icon)
-                                <i class="{{ $otherTopic->icon }}" style="color: {{ $otherTopic->color }};"></i>
+                                <i class="{{ $otherTopic->icon }} text-xs" style="color: {{ $otherTopic->color }};"></i>
                             @else
-                                <span class="material-icons text-sm" style="color: {{ $otherTopic->color }};">extension</span>
+                                <span class="material-icons text-xs" style="color: {{ $otherTopic->color }};">extension</span>
                             @endif
                         </div>
-                        <span class="text-sm font-medium text-gray-700 group-hover:text-gray-900 text-center">{{ $otherTopic->name }}</span>
-                        <span class="text-xs text-gray-500 mt-1">{{ $otherTopic->services_count }} hizmet</span>
+                        <span class="text-xs font-medium text-gray-600 group-hover:text-gray-800 text-center line-clamp-2">{{ $otherTopic->name }}</span>
+                        <span class="text-xs text-gray-400 mt-1">{{ $otherTopic->services_count }}</span>
                     </a>
                     @endforeach
-                </div>
-                <div class="text-center mt-4">
-                    <a href="{{ route('services.topics.index') }}" class="inline-flex items-center px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-lg transition-colors duration-300">
-                        <span class="material-icons mr-2">apps</span>
-                        Tüm Konuları Gör
-                    </a>
                 </div>
             </div>
             @endif

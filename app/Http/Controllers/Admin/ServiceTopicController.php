@@ -179,4 +179,32 @@ class ServiceTopicController extends Controller
         
         return response()->json(['success' => true]);
     }
+    
+    /**
+     * Tüm hizmet konularını temizle
+     */
+    public function cleanup()
+    {
+        try {
+            DB::beginTransaction();
+            
+            // Önce hizmet-konu ilişkilerini temizle
+            DB::table('service_service_topic')->delete();
+            
+            // Sonra tüm hizmet konularını sil
+            ServiceTopic::truncate();
+            
+            DB::commit();
+            
+            return redirect()->route('admin.service-topics.index')
+                ->with('success', 'Tüm hizmet konuları başarıyla temizlendi.');
+                
+        } catch (\Exception $e) {
+            DB::rollBack();
+            \Log::error('Hizmet konuları temizleme hatası: ' . $e->getMessage());
+            
+            return redirect()->back()
+                ->with('error', 'Hizmet konuları temizlenirken bir hata oluştu: ' . $e->getMessage());
+        }
+    }
 }

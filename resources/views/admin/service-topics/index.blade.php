@@ -32,6 +32,9 @@
                 <a href="{{ route('services.topics.index') }}" class="btn btn-success btn-sm me-2" target="_blank">
                     <i class="fas fa-external-link-alt me-1"></i> Sitede Görüntüle
                 </a>
+                <button type="button" class="btn btn-warning btn-sm me-2" onclick="confirmCleanup()">
+                    <i class="fas fa-broom me-1"></i> Tümünü Temizle
+                </button>
                 <a href="{{ route('admin.service-topics.create') }}" class="btn btn-primary btn-sm">
                     <i class="fas fa-plus me-1"></i> Yeni Hizmet Konusu
                 </a>
@@ -119,7 +122,7 @@
 
                 <!-- Pagination -->
                 <div class="d-flex justify-content-center mt-3">
-                    {{ $serviceTopics->links() }}
+                    {{ $serviceTopics->links('custom.pagination-simple') }}
                 </div>
             @else
                 <div class="alert alert-info">
@@ -170,5 +173,14 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
+
+// Temizleme onayı
+function confirmCleanup() {
+    if (confirm('UYARI: Bu işlem tüm hizmet konularını ve ilişkili verileri kalıcı olarak silecektir. Bu işlem geri alınamaz!\n\nDevam etmek istediğinizden emin misiniz?')) {
+        if (confirm('Son kez soruyorum: Tüm hizmet konularını silmek istediğinizden kesinlikle emin misiniz?')) {
+            window.location.href = '{{ route("admin.service-topics.cleanup") }}';
+        }
+    }
+}
 </script>
 @stop 

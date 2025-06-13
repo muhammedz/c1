@@ -25,7 +25,7 @@ class ServiceRepository extends BaseRepository
      */
     public function getFilteredServices(array $filters)
     {
-        $query = $this->model->query()->with(['categories']);
+        $query = $this->model->query()->with(['categories', 'unit', 'serviceTopics', 'hedefKitleler', 'newsCategories']);
         
         // Kategori filtresi
         if (isset($filters['category']) && $filters['category']) {
