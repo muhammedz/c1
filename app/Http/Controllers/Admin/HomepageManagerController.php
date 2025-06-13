@@ -164,54 +164,132 @@ class HomepageManagerController extends Controller
         
         // MediaPicker ile seçilen görselleri güncelle
         if ($request->filemanagersystem_app_logo) {
-            // MediaPicker URL'sini doğrudan kullan
-            $mobileAppSettings->app_logo = $request->filemanagersystem_app_logo;
+            // MediaPicker'dan gelen değer ID ise, gerçek dosya yolunu al
+            if (is_numeric($request->filemanagersystem_app_logo)) {
+                $media = \App\Models\FileManagerSystem\Media::find($request->filemanagersystem_app_logo);
+                if ($media) {
+                    // URL'den storage kısmını çıkararak sadece dosya yolunu al
+                    $path = str_replace('/storage/', '', $media->url);
+                    $mobileAppSettings->app_logo = $path;
+                } else {
+                    $mobileAppSettings->app_logo = $request->filemanagersystem_app_logo;
+                }
+            } else {
+                $mobileAppSettings->app_logo = $request->filemanagersystem_app_logo;
+            }
             
             // Log ile kaydedilen URL'yi kontrol edelim
             \Log::info('MediaPicker app_logo kaydediliyor', [
-                'url' => $request->filemanagersystem_app_logo
+                'original' => $request->filemanagersystem_app_logo,
+                'saved' => $mobileAppSettings->app_logo
             ]);
         }
         
         if ($request->filemanagersystem_app_header_image) {
-            // MediaPicker URL'sini doğrudan kullan
-            $mobileAppSettings->app_header_image = $request->filemanagersystem_app_header_image;
+            // MediaPicker'dan gelen değer ID ise, gerçek dosya yolunu al
+            if (is_numeric($request->filemanagersystem_app_header_image)) {
+                $media = \App\Models\FileManagerSystem\Media::find($request->filemanagersystem_app_header_image);
+                if ($media) {
+                    // URL'den storage kısmını çıkararak sadece dosya yolunu al
+                    $path = str_replace('/storage/', '', $media->url);
+                    $mobileAppSettings->app_header_image = $path;
+                } else {
+                    $mobileAppSettings->app_header_image = $request->filemanagersystem_app_header_image;
+                }
+            } else {
+                $mobileAppSettings->app_header_image = $request->filemanagersystem_app_header_image;
+            }
             
             // Log ile kaydedilen URL'yi kontrol edelim
             \Log::info('MediaPicker app_header_image kaydediliyor', [
-                'url' => $request->filemanagersystem_app_header_image
+                'original' => $request->filemanagersystem_app_header_image,
+                'saved' => $mobileAppSettings->app_header_image
             ]);
         }
         
         if ($request->filemanagersystem_phone_image) {
-            // MediaPicker URL'sini doğrudan kullan
-            $mobileAppSettings->phone_image = $request->filemanagersystem_phone_image;
+            // MediaPicker'dan gelen değer ID ise, gerçek dosya yolunu al
+            if (is_numeric($request->filemanagersystem_phone_image)) {
+                $media = \App\Models\FileManagerSystem\Media::find($request->filemanagersystem_phone_image);
+                if ($media) {
+                    // URL'den storage kısmını çıkararak sadece dosya yolunu al
+                    $path = str_replace('/storage/', '', $media->url);
+                    $mobileAppSettings->phone_image = $path;
+                } else {
+                    $mobileAppSettings->phone_image = $request->filemanagersystem_phone_image;
+                }
+            } else {
+                $mobileAppSettings->phone_image = $request->filemanagersystem_phone_image;
+            }
             
             // Log ile kaydedilen URL'yi kontrol edelim
             \Log::info('MediaPicker phone_image kaydediliyor', [
-                'url' => $request->filemanagersystem_phone_image
+                'original' => $request->filemanagersystem_phone_image,
+                'saved' => $mobileAppSettings->phone_image
             ]);
         }
         
         // Bağlantı kartları için özel ikon kaydetme
         if ($request->filemanagersystem_link_card_1_icon) {
-            $mobileAppSettings->link_card_1_custom_icon = $request->filemanagersystem_link_card_1_icon;
+            // MediaPicker'dan gelen değer ID ise, gerçek dosya yolunu al
+            if (is_numeric($request->filemanagersystem_link_card_1_icon)) {
+                $media = \App\Models\FileManagerSystem\Media::find($request->filemanagersystem_link_card_1_icon);
+                if ($media) {
+                    // URL'den storage kısmını çıkararak sadece dosya yolunu al
+                    $path = str_replace('/storage/', '', $media->url);
+                    $mobileAppSettings->link_card_1_custom_icon = $path;
+                } else {
+                    $mobileAppSettings->link_card_1_custom_icon = $request->filemanagersystem_link_card_1_icon;
+                }
+            } else {
+                $mobileAppSettings->link_card_1_custom_icon = $request->filemanagersystem_link_card_1_icon;
+            }
+            
             \Log::info('Bağlantı Kartı 1 özel ikon kaydediliyor', [
-                'id' => $request->filemanagersystem_link_card_1_icon
+                'original' => $request->filemanagersystem_link_card_1_icon,
+                'saved' => $mobileAppSettings->link_card_1_custom_icon
             ]);
         }
         
         if ($request->filemanagersystem_link_card_2_icon) {
-            $mobileAppSettings->link_card_2_custom_icon = $request->filemanagersystem_link_card_2_icon;
+            // MediaPicker'dan gelen değer ID ise, gerçek dosya yolunu al
+            if (is_numeric($request->filemanagersystem_link_card_2_icon)) {
+                $media = \App\Models\FileManagerSystem\Media::find($request->filemanagersystem_link_card_2_icon);
+                if ($media) {
+                    // URL'den storage kısmını çıkararak sadece dosya yolunu al
+                    $path = str_replace('/storage/', '', $media->url);
+                    $mobileAppSettings->link_card_2_custom_icon = $path;
+                } else {
+                    $mobileAppSettings->link_card_2_custom_icon = $request->filemanagersystem_link_card_2_icon;
+                }
+            } else {
+                $mobileAppSettings->link_card_2_custom_icon = $request->filemanagersystem_link_card_2_icon;
+            }
+            
             \Log::info('Bağlantı Kartı 2 özel ikon kaydediliyor', [
-                'id' => $request->filemanagersystem_link_card_2_icon
+                'original' => $request->filemanagersystem_link_card_2_icon,
+                'saved' => $mobileAppSettings->link_card_2_custom_icon
             ]);
         }
         
         if ($request->filemanagersystem_link_card_3_icon) {
-            $mobileAppSettings->link_card_3_custom_icon = $request->filemanagersystem_link_card_3_icon;
+            // MediaPicker'dan gelen değer ID ise, gerçek dosya yolunu al
+            if (is_numeric($request->filemanagersystem_link_card_3_icon)) {
+                $media = \App\Models\FileManagerSystem\Media::find($request->filemanagersystem_link_card_3_icon);
+                if ($media) {
+                    // URL'den storage kısmını çıkararak sadece dosya yolunu al
+                    $path = str_replace('/storage/', '', $media->url);
+                    $mobileAppSettings->link_card_3_custom_icon = $path;
+                } else {
+                    $mobileAppSettings->link_card_3_custom_icon = $request->filemanagersystem_link_card_3_icon;
+                }
+            } else {
+                $mobileAppSettings->link_card_3_custom_icon = $request->filemanagersystem_link_card_3_icon;
+            }
+            
             \Log::info('Bağlantı Kartı 3 özel ikon kaydediliyor', [
-                'id' => $request->filemanagersystem_link_card_3_icon
+                'original' => $request->filemanagersystem_link_card_3_icon,
+                'saved' => $mobileAppSettings->link_card_3_custom_icon
             ]);
         }
         

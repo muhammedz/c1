@@ -61,7 +61,11 @@
                                     <small class="form-text text-muted">Önerilen boyut: 128x128 piksel, PNG formatı</small>
                                     <div id="app_logo_preview" class="mt-2">
                                         @if($mobileAppSettings->app_logo)
-                                            <img src="{{ asset('storage/' . $mobileAppSettings->app_logo) }}" alt="Uygulama Logosu" class="img-thumbnail" style="max-width: 128px;">
+                                            @if(strpos($mobileAppSettings->app_logo, '/uploads/') !== false)
+                                                <img src="{{ $mobileAppSettings->app_logo }}" alt="Uygulama Logosu" class="img-thumbnail" style="max-width: 128px;">
+                                            @else
+                                                <img src="{{ asset('storage/' . $mobileAppSettings->app_logo) }}" alt="Uygulama Logosu" class="img-thumbnail" style="max-width: 128px;">
+                                            @endif
                                         @endif
                                     </div>
                                 </div>
@@ -109,7 +113,11 @@
                                     
                                     <div id="app_header_image_preview" class="mt-2">
                                         @if($mobileAppSettings->app_header_image)
-                                            <img src="{{ asset('storage/' . $mobileAppSettings->app_header_image) }}" alt="Uygulama Başlık Görseli" class="img-thumbnail" style="max-width: 100%;">
+                                            @if(strpos($mobileAppSettings->app_header_image, '/uploads/') !== false)
+                                                <img src="{{ $mobileAppSettings->app_header_image }}" alt="Uygulama Başlık Görseli" class="img-thumbnail" style="max-width: 100%;">
+                                            @else
+                                                <img src="{{ asset('storage/' . $mobileAppSettings->app_header_image) }}" alt="Uygulama Başlık Görseli" class="img-thumbnail" style="max-width: 100%;">
+                                            @endif
                                         @endif
                                     </div>
                                 </div>
@@ -174,7 +182,11 @@
                                     <small class="form-text text-muted">Önerilen boyut: 320x650 piksel, PNG formatı</small>
                                     <div id="phone_image_preview" class="mt-2">
                                         @if($mobileAppSettings->phone_image)
-                                            <img src="{{ asset('storage/' . $mobileAppSettings->phone_image) }}" alt="Telefon Görseli" class="img-thumbnail" style="max-height: 300px;">
+                                            @if(strpos($mobileAppSettings->phone_image, '/uploads/') !== false)
+                                                <img src="{{ $mobileAppSettings->phone_image }}" alt="Telefon Görseli" class="img-thumbnail" style="max-height: 300px;">
+                                            @else
+                                                <img src="{{ asset('storage/' . $mobileAppSettings->phone_image) }}" alt="Telefon Görseli" class="img-thumbnail" style="max-height: 300px;">
+                                            @endif
                                         @else
                                             <div class="mt-2 text-center">
                                                 <img src="{{ asset('assets/image/mobile-app.png') }}" alt="Varsayılan Telefon Görseli" class="img-thumbnail" style="max-height: 300px;">
@@ -444,7 +456,33 @@
                                 
                                 // Önizleme göster
                                 if (preview) {
-                                    $('#' + preview).html('<img src="' + mediaUrl + '" alt="Seçilen İkon" class="img-thumbnail" style="max-height: 48px;">');
+                                    // Önizleme için doğru URL'yi oluştur
+                                    let previewImageUrl = '';
+                                    if (event.data.mediaUrl) {
+                                        previewImageUrl = event.data.mediaUrl;
+                                        // Eğer URL tam değilse, base URL ekle
+                                        if (previewImageUrl && previewImageUrl.startsWith('/')) {
+                                            const baseUrl = window.location.protocol + '//' + window.location.host;
+                                            previewImageUrl = baseUrl + previewImageUrl;
+                                        }
+                                    } else if (event.data.mediaId) {
+                                        // Media ID ile preview URL oluştur
+                                        previewImageUrl = window.location.protocol + '//' + window.location.host + '/admin/filemanagersystem/media/preview/' + event.data.mediaId;
+                                    }
+                                    
+                                    if (previewImageUrl) {
+                                        // Önizleme türüne göre farklı boyutlar
+                                        let maxHeight = '48px';
+                                        if (preview.includes('app_logo')) {
+                                            maxHeight = '128px';
+                                        } else if (preview.includes('phone_image')) {
+                                            maxHeight = '300px';
+                                        } else if (preview.includes('app_header_image')) {
+                                            maxHeight = '200px';
+                                        }
+                                        
+                                        $('#' + preview).html('<img src="' + previewImageUrl + '" alt="Seçilen Görsel" class="img-thumbnail" style="max-height: ' + maxHeight + ';">');
+                                    }
                                 }
                                 
                                 // Modalı kapat
