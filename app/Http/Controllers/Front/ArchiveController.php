@@ -27,7 +27,12 @@ class ArchiveController extends Controller
 
         $archives = $query->paginate(12);
 
-        return view('front.archives.index', compact('archives'));
+        // Şimdilik kategoriler boş olarak tanımlıyoruz
+        // Gelecekte kategori sistemi eklendiğinde burası güncellenecek
+        $categories = collect();
+        $uncategorizedArchives = $archives;
+
+        return view('front.archives.index', compact('archives', 'categories', 'uncategorizedArchives'));
     }
 
     /**

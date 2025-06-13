@@ -332,86 +332,257 @@
                     <!-- Belgeler Listesi -->
                     <div id="documents-list">
                         @if($archive->allDocuments->count() > 1)
-                        <div class="mb-2">
-                            <div class="custom-control custom-checkbox">
-                                <input type="checkbox" class="custom-control-input" id="select-all-documents">
-                                <label class="custom-control-label" for="select-all-documents">
-                                    <strong>Tümünü Seç</strong>
-                                </label>
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="select-all-documents">
+                                    <label class="custom-control-label" for="select-all-documents">
+                                        <strong>Tümünü Seç</strong>
+                                    </label>
+                                </div>
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <button type="button" class="btn btn-outline-secondary" id="view-by-category">
+                                        <i class="fas fa-layer-group"></i> Kategoriye Göre
+                                    </button>
+                                    <button type="button" class="btn btn-outline-secondary active" id="view-all">
+                                        <i class="fas fa-list"></i> Tümü
+                                    </button>
+                                </div>
                             </div>
                         </div>
                         @endif
 
-                        @forelse($archive->allDocuments->sortByDesc('sort_order') as $document)
-                            <div class="document-item border rounded p-2 mb-2" data-id="{{ $document->id }}">
-                                <div class="d-flex justify-content-between align-items-start">
-                                    <div class="d-flex align-items-start">
-                                        <div class="custom-control custom-checkbox mr-2 mt-1">
-                                            <input type="checkbox" class="custom-control-input document-checkbox" 
-                                                   id="doc-{{ $document->id }}" value="{{ $document->id }}">
-                                            <label class="custom-control-label" for="doc-{{ $document->id }}"></label>
-                                        </div>
-                                        <div class="mr-2 mt-1">
-                                            <span class="badge badge-info" title="Sıra Numarası">{{ $document->sort_order }}</span>
-                                        </div>
-                                        <div class="flex-grow-1">
-                                            <h6 class="mb-1">
-                                                <i class="{{ $document->icon_class }}"></i>
-                                                {{ $document->name }}
-                                                @if($document->category)
-                                                    <span class="badge badge-secondary ml-2" style="background-color: {{ $document->category->color }}">
-                                                        @if($document->category->icon)
-                                                            <i class="{{ $document->category->icon }}"></i>
-                                                        @endif
-                                                        {{ $document->category->name }}
-                                                    </span>
+                        <!-- Kategoriye Göre Görünüm -->
+                        <div id="category-view" style="display: none;">
+                            @php
+                                $documentsGrouped = $archive->allDocuments->groupBy('category_id');
+                                $categorizedDocuments = $documentsGrouped->filter(function($documents, $categoryId) {
+                                    return $categoryId !== null;
+                                });
+                                $uncategorizedDocuments = $documentsGrouped->get(null, collect());
+                            @endphp
+
+                            @foreach($archive->documentCategories->sortBy('order') as $category)
+                                @if($categorizedDocuments->has($category->getKey()))
+                                    <div class="category-group mb-4">
+                                        <div class="category-header bg-light p-2 rounded mb-2">
+                                            <h6 class="mb-0 d-flex align-items-center">
+                                                @if($category->icon)
+                                                    <i class="{{ $category->icon }} mr-2" style="color: {{ $category->color }}"></i>
                                                 @endif
+                                                {{ $category->name }}
+                                                <span class="badge badge-info ml-2">{{ $categorizedDocuments->get($category->getKey())->count() }}</span>
                                             </h6>
-                                            @if($document->description)
-                                                <p class="text-muted small mb-1">{{ $document->description }}</p>
+                                            @if($category->description)
+                                                <small class="text-muted">{{ $category->description }}</small>
                                             @endif
-                                            <small class="text-muted">
-                                                {{ $document->file_name }} ({{ $document->formatted_size }})
-                                            </small>
                                         </div>
+                                        
+                                        @foreach($categorizedDocuments->get($category->getKey())->sortByDesc('sort_order') as $document)
+                                            <div class="document-item border rounded p-2 mb-2 ml-3" data-id="{{ $document->id }}">
+                                                <div class="d-flex justify-content-between align-items-start">
+                                                    <div class="d-flex align-items-start">
+                                                        <div class="custom-control custom-checkbox mr-2 mt-1">
+                                                            <input type="checkbox" class="custom-control-input document-checkbox" 
+                                                                   id="doc-cat-{{ $document->id }}" value="{{ $document->id }}">
+                                                            <label class="custom-control-label" for="doc-cat-{{ $document->id }}"></label>
+                                                        </div>
+                                                        <div class="mr-2 mt-1">
+                                                            <span class="badge badge-info" title="Sıra Numarası">{{ $document->sort_order }}</span>
+                                                        </div>
+                                                        <div class="flex-grow-1">
+                                                            <h6 class="mb-1">
+                                                                <i class="{{ $document->icon_class }}"></i>
+                                                                {{ $document->name }}
+                                                            </h6>
+                                                            @if($document->description)
+                                                                <p class="text-muted small mb-1">{{ $document->description }}</p>
+                                                            @endif
+                                                            <small class="text-muted">
+                                                                {{ $document->file_name }} ({{ $document->formatted_size }})
+                                                            </small>
+                                                        </div>
+                                                    </div>
+                                                    <div class="d-flex align-items-start">
+                                                        <div class="mr-2">
+                                                            <div class="input-group input-group-sm" style="width: 80px;">
+                                                                <input type="number" class="form-control form-control-sm sort-input" 
+                                                                       value="{{ $document->sort_order }}" min="0" max="9999"
+                                                                       data-id="{{ $document->id }}" title="Sıra değiştir">
+                                                                <div class="input-group-append">
+                                                                    <button class="btn btn-outline-success btn-sm update-sort" 
+                                                                            data-id="{{ $document->id }}" title="Sırayı Güncelle">
+                                                                        <i class="fas fa-check"></i>
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="btn-group-vertical btn-group-sm">
+                                                            <button type="button" class="btn btn-outline-primary btn-xs edit-document" 
+                                                                    data-id="{{ $document->id }}" title="Düzenle">
+                                                                <i class="fas fa-edit"></i>
+                                                            </button>
+                                                            <button type="button" class="btn btn-outline-danger btn-xs delete-document" 
+                                                                    data-id="{{ $document->id }}" title="Sil">
+                                                                <i class="fas fa-trash"></i>
+                                                            </button>
+                                                            <button type="button" class="btn btn-outline-secondary btn-xs toggle-status" 
+                                                                    data-id="{{ $document->id }}" title="Durum">
+                                                                <i class="fas fa-{{ $document->is_active ? 'eye' : 'eye-slash' }}"></i>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        @endforeach
                                     </div>
-                                    <div class="d-flex align-items-start">
-                                        <div class="mr-2">
-                                            <div class="input-group input-group-sm" style="width: 80px;">
-                                                <input type="number" class="form-control form-control-sm sort-input" 
-                                                       value="{{ $document->sort_order }}" min="0" max="9999"
-                                                       data-id="{{ $document->id }}" title="Sıra değiştir">
-                                                <div class="input-group-append">
-                                                    <button class="btn btn-outline-success btn-sm update-sort" 
-                                                            data-id="{{ $document->id }}" title="Sırayı Güncelle">
-                                                        <i class="fas fa-check"></i>
-                                                    </button>
+                                @endif
+                            @endforeach
+
+                            @if($uncategorizedDocuments->count() > 0)
+                                <div class="category-group mb-4">
+                                    <div class="category-header bg-light p-2 rounded mb-2">
+                                        <h6 class="mb-0 d-flex align-items-center">
+                                            <i class="fas fa-folder mr-2 text-muted"></i>
+                                            Kategorisiz Belgeler
+                                            <span class="badge badge-secondary ml-2">{{ $uncategorizedDocuments->count() }}</span>
+                                        </h6>
+                                    </div>
+                                    
+                                    @foreach($uncategorizedDocuments->sortByDesc('sort_order') as $document)
+                                        <div class="document-item border rounded p-2 mb-2 ml-3" data-id="{{ $document->id }}">
+                                            <div class="d-flex justify-content-between align-items-start">
+                                                <div class="d-flex align-items-start">
+                                                    <div class="custom-control custom-checkbox mr-2 mt-1">
+                                                        <input type="checkbox" class="custom-control-input document-checkbox" 
+                                                               id="doc-uncat-{{ $document->id }}" value="{{ $document->id }}">
+                                                        <label class="custom-control-label" for="doc-uncat-{{ $document->id }}"></label>
+                                                    </div>
+                                                    <div class="mr-2 mt-1">
+                                                        <span class="badge badge-info" title="Sıra Numarası">{{ $document->sort_order }}</span>
+                                                    </div>
+                                                    <div class="flex-grow-1">
+                                                        <h6 class="mb-1">
+                                                            <i class="{{ $document->icon_class }}"></i>
+                                                            {{ $document->name }}
+                                                        </h6>
+                                                        @if($document->description)
+                                                            <p class="text-muted small mb-1">{{ $document->description }}</p>
+                                                        @endif
+                                                        <small class="text-muted">
+                                                            {{ $document->file_name }} ({{ $document->formatted_size }})
+                                                        </small>
+                                                    </div>
+                                                </div>
+                                                <div class="d-flex align-items-start">
+                                                    <div class="mr-2">
+                                                        <div class="input-group input-group-sm" style="width: 80px;">
+                                                            <input type="number" class="form-control form-control-sm sort-input" 
+                                                                   value="{{ $document->sort_order }}" min="0" max="9999"
+                                                                   data-id="{{ $document->id }}" title="Sıra değiştir">
+                                                            <div class="input-group-append">
+                                                                <button class="btn btn-outline-success btn-sm update-sort" 
+                                                                        data-id="{{ $document->id }}" title="Sırayı Güncelle">
+                                                                    <i class="fas fa-check"></i>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="btn-group-vertical btn-group-sm">
+                                                        <button type="button" class="btn btn-outline-primary btn-xs edit-document" 
+                                                                data-id="{{ $document->id }}" title="Düzenle">
+                                                            <i class="fas fa-edit"></i>
+                                                        </button>
+                                                        <button type="button" class="btn btn-outline-danger btn-xs delete-document" 
+                                                                data-id="{{ $document->id }}" title="Sil">
+                                                            <i class="fas fa-trash"></i>
+                                                        </button>
+                                                        <button type="button" class="btn btn-outline-secondary btn-xs toggle-status" 
+                                                                data-id="{{ $document->id }}" title="Durum">
+                                                            <i class="fas fa-{{ $document->is_active ? 'eye' : 'eye-slash' }}"></i>
+                                                        </button>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="btn-group-vertical btn-group-sm">
-                                            <button type="button" class="btn btn-outline-primary btn-xs edit-document" 
-                                                    data-id="{{ $document->id }}" title="Düzenle">
-                                                <i class="fas fa-edit"></i>
-                                            </button>
-                                            <button type="button" class="btn btn-outline-danger btn-xs delete-document" 
-                                                    data-id="{{ $document->id }}" title="Sil">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                            <button type="button" class="btn btn-outline-secondary btn-xs toggle-status" 
-                                                    data-id="{{ $document->id }}" title="Durum">
-                                                <i class="fas fa-{{ $document->is_active ? 'eye' : 'eye-slash' }}"></i>
-                                            </button>
+                                    @endforeach
+                                </div>
+                            @endif
+                        </div>
+
+                        <!-- Normal Liste Görünümü -->
+                        <div id="normal-view">
+                            @forelse($archive->allDocuments->sortByDesc('sort_order') as $document)
+                                <div class="document-item border rounded p-2 mb-2" data-id="{{ $document->id }}">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div class="d-flex align-items-start">
+                                            <div class="custom-control custom-checkbox mr-2 mt-1">
+                                                <input type="checkbox" class="custom-control-input document-checkbox" 
+                                                       id="doc-{{ $document->id }}" value="{{ $document->id }}">
+                                                <label class="custom-control-label" for="doc-{{ $document->id }}"></label>
+                                            </div>
+                                            <div class="mr-2 mt-1">
+                                                <span class="badge badge-info" title="Sıra Numarası">{{ $document->sort_order }}</span>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <h6 class="mb-1">
+                                                    <i class="{{ $document->icon_class }}"></i>
+                                                    {{ $document->name }}
+                                                    @if($document->category)
+                                                        <span class="badge badge-secondary ml-2" style="background-color: {{ $document->category->color }}">
+                                                            @if($document->category->icon)
+                                                                <i class="{{ $document->category->icon }}"></i>
+                                                            @endif
+                                                            {{ $document->category->name }}
+                                                        </span>
+                                                    @endif
+                                                </h6>
+                                                @if($document->description)
+                                                    <p class="text-muted small mb-1">{{ $document->description }}</p>
+                                                @endif
+                                                <small class="text-muted">
+                                                    {{ $document->file_name }} ({{ $document->formatted_size }})
+                                                </small>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex align-items-start">
+                                            <div class="mr-2">
+                                                <div class="input-group input-group-sm" style="width: 80px;">
+                                                    <input type="number" class="form-control form-control-sm sort-input" 
+                                                           value="{{ $document->sort_order }}" min="0" max="9999"
+                                                           data-id="{{ $document->id }}" title="Sıra değiştir">
+                                                    <div class="input-group-append">
+                                                        <button class="btn btn-outline-success btn-sm update-sort" 
+                                                                data-id="{{ $document->id }}" title="Sırayı Güncelle">
+                                                            <i class="fas fa-check"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="btn-group-vertical btn-group-sm">
+                                                <button type="button" class="btn btn-outline-primary btn-xs edit-document" 
+                                                        data-id="{{ $document->id }}" title="Düzenle">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button type="button" class="btn btn-outline-danger btn-xs delete-document" 
+                                                        data-id="{{ $document->id }}" title="Sil">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                                <button type="button" class="btn btn-outline-secondary btn-xs toggle-status" 
+                                                        data-id="{{ $document->id }}" title="Durum">
+                                                    <i class="fas fa-{{ $document->is_active ? 'eye' : 'eye-slash' }}"></i>
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        @empty
-                            <div class="text-center text-muted py-3" id="no-documents">
-                                <i class="fas fa-folder-open fa-2x mb-2"></i>
-                                <p>Henüz belge yüklenmemiş.</p>
-                            </div>
-                        @endforelse
+                            @empty
+                                <div class="text-center text-muted py-3" id="no-documents">
+                                    <i class="fas fa-folder-open fa-2x mb-2"></i>
+                                    <p>Henüz belge yüklenmemiş.</p>
+                                </div>
+                            @endforelse
+                        </div>
                     </div>
                 </div>
             </div>
@@ -554,6 +725,27 @@ script.onload = function() {
 };
 
 $(document).ready(function() {
+    // Görünüm değiştirme butonları
+    $('#view-by-category').on('click', function() {
+        $('#normal-view').hide();
+        $('#category-view').show();
+        $(this).addClass('active');
+        $('#view-all').removeClass('active');
+        
+        // Tümünü seç checkbox'ını güncelle
+        updateBulkActions();
+    });
+    
+    $('#view-all').on('click', function() {
+        $('#category-view').hide();
+        $('#normal-view').show();
+        $(this).addClass('active');
+        $('#view-by-category').removeClass('active');
+        
+        // Tümünü seç checkbox'ını güncelle
+        updateBulkActions();
+    });
+
     // Tek belge yükleme formunu göster/gizle
     $('#toggle-single-upload').on('click', function() {
         $('#single-upload-form').toggle();
@@ -1048,7 +1240,7 @@ $(document).ready(function() {
 
     // Toplu seçim fonksiyonları
     function updateBulkActions() {
-        var selectedCount = $('.document-checkbox:checked').length;
+        var selectedCount = $('.document-checkbox:checked:visible').length;
         $('#selected-count').text(selectedCount + ' belge seçildi');
         
         if (selectedCount > 0) {
@@ -1057,8 +1249,8 @@ $(document).ready(function() {
             $('#bulk-actions').hide();
         }
         
-        // Tümünü seç checkbox'ını güncelle
-        var totalCount = $('.document-checkbox').length;
+        // Tümünü seç checkbox'ını güncelle - sadece görünür checkbox'ları say
+        var totalCount = $('.document-checkbox:visible').length;
         if (selectedCount === totalCount && totalCount > 0) {
             $('#select-all-documents').prop('checked', true).prop('indeterminate', false);
         } else if (selectedCount > 0) {
@@ -1071,7 +1263,7 @@ $(document).ready(function() {
     // Tümünü seç/seçme
     $('#select-all-documents').on('change', function() {
         var isChecked = $(this).is(':checked');
-        $('.document-checkbox').prop('checked', isChecked);
+        $('.document-checkbox:visible').prop('checked', isChecked);
         updateBulkActions();
     });
 
@@ -1082,7 +1274,7 @@ $(document).ready(function() {
 
     // Seçimi temizle
     $('#clear-selection-btn').on('click', function() {
-        $('.document-checkbox').prop('checked', false);
+        $('.document-checkbox:visible').prop('checked', false);
         $('#select-all-documents').prop('checked', false).prop('indeterminate', false);
         updateBulkActions();
     });

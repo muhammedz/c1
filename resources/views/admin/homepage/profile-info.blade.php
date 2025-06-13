@@ -170,12 +170,12 @@
                                 
                                 <!-- Twitter -->
                                 <div class="form-group">
-                                    <label for="twitter_url">Twitter URL</label>
+                                    <label for="twitter_url">Twitter/X URL</label>
                                     <div class="input-group">
                                         <div class="input-group-prepend">
                                             <span class="input-group-text"><i class="fab fa-twitter"></i></span>
                                         </div>
-                                        <input type="url" class="form-control" id="twitter_url" name="twitter_url" value="{{ old('twitter_url', $profileSettings->twitter_url) }}" placeholder="https://twitter.com/...">
+                                        <input type="url" class="form-control" id="twitter_url" name="twitter_url" value="{{ old('twitter_url', $profileSettings->twitter_url) }}" placeholder="https://x.com/...">
                                     </div>
                                 </div>
                                 

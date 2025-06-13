@@ -39,7 +39,7 @@
                 <div class="flex gap-2">
                     @if($mayor->social_twitter)
                     <a href="{{ $mayor->social_twitter }}" target="_blank" class="bg-white/10 hover:bg-white/20 text-white p-1.5 rounded-full transition-colors flex items-center justify-center w-8 h-8">
-                        <i class="fab fa-twitter text-base"></i>
+                        <i class="fab fa-x-twitter text-base"></i>
                     </a>
                     @endif
                     @if($mayor->social_instagram)
@@ -220,100 +220,55 @@
                     <i class="material-icons text-[#00352b]">newspaper</i>
                     Başkandan Haberler
                 </h2>
-                <a href="#" class="inline-flex items-center text-[#00352b] hover:text-[#20846c] font-medium transition-colors">
+                <a href="{{ route('news.index') }}" class="inline-flex items-center text-[#00352b] hover:text-[#20846c] font-medium transition-colors">
                     <span>Tüm Haberler</span>
                     <i class="material-icons text-sm ml-1">arrow_forward</i>
                 </a>
             </div>
             
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <!-- Haber Kartı 1 -->
+                @forelse($mayorNews as $news)
                 <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
                     <div class="aspect-video overflow-hidden">
-                        <img src="https://cankaya.epoxsoft.net.tr/images/huseyincanguner/huseyincanguner1.jpeg" alt="Başkan Mahalle Ziyaretinde" class="w-full h-full object-cover transition-transform duration-500 hover:scale-105">
+                        @if($news->image)
+                            <img src="{{ str_replace('/storage/storage/', '/storage/', $news->image) }}" alt="{{ $news->title }}" class="w-full h-full object-cover transition-transform duration-500 hover:scale-105">
+                        @else
+                            <div class="w-full h-full bg-gray-200 flex items-center justify-center">
+                                <i class="material-icons text-gray-400 text-4xl">article</i>
+                            </div>
+                        @endif
                     </div>
                     <div class="p-5">
-                        <span class="inline-block px-3 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-full mb-3">Ziyaret</span>
-                        <h3 class="text-lg font-semibold text-gray-800 mb-2 line-clamp-2">Başkan Güner, Çukurambar Mahallesi'nde Vatandaşlarla Buluştu</h3>
-                        <p class="text-gray-600 text-sm mb-4 line-clamp-2">Başkan Güner, Çukurambar Mahallesi'nde vatandaşları ziyaret ederek talep ve önerilerini dinledi.</p>
+                        @if($news->categories->first())
+                            <span class="inline-block px-3 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-full mb-3">{{ $news->categories->first()->name }}</span>
+                        @endif
+                        <h3 class="text-lg font-semibold text-gray-800 mb-2 line-clamp-2">{{ $news->title }}</h3>
+                        <p class="text-gray-600 text-sm mb-4 line-clamp-2">
+                            @if($news->summary)
+                                {{ Str::limit($news->summary, 100) }}
+                            @else
+                                {{ Str::limit(strip_tags($news->content), 100) }}
+                            @endif
+                        </p>
                         <div class="flex justify-between items-center pt-3 border-t border-gray-100">
                             <div class="flex items-center text-gray-500 text-xs">
                                 <i class="material-icons text-xs mr-1">calendar_today</i>
-                                <span>18 Haziran 2024</span>
+                                <span>{{ $news->published_at ? $news->published_at->format('d M Y') : $news->created_at->format('d M Y') }}</span>
                             </div>
-                            <a href="#" class="inline-flex items-center text-xs font-medium text-white bg-[#00352b] px-3 py-1.5 rounded-md hover:bg-[#20846c] transition-colors">
+                            <a href="{{ route('news.show', $news->slug) }}" class="inline-flex items-center text-xs font-medium text-white bg-[#00352b] px-3 py-1.5 rounded-md hover:bg-[#20846c] transition-colors">
                                 <span>Detaylar</span>
                                 <i class="material-icons text-xs ml-1">arrow_forward</i>
                             </a>
                         </div>
                     </div>
                 </div>
-                
-                <!-- Haber Kartı 2 -->
-                <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
-                    <div class="aspect-video overflow-hidden">
-                        <img src="https://cankaya.epoxsoft.net.tr/images/huseyincanguner/huseyincanguner2.jpeg" alt="Başkan Toplantıda" class="w-full h-full object-cover transition-transform duration-500 hover:scale-105">
-                    </div>
-                    <div class="p-5">
-                        <span class="inline-block px-3 py-1 bg-purple-100 text-purple-800 text-xs font-medium rounded-full mb-3">Toplantı</span>
-                        <h3 class="text-lg font-semibold text-gray-800 mb-2 line-clamp-2">Belediye Meclis Toplantısında Önemli Kararlar Alındı</h3>
-                        <p class="text-gray-600 text-sm mb-4 line-clamp-2">Çankaya Belediye Meclisi'nin Haziran ayı toplantısında kentin geleceğini ilgilendiren önemli kararlar alındı.</p>
-                        <div class="flex justify-between items-center pt-3 border-t border-gray-100">
-                            <div class="flex items-center text-gray-500 text-xs">
-                                <i class="material-icons text-xs mr-1">calendar_today</i>
-                                <span>15 Haziran 2024</span>
-                            </div>
-                            <a href="#" class="inline-flex items-center text-xs font-medium text-white bg-[#00352b] px-3 py-1.5 rounded-md hover:bg-[#20846c] transition-colors">
-                                <span>Detaylar</span>
-                                <i class="material-icons text-xs ml-1">arrow_forward</i>
-                            </a>
-                        </div>
-                    </div>
+                @empty
+                <div class="col-span-4 bg-white p-8 rounded-lg shadow-md text-center">
+                    <i class="material-icons text-gray-400 text-5xl mb-4">info</i>
+                    <h3 class="text-xl font-bold text-gray-800 mb-2">Henüz haber bulunmamaktadır</h3>
+                    <p class="text-gray-600">Başkan haberleri yakında yayınlanacaktır.</p>
                 </div>
-                
-                <!-- Haber Kartı 3 -->
-                <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
-                    <div class="aspect-video overflow-hidden">
-                        <img src="https://cankaya.epoxsoft.net.tr/images/huseyincanguner/huseyincanguner3.jpeg" alt="Başkan Projede" class="w-full h-full object-cover transition-transform duration-500 hover:scale-105">
-                    </div>
-                    <div class="p-5">
-                        <span class="inline-block px-3 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full mb-3">Proje</span>
-                        <h3 class="text-lg font-semibold text-gray-800 mb-2 line-clamp-2">Kent Tarımı Projesi'nin İlk Etabı Tamamlandı</h3>
-                        <p class="text-gray-600 text-sm mb-4 line-clamp-2">Sürdürülebilir tarım ve ekolojik dengenin korunması için başlatılan Kent Tarımı Projesi'nin ilk etabı tamamlandı.</p>
-                        <div class="flex justify-between items-center pt-3 border-t border-gray-100">
-                            <div class="flex items-center text-gray-500 text-xs">
-                                <i class="material-icons text-xs mr-1">calendar_today</i>
-                                <span>10 Haziran 2024</span>
-                            </div>
-                            <a href="#" class="inline-flex items-center text-xs font-medium text-white bg-[#00352b] px-3 py-1.5 rounded-md hover:bg-[#20846c] transition-colors">
-                                <span>Detaylar</span>
-                                <i class="material-icons text-xs ml-1">arrow_forward</i>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Haber Kartı 4 -->
-                <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
-                    <div class="aspect-video overflow-hidden">
-                        <img src="https://cankaya.epoxsoft.net.tr/images/huseyincanguner/huseyincanguner4.jpeg" alt="Başkan Konuşma Yaparken" class="w-full h-full object-cover transition-transform duration-500 hover:scale-105">
-                    </div>
-                    <div class="p-5">
-                        <span class="inline-block px-3 py-1 bg-amber-100 text-amber-800 text-xs font-medium rounded-full mb-3">Etkinlik</span>
-                        <h3 class="text-lg font-semibold text-gray-800 mb-2 line-clamp-2">Çankaya Festivali Büyük İlgi Gördü</h3>
-                        <p class="text-gray-600 text-sm mb-4 line-clamp-2">Çankaya Belediyesi tarafından düzenlenen festival, binlerce vatandaşın katılımıyla gerçekleşti.</p>
-                        <div class="flex justify-between items-center pt-3 border-t border-gray-100">
-                            <div class="flex items-center text-gray-500 text-xs">
-                                <i class="material-icons text-xs mr-1">calendar_today</i>
-                                <span>5 Haziran 2024</span>
-                            </div>
-                            <a href="#" class="inline-flex items-center text-xs font-medium text-white bg-[#00352b] px-3 py-1.5 rounded-md hover:bg-[#20846c] transition-colors">
-                                <span>Detaylar</span>
-                                <i class="material-icons text-xs ml-1">arrow_forward</i>
-                            </a>
-                        </div>
-                    </div>
-                </div>
+                @endforelse
             </div>
         </div>
         

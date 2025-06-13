@@ -259,7 +259,16 @@ class FrontController extends Controller
         $values = $mayor->values;
         $gallery = $mayor->gallery;
 
-        return view('frontend.corporate.baskan', compact('mayor', 'stories', 'agenda', 'values', 'gallery'));
+        // ID 15 numaralı kategoriden başkan haberlerini çek
+        $mayorNews = \App\Models\News::whereHas('categories', function($query) {
+                $query->where('news_categories.id', 15);
+            })
+            ->where('status', 'published')
+            ->orderBy('published_at', 'desc')
+            ->take(4) // Son 4 haber
+            ->get();
+
+        return view('frontend.corporate.baskan', compact('mayor', 'stories', 'agenda', 'values', 'gallery', 'mayorNews'));
     }
 
     /**
