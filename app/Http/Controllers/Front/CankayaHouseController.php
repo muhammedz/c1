@@ -12,8 +12,15 @@ class CankayaHouseController extends Controller
     /**
      * Display a listing of Çankaya Houses.
      */
-    public function index()
+    public function index(Request $request)
     {
+        $searchTerm = $request->get('search');
+        
+        // Eğer arama varsa, arama sonuçları sayfasını göster
+        if ($searchTerm) {
+            return $this->search($request);
+        }
+
         $cankayaHouses = CankayaHouse::active()
                                    ->with(['activeCourses' => function($query) {
                                        $query->upcoming()->take(3);
@@ -30,6 +37,49 @@ class CankayaHouseController extends Controller
                                          ->get();
 
         return view('front.cankaya-houses.index', compact('cankayaHouses', 'recentCourses'));
+    }
+
+    /**
+     * Çankaya Evleri ve kursları arama
+     */
+    public function search(Request $request)
+    {
+        $searchTerm = $request->get('search');
+        $results = [];
+        $total = 0;
+
+        if ($searchTerm) {
+            // Çankaya Evlerini ara
+            $houses = CankayaHouse::active()
+                                 ->where(function($q) use ($searchTerm) {
+                                     $q->where('name', 'like', '%' . $searchTerm . '%')
+                                       ->orWhere('address', 'like', '%' . $searchTerm . '%')
+                                       ->orWhere('description', 'like', '%' . $searchTerm . '%');
+                                 })
+                                 ->withCount('activeCourses')
+                                 ->ordered()
+                                 ->get();
+
+            // Kursları ara
+            $courses = CankayaHouseCourse::with('cankayaHouse')
+                                       ->active()
+                                       ->where(function($q) use ($searchTerm) {
+                                           $q->where('name', 'like', '%' . $searchTerm . '%')
+                                             ->orWhere('description', 'like', '%' . $searchTerm . '%')
+                                             ->orWhere('instructor', 'like', '%' . $searchTerm . '%');
+                                       })
+                                       ->orderBy('start_date', 'desc')
+                                       ->get();
+
+            $results = [
+                'houses' => $houses,
+                'courses' => $courses,
+                'total' => $houses->count() + $courses->count()
+            ];
+            $total = $results['total'];
+        }
+
+        return view('front.cankaya-houses.search', compact('searchTerm', 'results', 'total'));
     }
 
     /**

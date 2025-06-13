@@ -1,11 +1,12 @@
 @extends('layouts.front')
 
-@section('title', 'Başkanımız')
-@section('meta_description', 'Başkanımızın biyografisi, faaliyetleri ve duyuruları')
+@section('title', $mayor->page_title ?? 'Başkanımız')
+@section('meta_description', $mayor->meta_description ?? 'Başkanımızın biyografisi, faaliyetleri ve duyuruları')
 
 @section('content')
 <!-- Hero Bölümü - Daha Geniş ve Etkili -->
-<div class="relative bg-gradient-to-r from-[#00352b] to-[#20846c] overflow-hidden">
+<div class="relative bg-gradient-to-r from-[{{ $mayor->hero_bg_color ?? '#00352b' }}] to-[#20846c] overflow-hidden"
+     @if($mayor->hero_bg_image_url) style="background-image: url('{{ $mayor->hero_bg_image_url }}'); background-size: cover; background-position: center;" @endif>
     <div class="absolute inset-0 opacity-20">
         <!-- Pattern overlay -->
         <svg xmlns="http://www.w3.org/2000/svg" class="w-full h-full" preserveAspectRatio="none">
@@ -26,25 +27,41 @@
         <div class="flex flex-col md:flex-row items-center gap-6">
             <!-- Başkan Fotoğrafı -->
             <div class="w-36 h-36 md:w-44 md:h-44 rounded-full overflow-hidden border-4 border-white shadow-xl flex-shrink-0">
-                <img src="https://cankaya.epoxsoft.net.tr/uploads/images/iyu1AIj1YVxWUezQXpVwYyco4PDjuOkHYVmtkPmH.webp" alt="Başkanımız Av. Hüseyin Can Güner" class="w-full h-full object-cover">
+                <img src="{{ $mayor->profile_image_url ?? 'https://cankaya.epoxsoft.net.tr/uploads/images/iyu1AIj1YVxWUezQXpVwYyco4PDjuOkHYVmtkPmH.webp' }}" alt="Başkanımız {{ $mayor->name }}" class="w-full h-full object-cover">
             </div>
             
             <div>
                 <span class="inline-block px-3 py-0.5 bg-white/20 text-white text-xs rounded-full mb-2">Çankaya Belediyesi</span>
-                <h1 class="text-2xl md:text-4xl font-bold text-white mb-1">Av. Hüseyin Can Güner</h1>
-                <h2 class="text-white/90 text-lg md:text-xl mb-4">Belediye Başkanı</h2>
+                <h1 class="text-2xl md:text-4xl font-bold text-white mb-1">{{ $mayor->name }}</h1>
+                <h2 class="text-white/90 text-lg md:text-xl mb-4">{{ $mayor->title }}</h2>
                 
                 <!-- Sosyal Medya Linkleri -->
                 <div class="flex gap-2">
-                    <a href="https://x.com/hcanguner" target="_blank" class="bg-white/10 hover:bg-white/20 text-white p-1.5 rounded-full transition-colors flex items-center justify-center w-8 h-8">
+                    @if($mayor->social_twitter)
+                    <a href="{{ $mayor->social_twitter }}" target="_blank" class="bg-white/10 hover:bg-white/20 text-white p-1.5 rounded-full transition-colors flex items-center justify-center w-8 h-8">
                         <i class="fab fa-twitter text-base"></i>
                     </a>
-                    <a href="https://www.instagram.com/hcanguner/" target="_blank" class="bg-white/10 hover:bg-white/20 text-white p-1.5 rounded-full transition-colors flex items-center justify-center w-8 h-8">
+                    @endif
+                    @if($mayor->social_instagram)
+                    <a href="{{ $mayor->social_instagram }}" target="_blank" class="bg-white/10 hover:bg-white/20 text-white p-1.5 rounded-full transition-colors flex items-center justify-center w-8 h-8">
                         <i class="fab fa-instagram text-base"></i>
                     </a>
-                    <a href="mailto:huseyincanguner@cankaya.bel.tr" class="bg-white/10 hover:bg-white/20 text-white p-1.5 rounded-full transition-colors flex items-center justify-center w-8 h-8">
+                    @endif
+                    @if($mayor->social_facebook)
+                    <a href="{{ $mayor->social_facebook }}" target="_blank" class="bg-white/10 hover:bg-white/20 text-white p-1.5 rounded-full transition-colors flex items-center justify-center w-8 h-8">
+                        <i class="fab fa-facebook text-base"></i>
+                    </a>
+                    @endif
+                    @if($mayor->social_linkedin)
+                    <a href="{{ $mayor->social_linkedin }}" target="_blank" class="bg-white/10 hover:bg-white/20 text-white p-1.5 rounded-full transition-colors flex items-center justify-center w-8 h-8">
+                        <i class="fab fa-linkedin text-base"></i>
+                    </a>
+                    @endif
+                    @if($mayor->social_email)
+                    <a href="mailto:{{ $mayor->social_email }}" class="bg-white/10 hover:bg-white/20 text-white p-1.5 rounded-full transition-colors flex items-center justify-center w-8 h-8">
                         <span class="material-icons text-sm">email</span>
                     </a>
+                    @endif
                 </div>
             </div>
         </div>
@@ -52,111 +69,25 @@
 </div>
 
 <!-- Basit Hikaye Çerçeveleri -->
+@if($stories->count() > 0)
 <div class="py-8 bg-slate-50 shadow-sm">
     <div class="container max-w-7xl mx-auto px-4">
         <div class="flex overflow-x-auto gap-6 pb-3 justify-between">
-            <!-- Hikaye 1 -->
-            <div class="hikaye-item flex-shrink-0 text-center" onclick="acLightbox(0)">
-                <div class="w-20 h-20 rounded-full p-1 bg-gradient-to-r from-amber-500 to-green-500 mx-auto cursor-pointer">
+            @foreach($stories as $index => $story)
+            <!-- Hikaye {{ $index + 1 }} -->
+            <div class="hikaye-item flex-shrink-0 text-center" onclick="acLightbox({{ $index }})">
+                <div class="w-20 h-20 rounded-full p-1 bg-gradient-to-r {{ $story->getExtraValue('gradient', 'from-blue-500 to-cyan-400') }} mx-auto cursor-pointer">
                     <div class="w-full h-full rounded-full overflow-hidden border-2 border-white">
-                        <img src="https://cankaya.epoxsoft.net.tr/images/huseyincanguner/huseyincanguner1.jpeg" alt="Projeler" class="w-full h-full object-cover">
+                        <img src="{{ $story->image_url ?? 'https://cankaya.epoxsoft.net.tr/images/huseyincanguner/huseyincanguner' . ($index + 1) . '.jpeg' }}" alt="{{ $story->title }}" class="w-full h-full object-cover">
                     </div>
                 </div>
-                <p class="text-xs font-medium mt-2 text-gray-700">Projeler</p>
+                <p class="text-xs font-medium mt-2 text-gray-700">{{ $story->title }}</p>
             </div>
-            
-            <!-- Hikaye 2 -->
-            <div class="hikaye-item flex-shrink-0 text-center" onclick="acLightbox(1)">
-                <div class="w-20 h-20 rounded-full p-1 bg-gradient-to-r from-purple-500 to-pink-500 mx-auto cursor-pointer">
-                    <div class="w-full h-full rounded-full overflow-hidden border-2 border-white">
-                        <img src="https://cankaya.epoxsoft.net.tr/images/huseyincanguner/huseyincanguner2.jpeg" alt="Etkinlikler" class="w-full h-full object-cover">
-                    </div>
-                </div>
-                <p class="text-xs font-medium mt-2 text-gray-700">Etkinlikler</p>
-            </div>
-            
-            <!-- Hikaye 3 -->
-            <div class="hikaye-item flex-shrink-0 text-center" onclick="acLightbox(2)">
-                <div class="w-20 h-20 rounded-full p-1 bg-gradient-to-r from-blue-500 to-cyan-400 mx-auto cursor-pointer">
-                    <div class="w-full h-full rounded-full overflow-hidden border-2 border-white">
-                        <img src="https://cankaya.epoxsoft.net.tr/images/huseyincanguner/huseyincanguner3.jpeg" alt="Buluşmalar" class="w-full h-full object-cover">
-                    </div>
-                </div>
-                <p class="text-xs font-medium mt-2 text-gray-700">Buluşmalar</p>
-            </div>
-            
-            <!-- Hikaye 4 -->
-            <div class="hikaye-item flex-shrink-0 text-center" onclick="acLightbox(3)">
-                <div class="w-20 h-20 rounded-full p-1 bg-gradient-to-r from-green-500 to-emerald-400 mx-auto cursor-pointer">
-                    <div class="w-full h-full rounded-full overflow-hidden border-2 border-white">
-                        <img src="https://cankaya.epoxsoft.net.tr/images/huseyincanguner/huseyincanguner4.jpeg" alt="Kent Tarımı" class="w-full h-full object-cover">
-                    </div>
-                </div>
-                <p class="text-xs font-medium mt-2 text-gray-700">Kent Tarımı</p>
-            </div>
-            
-            <!-- Hikaye 5 -->
-            <div class="hikaye-item flex-shrink-0 text-center" onclick="acLightbox(4)">
-                <div class="w-20 h-20 rounded-full p-1 bg-gradient-to-r from-red-500 to-orange-400 mx-auto cursor-pointer">
-                    <div class="w-full h-full rounded-full overflow-hidden border-2 border-white">
-                        <img src="https://cankaya.epoxsoft.net.tr/images/huseyincanguner/huseyincanguner5.jpeg" alt="Eğitim" class="w-full h-full object-cover">
-                    </div>
-                </div>
-                <p class="text-xs font-medium mt-2 text-gray-700">Eğitim</p>
-            </div>
-            
-            <!-- Hikaye 6 -->
-            <div class="hikaye-item flex-shrink-0 text-center" onclick="acLightbox(5)">
-                <div class="w-20 h-20 rounded-full p-1 bg-gradient-to-r from-indigo-500 to-purple-500 mx-auto cursor-pointer">
-                    <div class="w-full h-full rounded-full overflow-hidden border-2 border-white">
-                        <img src="https://cankaya.epoxsoft.net.tr/images/huseyincanguner/huseyincanguner6.jpeg" alt="Spor" class="w-full h-full object-cover">
-                    </div>
-                </div>
-                <p class="text-xs font-medium mt-2 text-gray-700">Spor</p>
-            </div>
-            
-            <!-- Hikaye 7 -->
-            <div class="hikaye-item flex-shrink-0 text-center" onclick="acLightbox(6)">
-                <div class="w-20 h-20 rounded-full p-1 bg-gradient-to-r from-pink-500 to-rose-500 mx-auto cursor-pointer">
-                    <div class="w-full h-full rounded-full overflow-hidden border-2 border-white">
-                        <img src="https://cankaya.epoxsoft.net.tr/images/huseyincanguner/huseyincanguner7.jpeg" alt="Kültür" class="w-full h-full object-cover">
-                    </div>
-                </div>
-                <p class="text-xs font-medium mt-2 text-gray-700">Kültür Sanat</p>
-            </div>
-            
-            <!-- Hikaye 8 -->
-            <div class="hikaye-item flex-shrink-0 text-center" onclick="acLightbox(7)">
-                <div class="w-20 h-20 rounded-full p-1 bg-gradient-to-r from-blue-600 to-blue-400 mx-auto cursor-pointer">
-                    <div class="w-full h-full rounded-full overflow-hidden border-2 border-white">
-                        <img src="https://cankaya.epoxsoft.net.tr/images/huseyincanguner/huseyincanguner8.jpeg" alt="Dijital" class="w-full h-full object-cover">
-                    </div>
-                </div>
-                <p class="text-xs font-medium mt-2 text-gray-700">Dijital</p>
-            </div>
-            
-            <!-- Hikaye 9 (Yeni) -->
-            <div class="hikaye-item flex-shrink-0 text-center" onclick="acLightbox(8)">
-                <div class="w-20 h-20 rounded-full p-1 bg-gradient-to-r from-amber-600 to-amber-400 mx-auto cursor-pointer">
-                    <div class="w-full h-full rounded-full overflow-hidden border-2 border-white">
-                        <img src="https://cankaya.epoxsoft.net.tr/images/huseyincanguner/huseyincanguner9.jpeg" alt="Ulaşım" class="w-full h-full object-cover">
-                    </div>
-                </div>
-                <p class="text-xs font-medium mt-2 text-gray-700">Ulaşım</p>
-            </div>
-            
-            <!-- Hikaye 10 (Yeni) -->
-            <div class="hikaye-item flex-shrink-0 text-center" onclick="acLightbox(9)">
-                <div class="w-20 h-20 rounded-full p-1 bg-gradient-to-r from-teal-500 to-teal-300 mx-auto cursor-pointer">
-                    <div class="w-full h-full rounded-full overflow-hidden border-2 border-white">
-                        <img src="https://cankaya.epoxsoft.net.tr/images/huseyincanguner/huseyincanguner10.jpeg" alt="Çevre" class="w-full h-full object-cover">
-                    </div>
-                </div>
-                <p class="text-xs font-medium mt-2 text-gray-700">Çevre</p>
-            </div>
+            @endforeach
         </div>
     </div>
 </div>
+@endif
 
 <!-- Basit Lightbox -->
 <div id="lightbox" class="fixed inset-0 w-full h-full z-50 hidden bg-black/90" onclick="kapatLightbox()">
@@ -217,28 +148,13 @@
             
             <div class="p-6">
                 <div class="prose prose-lg max-w-none prose-headings:text-gray-800 prose-p:text-gray-700 prose-a:text-[#00352b] prose-a:no-underline hover:prose-a:text-[#20846c] hover:prose-a:underline prose-img:rounded-lg">
-                    <p>1993 yılında Ankara'da doğdu.</p>
-                    
-                    <p>Avukat, Ankara Üniversitesi Hukuk Fakültesi'nden 2015 yılında mezun oldu.</p>
-                    
-                    <p>Cumhuriyet Halk Partisi'ne 2012 yılında kaydoldu. Ankara İl Gençlik Kolları Üniversite Komisyonunda, Sosyal Demokrat Öğrenciler örgütlenmesinde ve Çankaya İlçe Gençlik Kolunda çalışmalar yürüttü.</p>
-                    
-                    <p>2013-2014 yıllarında Etimesgut Gençlik Kolu Başkanlığı görevinde bulundu. 2014-2016 yılları arasında Genel Merkez Yerel Yönetimler Komisyonunda görev aldı.</p>
-                    
-                    <p>2018-2020 yılları arasında CHP Çankaya İlçe Başkan Yardımcısı olarak görev yaptı. 2020-2023 yılları arasında CHP'yi temsilen Çankaya İlçe Seçim Kurulu üyeliğinde bulundu.</p>
-                    
-                    <p>14 Mayıs 2023 Milletvekili Genel Seçimlerinde Ankara 1. Bölge 11. Sıra Milletvekili Adayı oldu. 4-5 Kasım 2023 tarihinde gerçekleştirilen 38. Olağan Kurultay'da CHP Parti Meclisi Üyesi seçildi.</p>
-                    
-                    <p>İkinci Yüzyıl Dergisi Yayın Kurulu Üyeliği ve Türkiye Tenis Federasyonu Disiplin Kurulu Üyeliği görevlerinde bulundu.</p>
-                    
-                    <p>Sosyal Demokrat Belediyeler Derneği'nin örgütlenme ve gelişiminde ve Sosyal Demokrat Kamu İşverenleri Sendikası'nın kuruluşunda görev aldı. 2021-2023 yılları arasında SODEMSEN Hukuk Müşavirliği görevinde bulundu. 2024 yılından itibaren SODEMSEN Başkanlığı görevini yürütmektedir.</p>
-                    
-                    <p>Sosyal Demokrasi Derneği ve Sosyal Demokrat Avukatlar Derneği üyesidir.</p>
+                    {!! $mayor->biography ? nl2br(e($mayor->biography)) : '<p>Biyografi bilgisi henüz eklenmemiş.</p>' !!}
                 </div>
             </div>
         </div>
         
         <!-- Gündem ve Etkinlikler Kartı -->
+        @if($agenda->count() > 0)
         <div class="bg-white shadow-md rounded-xl overflow-hidden mb-8">
             <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center">
                 <h2 class="text-2xl font-bold text-gray-800">Başkanın Gündemi</h2>
@@ -247,75 +163,45 @@
             
             <div class="p-6">
                 <div class="divide-y divide-gray-100">
-                    <!-- Gündem Öğesi 1 -->
+                    @foreach($agenda as $item)
+                    <!-- Gündem Öğesi -->
                     <div class="py-4 first:pt-0 last:pb-0 hover:bg-slate-50 transition-colors rounded-lg p-2 -mx-2">
                         <div class="flex items-center mb-2">
-                            <span class="bg-[#00352b] text-white text-sm px-3 py-1 rounded-full mr-3">24 Haziran 2024</span>
-                            <span class="text-sm text-gray-500">10:00</span>
-                            <span class="ml-auto px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">Toplantı</span>
+                            <span class="bg-[#00352b] text-white text-sm px-3 py-1 rounded-full mr-3">
+                                {{ $item->getExtraValue('event_date') ? \Carbon\Carbon::parse($item->getExtraValue('event_date'))->format('d M Y') : 'Tarih belirtilmemiş' }}
+                            </span>
+                            @if($item->getExtraValue('event_time'))
+                            <span class="text-sm text-gray-500">{{ $item->getExtraValue('event_time') }}</span>
+                            @endif
+                            <span class="ml-auto px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full capitalize">
+                                {{ $item->getExtraValue('event_type', 'etkinlik') }}
+                            </span>
                         </div>
-                        <h3 class="text-xl font-semibold text-gray-800 mb-2">Belediye Meclis Toplantısı</h3>
-                        <p class="text-gray-600">Çankaya Belediyesi meclis toplantısında başkanlık yapacak ve bütçe görüşmelerini yönetecek.</p>
+                        <h3 class="text-xl font-semibold text-gray-800 mb-2">{{ $item->title }}</h3>
+                        <p class="text-gray-600">{{ $item->description }}</p>
                         <div class="flex items-center mt-3 text-sm">
+                            @if($item->getExtraValue('location'))
                             <span class="flex items-center text-gray-500 mr-4">
                                 <span class="material-icons text-xs mr-1">location_on</span>
-                                Çankaya Belediyesi Meclis Salonu
+                                {{ $item->getExtraValue('location') }}
                             </span>
+                            @endif
+                            @if($item->getExtraValue('participants'))
                             <span class="flex items-center text-gray-500">
                                 <span class="material-icons text-xs mr-1">people</span>
-                                Meclis Üyeleri
+                                {{ $item->getExtraValue('participants') }}
                             </span>
+                            @endif
                         </div>
                     </div>
-                    
-                    <!-- Gündem Öğesi 2 -->
-                    <div class="py-4 first:pt-0 last:pb-0 hover:bg-slate-50 transition-colors rounded-lg p-2 -mx-2">
-                        <div class="flex items-center mb-2">
-                            <span class="bg-[#00352b] text-white text-sm px-3 py-1 rounded-full mr-3">25 Haziran 2024</span>
-                            <span class="text-sm text-gray-500">14:30</span>
-                            <span class="ml-auto px-2 py-1 bg-amber-100 text-amber-800 text-xs rounded-full">Açılış</span>
-                        </div>
-                        <h3 class="text-xl font-semibold text-gray-800 mb-2">Kent Tarımı Projesi Açılışı</h3>
-                        <p class="text-gray-600">Çankaya Belediyesi'nin yürüttüğü Kent Tarımı Projesi'nin açılış törenine katılacak ve konuşma yapacak.</p>
-                        <div class="flex items-center mt-3 text-sm">
-                            <span class="flex items-center text-gray-500 mr-4">
-                                <span class="material-icons text-xs mr-1">location_on</span>
-                                Çankaya Kent Tarım Alanı
-                            </span>
-                            <span class="flex items-center text-gray-500">
-                                <span class="material-icons text-xs mr-1">people</span>
-                                Halka Açık
-                            </span>
-                        </div>
-                    </div>
-                    
-                    <!-- Gündem Öğesi 3 -->
-                    <div class="py-4 first:pt-0 last:pb-0 hover:bg-slate-50 transition-colors rounded-lg p-2 -mx-2">
-                        <div class="flex items-center mb-2">
-                            <span class="bg-[#00352b] text-white text-sm px-3 py-1 rounded-full mr-3">27 Haziran 2024</span>
-                            <span class="text-sm text-gray-500">09:00</span>
-                            <span class="ml-auto px-2 py-1 bg-purple-100 text-purple-800 text-xs rounded-full">Ziyaret</span>
-                        </div>
-                        <h3 class="text-xl font-semibold text-gray-800 mb-2">Mahalle Ziyaretleri</h3>
-                        <p class="text-gray-600">Çankaya'daki mahalleleri ziyaret ederek vatandaşların sorunlarını dinleyecek ve çözüm önerileri sunacak.</p>
-                        <div class="flex items-center mt-3 text-sm">
-                            <span class="flex items-center text-gray-500 mr-4">
-                                <span class="material-icons text-xs mr-1">location_on</span>
-                                Çukurambar ve 100.Yıl Mahalleleri
-                            </span>
-                            <span class="flex items-center text-gray-500">
-                                <span class="material-icons text-xs mr-1">people</span>
-                                Mahalle Sakinleri
-                            </span>
-                        </div>
-                    </div>
+                    @endforeach
                 </div>
             </div>
             
             <div class="px-6 py-4 bg-gray-50 flex justify-between items-center">
                 <div class="flex items-center text-sm text-gray-500">
                     <span class="material-icons text-base mr-1">calendar_today</span>
-                    <span>Haziran 2024</span>
+                    <span>{{ now()->format('F Y') }}</span>
                 </div>
                 <a href="#" class="inline-flex items-center text-[#00352b] hover:text-[#20846c] font-medium transition-colors">
                     <span>Tüm Etkinlikler</span>
@@ -323,6 +209,7 @@
                 </a>
             </div>
         </div>
+        @endif
         
         <!-- Başkandan Mesajlar Kartı -->
         <div class="bg-white shadow-md rounded-xl overflow-hidden">
@@ -349,35 +236,21 @@
                     </div>
                 </div>
                 
+                @if($values->count() > 0)
                 <div class="mt-6 ml-6 pt-6 border-t border-slate-100">
                     <h3 class="text-xl font-semibold text-gray-800 mb-3">Öne Çıkan Değerlerimiz</h3>
                     <div class="grid grid-cols-2 gap-4">
+                        @foreach($values as $value)
                         <div class="flex items-start">
-                            <span class="flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-full bg-green-100 text-green-800 mr-3">
-                                <span class="material-icons text-sm">eco</span>
+                            <span class="flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-full {{ $value->getExtraValue('bg_color', 'bg-blue-100') }} {{ $value->getExtraValue('text_color', 'text-blue-800') }} mr-3">
+                                <span class="material-icons text-sm">{{ $value->getExtraValue('icon', 'star') }}</span>
                             </span>
-                            <span class="text-gray-700">Sürdürülebilirlik</span>
+                            <span class="text-gray-700">{{ $value->title }}</span>
                         </div>
-                        <div class="flex items-start">
-                            <span class="flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 text-blue-800 mr-3">
-                                <span class="material-icons text-sm">people</span>
-                            </span>
-                            <span class="text-gray-700">Katılımcılık</span>
-                        </div>
-                        <div class="flex items-start">
-                            <span class="flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-full bg-purple-100 text-purple-800 mr-3">
-                                <span class="material-icons text-sm">balance</span>
-                            </span>
-                            <span class="text-gray-700">Sosyal Adalet</span>
-                        </div>
-                        <div class="flex items-start">
-                            <span class="flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-full bg-amber-100 text-amber-800 mr-3">
-                                <span class="material-icons text-sm">visibility</span>
-                            </span>
-                            <span class="text-gray-700">Şeffaflık</span>
-                        </div>
+                        @endforeach
                     </div>
                 </div>
+                @endif
             </div>
         </div>
     </div>
@@ -491,6 +364,7 @@
         </div>
         
         <!-- Fotoğraf Galerisi -->
+        @if($gallery->count() > 0)
         <div>
             <div class="flex justify-between items-center mb-8">
                 <h2 class="text-3xl font-bold text-gray-800">Fotoğraf Galerisi</h2>
@@ -501,43 +375,24 @@
             </div>
             
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <!-- Fotoğraf 1 -->
+                @foreach($gallery as $photo)
+                <!-- Fotoğraf -->
                 <div class="relative overflow-hidden rounded-lg group h-48 md:h-64">
-                    <img src="https://cankaya.epoxsoft.net.tr/images/huseyincanguner/huseyincanguner5.jpeg" alt="Galeri Fotoğrafı 1" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                    <img src="{{ $photo->image_url ?? 'https://cankaya.epoxsoft.net.tr/images/huseyincanguner/huseyincanguner5.jpeg' }}" alt="{{ $photo->title }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
                     <div class="absolute inset-0 bg-black opacity-0 group-hover:opacity-50 transition-opacity"></div>
                     <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                         <span class="material-icons text-white text-3xl">zoom_in</span>
                     </div>
-                </div>
-                
-                <!-- Fotoğraf 2 -->
-                <div class="relative overflow-hidden rounded-lg group h-48 md:h-64">
-                    <img src="https://cankaya.epoxsoft.net.tr/images/huseyincanguner/huseyincanguner6.jpeg" alt="Galeri Fotoğrafı 2" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
-                    <div class="absolute inset-0 bg-black opacity-0 group-hover:opacity-50 transition-opacity"></div>
-                    <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                        <span class="material-icons text-white text-3xl">zoom_in</span>
+                    @if($photo->getExtraValue('category'))
+                    <div class="absolute top-2 left-2 bg-black/50 text-white text-xs px-2 py-1 rounded">
+                        {{ $photo->getExtraValue('category') }}
                     </div>
+                    @endif
                 </div>
-                
-                <!-- Fotoğraf 3 -->
-                <div class="relative overflow-hidden rounded-lg group h-48 md:h-64">
-                    <img src="https://cankaya.epoxsoft.net.tr/images/huseyincanguner/huseyincanguner7.jpeg" alt="Galeri Fotoğrafı 3" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
-                    <div class="absolute inset-0 bg-black opacity-0 group-hover:opacity-50 transition-opacity"></div>
-                    <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                        <span class="material-icons text-white text-3xl">zoom_in</span>
-                    </div>
-                </div>
-                
-                <!-- Fotoğraf 4 -->
-                <div class="relative overflow-hidden rounded-lg group h-48 md:h-64">
-                    <img src="https://cankaya.epoxsoft.net.tr/images/huseyincanguner/huseyincanguner8.jpeg" alt="Galeri Fotoğrafı 4" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
-                    <div class="absolute inset-0 bg-black opacity-0 group-hover:opacity-50 transition-opacity"></div>
-                    <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                        <span class="material-icons text-white text-3xl">zoom_in</span>
-                    </div>
-                </div>
+                @endforeach
             </div>
         </div>
+        @endif
     </div>
 </section>
 @endsection
@@ -545,56 +400,13 @@
 <script>
     // Hikaye verileri
     const hikayeler = [
+        @foreach($stories as $story)
         {
-            baslik: "Belediye Projeleri",
-            metin: "Başkan Güner, sürdürülebilir belediyecilik anlayışıyla yeni projeleri hayata geçiriyor.",
-            resim: "https://cankaya.epoxsoft.net.tr/images/huseyincanguner/huseyincanguner1.jpeg"
-        },
-        {
-            baslik: "Etkinlikler",
-            metin: "Çankaya'da kültürel ve sanatsal etkinliklerle dolu bir yaz sezonu başlıyor.",
-            resim: "https://cankaya.epoxsoft.net.tr/images/huseyincanguner/huseyincanguner2.jpeg"
-        },
-        {
-            baslik: "Mahalle Buluşmaları",
-            metin: "Başkan Güner, mahalle sakinleriyle bir araya geliyor, sorunları yerinde tespit ediyor.",
-            resim: "https://cankaya.epoxsoft.net.tr/images/huseyincanguner/huseyincanguner3.jpeg"
-        },
-        {
-            baslik: "Kent Tarımı",
-            metin: "Çankaya'da kent tarımı projeleriyle organik tarım yaygınlaşıyor, yerel üretim destekleniyor.",
-            resim: "https://cankaya.epoxsoft.net.tr/images/huseyincanguner/huseyincanguner4.jpeg"
-        },
-        {
-            baslik: "Eğitim Destekleri",
-            metin: "Gençlere ve çocuklara yönelik eğitim destekleri artarak devam ediyor.",
-            resim: "https://cankaya.epoxsoft.net.tr/images/huseyincanguner/huseyincanguner5.jpeg"
-        },
-        {
-            baslik: "Spor Faaliyetleri",
-            metin: "Çankaya'da spor tesisleri ve etkinliklerle her yaştan vatandaşlar spora teşvik ediliyor.",
-            resim: "https://cankaya.epoxsoft.net.tr/images/huseyincanguner/huseyincanguner6.jpeg"
-        },
-        {
-            baslik: "Kültür Sanat",
-            metin: "Çankaya'da kültür sanat etkinlikleri tüm hızıyla devam ediyor.",
-            resim: "https://cankaya.epoxsoft.net.tr/images/huseyincanguner/huseyincanguner7.jpeg"
-        },
-        {
-            baslik: "Dijital Hizmetler",
-            metin: "Çankaya Belediyesi dijital dönüşüm ile hizmetlerini daha erişilebilir hale getiriyor.",
-            resim: "https://cankaya.epoxsoft.net.tr/images/huseyincanguner/huseyincanguner8.jpeg"
-        },
-        {
-            baslik: "Ulaşım Projeleri",
-            metin: "Çankaya'da ulaşım altyapısı yenileniyor, daha sürdürülebilir ulaşım çözümleri sunuluyor.",
-            resim: "https://cankaya.epoxsoft.net.tr/images/huseyincanguner/huseyincanguner9.jpeg"
-        },
-        {
-            baslik: "Çevre Dönüşümü",
-            metin: "Çevre dostu projelerle Çankaya daha yeşil bir ilçe haline geliyor.",
-            resim: "https://cankaya.epoxsoft.net.tr/images/huseyincanguner/huseyincanguner10.jpeg"
-        }
+            baslik: "{{ $story->title }}",
+            metin: "{{ $story->description }}",
+            resim: "{{ $story->image_url ?? 'https://cankaya.epoxsoft.net.tr/images/huseyincanguner/huseyincanguner1.jpeg' }}"
+        }@if(!$loop->last),@endif
+        @endforeach
     ];
     
     let aktifHikayeIndex = 0;

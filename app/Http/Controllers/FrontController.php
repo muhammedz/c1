@@ -211,17 +211,32 @@ class FrontController extends Controller
             
             // /storage/ kısmını da çıkar (eğer varsa)
             if (strpos($pathName, '/storage/') !== false) {
-                $imageUrl = explode('/storage/', $pathName)[1] ?? $pathName;
+                $cleanPath = explode('/storage/', $pathName)[1] ?? $pathName;
+                // uploads/ ile başlayacak şekilde düzenle
+                return 'uploads/' . ltrim($cleanPath, '/');
             } else {
                 // Eğer /storage/ yoksa, / ile başlayan path'i temizle
-                $imageUrl = ltrim($pathName, '/');
+                $cleanPath = ltrim($pathName, '/');
+                // uploads/ ile başlamıyorsa ekle
+                return strpos($cleanPath, 'uploads/') === 0 ? $cleanPath : 'uploads/' . $cleanPath;
             }
         } else if (strpos($imageUrl, '/storage/') === 0) {
-            // Sadece /storage/ ile başlıyorsa, bu kısmı çıkar
-            $imageUrl = substr($imageUrl, strlen('/storage/'));
+            // Sadece /storage/ ile başlıyorsa, bu kısmı çıkar ve uploads/ ekle
+            $cleanPath = substr($imageUrl, strlen('/storage/'));
+            return 'uploads/' . ltrim($cleanPath, '/');
+        } else if (strpos($imageUrl, 'storage/') === 0) {
+            // storage/ ile başlıyorsa, bu kısmı çıkar ve uploads/ ekle
+            $cleanPath = substr($imageUrl, strlen('storage/'));
+            return 'uploads/' . ltrim($cleanPath, '/');
         }
         
-        return $imageUrl;
+        // Eğer zaten uploads/ ile başlıyorsa olduğu gibi bırak
+        if (strpos($imageUrl, 'uploads/') === 0) {
+            return $imageUrl;
+        }
+        
+        // Diğer durumlarda uploads/ ekle
+        return 'uploads/' . ltrim($imageUrl, '/');
     }
 
     /**
@@ -231,7 +246,20 @@ class FrontController extends Controller
      */
     public function baskan()
     {
-        return view('frontend.corporate.baskan');
+        $mayor = \App\Models\Mayor::getActive();
+        
+        if (!$mayor) {
+            // Eğer aktif başkan yoksa 404
+            abort(404, 'Başkan bilgisi bulunamadı.');
+        }
+
+        // İçerikleri çek
+        $stories = $mayor->stories;
+        $agenda = $mayor->agenda;
+        $values = $mayor->values;
+        $gallery = $mayor->gallery;
+
+        return view('frontend.corporate.baskan', compact('mayor', 'stories', 'agenda', 'values', 'gallery'));
     }
 
     /**

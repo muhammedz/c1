@@ -29,7 +29,7 @@
         <div class="bg-white rounded-2xl w-full h-48 md:w-1/4 shadow-sm p-6 md:p-8 flex items-center justify-center">
             <div class="text-center">
                 @if($logoPlans->card2_image)
-                    <img src="{{ $logoPlans->card2_image }}" alt="{{ $logoPlans->card2_title ?? 'Stratejik Plan' }}" class="w-24 h-24 md:w-32 md:h-32 mx-auto mb-3 md:mb-4 object-contain">
+                    <img src="{{ asset($logoPlans->card2_image) }}" alt="{{ $logoPlans->card2_title ?? 'Stratejik Plan' }}" class="w-24 h-24 md:w-32 md:h-32 mx-auto mb-3 md:mb-4 object-contain">
                 @else
                     <img src="https://cdn-icons-png.flaticon.com/512/1087/1087927.png" alt="{{ $logoPlans->card2_title ?? 'Stratejik Plan' }}" class="w-24 h-24 md:w-32 md:h-32 mx-auto mb-3 md:mb-4 object-contain">
                 @endif
@@ -47,7 +47,7 @@
         <div class="bg-[{{ $logoPlans->logo_bg_color ?? '#004d2e' }}] w-full md:w-2/4 h-48 rounded-2xl p-6 md:p-8 flex items-center justify-center" style="background-color: {{ $logoPlans->logo_bg_color ?? '#004d2e' }}">
             <div class="text-center text-white">
                 @if($logoPlans->logo_image)
-                    <img src="{{ $logoPlans->logo_image }}" alt="{{ $logoPlans->logo_title ?? 'Logo' }}" class="max-h-36 max-w-full mx-auto">
+                    <img src="{{ asset($logoPlans->logo_image) }}" alt="{{ $logoPlans->logo_title ?? 'Logo' }}" class="max-h-36 max-w-full mx-auto">
                 @else
                     <p class="text-xl md:text-2xl font-medium">{{ $logoPlans->logo_title ?? 'Farklı Logo gelecek' }}<br>Önerilen boyut: 300x100 piksel, PNG formatı</p>
                 @endif

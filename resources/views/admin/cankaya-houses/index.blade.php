@@ -148,7 +148,7 @@
                     <!-- Pagination -->
                     @if($cankayaHouses->hasPages())
                         <div class="d-flex justify-content-center">
-                            {{ $cankayaHouses->appends(request()->query())->links() }}
+                            {{ $cankayaHouses->appends(request()->query())->links('custom.pagination') }}
                         </div>
                     @endif
                 </div>

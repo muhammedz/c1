@@ -96,7 +96,7 @@
                                     
                                     <div class="mt-2" id="card2_image_preview" style="{{ $logoPlans->card2_image ? '' : 'display: none;' }}">
                                         @if($logoPlans->card2_image)
-                                            <img src="{{ asset('storage/' . $logoPlans->card2_image) }}" alt="Kart 2 Görseli" class="img-thumbnail" style="max-width: 128px;">
+                                            <img src="{{ asset($logoPlans->card2_image) }}" alt="Kart 2 Görseli" class="img-thumbnail" style="max-width: 128px;">
                                         @endif
                                     </div>
                                 </div>
@@ -139,7 +139,7 @@
                                     
                                     <div class="mt-2" id="logo_image_preview" style="{{ $logoPlans->logo_image ? '' : 'display: none;' }}">
                                         @if($logoPlans->logo_image)
-                                            <img src="{{ asset('storage/' . $logoPlans->logo_image) }}" alt="Logo Görseli" class="img-thumbnail" style="max-width: 300px;">
+                                            <img src="{{ asset($logoPlans->logo_image) }}" alt="Logo Görseli" class="img-thumbnail" style="max-width: 300px;">
                                         @endif
                                     </div>
                                 </div>
@@ -162,7 +162,7 @@
                                     </div>
                                     <div class="card-body text-center p-4" id="logo_preview" style="background-color: {{ $logoPlans->logo_bg_color ?? '#004d2e' }}; color: white; min-height: 150px; display: flex; align-items: center; justify-content: center; border-radius: 0.5rem;">
                                         @if($logoPlans->logo_image)
-                                            <img src="{{ asset('storage/' . $logoPlans->logo_image) }}" alt="Logo Görseli" style="max-width: 100%; max-height: 150px;">
+                                            <img src="{{ asset($logoPlans->logo_image) }}" alt="Logo Görseli" style="max-width: 100%; max-height: 150px;">
                                         @else
                                             <p class="font-weight-bold" style="font-size: 1.5rem;">{{ $logoPlans->logo_title ?? 'Farklı Logo gelecek' }}<br>Png formatında</p>
                                         @endif
@@ -319,7 +319,7 @@
                         // Eğer tam URL ise (http:// veya https:// içeriyorsa)
                         if (mediaUrl.includes('http://') || mediaUrl.includes('https://')) {
                             // Domain kısmını çıkar, sadece gerçek dosya yolunu al
-                            // Örnek: https://example.com/storage/images/file.jpg -> images/file.jpg
+                            // Örnek: https://example.com/storage/images/file.jpg -> uploads/images/file.jpg
                             
                             // URL'den domain kısmını çıkar
                             const urlObj = new URL(mediaUrl);
@@ -327,14 +327,24 @@
                             
                             // /storage/ kısmını da çıkar (eğer varsa)
                             if (pathName.includes('/storage/')) {
-                                mediaUrl = pathName.split('/storage/')[1];
+                                const cleanPath = pathName.split('/storage/')[1];
+                                mediaUrl = 'uploads/' + cleanPath;
                             } else {
-                                // Eğer /storage/ yoksa, / ile başlayan path'i temizle
-                                mediaUrl = pathName.startsWith('/') ? pathName.substring(1) : pathName;
+                                // Eğer /storage/ yoksa, / ile başlayan path'i temizle ve uploads/ ekle
+                                const cleanPath = pathName.startsWith('/') ? pathName.substring(1) : pathName;
+                                mediaUrl = cleanPath.startsWith('uploads/') ? cleanPath : 'uploads/' + cleanPath;
                             }
                         } else if (mediaUrl.startsWith('/storage/')) {
-                            // Sadece /storage/ ile başlıyorsa, bu kısmı çıkar
-                            mediaUrl = mediaUrl.substring('/storage/'.length);
+                            // Sadece /storage/ ile başlıyorsa, bu kısmı çıkar ve uploads/ ekle
+                            const cleanPath = mediaUrl.substring('/storage/'.length);
+                            mediaUrl = 'uploads/' + cleanPath;
+                        } else if (mediaUrl.startsWith('storage/')) {
+                            // storage/ ile başlıyorsa, bu kısmı çıkar ve uploads/ ekle
+                            const cleanPath = mediaUrl.substring('storage/'.length);
+                            mediaUrl = 'uploads/' + cleanPath;
+                        } else if (!mediaUrl.startsWith('uploads/')) {
+                            // uploads/ ile başlamıyorsa ekle
+                            mediaUrl = 'uploads/' + mediaUrl;
                         }
                         
                         console.log('Temizlenmiş URL:', mediaUrl);
@@ -353,7 +363,7 @@
                     }
                     
                     // Önizleme için tam URL kullan
-                    const previewUrl = asset_url + 'storage/' + mediaUrl;
+                    const previewUrl = asset_url + mediaUrl;
                     previewImg.attr('src', previewUrl);
                     previewImg.attr('alt', data.alt || 'Seçilen Görsel');
                     previewElement.show();

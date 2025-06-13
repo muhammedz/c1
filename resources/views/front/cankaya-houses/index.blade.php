@@ -141,6 +141,18 @@
         }
     }
 
+    .house-card-link {
+        text-decoration: none;
+        color: inherit;
+        display: block;
+        height: 100%;
+    }
+    
+    .house-card-link:hover {
+        text-decoration: none;
+        color: inherit;
+    }
+    
     .house-card {
         background-color: white;
         border-radius: 0.75rem;
@@ -152,9 +164,10 @@
         flex-direction: column;
         border: 1px solid #e5e7eb;
         position: relative;
+        cursor: pointer;
     }
     
-    .house-card:hover {
+    .house-card-link:hover .house-card {
         transform: translateY(-4px);
         box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
         border-color: #00352b;
@@ -179,7 +192,7 @@
         transition: transform 0.5s ease;
     }
 
-    .house-card:hover .house-card-image {
+    .house-card-link:hover .house-card-image {
         transform: scale(1.05);
     }
 
@@ -248,23 +261,51 @@
     }
 
     .view-house-btn {
-        background-color: #00352b;
+        background: linear-gradient(135deg, #00352b 0%, #20846c 100%);
         color: white;
-        padding: 0.5rem 1rem;
-        border-radius: 0.375rem;
+        padding: 0.75rem 1.5rem;
+        border-radius: 0.5rem;
         font-size: 0.875rem;
-        font-weight: 500;
+        font-weight: 600;
         text-decoration: none;
-        transition: all 0.2s ease;
+        transition: all 0.3s ease;
         display: inline-flex;
         align-items: center;
-        gap: 0.25rem;
+        justify-content: center;
+        gap: 0.5rem;
+        border: none;
+        box-shadow: 0 2px 8px rgba(0, 53, 43, 0.2);
+        position: relative;
+        overflow: hidden;
     }
 
-    .view-house-btn:hover {
-        background-color: #004d2e;
-        color: white;
-        text-decoration: none;
+    .view-house-btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.5s ease;
+    }
+
+    .house-card-link:hover .view-house-btn {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(0, 53, 43, 0.3);
+        background: linear-gradient(135deg, #20846c 0%, #00352b 100%);
+    }
+
+    .house-card-link:hover .view-house-btn::before {
+        left: 100%;
+    }
+
+    .view-house-btn i {
+        transition: transform 0.3s ease;
+    }
+
+    .house-card-link:hover .view-house-btn i {
+        transform: translateX(3px);
     }
 
     /* Son Eklenen Kurslar Bölümü */
@@ -439,94 +480,131 @@
 
 @section('content')
 <!-- Hero Bölümü -->
-<section class="category-header">
-    <div class="pattern-overlay"></div>
-    <div class="decorative-shape-1"></div>
-    <div class="decorative-shape-2"></div>
+<div class="relative bg-gradient-to-r from-[#00352b] to-[#20846c] overflow-hidden">
+    <div class="absolute inset-0 opacity-20">
+        <!-- Pattern overlay -->
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-full h-full" preserveAspectRatio="none">
+            <defs>
+                <pattern id="hero-pattern" width="40" height="40" patternUnits="userSpaceOnUse">
+                    <path d="M0 20 L40 20 M20 0 L20 40" stroke="currentColor" stroke-width="1" fill="none" />
+                </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#hero-pattern)" />
+        </svg>
+    </div>
     
-    <div class="category-container">
+    <!-- Dekoratif şekiller -->
+    <div class="absolute -right-20 -bottom-20 w-64 h-64 rounded-full bg-[#e6a23c]/10 blur-3xl"></div>
+    <div class="absolute -left-10 top-10 w-40 h-40 rounded-full bg-white/5 blur-2xl"></div>
+    
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-10 relative z-10">
         <!-- Breadcrumb -->
-        <nav class="breadcrumb">
-            <a href="{{ route('front.home') }}" class="breadcrumb-link">
-                <i class="fas fa-home"></i>
-                Anasayfa
-            </a>
-            <span class="breadcrumb-separator">/</span>
-            <span class="breadcrumb-item">Çankaya Evleri</span>
+        <nav class="mb-4">
+            <div class="flex items-center space-x-2 text-white/80 text-sm">
+                <a href="{{ route('front.home') }}" class="hover:text-white transition-colors">
+                    <i class="fas fa-home"></i>
+                    Anasayfa
+                </a>
+                <span>/</span>
+                <span class="text-white">Çankaya Evleri</span>
+            </div>
         </nav>
         
-        <!-- Başlık -->
-        <h1 class="category-title">Çankaya Evleri</h1>
-        <p class="category-description">
-            Çankaya Belediyesi'nin farklı lokasyonlardaki eğitim merkezlerinde düzenlenen 
-            kurslar ve etkinlikler hakkında bilgi alın.
-        </p>
+        <div class="flex flex-col md:flex-row items-center justify-between">
+            <!-- Sol taraf - başlık ve açıklama -->
+            <div class="w-full md:w-1/2 mb-6 md:mb-0 md:pr-8">
+                <div class="inline-block bg-white/10 backdrop-blur-sm px-4 py-1 rounded-full text-white/90 text-sm mb-3 border border-white/10">
+                    <span class="material-icons text-xs align-middle mr-1">home</span>
+                    <span>Eğitim Merkezleri</span>
+                </div>
+                <h1 class="text-3xl md:text-4xl font-bold text-white mb-4">
+                    <span class="text-[#e6a23c]">Çankaya</span> Evleri
+                </h1>
+                <p class="text-white/80 text-lg mb-0">
+                    Çankaya Belediyesi'nin farklı lokasyonlardaki eğitim merkezlerinde düzenlenen 
+                    kurslar ve etkinlikler hakkında bilgi alın.
+                </p>
+            </div>
+            
+            <!-- Sağ taraf - arama kutusu -->
+            <div class="w-full md:w-1/2 md:pl-8">
+                <div class="bg-white/10 backdrop-blur-md rounded-xl p-4 border border-white/20 shadow-xl">
+                    <h3 class="text-lg text-white font-medium mb-3">Çankaya Evi Ara</h3>
+                    
+                    <form action="{{ route('cankaya-houses.index') }}" method="GET">
+                        <div class="mb-3">
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-white/60">
+                                    <span class="material-icons">search</span>
+                                </span>
+                                <input 
+                                    type="text" 
+                                    name="search" 
+                                    placeholder="Çankaya Evi adı yazın..." 
+                                    class="w-full bg-white/10 border border-white/20 text-white placeholder-white/60 pl-10 pr-4 py-3 rounded-xl focus:ring-2 focus:ring-white/30 outline-none"
+                                    value="{{ request()->get('search') }}"
+                                >
+                            </div>
+                        </div>
+                        <button type="submit" class="w-full bg-white hover:bg-gray-100 text-[#00352b] font-semibold py-3 px-5 rounded-xl transition-all duration-300 flex items-center justify-center">
+                            <span class="material-icons mr-2">search</span>
+                            Ara
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
-</section>
+</div>
 
 <!-- Ana İçerik -->
 <section class="houses-portal">
     <div class="container">
         @if($cankayaHouses->count() > 0)
+            <!-- Arama Sonuçları Bilgisi -->
+            @if(request()->get('search'))
+                <div class="mb-6">
+                    <div class="flex items-center justify-between">
+                        <h2 class="text-xl font-bold text-gray-800">
+                            "{{ request()->get('search') }}" için Arama Sonuçları
+                        </h2>
+                        <span class="text-sm text-gray-600 bg-white px-3 py-1 rounded-full border border-gray-200">
+                            {{ $cankayaHouses->count() }} ev bulundu
+                        </span>
+                    </div>
+                </div>
+            @endif
+            
             <!-- Çankaya Evleri Grid -->
             <div class="houses-grid">
                 @foreach($cankayaHouses as $house)
-                <div class="house-card">
-                    <div class="house-card-image-container">
-                        @if($house->first_image)
-                            <img src="{{ $house->first_image }}" 
-                                 alt="{{ $house->name }}" 
-                                 class="house-card-image">
-                        @else
-                            <div class="d-flex align-items-center justify-content-center h-100 text-muted">
-                                <i class="fas fa-home fa-3x"></i>
-                            </div>
-                        @endif
-                    </div>
-                    
-                    <div class="house-card-content">
-                        <h3 class="house-card-title">{{ $house->name }}</h3>
-                        
-                        <div class="house-card-address">
-                            <i class="fas fa-map-marker-alt mt-1"></i>
-                            <span>{{ Str::limit($house->address, 100) }}</span>
-                        </div>
-                        
-                        @if($house->description)
-                            <p class="text-muted mb-3" style="font-size: 0.875rem;">
-                                {{ Str::limit($house->description, 100) }}
-                            </p>
-                        @endif
-                        
-                        <div class="house-card-stats">
-                            <div class="house-stat">
-                                <i class="fas fa-graduation-cap"></i>
-                                <span class="house-stat-number">{{ $house->active_courses_count }}</span>
-                                <span>Aktif Kurs</span>
-                            </div>
-                            @if($house->images && count($house->images) > 1)
-                                <div class="house-stat">
-                                    <i class="fas fa-images"></i>
-                                    <span class="house-stat-number">{{ count($house->images) }}</span>
-                                    <span>Resim</span>
+                <a href="{{ route('cankaya-houses.show', $house) }}" class="house-card-link">
+                    <div class="house-card">
+                        <div class="house-card-image-container">
+                            @if($house->first_image)
+                                <img src="{{ $house->first_image }}" 
+                                     alt="{{ $house->name }}" 
+                                     class="house-card-image">
+                            @else
+                                <div class="d-flex align-items-center justify-content-center h-100 text-muted">
+                                    <i class="fas fa-home fa-3x"></i>
                                 </div>
                             @endif
                         </div>
-                    </div>
-                    
-                    <div class="house-card-footer">
-                        <div class="house-contact-info">
-                            @if($house->phone)
-                                <i class="fas fa-phone"></i>
-                                <span>{{ $house->phone }}</span>
-                            @endif
+                        
+                        <div class="house-card-content">
+                            <h3 class="house-card-title">{{ $house->name }}</h3>
+                            
+                            <div class="mt-auto">
+                                <span class="view-house-btn w-100 text-center">
+                                    <i class="fas fa-eye"></i>
+                                    İncele
+                                    <i class="fas fa-arrow-right"></i>
+                                </span>
+                            </div>
                         </div>
-                        <a href="{{ route('cankaya-houses.show', $house) }}" class="view-house-btn">
-                            Detayları Gör
-                            <i class="fas fa-arrow-right"></i>
-                        </a>
                     </div>
-                </div>
+                </a>
                 @endforeach
             </div>
         @else

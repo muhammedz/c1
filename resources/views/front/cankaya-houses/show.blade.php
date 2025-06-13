@@ -661,27 +661,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 {{ $cankayaHouse->description }}
             </p>
         @endif
-        
-        <div class="house-info">
-            @if($cankayaHouse->address)
-                <div class="house-info-item">
-                    <i class="fas fa-map-marker-alt"></i>
-                    <span>{{ $cankayaHouse->address }}</span>
-                </div>
-            @endif
-            
-            @if($cankayaHouse->phone)
-                <div class="house-info-item">
-                    <i class="fas fa-phone"></i>
-                    <span>{{ $cankayaHouse->phone }}</span>
-                </div>
-            @endif
-            
-            <div class="house-info-item">
-                <i class="fas fa-graduation-cap"></i>
-                <span>{{ $cankayaHouse->courses->count() }} Kurs</span>
-            </div>
-        </div>
     </div>
 </section>
 
@@ -695,26 +674,20 @@ document.addEventListener('DOMContentLoaded', function() {
                 <h3 class="text-xl font-bold text-[#00352b] mb-2">Çankaya Evleri</h3>
                 <div class="space-y-2">
                     <!-- Mevcut ev -->
-                    <div class="flex items-center justify-between px-3 py-2 rounded-lg bg-[#00352b] text-white transition-all">
+                    <div class="flex items-center px-3 py-2 rounded-lg bg-[#00352b] text-white transition-all">
                         <div class="flex items-center">
                             <i class="fas fa-home mr-2.5 text-white"></i>
                             <span class="text-sm">{{ $cankayaHouse->name }}</span>
                         </div>
-                        <span class="text-xs py-1 px-2.5 rounded-full bg-white text-[#00352b]">
-                            {{ $cankayaHouse->courses->count() }}
-                        </span>
                     </div>
                     
                     @foreach($otherHouses as $house)
                         <a href="{{ route('cankaya-houses.show', $house) }}" 
-                           class="flex items-center justify-between px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 transition-all">
+                           class="flex items-center px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 transition-all">
                             <div class="flex items-center">
                                 <i class="fas fa-home mr-2.5 text-gray-500"></i>
                                 <span class="text-sm">{{ $house->name }}</span>
                             </div>
-                            <span class="text-xs py-1 px-2.5 rounded-full bg-gray-100 text-gray-600">
-                                {{ $house->courses->count() }}
-                            </span>
                         </a>
                     @endforeach
                 </div>
@@ -732,10 +705,22 @@ document.addEventListener('DOMContentLoaded', function() {
     <!-- Sağ Taraf - Ana İçerik Alanı -->
     <div class="page-content-area">
         <!-- İletişim Bölümü -->
-        @if($cankayaHouse->phone || $cankayaHouse->location_link)
+        @if($cankayaHouse->address || $cankayaHouse->phone || $cankayaHouse->location_link)
         <div class="page-content-section">
             <h2 class="mb-6">İletişim</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                @if($cankayaHouse->address)
+                <div class="flex items-start p-4 bg-gray-50 rounded-lg">
+                    <div class="flex-shrink-0 w-12 h-12 bg-[#00352b] rounded-lg flex items-center justify-center">
+                        <i class="fas fa-map-marker-alt text-white"></i>
+                    </div>
+                    <div class="ml-4">
+                        <h3 class="text-lg font-semibold text-gray-900">Adres</h3>
+                        <p class="text-gray-600">{{ $cankayaHouse->address }}</p>
+                    </div>
+                </div>
+                @endif
+                
                 @if($cankayaHouse->phone)
                 <div class="flex items-center p-4 bg-gray-50 rounded-lg">
                     <div class="flex-shrink-0 w-12 h-12 bg-[#00352b] rounded-lg flex items-center justify-center">
@@ -751,10 +736,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 @if($cankayaHouse->location_link)
                 <div class="flex items-center p-4 bg-gray-50 rounded-lg">
                     <div class="flex-shrink-0 w-12 h-12 bg-[#00352b] rounded-lg flex items-center justify-center">
-                        <i class="fas fa-map-marker-alt text-white"></i>
+                        <i class="fas fa-external-link-alt text-white"></i>
                     </div>
                     <div class="ml-4">
-                        <h3 class="text-lg font-semibold text-gray-900">Konum</h3>
+                        <h3 class="text-lg font-semibold text-gray-900">Harita</h3>
                         <a href="{{ $cankayaHouse->location_link }}" target="_blank" class="text-[#00352b] hover:text-[#002a22] font-medium">
                             Haritada Görüntüle
                         </a>
