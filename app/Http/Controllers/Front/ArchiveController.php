@@ -37,12 +37,36 @@ class ArchiveController extends Controller
     {
         $archive = Archive::where('slug', $slug)
                          ->published()
-                         ->with(['user', 'documents'])
+                         ->with(['user', 'documents.category', 'documentCategories'])
                          ->firstOrFail();
 
         // Görüntülenme sayısını artır
         $archive->incrementViewCount();
 
-        return view('front.archives.show', compact('archive'));
+        // Belgeleri kategorilere göre gruplandır
+        $categorizedDocuments = [];
+        $uncategorizedDocuments = [];
+
+        foreach ($archive->documents as $document) {
+            if ($document->category) {
+                $categoryId = $document->category->id;
+                if (!isset($categorizedDocuments[$categoryId])) {
+                    $categorizedDocuments[$categoryId] = [
+                        'category' => $document->category,
+                        'documents' => []
+                    ];
+                }
+                $categorizedDocuments[$categoryId]['documents'][] = $document;
+            } else {
+                $uncategorizedDocuments[] = $document;
+            }
+        }
+
+        // Kategorileri sıraya göre sırala
+        uasort($categorizedDocuments, function($a, $b) {
+            return $a['category']->order <=> $b['category']->order;
+        });
+
+        return view('front.archives.show', compact('archive', 'categorizedDocuments', 'uncategorizedDocuments'));
     }
 } 

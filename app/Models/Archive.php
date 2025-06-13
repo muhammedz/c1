@@ -98,6 +98,14 @@ class Archive extends Model
     }
 
     /**
+     * Belge kategorileri ilişkisi
+     */
+    public function documentCategories()
+    {
+        return $this->hasMany(ArchiveDocumentCategory::class)->active()->ordered();
+    }
+
+    /**
      * Yayınlanmış arşivler scope
      */
     public function scopePublished($query)

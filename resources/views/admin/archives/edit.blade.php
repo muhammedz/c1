@@ -2,6 +2,39 @@
 
 @section('title', 'Arşiv Düzenle')
 
+@section('css')
+<style>
+.sortable-ghost {
+    opacity: 0.4;
+    background: #f8f9fa;
+}
+
+.sortable-chosen {
+    background: #e3f2fd;
+    border-color: #2196f3;
+}
+
+.sortable-drag {
+    background: #fff;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    transform: rotate(5deg);
+}
+
+.category-item {
+    transition: all 0.2s ease;
+}
+
+.category-item:hover {
+    background-color: #f8f9fa;
+    border-color: #dee2e6;
+}
+
+.drag-handle:hover {
+    color: #495057 !important;
+}
+</style>
+@stop
+
 @section('content_header')
     <h1>Arşiv Düzenle: {{ $archive->title }}</h1>
 @stop
@@ -124,6 +157,52 @@
 
         <!-- Sağ Kolon - Belgeler -->
         <div class="col-md-4">
+            <!-- Belge Kategorileri -->
+            <div class="card mb-3">
+                <div class="card-header">
+                    <h3 class="card-title">Belge Kategorileri</h3>
+                    <div class="card-tools">
+                        <button type="button" class="btn btn-primary btn-sm" id="add-category-btn">
+                            <i class="fas fa-plus"></i> Kategori Ekle
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div id="categories-list" class="sortable-categories">
+                        @forelse($archive->documentCategories as $category)
+                            <div class="category-item border rounded p-2 mb-2" data-id="{{ $category->id }}" data-order="{{ $category->order }}">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div class="d-flex align-items-center">
+                                        <i class="fas fa-grip-vertical text-muted mr-2 drag-handle" style="cursor: move;" title="Sürükle"></i>
+                                        @if($category->icon)
+                                            <i class="{{ $category->icon }} mr-2" style="color: {{ $category->color }}"></i>
+                                        @endif
+                                        <span class="category-name">{{ $category->name }}</span>
+                                        <span class="badge badge-info ml-2">{{ $category->documents->count() }}</span>
+                                        <small class="text-muted ml-2">(Sıra: {{ $category->order }})</small>
+                                    </div>
+                                    <div class="btn-group btn-group-sm">
+                                        <button type="button" class="btn btn-outline-primary edit-category" 
+                                                data-id="{{ $category->id }}" title="Düzenle">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-outline-danger delete-category" 
+                                                data-id="{{ $category->id }}" title="Sil">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        @empty
+                            <div class="text-center text-muted py-3" id="no-categories">
+                                <i class="fas fa-folder-open fa-2x mb-2"></i>
+                                <p>Henüz kategori oluşturulmamış.</p>
+                            </div>
+                        @endforelse
+                    </div>
+                </div>
+            </div>
+
             <!-- Belgeler -->
             <div class="card">
                 <div class="card-header">
@@ -133,6 +212,16 @@
                     <!-- Toplu Belge Yükleme Formu -->
                     <form id="bulk-document-upload-form" enctype="multipart/form-data">
                         @csrf
+                        <div class="form-group">
+                            <label for="bulk_category_id">Kategori</label>
+                            <select class="form-control" id="bulk_category_id" name="category_id">
+                                <option value="">Kategorisiz</option>
+                                @foreach($archive->documentCategories as $category)
+                                    <option value="{{ $category->id }}">{{ $category->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        
                         <div class="form-group">
                             <label for="bulk_document_files">Belgeler <span class="text-danger">*</span></label>
                             <input type="file" class="form-control-file" id="bulk_document_files" name="files[]" multiple required
@@ -184,6 +273,16 @@
                     <div id="single-upload-form" style="display: none;">
                         <form id="document-upload-form" enctype="multipart/form-data">
                         @csrf
+                        <div class="form-group">
+                            <label for="document_category_id">Kategori</label>
+                            <select class="form-control" id="document_category_id" name="category_id">
+                                <option value="">Kategorisiz</option>
+                                @foreach($archive->documentCategories as $category)
+                                    <option value="{{ $category->id }}">{{ $category->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        
                         <div class="form-group">
                             <label for="document_name">Belge Adı <span class="text-danger">*</span></label>
                             <input type="text" class="form-control" id="document_name" name="name" required>
@@ -259,6 +358,14 @@
                                             <h6 class="mb-1">
                                                 <i class="{{ $document->icon_class }}"></i>
                                                 {{ $document->name }}
+                                                @if($document->category)
+                                                    <span class="badge badge-secondary ml-2" style="background-color: {{ $document->category->color }}">
+                                                        @if($document->category->icon)
+                                                            <i class="{{ $document->category->icon }}"></i>
+                                                        @endif
+                                                        {{ $document->category->name }}
+                                                    </span>
+                                                @endif
                                             </h6>
                                             @if($document->description)
                                                 <p class="text-muted small mb-1">{{ $document->description }}</p>
@@ -355,9 +462,59 @@
             </div>
         </div>
     </div>
+<!-- Kategori Ekleme/Düzenleme Modal -->
+<div class="modal fade" id="categoryModal" tabindex="-1" role="dialog" aria-labelledby="categoryModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="categoryModalLabel">Kategori Ekle</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form id="categoryForm">
+                @csrf
+                <div class="modal-body">
+                    <input type="hidden" id="category_id" name="category_id">
+                    
+                    <div class="form-group">
+                        <label for="category_name">Kategori Adı <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="category_name" name="name" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="category_icon">İkon</label>
+                        <input type="text" class="form-control" id="category_icon" name="icon" placeholder="fas fa-folder">
+                        <small class="form-text text-muted">FontAwesome ikon sınıfı</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="category_color">Renk</label>
+                        <input type="color" class="form-control" id="category_color" name="color" value="#3498db">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="category_description">Açıklama</label>
+                        <textarea class="form-control" id="category_description" name="description" rows="2"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="category_order">Sıra</label>
+                        <input type="number" class="form-control" id="category_order" name="order" value="0" min="0">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+                    <button type="submit" class="btn btn-primary">Kaydet</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 @stop
 
 @section('js')
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
 <script>
 // TinyMCE'yi dinamik olarak yükle
 var script = document.createElement('script');
@@ -515,6 +672,7 @@ $(document).ready(function() {
         var formData = new FormData();
         formData.append('file', file);
         formData.append('name', fileName);
+        formData.append('category_id', $('#bulk_category_id').val());
         formData.append('_token', '{{ csrf_token() }}');
         
         // Progress bar'ı güncelle
@@ -996,6 +1154,244 @@ $(document).ready(function() {
             }
         });
     });
+
+    // Kategori Yönetimi
+    
+    // Kategori sıralama (Drag & Drop)
+    var categoriesList = document.getElementById('categories-list');
+    if (categoriesList && categoriesList.children.length > 0) {
+        var sortable = Sortable.create(categoriesList, {
+            handle: '.drag-handle',
+            animation: 150,
+            ghostClass: 'sortable-ghost',
+            chosenClass: 'sortable-chosen',
+            dragClass: 'sortable-drag',
+            onEnd: function(evt) {
+                // Sıralama değiştiğinde
+                updateCategoryOrder();
+            }
+        });
+    }
+
+    // Kategori sırasını güncelle
+    function updateCategoryOrder() {
+        var categoryItems = $('.category-item');
+        var orderData = [];
+        
+        categoryItems.each(function(index) {
+            var categoryId = $(this).data('id');
+            var newOrder = index + 1;
+            orderData.push({
+                id: categoryId,
+                order: newOrder
+            });
+            
+            // Görsel olarak sıra numarasını güncelle
+            $(this).find('small:contains("Sıra:")').text('(Sıra: ' + newOrder + ')');
+        });
+        
+        // AJAX ile sıralamayı kaydet
+        $.ajax({
+            url: '/admin/archive-document-categories/update-order',
+            type: 'POST',
+            data: {
+                _token: '{{ csrf_token() }}',
+                categories: orderData
+            },
+            success: function(response) {
+                if (response.success) {
+                    toastr.success('Kategori sıralaması güncellendi.');
+                }
+            },
+            error: function(xhr) {
+                toastr.error('Sıralama güncellenirken bir hata oluştu.');
+                // Hata durumunda sayfayı yenile
+                setTimeout(function() {
+                    location.reload();
+                }, 1000);
+            }
+        });
+    }
+    
+    // Kategori ekleme butonu
+    $('#add-category-btn').on('click', function() {
+        $('#categoryModalLabel').text('Kategori Ekle');
+        $('#categoryForm')[0].reset();
+        $('#category_id').val('');
+        $('#category_color').val('#3498db');
+        $('#categoryModal').modal('show');
+    });
+
+    // Kategori düzenleme
+    $(document).on('click', '.edit-category', function() {
+        var categoryId = $(this).data('id');
+        
+        $.get('/admin/archive-document-categories/' + categoryId, function(category) {
+            $('#categoryModalLabel').text('Kategori Düzenle');
+            $('#category_id').val(category.id);
+            $('#category_name').val(category.name);
+            $('#category_icon').val(category.icon);
+            $('#category_color').val(category.color);
+            $('#category_description').val(category.description);
+            $('#category_order').val(category.order);
+            $('#categoryModal').modal('show');
+        });
+    });
+
+    // Kategori kaydetme
+    $('#categoryForm').on('submit', function(e) {
+        e.preventDefault();
+        
+        var formData = $(this).serialize();
+        var categoryId = $('#category_id').val();
+        var url = categoryId ? '/admin/archive-document-categories/' + categoryId : '/admin/archive-document-categories';
+        var method = categoryId ? 'PUT' : 'POST';
+        
+        // Archive ID'yi ekle
+        formData += '&archive_id={{ $archive->id }}';
+        
+        if (categoryId) {
+            formData += '&_method=PUT';
+        }
+        
+        $.ajax({
+            url: url,
+            type: 'POST',
+            data: formData,
+            success: function(response) {
+                if (response.success) {
+                    $('#categoryModal').modal('hide');
+                    toastr.success(response.message);
+                    
+                    // Kategori listesini güncelle
+                    updateCategoryList();
+                    
+                    // Select option'larını güncelle
+                    updateCategorySelects();
+                }
+            },
+            error: function(xhr) {
+                var errors = xhr.responseJSON.errors;
+                if (errors) {
+                    var errorMessage = '';
+                    Object.keys(errors).forEach(function(key) {
+                        errorMessage += errors[key][0] + '\n';
+                    });
+                    toastr.error(errorMessage);
+                } else {
+                    toastr.error('Kategori kaydedilirken bir hata oluştu.');
+                }
+            }
+        });
+    });
+
+    // Kategori silme
+    $(document).on('click', '.delete-category', function() {
+        var categoryId = $(this).data('id');
+        var categoryName = $(this).closest('.category-item').find('.category-name').text();
+        
+        if (!confirm('Bu kategoriyi silmek istediğinizden emin misiniz?\n\nKategori: ' + categoryName)) {
+            return;
+        }
+        
+        $.ajax({
+            url: '/admin/archive-document-categories/' + categoryId,
+            type: 'DELETE',
+            data: {
+                _token: '{{ csrf_token() }}'
+            },
+            success: function(response) {
+                if (response.success) {
+                    toastr.success(response.message);
+                    
+                    // Kategori listesini güncelle
+                    updateCategoryList();
+                    
+                    // Select option'larını güncelle
+                    updateCategorySelects();
+                }
+            },
+            error: function(xhr) {
+                var errorMessage = 'Kategori silinirken bir hata oluştu.';
+                if (xhr.responseJSON && xhr.responseJSON.message) {
+                    errorMessage = xhr.responseJSON.message;
+                }
+                toastr.error(errorMessage);
+            }
+        });
+    });
+
+    // Kategori listesini güncelleme
+    function updateCategoryList() {
+        $.get('/admin/archives/{{ $archive->id }}/categories', function(categories) {
+            var html = '';
+            
+            if (categories.length > 0) {
+                categories.forEach(function(category) {
+                    html += `
+                        <div class="category-item border rounded p-2 mb-2" data-id="${category.id}" data-order="${category.order}">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-grip-vertical text-muted mr-2 drag-handle" style="cursor: move;" title="Sürükle"></i>
+                                    ${category.icon ? `<i class="${category.icon} mr-2" style="color: ${category.color}"></i>` : ''}
+                                    <span class="category-name">${category.name}</span>
+                                    <span class="badge badge-info ml-2">${category.documents_count || 0}</span>
+                                    <small class="text-muted ml-2">(Sıra: ${category.order})</small>
+                                </div>
+                                <div class="btn-group btn-group-sm">
+                                    <button type="button" class="btn btn-outline-primary edit-category" 
+                                            data-id="${category.id}" title="Düzenle">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-outline-danger delete-category" 
+                                            data-id="${category.id}" title="Sil">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+            } else {
+                html = `
+                    <div class="text-center text-muted py-3" id="no-categories">
+                        <i class="fas fa-folder-open fa-2x mb-2"></i>
+                        <p>Henüz kategori oluşturulmamış.</p>
+                    </div>
+                `;
+            }
+            
+            $('#categories-list').html(html);
+            
+            // Sortable'ı yeniden başlat
+            var categoriesList = document.getElementById('categories-list');
+            if (categoriesList && categoriesList.children.length > 0) {
+                Sortable.create(categoriesList, {
+                    handle: '.drag-handle',
+                    animation: 150,
+                    ghostClass: 'sortable-ghost',
+                    chosenClass: 'sortable-chosen',
+                    dragClass: 'sortable-drag',
+                    onEnd: function(evt) {
+                        updateCategoryOrder();
+                    }
+                });
+            }
+        });
+    }
+
+    // Select option'larını güncelleme
+    function updateCategorySelects() {
+        $.get('/admin/archives/{{ $archive->id }}/categories', function(categories) {
+            var options = '<option value="">Kategorisiz</option>';
+            
+            categories.forEach(function(category) {
+                options += `<option value="${category.id}">${category.name}</option>`;
+            });
+            
+            $('#bulk_category_id, #document_category_id').html(options);
+        });
+    }
 });
 </script>
 @stop 

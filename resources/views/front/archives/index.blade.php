@@ -61,75 +61,194 @@
             </div>
         </div>
 
-        @if($archives->count() > 0)
-            <!-- Arşiv Tablosu -->
-            <div class="bg-white rounded-lg shadow-sm border overflow-hidden">
-                <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Başlık
-                                </th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-32">
-                                    Belgeler
-                                </th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-32">
-                                    İşlemler
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody class="bg-white divide-y divide-gray-200">
-                            @foreach($archives as $archive)
-                                <tr class="hover:bg-gray-50 transition-colors">
-                                    <td class="px-6 py-4">
-                                        <div class="text-base font-medium text-gray-900">
-                                            <a href="{{ route('archives.show', $archive->slug) }}" 
-                                               class="hover:text-blue-600 transition-colors">
-                                                {{ $archive->title }}
-                                            </a>
-                                        </div>
-                                        @if($archive->excerpt)
-                                            <div class="text-sm text-gray-500 mt-1">
-                                                {{ Str::limit($archive->excerpt, 100) }}
-                                            </div>
+        @if($categories->count() > 0 || $uncategorizedArchives->count() > 0)
+            <!-- Kategorilere Göre Arşivler -->
+            <div class="space-y-8">
+                @foreach($categories as $category)
+                    @if($category->archives->count() > 0)
+                        <div class="bg-white rounded-lg shadow-sm border overflow-hidden">
+                            <!-- Kategori Başlığı -->
+                            <div class="bg-gradient-to-r from-blue-50 to-indigo-50 px-6 py-4 border-b">
+                                <div class="flex items-center">
+                                    @if($category->icon)
+                                        <i class="{{ $category->icon }} text-blue-600 mr-3 text-lg"></i>
+                                    @endif
+                                    <div>
+                                        <h2 class="text-xl font-semibold text-gray-900">{{ $category->name }}</h2>
+                                        @if($category->description)
+                                            <p class="text-sm text-gray-600 mt-1">{{ $category->description }}</p>
                                         @endif
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        @if($archive->documents->count() > 0)
-                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                                <i class="fas fa-file mr-1"></i>
-                                                {{ $archive->documents->count() }} Belge
-                                            </span>
-                                        @else
-                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                                                <i class="fas fa-file mr-1"></i>
-                                                0 Belge
-                                            </span>
-                                        @endif
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                        <a href="{{ route('archives.show', $archive->slug) }}" 
-                                           class="inline-flex items-center px-3 py-1 border border-blue-300 text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-md text-sm transition-colors">
-                                            <i class="fas fa-eye mr-1"></i>
-                                            Görüntüle
-                                        </a>
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+                                    </div>
+                                    <div class="ml-auto">
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                            {{ $category->archives->count() }} Arşiv
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
 
-            <!-- Sayfalama -->
-            @if($archives->hasPages())
-                <div class="mt-8 flex justify-center">
-                    <div class="bg-white rounded-lg shadow-sm border px-4 py-3">
-                        {{ $archives->appends(request()->query())->links() }}
+                            <!-- Kategori Arşivleri -->
+                            <div class="overflow-x-auto">
+                                <table class="min-w-full divide-y divide-gray-200">
+                                    <thead class="bg-gray-50">
+                                        <tr>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                Başlık
+                                            </th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-32">
+                                                Belgeler
+                                            </th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-32">
+                                                İşlemler
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="bg-white divide-y divide-gray-200">
+                                        @foreach($category->archives as $archive)
+                                            <tr class="hover:bg-gray-50 transition-colors">
+                                                <td class="px-6 py-4">
+                                                    <div class="flex items-start">
+                                                        @if($archive->is_featured)
+                                                            <i class="fas fa-star text-yellow-500 mr-2 mt-1 flex-shrink-0"></i>
+                                                        @endif
+                                                        <div>
+                                                            <div class="text-base font-medium text-gray-900">
+                                                                <a href="{{ route('archives.show', $archive->slug) }}" 
+                                                                   class="hover:text-blue-600 transition-colors">
+                                                                    {{ $archive->title }}
+                                                                </a>
+                                                            </div>
+                                                            @if($archive->excerpt)
+                                                                <div class="text-sm text-gray-500 mt-1">
+                                                                    {{ Str::limit($archive->excerpt, 100) }}
+                                                                </div>
+                                                            @endif
+                                                            <div class="text-xs text-gray-400 mt-1">
+                                                                <i class="fas fa-calendar mr-1"></i>
+                                                                {{ $archive->formatted_date }}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td class="px-6 py-4 whitespace-nowrap">
+                                                    @if($archive->documents->count() > 0)
+                                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                                            <i class="fas fa-file mr-1"></i>
+                                                            {{ $archive->documents->count() }} Belge
+                                                        </span>
+                                                    @else
+                                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                                            <i class="fas fa-file mr-1"></i>
+                                                            0 Belge
+                                                        </span>
+                                                    @endif
+                                                </td>
+                                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                                    <a href="{{ route('archives.show', $archive->slug) }}" 
+                                                       class="inline-flex items-center px-3 py-1 border border-blue-300 text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-md text-sm transition-colors">
+                                                        <i class="fas fa-eye mr-1"></i>
+                                                        Görüntüle
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    @endif
+                @endforeach
+
+                <!-- Kategorisiz Arşivler -->
+                @if($uncategorizedArchives->count() > 0)
+                    <div class="bg-white rounded-lg shadow-sm border overflow-hidden">
+                        <!-- Başlık -->
+                        <div class="bg-gradient-to-r from-gray-50 to-gray-100 px-6 py-4 border-b">
+                            <div class="flex items-center">
+                                <i class="fas fa-folder-open text-gray-600 mr-3 text-lg"></i>
+                                <div>
+                                    <h2 class="text-xl font-semibold text-gray-900">Diğer Arşivler</h2>
+                                    <p class="text-sm text-gray-600 mt-1">Kategorize edilmemiş arşiv belgeleri</p>
+                                </div>
+                                <div class="ml-auto">
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                        {{ $uncategorizedArchives->count() }} Arşiv
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Kategorisiz Arşivler -->
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Başlık
+                                        </th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-32">
+                                            Belgeler
+                                        </th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-32">
+                                            İşlemler
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200">
+                                    @foreach($uncategorizedArchives as $archive)
+                                        <tr class="hover:bg-gray-50 transition-colors">
+                                            <td class="px-6 py-4">
+                                                <div class="flex items-start">
+                                                    @if($archive->is_featured)
+                                                        <i class="fas fa-star text-yellow-500 mr-2 mt-1 flex-shrink-0"></i>
+                                                    @endif
+                                                    <div>
+                                                        <div class="text-base font-medium text-gray-900">
+                                                            <a href="{{ route('archives.show', $archive->slug) }}" 
+                                                               class="hover:text-blue-600 transition-colors">
+                                                                {{ $archive->title }}
+                                                            </a>
+                                                        </div>
+                                                        @if($archive->excerpt)
+                                                            <div class="text-sm text-gray-500 mt-1">
+                                                                {{ Str::limit($archive->excerpt, 100) }}
+                                                            </div>
+                                                        @endif
+                                                        <div class="text-xs text-gray-400 mt-1">
+                                                            <i class="fas fa-calendar mr-1"></i>
+                                                            {{ $archive->formatted_date }}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                @if($archive->documents->count() > 0)
+                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                                        <i class="fas fa-file mr-1"></i>
+                                                        {{ $archive->documents->count() }} Belge
+                                                    </span>
+                                                @else
+                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                                        <i class="fas fa-file mr-1"></i>
+                                                        0 Belge
+                                                    </span>
+                                                @endif
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                                <a href="{{ route('archives.show', $archive->slug) }}" 
+                                                   class="inline-flex items-center px-3 py-1 border border-blue-300 text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-md text-sm transition-colors">
+                                                    <i class="fas fa-eye mr-1"></i>
+                                                    Görüntüle
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
-                </div>
-            @endif
+                @endif
+            </div>
         @else
             <!-- Boş Durum -->
             <div class="bg-white rounded-lg shadow-sm border">

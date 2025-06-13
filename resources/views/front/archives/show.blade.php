@@ -98,61 +98,143 @@
             </div>
         @endif
 
-        <!-- Belgeler Tablosu -->
+        <!-- Belgeler -->
         @if($archive->documents->count() > 0)
-            <div id="belgeler" class="bg-white rounded-lg shadow-sm border mb-6">
-                <div class="border-b border-gray-200 px-6 py-4">
-                    <h2 class="text-lg font-semibold text-gray-900">
-                        <i class="fas fa-file-alt mr-2"></i>
-                        Belgeler ({{ $archive->documents->count() }})
-                    </h2>
-                </div>
-                <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Belge Adı
-                                </th>
-                                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    İşlemler
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody class="bg-white divide-y divide-gray-200">
-                            @foreach($archive->documents as $document)
-                                <tr class="hover:bg-gray-50 transition-colors">
-                                    <td class="px-6 py-4">
-                                        <div class="flex items-center">
-                                            <i class="{{ $document->icon_class }} text-gray-400 mr-3"></i>
-                                            <div>
-                                                <div class="text-sm font-medium text-gray-900">
-                                                    {{ $document->name }}
+            <div id="belgeler" class="space-y-6">
+                <!-- Kategorili Belgeler -->
+                @foreach($categorizedDocuments as $categoryData)
+                    <div class="bg-white rounded-lg shadow-sm border">
+                        <div class="border-b border-gray-200 px-6 py-4">
+                            <h3 class="text-xl font-bold text-gray-900 flex items-center">
+                                @if($categoryData['category']->icon)
+                                    <i class="{{ $categoryData['category']->icon }} mr-3" style="color: {{ $categoryData['category']->color }}"></i>
+                                @else
+                                    <i class="fas fa-folder mr-3" style="color: {{ $categoryData['category']->color }}"></i>
+                                @endif
+                                {{ $categoryData['category']->name }}
+                                <span class="ml-3 inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-800">
+                                    {{ count($categoryData['documents']) }}
+                                </span>
+                            </h3>
+                            @if($categoryData['category']->description)
+                                <p class="text-sm text-gray-600 mt-2">{{ $categoryData['category']->description }}</p>
+                            @endif
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Belge Adı
+                                        </th>
+                                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            İşlemler
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200">
+                                    @foreach($categoryData['documents'] as $document)
+                                        <tr class="hover:bg-gray-50 transition-colors">
+                                            <td class="px-6 py-4">
+                                                <div>
+                                                    <div class="text-base font-semibold text-gray-900">
+                                                        {{ $document->name }}
+                                                    </div>
+                                                    @if($document->description)
+                                                        <div class="text-sm text-gray-500 mt-1">
+                                                            {{ $document->description }}
+                                                        </div>
+                                                    @endif
                                                 </div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="px-6 py-4 text-right">
-                                        <div class="flex items-center justify-end space-x-2">
-                                            <a href="{{ $document->download_url }}" 
-                                               class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
-                                               download>
-                                                <i class="fas fa-download mr-2"></i>
-                                                İndir
-                                            </a>
-                                            <a href="{{ $document->download_url }}" 
-                                               class="inline-flex items-center px-3 py-2 border border-gray-300 text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
-                                               target="_blank">
-                                                <i class="fas fa-eye mr-2"></i>
-                                                Görüntüle
-                                            </a>
-                                        </div>
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
+                                            </td>
+                                            <td class="px-6 py-4 text-right">
+                                                <div class="flex items-center justify-end space-x-2">
+                                                    <a href="{{ $document->download_url }}" 
+                                                       class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+                                                       download>
+                                                        <i class="fas fa-download mr-2"></i>
+                                                        İndir
+                                                    </a>
+                                                    <a href="{{ $document->download_url }}" 
+                                                       class="inline-flex items-center px-3 py-2 border border-gray-300 text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+                                                       target="_blank">
+                                                        <i class="fas fa-eye mr-2"></i>
+                                                        Görüntüle
+                                                    </a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                @endforeach
+
+                <!-- Kategorisiz Belgeler -->
+                @if(count($uncategorizedDocuments) > 0)
+                    <div class="bg-white rounded-lg shadow-sm border">
+                        <div class="border-b border-gray-200 px-6 py-4">
+                            <h3 class="text-xl font-bold text-gray-900 flex items-center">
+                                <i class="fas fa-file-alt mr-3 text-gray-400"></i>
+                                Diğer Belgeler
+                                <span class="ml-3 inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-800">
+                                    {{ count($uncategorizedDocuments) }}
+                                </span>
+                            </h3>
+                        </div>
+                        <div class="overflow-x-auto">
+                                                         <table class="min-w-full divide-y divide-gray-200">
+                                 <thead class="bg-gray-50">
+                                     <tr>
+                                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                             Belge Adı
+                                         </th>
+                                         <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                             İşlemler
+                                         </th>
+                                     </tr>
+                                 </thead>
+                                 <tbody class="bg-white divide-y divide-gray-200">
+                                     @foreach($uncategorizedDocuments as $document)
+                                         <tr class="hover:bg-gray-50 transition-colors">
+                                             <td class="px-6 py-4">
+                                                 <div>
+                                                     <div class="text-base font-semibold text-gray-900">
+                                                         {{ $document->name }}
+                                                     </div>
+                                                     @if($document->description)
+                                                         <div class="text-sm text-gray-500 mt-1">
+                                                             {{ $document->description }}
+                                                         </div>
+                                                     @endif
+                                                 </div>
+                                             </td>
+                                             <td class="px-6 py-4 text-right">
+                                                 <div class="flex items-center justify-end space-x-2">
+                                                     <a href="{{ $document->download_url }}" 
+                                                        class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+                                                        download>
+                                                         <i class="fas fa-download mr-2"></i>
+                                                         İndir
+                                                     </a>
+                                                     <a href="{{ $document->download_url }}" 
+                                                        class="inline-flex items-center px-3 py-2 border border-gray-300 text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+                                                        target="_blank">
+                                                         <i class="fas fa-eye mr-2"></i>
+                                                         Görüntüle
+                                                     </a>
+                                                 </div>
+                                             </td>
+                                         </tr>
+                                     @endforeach
+                                 </tbody>
+                             </table>
+                        </div>
+                    </div>
+                @endif
+
+
             </div>
         @endif
 

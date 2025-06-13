@@ -70,7 +70,7 @@ class MayorContentController extends Controller
 
         // Görsel yükleme
         if ($request->hasFile('image')) {
-            $data['image'] = $request->file('image')->store('mayor/content', 'public');
+            $data['image'] = $request->file('image')->store('mayor/content', 'uploads');
         }
 
         // Sort order belirleme
@@ -121,11 +121,11 @@ class MayorContentController extends Controller
         // Görsel yükleme
         if ($request->hasFile('image')) {
             // Eski görseli sil
-            if ($mayorContent->image && Storage::disk('public')->exists($mayorContent->image)) {
-                Storage::disk('public')->delete($mayorContent->image);
+            if ($mayorContent->image && Storage::disk('uploads')->exists($mayorContent->image)) {
+                Storage::disk('uploads')->delete($mayorContent->image);
             }
             
-            $data['image'] = $request->file('image')->store('mayor/content', 'public');
+            $data['image'] = $request->file('image')->store('mayor/content', 'uploads');
         }
 
         $mayorContent->update($data);
@@ -142,8 +142,8 @@ class MayorContentController extends Controller
         $type = $mayorContent->type;
         
         // Görseli sil
-        if ($mayorContent->image && Storage::disk('public')->exists($mayorContent->image)) {
-            Storage::disk('public')->delete($mayorContent->image);
+        if ($mayorContent->image && Storage::disk('uploads')->exists($mayorContent->image)) {
+            Storage::disk('uploads')->delete($mayorContent->image);
         }
 
         $mayorContent->delete();
@@ -215,8 +215,8 @@ class MayorContentController extends Controller
             case 'delete':
                 // Görselleri sil
                 foreach ($contents->get() as $content) {
-                    if ($content->image && Storage::disk('public')->exists($content->image)) {
-                        Storage::disk('public')->delete($content->image);
+                    if ($content->image && Storage::disk('uploads')->exists($content->image)) {
+                        Storage::disk('uploads')->delete($content->image);
                     }
                 }
                 $contents->delete();
@@ -228,5 +228,59 @@ class MayorContentController extends Controller
             'success' => true,
             'message' => $message
         ]);
+    }
+
+    /**
+     * Toplu fotoğraf yükleme
+     */
+    public function bulkUpload(Request $request)
+    {
+        $mayor = Mayor::first();
+        if (!$mayor) {
+            return redirect()->route('admin.mayor.index')
+                ->with('error', 'Önce başkan bilgilerini oluşturun.');
+        }
+
+        $request->validate([
+            'type' => 'required|in:gallery',
+            'images' => 'required|array|min:1',
+            'images.*' => 'image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+        ]);
+
+        $uploadedCount = 0;
+        $maxOrder = MayorContent::where('mayor_id', $mayor->id)
+            ->where('type', 'gallery')
+            ->max('sort_order') ?? 0;
+
+        foreach ($request->file('images') as $index => $image) {
+            try {
+                // Dosyayı yükle
+                $imagePath = $image->store('mayor/gallery', 'uploads');
+                
+                // Veritabanına kaydet
+                MayorContent::create([
+                    'mayor_id' => $mayor->id,
+                    'type' => 'gallery',
+                    'title' => 'Galeri Fotoğrafı ' . ($index + 1),
+                    'description' => null,
+                    'image' => $imagePath,
+                    'sort_order' => $maxOrder + $index + 1,
+                    'is_active' => true,
+                ]);
+                
+                $uploadedCount++;
+            } catch (\Exception $e) {
+                // Hata durumunda devam et
+                continue;
+            }
+        }
+
+        if ($uploadedCount > 0) {
+            return redirect()->route('admin.mayor-content.index', ['type' => 'gallery'])
+                ->with('success', $uploadedCount . ' fotoğraf başarıyla yüklendi.');
+        } else {
+            return redirect()->route('admin.mayor-content.index', ['type' => 'gallery'])
+                ->with('error', 'Fotoğraflar yüklenirken bir hata oluştu.');
+        }
     }
 }

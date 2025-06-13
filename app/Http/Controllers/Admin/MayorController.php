@@ -90,21 +90,21 @@ class MayorController extends Controller
         // Profil fotoğrafı yükleme
         if ($request->hasFile('profile_image')) {
             // Eski fotoğrafı sil
-            if ($mayor->profile_image && Storage::disk('public')->exists($mayor->profile_image)) {
-                Storage::disk('public')->delete($mayor->profile_image);
+            if ($mayor->profile_image && Storage::disk('uploads')->exists($mayor->profile_image)) {
+                Storage::disk('uploads')->delete($mayor->profile_image);
             }
             
-            $data['profile_image'] = $request->file('profile_image')->store('mayor/profile', 'public');
+            $data['profile_image'] = $request->file('profile_image')->store('mayor/profile', 'uploads');
         }
 
         // Hero arka plan görseli yükleme
         if ($request->hasFile('hero_bg_image')) {
             // Eski görseli sil
-            if ($mayor->hero_bg_image && Storage::disk('public')->exists($mayor->hero_bg_image)) {
-                Storage::disk('public')->delete($mayor->hero_bg_image);
+            if ($mayor->hero_bg_image && Storage::disk('uploads')->exists($mayor->hero_bg_image)) {
+                Storage::disk('uploads')->delete($mayor->hero_bg_image);
             }
             
-            $data['hero_bg_image'] = $request->file('hero_bg_image')->store('mayor/hero', 'public');
+            $data['hero_bg_image'] = $request->file('hero_bg_image')->store('mayor/hero', 'uploads');
         }
 
         $mayor->update($data);

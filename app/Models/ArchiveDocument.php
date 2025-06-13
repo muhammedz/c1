@@ -11,6 +11,7 @@ class ArchiveDocument extends Model
 
     protected $fillable = [
         'archive_id',
+        'category_id',
         'name',
         'description',
         'file_path',
@@ -35,6 +36,14 @@ class ArchiveDocument extends Model
     public function archive()
     {
         return $this->belongsTo(Archive::class);
+    }
+
+    /**
+     * Kategori ilişkisi
+     */
+    public function category()
+    {
+        return $this->belongsTo(ArchiveDocumentCategory::class, 'category_id');
     }
 
     /**

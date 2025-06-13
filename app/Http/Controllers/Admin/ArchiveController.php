@@ -91,7 +91,7 @@ class ArchiveController extends Controller
      */
     public function edit(Archive $archive)
     {
-        $archive->load('allDocuments');
+        $archive->load(['allDocuments.category', 'documentCategories']);
         return view('admin.archives.edit', compact('archive'));
     }
 

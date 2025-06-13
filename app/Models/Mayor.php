@@ -103,7 +103,7 @@ class Mayor extends Model
             return $this->profile_image;
         }
 
-        return asset('storage/' . $this->profile_image);
+        return asset('uploads/' . $this->profile_image);
     }
 
     /**
@@ -119,6 +119,6 @@ class Mayor extends Model
             return $this->hero_bg_image;
         }
 
-        return asset('storage/' . $this->hero_bg_image);
+        return asset('uploads/' . $this->hero_bg_image);
     }
 }

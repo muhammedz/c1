@@ -168,7 +168,7 @@
                     <div class="py-4 first:pt-0 last:pb-0 hover:bg-slate-50 transition-colors rounded-lg p-2 -mx-2">
                         <div class="flex items-center mb-2">
                             <span class="bg-[#00352b] text-white text-sm px-3 py-1 rounded-full mr-3">
-                                {{ $item->getExtraValue('event_date') ? \Carbon\Carbon::parse($item->getExtraValue('event_date'))->format('d M Y') : 'Tarih belirtilmemiş' }}
+                                {{ $item->getExtraValue('event_date') ? \Carbon\Carbon::parse($item->getExtraValue('event_date'))->format('d/m/Y') : 'Tarih belirtilmemiş' }}
                             </span>
                             @if($item->getExtraValue('event_time'))
                             <span class="text-sm text-gray-500">{{ $item->getExtraValue('event_time') }}</span>
@@ -198,61 +198,15 @@
                 </div>
             </div>
             
-            <div class="px-6 py-4 bg-gray-50 flex justify-between items-center">
+            <div class="px-6 py-4 bg-gray-50">
                 <div class="flex items-center text-sm text-gray-500">
                     <span class="material-icons text-base mr-1">calendar_today</span>
-                    <span>{{ now()->format('F Y') }}</span>
+                    <span>{{ now()->format('m/Y') }}</span>
                 </div>
-                <a href="#" class="inline-flex items-center text-[#00352b] hover:text-[#20846c] font-medium transition-colors">
-                    <span>Tüm Etkinlikler</span>
-                    <span class="material-icons ml-1">arrow_forward</span>
-                </a>
             </div>
         </div>
         @endif
-        
-        <!-- Başkandan Mesajlar Kartı -->
-        <div class="bg-white shadow-md rounded-xl overflow-hidden">
-            <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center">
-                <h2 class="text-2xl font-bold text-gray-800">Başkandan Mesajlar</h2>
-                <span class="text-xs font-medium text-gray-500">Son güncelleme: 20 Haziran 2024</span>
-            </div>
-            
-            <div class="p-6">
-                <div class="relative">
-                    <div class="absolute top-0 left-0 h-full w-1 bg-gradient-to-b from-[#00352b] to-[#20846c] rounded-full"></div>
-                    <div class="pl-6 prose prose-lg max-w-none prose-headings:text-gray-800 prose-p:text-gray-700">
-                        <blockquote class="italic text-gray-700 bg-slate-50 p-6 rounded-lg shadow-sm border-l-4 border-[#00352b]">
-                            "Çankaya'mızı örnek bir belediye yapmak için çalışıyoruz. Katılımcı, şeffaf ve hesap verebilir bir yönetim anlayışıyla, sosyal demokrat değerleri yerel yönetimde uygulamaya çalışıyoruz. Amacımız Çankaya'da yaşayan herkesin yaşam kalitesini artırmak, eşit hizmet götürmek ve sürdürülebilir projelerle geleceğe yatırım yapmaktır. Tarım alanındaki çalışmalarımız, kent kimliğine katkı sağlayan projelerimiz ve sosyal dayanışma programlarımızla fark yaratmaya devam edeceğiz."
-                        </blockquote>
-                    </div>
-                </div>
-                
-                <div class="flex items-center mt-6 ml-6">
-                    <img src="https://cankaya.epoxsoft.net.tr/images/huseyincanguner/huseyincanguner6.jpeg" alt="Av. Hüseyin Can Güner" class="w-12 h-12 rounded-full mr-4 border-2 border-[#00352b]">
-                    <div>
-                        <p class="font-bold text-gray-900">Av. Hüseyin Can Güner</p>
-                        <p class="text-gray-600 text-sm">Çankaya Belediye Başkanı</p>
-                    </div>
-                </div>
-                
-                @if($values->count() > 0)
-                <div class="mt-6 ml-6 pt-6 border-t border-slate-100">
-                    <h3 class="text-xl font-semibold text-gray-800 mb-3">Öne Çıkan Değerlerimiz</h3>
-                    <div class="grid grid-cols-2 gap-4">
-                        @foreach($values as $value)
-                        <div class="flex items-start">
-                            <span class="flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-full {{ $value->getExtraValue('bg_color', 'bg-blue-100') }} {{ $value->getExtraValue('text_color', 'text-blue-800') }} mr-3">
-                                <span class="material-icons text-sm">{{ $value->getExtraValue('icon', 'star') }}</span>
-                            </span>
-                            <span class="text-gray-700">{{ $value->title }}</span>
-                        </div>
-                        @endforeach
-                    </div>
-                </div>
-                @endif
-            </div>
-        </div>
+
     </div>
 </section>
 
@@ -377,7 +331,7 @@
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                 @foreach($gallery as $photo)
                 <!-- Fotoğraf -->
-                <div class="relative overflow-hidden rounded-lg group h-48 md:h-64">
+                <div class="relative overflow-hidden rounded-lg group h-48 md:h-64 cursor-pointer" onclick="acFotoLightbox('{{ $photo->image_url ?? 'https://cankaya.epoxsoft.net.tr/images/huseyincanguner/huseyincanguner5.jpeg' }}', '{{ $photo->title }}')">
                     <img src="{{ $photo->image_url ?? 'https://cankaya.epoxsoft.net.tr/images/huseyincanguner/huseyincanguner5.jpeg' }}" alt="{{ $photo->title }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
                     <div class="absolute inset-0 bg-black opacity-0 group-hover:opacity-50 transition-opacity"></div>
                     <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
@@ -396,6 +350,19 @@
     </div>
 </section>
 @endsection
+
+<!-- Fotoğraf Lightbox -->
+<div id="fotoLightbox" class="fixed inset-0 bg-black bg-opacity-90 z-50 hidden flex items-center justify-center p-4" onclick="kapatFotoLightbox()">
+    <!-- Kapatma butonu - siyah alanda üstte -->
+    <button onclick="kapatFotoLightbox()" class="absolute top-6 right-6 text-white hover:text-gray-300 z-20 text-4xl">
+        <span class="material-icons text-4xl">close</span>
+    </button>
+    
+    <div class="relative max-w-4xl max-h-full" onclick="event.stopPropagation()">
+        <!-- Fotoğraf -->
+        <img id="lightboxFoto" src="" alt="" class="max-w-full max-h-[90vh] object-contain rounded-lg">
+    </div>
+</div>
 
 <script>
     // Hikaye verileri
@@ -475,20 +442,7 @@
         }
     }
     
-    // ESC tuşuna basınca kapat
-    document.addEventListener('keydown', function(event) {
-        if (event.key === 'Escape') {
-            kapatLightbox();
-        } else if (event.key === 'ArrowRight') {
-            if (!document.getElementById('lightbox').classList.contains('hidden')) {
-                sonrakiHikaye(event);
-            }
-        } else if (event.key === 'ArrowLeft') {
-            if (!document.getElementById('lightbox').classList.contains('hidden')) {
-                oncekiHikaye(event);
-            }
-        }
-    });
+
     
     // Dokunmatik kaydırma desteği
     let touchStartX = 0;
@@ -512,4 +466,37 @@
             oncekiHikaye(new Event('touch'));
         }
     }
+    
+    // Fotoğraf Lightbox fonksiyonları
+    function acFotoLightbox(fotoUrl, baslik) {
+        document.getElementById('lightboxFoto').src = fotoUrl;
+        document.getElementById('fotoLightbox').classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+    }
+    
+    function kapatFotoLightbox() {
+        document.getElementById('fotoLightbox').classList.add('hidden');
+        document.body.style.overflow = '';
+    }
+    
+    // Fotoğraf lightbox için ESC tuşu desteği
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape') {
+            if (!document.getElementById('fotoLightbox').classList.contains('hidden')) {
+                kapatFotoLightbox();
+            } else {
+                kapatLightbox();
+            }
+        } else if (event.key === 'ArrowRight') {
+            if (!document.getElementById('lightbox').classList.contains('hidden')) {
+                sonrakiHikaye(event);
+            }
+        } else if (event.key === 'ArrowLeft') {
+            if (!document.getElementById('lightbox').classList.contains('hidden')) {
+                oncekiHikaye(event);
+            }
+        }
+    });
+    
+
 </script> 

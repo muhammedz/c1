@@ -21,6 +21,7 @@ class ArchiveDocumentController extends Controller
             'description' => 'nullable|string',
             'file' => 'required|file|max:51200', // 50MB max
             'sort_order' => 'nullable|integer|min:0',
+            'category_id' => 'nullable|exists:archive_document_categories,id',
         ]);
 
         $file = $request->file('file');
@@ -55,6 +56,7 @@ class ArchiveDocumentController extends Controller
         $document = $archive->allDocuments()->create([
             'name' => $request->name,
             'description' => $request->description,
+            'category_id' => $request->category_id,
             'file_path' => $filePath,
             'file_name' => $originalFileName,
             'file_size' => $fileSize,
@@ -91,6 +93,7 @@ class ArchiveDocumentController extends Controller
             'files.*' => 'required|file|max:51200', // 50MB max per file
             'names' => 'required|array',
             'names.*' => 'required|string|max:255',
+            'category_id' => 'nullable|exists:archive_document_categories,id',
         ]);
 
         $files = $request->file('files');
@@ -133,6 +136,7 @@ class ArchiveDocumentController extends Controller
                 $document = $archive->allDocuments()->create([
                     'name' => $documentName,
                     'description' => null,
+                    'category_id' => $request->category_id,
                     'file_path' => $filePath,
                     'file_name' => $originalFileName,
                     'file_size' => $fileSize,

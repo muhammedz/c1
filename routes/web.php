@@ -22,6 +22,7 @@ use App\Http\Controllers\Admin\TestDepartmentController;
 use App\Http\Controllers\Admin\HedefKitleController;
 use App\Http\Controllers\Admin\ArchiveController;
 use App\Http\Controllers\Admin\ArchiveDocumentController;
+use App\Http\Controllers\Admin\ArchiveDocumentCategoryController;
 use App\Http\Controllers\AnnouncementFrontController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\FrontController;
@@ -162,6 +163,11 @@ Route::middleware(['auth', 'role:admin'])->name('admin.')->prefix('admin')->grou
     Route::post('archives/{archive}/documents/sort', [ArchiveDocumentController::class, 'updateSortOrder'])->name('archives.documents.sort');
     Route::post('archive-documents/{document}/update-sort', [ArchiveDocumentController::class, 'updateSort'])->name('archive-documents.update-sort');
     Route::post('archive-documents/{document}/toggle-status', [ArchiveDocumentController::class, 'toggleStatus'])->name('archive-documents.toggle-status');
+
+    // Archive Document Categories
+    Route::resource('archive-document-categories', ArchiveDocumentCategoryController::class);
+    Route::get('archives/{archive}/categories', [ArchiveDocumentCategoryController::class, 'getArchiveCategories'])->name('archives.categories');
+    Route::post('archive-document-categories/update-order', [ArchiveDocumentCategoryController::class, 'updateOrder'])->name('archive-document-categories.update-order');
     
     // İhaleler Yönetimi
     Route::resource('tenders', App\Http\Controllers\Admin\TenderController::class);
@@ -338,6 +344,7 @@ Route::middleware(['auth', 'role:admin'])->name('admin.')->prefix('admin')->grou
         Route::get('/', [App\Http\Controllers\Admin\MayorContentController::class, 'index'])->name('index');
         Route::get('/create', [App\Http\Controllers\Admin\MayorContentController::class, 'create'])->name('create');
         Route::post('/', [App\Http\Controllers\Admin\MayorContentController::class, 'store'])->name('store');
+        Route::post('/bulk-upload', [App\Http\Controllers\Admin\MayorContentController::class, 'bulkUpload'])->name('bulk-upload');
         Route::get('/{mayorContent}', [App\Http\Controllers\Admin\MayorContentController::class, 'show'])->name('show');
         Route::get('/{mayorContent}/edit', [App\Http\Controllers\Admin\MayorContentController::class, 'edit'])->name('edit');
         Route::put('/{mayorContent}', [App\Http\Controllers\Admin\MayorContentController::class, 'update'])->name('update');
