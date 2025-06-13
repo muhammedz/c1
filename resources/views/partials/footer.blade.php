@@ -1,67 +1,144 @@
+@php
+    $footerSettings = \App\Models\FooterSetting::first();
+    $footerMenus = \App\Models\FooterMenu::active()->ordered()->with('activeLinks')->get();
+@endphp
+
 <!-- Footer kısmı -->
-<footer id="footer-section" class="footer-section bg-[#004d2e] text-white py-12 mt-12">
+<footer id="footer-section" class="footer-section bg-[#065a28] text-white py-12 mt-12" style="font-family: 'TT Norms Pro', sans-serif;">
     <div class="container max-w-7xl mx-auto px-4">
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
-            <div>
-                <h3 class="text-xl font-bold mb-4">İletişim</h3>
-                <ul class="space-y-2">
-                    <li class="flex items-start gap-2">
-                        <span class="material-icons text-white/80 mt-1">location_on</span>
-                        <span>Belediye Caddesi No: 1, Merkez</span>
-                    </li>
-                    <li class="flex items-start gap-2">
-                        <span class="material-icons text-white/80 mt-1">phone</span>
-                        <span>0123 456 78 90</span>
-                    </li>
-                    <li class="flex items-start gap-2">
-                        <span class="material-icons text-white/80 mt-1">email</span>
-                        <span>info@belediye.gov.tr</span>
-                    </li>
-                </ul>
-            </div>
-            <div>
-                <h3 class="text-xl font-bold mb-4">Hızlı Bağlantılar</h3>
-                <ul class="space-y-2">
-                    <li><a href="#" class="hover:underline">Anasayfa</a></li>
-                    <li><a href="#" class="hover:underline">Kurumsal</a></li>
-                    <li><a href="#" class="hover:underline">Hizmetler</a></li>
-                    <li><a href="#" class="hover:underline">Projeler</a></li>
-                    <li><a href="#" class="hover:underline">İletişim</a></li>
-                </ul>
-            </div>
-            <div>
-                <h3 class="text-xl font-bold mb-4">Online Hizmetler</h3>
-                <ul class="space-y-2">
-                    <li><a href="#" class="hover:underline">E-Belediye</a></li>
-                    <li><a href="#" class="hover:underline">Başvuru Takip</a></li>
-                    <li><a href="#" class="hover:underline">Ödeme Yap</a></li>
-                    <li><a href="#" class="hover:underline">Şikayet Bildir</a></li>
-                </ul>
-            </div>
-            <div>
-                <h3 class="text-xl font-bold mb-4">Sosyal Medya</h3>
-                <div class="flex gap-4 mt-2">
-                    <a href="#" class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20">
-                        <i class="fab fa-facebook-f text-white"></i>
+        <div class="grid grid-cols-1 md:grid-cols-5 gap-8">
+            @foreach($footerMenus as $menu)
+                <div>
+                    <h3 class="text-xl font-bold mb-6 text-white">{{ $menu->title }}</h3>
+                    @if($menu->activeLinks->count() > 0)
+                        <ul class="space-y-2 text-sm">
+                            @foreach($menu->activeLinks as $link)
+                                <li><a href="{{ $link->url }}" class="hover:underline">{{ $link->title }}</a></li>
+                            @endforeach
+                        </ul>
+                    @endif
+                </div>
+            @endforeach
+
+            <!-- İLETİŞİM VE LOGO -->
+            <div class="text-center">
+                <!-- Logo -->
+                <div class="mb-6">
+                    <div class="flex justify-center items-center mb-4">
+                        @if($footerSettings && $footerSettings->logo)
+                            <img src="{{ $footerSettings->logo_url }}" alt="{{ $footerSettings->company_name }}" class="w-16 h-16 object-contain">
+                        @else
+                            <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center">
+                                <svg class="w-12 h-12 text-[#065a28]" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M12 2L2 7v10c0 5.55 3.84 9.74 9 11 5.16-1.26 9-5.45 9-11V7l-10-5z"/>
+                                </svg>
+                            </div>
+                        @endif
+                    </div>
+                    @if($footerSettings)
+                        <h4 class="text-lg font-bold text-white">{{ $footerSettings->company_name }}</h4>
+                        <p class="text-sm text-white/80">{{ $footerSettings->company_subtitle }}</p>
+                    @else
+                        <h4 class="text-lg font-bold text-white">Çankaya</h4>
+                        <p class="text-sm text-white/80">BELEDİYESİ</p>
+                    @endif
+                </div>
+
+                <!-- İletişim Bilgileri -->
+                <div class="text-sm space-y-3 mb-6">
+                    @if($footerSettings)
+                        <div>
+                            <p class="font-semibold text-white">{{ $footerSettings->address_line1 }}</p>
+                            <p class="text-white/80">{{ $footerSettings->address_line2 }}</p>
+                        </div>
+                        
+                        <div>
+                            <p class="font-semibold text-white">{{ $footerSettings->contact_center_title }}</p>
+                            <p class="text-white/80">{{ $footerSettings->contact_center_phone }}</p>
+                        </div>
+                        
+                        <div>
+                            <p class="font-semibold text-white">{{ $footerSettings->whatsapp_title }}</p>
+                            <p class="text-white/80">{{ $footerSettings->whatsapp_number }}</p>
+                        </div>
+                        
+                        <div>
+                            <p class="font-semibold text-white">{{ $footerSettings->email_title }}</p>
+                            <p class="text-white/80 break-all">{{ $footerSettings->email_address }}</p>
+                        </div>
+                        
+                        <div>
+                            <p class="font-semibold text-white">{{ $footerSettings->kep_title }}</p>
+                            <p class="text-white/80 break-all">{{ $footerSettings->kep_address }}</p>
+                        </div>
+                    @else
+                        <div>
+                            <p class="font-semibold text-white">Ziya Gökalp Caddesi</p>
+                            <p class="text-white/80">No: 11 Kızılay/Ankara</p>
+                        </div>
+                        
+                        <div>
+                            <p class="font-semibold text-white">Çankaya İletişim Merkezi</p>
+                            <p class="text-white/80">444 06 01</p>
+                        </div>
+                        
+                        <div>
+                            <p class="font-semibold text-white">Whatsapp Hattı</p>
+                            <p class="text-white/80">0(505) 167 19 67</p>
+                        </div>
+                        
+                        <div>
+                            <p class="font-semibold text-white">E-Posta</p>
+                            <p class="text-white/80 break-all">iletisimmerkezi@cankaya.bel.tr</p>
+                        </div>
+                        
+                        <div>
+                            <p class="font-semibold text-white">Kep Adresi</p>
+                            <p class="text-white/80 break-all">cankayabelediyesi@hs01.kep.tr</p>
+                        </div>
+                    @endif
+                </div>
+
+                <!-- Sosyal Medya -->
+                <div class="flex justify-center gap-3">
+                    <a href="#" class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 transition-colors">
+                        <i class="fab fa-facebook-f text-white text-lg"></i>
                     </a>
-                    <a href="#" class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20">
-                        <i class="fab fa-twitter text-white"></i>
+                    <a href="#" class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 transition-colors">
+                        <i class="fab fa-instagram text-white text-lg"></i>
                     </a>
-                    <a href="#" class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20">
-                        <i class="fab fa-instagram text-white"></i>
+                    <a href="#" class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 transition-colors">
+                        <i class="fab fa-twitter text-white text-lg"></i>
                     </a>
-                    <a href="#" class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20">
-                        <i class="fab fa-youtube text-white"></i>
+                    <a href="#" class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 transition-colors">
+                        <i class="fab fa-youtube text-white text-lg"></i>
                     </a>
                 </div>
             </div>
         </div>
-        <div class="border-t border-white/20 mt-8 pt-8 text-center text-white/60">
-            <p>© 2024 Belediye. Tüm hakları saklıdır.</p>
+        
+        <!-- Copyright -->
+        <div class="border-t border-white/20 mt-8 pt-6">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <p class="text-white/80 text-sm mb-2 md:mb-0">
+                    @if($footerSettings && $footerSettings->copyright_left)
+                        {{ $footerSettings->copyright_left }}
+                    @else
+                        © {{ date('Y') }} Çankaya Belediyesi. Tüm hakları saklıdır.
+                    @endif
+                </p>
+                <p class="text-white/80 text-sm">
+                    @if($footerSettings && $footerSettings->copyright_right)
+                        {{ $footerSettings->copyright_right }}
+                    @else
+                        Web Tasarım: EPOXSOFT
+                    @endif
+                </p>
+            </div>
         </div>
     </div>
-</footer> 
+</footer>
 
-    <!-- Swiper JS -->
-    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-    <script src="assets/js/script.js"></script>
+<!-- Swiper JS -->
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+<script src="assets/js/script.js"></script>

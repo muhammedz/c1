@@ -263,7 +263,7 @@ return [
     'register_url' => 'register',
     'password_reset_url' => 'password/reset',
     'password_email_url' => 'password/email',
-    'profile_url' => false,
+    'profile_url' => 'admin/profile',
     'disable_darkmode_routes' => false,
 
     /*
@@ -330,12 +330,6 @@ return [
         ],
         ['header' => 'İÇERİK YÖNETİMİ'],
         [
-            'text'    => 'Duyurular',
-            'icon'    => 'fas fa-fw fa-bullhorn',
-            'url'     => 'admin/announcements',
-            'active'  => ['admin/announcements', 'admin/announcements/*'],
-        ],
-        [
             'text'    => 'Kurumsal Kadro',
             'icon'    => 'fas fa-fw fa-users',
             'url'     => 'admin/corporate/categories',
@@ -388,12 +382,6 @@ return [
                     'active' => ['admin/pages/create']
                 ],
                 [
-                    'text' => 'Sayfaları Görüntüle',
-                    'url'  => 'sayfalar',
-                    'icon' => 'fas fa-fw fa-eye',
-                    'target' => '_blank'
-                ],
-                [
                     'text' => 'Sayfa Kategorileri',
                     'url'  => 'admin/page-categories',
                     'icon' => 'fas fa-fw fa-folder',
@@ -405,51 +393,13 @@ return [
                     'icon' => 'fas fa-fw fa-tags',
                     'active' => ['admin/page-tags', 'admin/page-tags/*']
                 ],
-            ],
+                        ],
         ],
         [
-            'text'    => 'Anasayfa Yönetimi',
-            'icon'    => 'fas fa-fw fa-home',
-            'url'     => 'admin/homepage',
-            'active'  => ['admin/homepage', 'admin/homepage/*'],
-            'submenu' => [
-                [
-                    'text' => 'Genel Görünüm',
-                    'url'  => 'admin/homepage',
-                    'icon' => 'fas fa-fw fa-tachometer-alt',
-                    'active' => ['admin/homepage']
-                ],
-                [
-                    'text' => 'Profil Bilgileri',
-                    'url'  => 'admin/homepage/profile-info',
-                    'icon' => 'fas fa-fw fa-user-circle',
-                    'active' => ['admin/homepage/profile-info']
-                ],
-                [
-                    'text' => 'Mobil Uygulama',
-                    'url'  => 'admin/homepage/mobile-app',
-                    'icon' => 'fas fa-fw fa-mobile-alt',
-                    'active' => ['admin/homepage/mobile-app']
-                ],
-                [
-                    'text' => 'Logo ve Planlar',
-                    'url'  => 'admin/homepage/logo-and-plans',
-                    'icon' => 'fas fa-fw fa-image',
-                    'active' => ['admin/homepage/logo-and-plans']
-                ],
-                [
-                    'text' => 'Öne Çıkan Hizmetler',
-                    'url'  => 'admin/homepage/featured-services',
-                    'icon' => 'fas fa-fw fa-star',
-                    'active' => ['admin/homepage/featured-services']
-                ],
-                [
-                    'text' => 'Header Yönetimi',
-                    'url'  => 'admin/homepage/header',
-                    'icon' => 'fas fa-fw fa-heading',
-                    'active' => ['admin/homepage/header', 'admin/homepage/header/*']
-                ],
-            ],
+            'text' => 'Genel Görünüm',
+            'url'  => 'admin/homepage',
+            'icon' => 'fas fa-fw fa-tachometer-alt',
+            'active' => ['admin/homepage', 'admin/homepage/*']
         ],
         [
             'text'    => 'Dosya Yönetim Sistemi',
@@ -488,44 +438,7 @@ return [
                 ],
             ],
         ],
-        [
-            'text'    => 'Arama Ayarları',
-            'icon'    => 'fas fa-fw fa-search',
-            'url'     => 'admin/search-settings',
-            'active'  => ['admin/search-settings', 'admin/search-quick-links/*', 'admin/search-popular-queries/*'],
-        ],
-        ['header' => 'KULLANICI YÖNETİMİ'],
-        [
-            'text'    => 'Kullanıcılar',
-            'icon'    => 'fas fa-fw fa-users',
-            'submenu' => [
-                [
-                    'text' => 'Tüm Kullanıcılar',
-                    'url'  => 'admin/users',
-                    'icon' => 'fas fa-fw fa-list',
-                    'active' => ['admin/users', 'admin/users/*/edit']
-                ],
-                [
-                    'text' => 'Yeni Kullanıcı',
-                    'url'  => 'admin/users/create',
-                    'icon' => 'fas fa-fw fa-user-plus',
-                    'active' => ['admin/users/create']
-                ],
-                [
-                    'text' => 'Roller',
-                    'url'  => 'admin/roles',
-                    'icon' => 'fas fa-fw fa-user-tag',
-                    'active' => ['admin/roles', 'admin/roles/*']
-                ],
-            ],
-        ],
-        ['header' => 'HESAP'],
-        [
-            'text'    => 'Profil',
-            'url'     => 'admin/profile',
-            'icon'    => 'fas fa-fw fa-user',
-            'active'  => ['admin/profile']
-        ],
+
         // Projeler Modülü
         [
             'text'    => 'Projeler',
@@ -621,13 +534,7 @@ return [
                 ],
             ],
         ],
-        // Hedef Kitleler Modülü
-        [
-            'text'    => 'Hedef Kitleler',
-            'icon'    => 'fas fa-bullseye',
-            'url'     => 'admin/hedef-kitleler',
-            'active'  => ['admin/hedef-kitleler', 'admin/hedef-kitleler/*'],
-        ],
+
         // Çankaya Evleri Modülü
         [
             'text'    => 'Çankaya Evleri',

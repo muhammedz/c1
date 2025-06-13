@@ -5,9 +5,14 @@
 @section('content_header')
     <div class="d-flex justify-content-between">
         <h1>Kullanıcılar</h1>
-        <a href="{{ route('admin.users.create') }}" class="btn btn-primary">
-            <i class="fas fa-plus"></i> Yeni Kullanıcı Ekle
-        </a>
+        <div>
+            <a href="{{ route('admin.roles.index') }}" class="btn btn-warning">
+                <i class="fas fa-user-tag"></i> Roller
+            </a>
+            <a href="{{ route('admin.users.create') }}" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Yeni Kullanıcı Ekle
+            </a>
+        </div>
     </div>
 @stop
 

@@ -11,13 +11,13 @@
         <div class="col-lg-3 col-6">
             <div class="small-box bg-info">
                 <div class="inner">
-                    <h3>{{ $stats['total_users'] }}</h3>
-                    <p>Kullanıcılar</p>
+                    <h3>{{ $stats['total_services'] }}</h3>
+                    <p>Hizmetler</p>
                 </div>
                 <div class="icon">
-                    <i class="fas fa-users"></i>
+                    <i class="fas fa-concierge-bell"></i>
                 </div>
-                <a href="{{ route('admin.users.index') }}" class="small-box-footer">
+                <a href="{{ route('admin.services.index') }}" class="small-box-footer">
                     Detaylar <i class="fas fa-arrow-circle-right"></i>
                 </a>
             </div>
@@ -26,13 +26,13 @@
         <div class="col-lg-3 col-6">
             <div class="small-box bg-success">
                 <div class="inner">
-                    <h3>{{ $stats['published_posts'] }}/{{ $stats['total_posts'] }}</h3>
-                    <p>Blog Yazıları</p>
+                    <h3>{{ $stats['total_mudurlukler'] }}</h3>
+                    <p>Müdürlükler</p>
                 </div>
                 <div class="icon">
-                    <i class="fas fa-newspaper"></i>
+                    <i class="fas fa-building"></i>
                 </div>
-                <a href="#" class="small-box-footer">
+                <a href="{{ route('admin.mudurlukler.index') }}" class="small-box-footer">
                     Detaylar <i class="fas fa-arrow-circle-right"></i>
                 </a>
             </div>
@@ -41,13 +41,13 @@
         <div class="col-lg-3 col-6">
             <div class="small-box bg-warning">
                 <div class="inner">
-                    <h3>{{ $stats['published_pages'] }}/{{ $stats['total_pages'] }}</h3>
-                    <p>Sayfalar</p>
+                    <h3>{{ $stats['total_projects'] }}</h3>
+                    <p>Projeler</p>
                 </div>
                 <div class="icon">
-                    <i class="fas fa-file"></i>
+                    <i class="fas fa-project-diagram"></i>
                 </div>
-                <a href="#" class="small-box-footer">
+                <a href="{{ route('admin.projects.index') }}" class="small-box-footer">
                     Detaylar <i class="fas fa-arrow-circle-right"></i>
                 </a>
             </div>
@@ -56,13 +56,13 @@
         <div class="col-lg-3 col-6">
             <div class="small-box bg-danger">
                 <div class="inner">
-                    <h3>{{ $stats['active_categories'] }}/{{ $stats['total_categories'] }}</h3>
-                    <p>Kategoriler</p>
+                    <h3>{{ $stats['total_cankaya_houses'] }}</h3>
+                    <p>Çankaya Evleri</p>
                 </div>
                 <div class="icon">
-                    <i class="fas fa-list"></i>
+                    <i class="fas fa-home"></i>
                 </div>
-                <a href="#" class="small-box-footer">
+                <a href="{{ route('admin.cankaya-houses.index') }}" class="small-box-footer">
                     Detaylar <i class="fas fa-arrow-circle-right"></i>
                 </a>
             </div>
@@ -111,39 +111,41 @@
         <div class="col-md-6">
             <div class="card">
                 <div class="card-header">
-                    <h3 class="card-title">Son Eklenen Blog Yazıları</h3>
+                    <h3 class="card-title">Son Eklenen Haberler</h3>
                 </div>
                 <div class="card-body p-0">
                     <table class="table">
                         <thead>
                             <tr>
                                 <th>Başlık</th>
-                                <th>Yazar</th>
+                                <th>Kategori</th>
                                 <th>Durum</th>
                                 <th>İşlemler</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @forelse($latest_posts as $post)
+                            @forelse($latest_news as $news)
                                 <tr>
-                                    <td>{{ $post->title }}</td>
-                                    <td>{{ optional($post->creator)->name ?? 'N/A' }}</td>
+                                    <td>{{ $news->title }}</td>
+                                    <td>{{ optional($news->category)->name ?? 'Kategori Yok' }}</td>
                                     <td>
-                                        @if($post->is_published)
+                                        @if($news->status === 'published')
                                             <span class="badge badge-success">Yayında</span>
-                                        @else
+                                        @elseif($news->status === 'draft')
                                             <span class="badge badge-warning">Taslak</span>
+                                        @else
+                                            <span class="badge badge-secondary">{{ ucfirst($news->status) }}</span>
                                         @endif
                                     </td>
                                     <td>
-                                        <a href="#" class="btn btn-sm btn-info">
-                                            <i class="fas fa-eye"></i>
+                                        <a href="{{ route('admin.news.edit', $news->id) }}" class="btn btn-sm btn-info">
+                                            <i class="fas fa-edit"></i>
                                         </a>
                                     </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="4" class="text-center">Henüz blog yazısı yok</td>
+                                    <td colspan="4" class="text-center">Henüz haber yok</td>
                                 </tr>
                             @endforelse
                         </tbody>

@@ -27,11 +27,7 @@ class HomepageController extends Controller
      */
     public function index()
     {
-        $sliderCount = Slider::count();
-        $activeSliderCount = Slider::where('is_active', true)->count();
-        $menuCategoryCount = QuickMenuCategory::count();
-        
-        return view('admin.homepage.index', compact('sliderCount', 'activeSliderCount', 'menuCategoryCount'));
+        return view('admin.homepage.index');
     }
     
     /**

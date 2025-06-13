@@ -7,6 +7,11 @@ use App\Models\Category;
 use App\Models\Page;
 use App\Models\Post;
 use App\Models\User;
+use App\Models\News;
+use App\Models\Service;
+use App\Models\Mudurluk;
+use App\Models\Project;
+use App\Models\CankayaHouse;
 use Illuminate\Http\Request;
 
 class DashboardController extends Controller
@@ -25,6 +30,19 @@ class DashboardController extends Controller
             'published_posts' => Post::where('is_published', true)->count(),
             'published_pages' => Page::where('is_published', true)->count(),
             'active_categories' => Category::where('is_active', true)->count(),
+            // Haber istatistikleri
+            'total_news' => News::count(),
+            'published_news' => News::where('status', 'published')->count(),
+            'headline_news' => News::where('is_headline', true)->count(),
+            // Yeni istatistikler
+            'total_services' => Service::count(),
+            'published_services' => Service::where('status', 'published')->count(),
+            'total_mudurlukler' => Mudurluk::count(),
+            'active_mudurlukler' => Mudurluk::where('is_active', true)->count(),
+            'total_projects' => Project::count(),
+            'active_projects' => Project::where('is_active', true)->count(),
+            'total_cankaya_houses' => CankayaHouse::count(),
+            'active_cankaya_houses' => CankayaHouse::where('status', 'active')->count(),
         ];
         
         // Son eklenen kullanıcılar
@@ -33,7 +51,10 @@ class DashboardController extends Controller
         // Son eklenen gönderiler
         $latest_posts = Post::with('creator')->latest()->limit(5)->get();
         
-        return view('admin.dashboard', compact('stats', 'latest_users', 'latest_posts'));
+        // Son eklenen haberler
+        $latest_news = News::with('category')->latest()->limit(5)->get();
+        
+        return view('admin.dashboard', compact('stats', 'latest_users', 'latest_posts', 'latest_news'));
     }
     
     /**

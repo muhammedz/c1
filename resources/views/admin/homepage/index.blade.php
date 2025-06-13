@@ -11,56 +11,45 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-header">
-                    <h3 class="card-title">Anasayfa Bileşenleri</h3>
+                    <h3 class="card-title">Anasayfa Yönetimi</h3>
                 </div>
                 <div class="card-body">
                     <div class="row">
-                        <!-- Slider Yönetimi Kartı -->
-                        <div class="col-md-6 col-lg-4">
-                            <div class="small-box bg-info">
-                                <div class="inner">
-                                    <h3>{{ $sliderCount }}</h3>
-                                    <p>Slider Görseli</p>
-                                    <p class="text-sm mb-0">{{ $activeSliderCount }} aktif görsel</p>
-                                </div>
-                                <div class="icon">
-                                    <i class="fas fa-images"></i>
-                                </div>
-                                <a href="{{ route('admin.homepage.sliders') }}" class="small-box-footer">
-                                    Yönet <i class="fas fa-arrow-circle-right"></i>
-                                </a>
-                            </div>
+                        <!-- İlk Satır -->
+                        <div class="col-md-4">
+                            <a href="{{ route('admin.dashboard') }}" class="btn btn-primary btn-lg btn-block mb-3">
+                                <i class="fas fa-tachometer-alt mr-2"></i> Genel Görünüm
+                            </a>
+                        </div>
+                        <div class="col-md-4">
+                            <a href="{{ route('admin.profile') }}" class="btn btn-secondary btn-lg btn-block mb-3">
+                                <i class="fas fa-user mr-2"></i> Profil Bilgileri
+                            </a>
+                        </div>
+                        <div class="col-md-4">
+                            <a href="#" class="btn btn-info btn-lg btn-block mb-3">
+                                <i class="fas fa-mobile-alt mr-2"></i> Mobil Uygulama
+                            </a>
                         </div>
                         
-                        <!-- Quick Menu Yönetimi Kartı -->
-                        <div class="col-md-6 col-lg-4">
-                            <div class="small-box bg-success">
-                                <div class="inner">
-                                    <h3>{{ $menuCategoryCount }}</h3>
-                                    <p>Hızlı Menü Kategorisi</p>
-                                </div>
-                                <div class="icon">
-                                    <i class="fas fa-bars"></i>
-                                </div>
-                                <a href="{{ route('admin.homepage.quick-menus.index') }}" class="small-box-footer">
-                                    Yönet <i class="fas fa-arrow-circle-right"></i>
-                                </a>
-                            </div>
+                        <!-- İkinci Satır -->
+                        <div class="col-md-4">
+                            <a href="#" class="btn btn-warning btn-lg btn-block mb-3">
+                                <i class="fas fa-image mr-2"></i> Logo ve Planlar
+                            </a>
                         </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <div class="row">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header">
-                    <h3 class="card-title">Yönetim Bağlantıları</h3>
-                </div>
-                <div class="card-body">
-                    <div class="row">
+                        <div class="col-md-4">
+                            <a href="#" class="btn btn-success btn-lg btn-block mb-3">
+                                <i class="fas fa-star mr-2"></i> Öne Çıkan Hizmetler
+                            </a>
+                        </div>
+                        <div class="col-md-4">
+                            <a href="{{ route('admin.homepage.header') }}" class="btn btn-dark btn-lg btn-block mb-3">
+                                <i class="fas fa-heading mr-2"></i> Header Yönetimi
+                            </a>
+                        </div>
+                        
+                        <!-- Üçüncü Satır -->
                         <div class="col-md-4">
                             <a href="{{ route('admin.homepage.sliders') }}" class="btn btn-primary btn-lg btn-block mb-3">
                                 <i class="fas fa-images mr-2"></i> Slider Yönetimi
@@ -74,6 +63,13 @@
                         <div class="col-md-4">
                             <a href="{{ route('admin.menusystem.index') }}" class="btn btn-warning btn-lg btn-block mb-3">
                                 <i class="fas fa-sitemap mr-2"></i> Menü Sistemi
+                            </a>
+                        </div>
+                        
+                        <!-- Dördüncü Satır -->
+                        <div class="col-md-4">
+                            <a href="{{ route('admin.footer.index') }}" class="btn btn-info btn-lg btn-block mb-3">
+                                <i class="fas fa-layer-group mr-2"></i> Footer Yönetimi
                             </a>
                         </div>
                     </div>

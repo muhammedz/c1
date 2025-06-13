@@ -43,6 +43,9 @@ use App\Http\Controllers\SearchController;
 use App\Http\Controllers\SearchPageController;
 use App\Http\Controllers\Admin\ServicesUnitController;
 use App\Http\Controllers\Admin\ServiceTopicController;
+use App\Http\Controllers\Admin\FooterController;
+use App\Http\Controllers\Admin\FooterMenuController;
+use App\Http\Controllers\Admin\FooterMenuLinkController;
 
 /*
 |--------------------------------------------------------------------------
@@ -428,6 +431,31 @@ Route::middleware(['auth', 'role:admin'])->name('admin.')->prefix('admin')->grou
         Route::delete('/menu-items/{item}', [App\Http\Controllers\Admin\MenuItemController::class, 'destroy'])->name('menu-items.destroy');
         Route::post('/menu-items/order', [App\Http\Controllers\Admin\MenuItemController::class, 'updateOrder'])->name('menu-items.order');
         Route::get('/menu-items/icons', [App\Http\Controllers\Admin\MenuItemController::class, 'getIcons'])->name('menu-items.icons');
+    });
+    
+    // Footer Yönetimi
+    Route::prefix('footer')->name('footer.')->group(function () {
+        // Ana footer yönetimi
+        Route::get('/', [App\Http\Controllers\Admin\FooterController::class, 'index'])->name('index');
+        Route::post('/settings', [App\Http\Controllers\Admin\FooterController::class, 'updateSettings'])->name('settings.update');
+        Route::delete('/logo', [App\Http\Controllers\Admin\FooterController::class, 'deleteLogo'])->name('logo.delete');
+        
+        // Footer menüleri
+        Route::resource('menus', App\Http\Controllers\Admin\FooterMenuController::class);
+        Route::post('menus/order', [App\Http\Controllers\Admin\FooterMenuController::class, 'updateOrder'])->name('menus.order');
+        Route::post('menus/{footerMenu}/toggle', [App\Http\Controllers\Admin\FooterMenuController::class, 'toggleStatus'])->name('menus.toggle');
+        
+        // Footer menü linkleri
+        Route::prefix('menus/{footerMenu}/links')->name('menus.links.')->group(function () {
+            Route::get('/', [App\Http\Controllers\Admin\FooterMenuLinkController::class, 'index'])->name('index');
+            Route::get('/create', [App\Http\Controllers\Admin\FooterMenuLinkController::class, 'create'])->name('create');
+            Route::post('/', [App\Http\Controllers\Admin\FooterMenuLinkController::class, 'store'])->name('store');
+            Route::get('/{link}/edit', [App\Http\Controllers\Admin\FooterMenuLinkController::class, 'edit'])->name('edit');
+            Route::put('/{link}', [App\Http\Controllers\Admin\FooterMenuLinkController::class, 'update'])->name('update');
+            Route::delete('/{link}', [App\Http\Controllers\Admin\FooterMenuLinkController::class, 'destroy'])->name('destroy');
+            Route::post('/order', [App\Http\Controllers\Admin\FooterMenuLinkController::class, 'updateOrder'])->name('order');
+            Route::post('/{link}/toggle', [App\Http\Controllers\Admin\FooterMenuLinkController::class, 'toggleStatus'])->name('toggle');
+        });
     });
 });
 
