@@ -116,7 +116,7 @@
                                                 <div class="project-item">
                                                     <a href="{{ route('front.projects.detail', $project->slug) }}" data-url="{{ route('front.projects.detail', $project->slug) }}" class="project-link block aspect-video rounded-2xl overflow-hidden relative group">
                                                         <img src="{{ $project->cover_image_url }}" alt="{{ $project->title }}" class="w-full h-full object-cover">
-                                                        <div class="absolute inset-0 bg-black/60"></div>
+                                                        <div class="absolute inset-0 bg-black/25"></div>
                                                         <div class="absolute bottom-0 left-0 right-0 p-6">
                                                             <h3 class="text-white text-xl font-bold" style="font-family: 'TT Norms Pro', sans-serif; font-weight: 700;">{{ $project->title }}</h3>
                                                             <p class="text-white/80 mt-2" style="font-family: 'TT Norms Pro', sans-serif; font-weight: 400;">{{ $project->status_text }}</p>
@@ -148,7 +148,7 @@
                                     <div class="project-item">
                                         <a href="/projeler/demo-proje" data-url="/projeler/demo-proje" class="project-link block aspect-video rounded-2xl overflow-hidden relative group">
                                             <img src="https://images.unsplash.com/photo-1587764379873-97837921fd44" alt="HAYVAN EVİ" class="w-full h-full object-cover">
-                                            <div class="absolute inset-0 bg-black/60"></div>
+                                            <div class="absolute inset-0 bg-black/25"></div>
                                             <div class="absolute bottom-0 left-0 right-0 p-6">
                                                 <h3 class="text-white text-xl font-bold" style="font-family: 'TT Norms Pro', sans-serif; font-weight: 700;">HAYVAN EVİ</h3>
                                                 <p class="text-white/80 mt-2" style="font-family: 'TT Norms Pro', sans-serif; font-weight: 400;">2024'te Tamamlandı</p>
@@ -158,7 +158,7 @@
                                     <div class="project-item">
                                         <a href="/projeler/demo-proje" data-url="/projeler/demo-proje" class="project-link block aspect-video rounded-2xl overflow-hidden relative group">
                                             <img src="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4" alt="ÇOCUK EVİ" class="w-full h-full object-cover">
-                                            <div class="absolute inset-0 bg-black/60"></div>
+                                            <div class="absolute inset-0 bg-black/25"></div>
                                             <div class="absolute bottom-0 left-0 right-0 p-6">
                                                 <h3 class="text-white text-xl font-bold" style="font-family: 'TT Norms Pro', sans-serif; font-weight: 700;">ÇOCUK EVİ</h3>
                                                 <p class="text-white/80 mt-2" style="font-family: 'TT Norms Pro', sans-serif; font-weight: 400;">2023'te Tamamlandı</p>
@@ -173,7 +173,7 @@
                                     <div class="project-item">
                                         <a href="/projeler/demo-proje" data-url="/projeler/demo-proje" class="project-link block aspect-video rounded-2xl overflow-hidden relative group">
                                             <img src="https://images.unsplash.com/photo-1581094794329-c8112a89af12" alt="EĞİTİM MERKEZİ" class="w-full h-full object-cover">
-                                            <div class="absolute inset-0 bg-black/60"></div>
+                                            <div class="absolute inset-0 bg-black/25"></div>
                                             <div class="absolute bottom-0 left-0 right-0 p-6">
                                                 <h3 class="text-white text-xl font-bold" style="font-family: 'TT Norms Pro', sans-serif; font-weight: 700;">EĞİTİM MERKEZİ</h3>
                                                 <p class="text-white/80 mt-2" style="font-family: 'TT Norms Pro', sans-serif; font-weight: 400;">2022'de Tamamlandı</p>
@@ -183,7 +183,7 @@
                                     <div class="project-item">
                                         <a href="/projeler/demo-proje" data-url="/projeler/demo-proje" class="project-link block aspect-video rounded-2xl overflow-hidden relative group">
                                             <img src="https://images.unsplash.com/photo-1513694203232-719a280e022f" alt="SPOR SALONU" class="w-full h-full object-cover">
-                                            <div class="absolute inset-0 bg-black/60"></div>
+                                            <div class="absolute inset-0 bg-black/25"></div>
                                             <div class="absolute bottom-0 left-0 right-0 p-6">
                                                 <h3 class="text-white text-xl font-bold" style="font-family: 'TT Norms Pro', sans-serif; font-weight: 700;">SPOR SALONU</h3>
                                                 <p class="text-white/80 mt-2" style="font-family: 'TT Norms Pro', sans-serif; font-weight: 400;">2022'de Tamamlandı</p>
@@ -203,7 +203,7 @@
                                     <div class="project-item">
                                         <a href="/projeler/demo-proje" data-url="/projeler/demo-proje" class="project-link block aspect-video rounded-2xl overflow-hidden relative group">
                                             <img src="https://images.unsplash.com/photo-1531834685032-c34bf0d84c77" alt="YEŞİL ENERJİ" class="w-full h-full object-cover">
-                                            <div class="absolute inset-0 bg-black/60"></div>
+                                            <div class="absolute inset-0 bg-black/25"></div>
                                             <div class="absolute bottom-0 left-0 right-0 p-6">
                                                 <h3 class="text-white text-xl font-bold">YEŞİL ENERJİ SANTRALİ</h3>
                                                 <p class="text-white/80 mt-2">2025'te Başlayacak</p>
@@ -213,7 +213,7 @@
                                     <div class="project-item">
                                         <a href="/projeler/demo-proje" data-url="/projeler/demo-proje" class="project-link block aspect-video rounded-2xl overflow-hidden relative group">
                                             <img src="https://images.unsplash.com/photo-1517048676732-d65bc937f952" alt="AKILLI ULAŞIM" class="w-full h-full object-cover">
-                                            <div class="absolute inset-0 bg-black/60"></div>
+                                            <div class="absolute inset-0 bg-black/25"></div>
                                             <div class="absolute bottom-0 left-0 right-0 p-6">
                                                 <h3 class="text-white text-xl font-bold">AKILLI ULAŞIM SİSTEMİ</h3>
                                                 <p class="text-white/80 mt-2">2025'te Başlayacak</p>
@@ -228,7 +228,7 @@
                                     <div class="project-item">
                                         <a href="/projeler/demo-proje" data-url="/projeler/demo-proje" class="project-link block aspect-video rounded-2xl overflow-hidden relative group">
                                             <img src="https://images.unsplash.com/photo-1497366754035-f200968a6e72" alt="MODERN KÜTÜPHANE" class="w-full h-full object-cover">
-                                            <div class="absolute inset-0 bg-black/60"></div>
+                                            <div class="absolute inset-0 bg-black/25"></div>
                                             <div class="absolute bottom-0 left-0 right-0 p-6">
                                                 <h3 class="text-white text-xl font-bold">MODERN KÜTÜPHANE</h3>
                                                 <p class="text-white/80 mt-2">2026'da Başlayacak</p>
@@ -238,7 +238,7 @@
                                     <div class="project-item">
                                         <a href="/projeler/demo-proje" data-url="/projeler/demo-proje" class="project-link block aspect-video rounded-2xl overflow-hidden relative group">
                                             <img src="https://images.unsplash.com/photo-1566669437687-7040a066c756" alt="BİLİM MERKEZİ" class="w-full h-full object-cover">
-                                            <div class="absolute inset-0 bg-black/60"></div>
+                                            <div class="absolute inset-0 bg-black/25"></div>
                                             <div class="absolute bottom-0 left-0 right-0 p-6">
                                                 <h3 class="text-white text-xl font-bold">BİLİM MERKEZİ</h3>
                                                 <p class="text-white/80 mt-2">2026'da Başlayacak</p>

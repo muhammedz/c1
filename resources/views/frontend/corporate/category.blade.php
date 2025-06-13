@@ -75,7 +75,7 @@
 <section class="py-12 bg-slate-100">
     <div class="container max-w-7xl mx-auto px-4">
         @if(count($members) > 0)
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5">
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-5">
             @foreach($members as $member)
                 @if($member->use_custom_link && $member->custom_link)
                 <a href="{{ $member->custom_link }}" 

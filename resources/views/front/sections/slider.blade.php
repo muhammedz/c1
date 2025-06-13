@@ -32,7 +32,7 @@
             <!-- Slider {{ $loop->iteration }} -->
             <div class="swiper-slide relative">
                 <!-- Gradient overlay -->
-                <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-black/20 z-10"></div>
+                <div class="absolute inset-0 bg-gradient-to-t from-black/30 via-black/15 to-black/5 z-10"></div>
                 
                 <!-- Slide image - Placeholder görsel kullan -->
                 <div class="w-full h-full bg-gray-800">
@@ -120,7 +120,7 @@
             <!-- Fallback slider eğer veritabanında slider yoksa -->
             <div class="swiper-slide relative">
                 <!-- Gradient overlay -->
-                <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-black/20 z-10"></div>
+                <div class="absolute inset-0 bg-gradient-to-t from-black/30 via-black/15 to-black/5 z-10"></div>
                 
                 <!-- Slide image - Placeholder görsel kullan -->
                 <div class="w-full h-full bg-gray-800">
