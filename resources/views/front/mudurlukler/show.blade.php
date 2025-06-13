@@ -306,7 +306,7 @@
                 <h2>Dosyalar ve Dökümanlar</h2>
                 <p class="mb-5">{{ $mudurluk->name }} müdürlüğüne ait resmi belgeler ve dökümanları aşağıdan indirebilirsiniz:</p>
                 
-                <!-- Hizmet Standartları -->
+                                                <!-- Hizmet Standartları -->
                 @php
                     $hizmetStandartlari = $mudurluk->files->where('type', 'hizmet_standartlari')->where('is_active', true);
                 @endphp
@@ -323,7 +323,7 @@
                                     </div>
                                     <p class="text-sm text-gray-600 mb-4">{{ $file->file_name }} • {{ number_format($file->file_size / 1024, 1) }} KB</p>
                                     <div class="mt-auto flex items-center">
-                                        <a href="{{ route('mudurlukler.download-file', [$mudurluk->slug, $file]) }}" target="_blank" class="inline-flex items-center text-[#00352b] hover:text-[#20846c] transition-colors">
+                                        <a href="{{ route('mudurlukler.download-file', [$mudurluk->slug, $file]) }}" class="inline-flex items-center text-[#00352b] hover:text-[#20846c] transition-colors">
                                             <span class="material-icons mr-1 text-sm">file_download</span>
                                             <span class="text-sm font-medium">İndir</span>
                                         </a>
@@ -352,7 +352,7 @@
                                     </div>
                                     <p class="text-sm text-gray-600 mb-4">{{ $file->file_name }} • {{ number_format($file->file_size / 1024, 1) }} KB</p>
                                     <div class="mt-auto flex items-center">
-                                        <a href="{{ route('mudurlukler.download-file', [$mudurluk->slug, $file]) }}" target="_blank" class="inline-flex items-center text-[#00352b] hover:text-[#20846c] transition-colors">
+                                        <a href="{{ route('mudurlukler.download-file', [$mudurluk->slug, $file]) }}" class="inline-flex items-center text-[#00352b] hover:text-[#20846c] transition-colors">
                                             <span class="material-icons mr-1 text-sm">file_download</span>
                                             <span class="text-sm font-medium">İndir</span>
                                         </a>
