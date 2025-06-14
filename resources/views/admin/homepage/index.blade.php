@@ -27,19 +27,19 @@
                             </a>
                         </div>
                         <div class="col-md-4">
-                            <a href="#" class="btn btn-info btn-lg btn-block mb-3">
+                            <a href="{{ route('admin.homepage.mobile-app') }}" class="btn btn-info btn-lg btn-block mb-3">
                                 <i class="fas fa-mobile-alt mr-2"></i> Mobil Uygulama
                             </a>
                         </div>
                         
                         <!-- İkinci Satır -->
                         <div class="col-md-4">
-                            <a href="#" class="btn btn-warning btn-lg btn-block mb-3">
+                            <a href="{{ route('admin.homepage.logo-and-plans') }}" class="btn btn-warning btn-lg btn-block mb-3">
                                 <i class="fas fa-image mr-2"></i> Logo ve Planlar
                             </a>
                         </div>
                         <div class="col-md-4">
-                            <a href="#" class="btn btn-success btn-lg btn-block mb-3">
+                            <a href="{{ route('admin.homepage.featured-services') }}" class="btn btn-success btn-lg btn-block mb-3">
                                 <i class="fas fa-star mr-2"></i> Öne Çıkan Hizmetler
                             </a>
                         </div>

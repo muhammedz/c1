@@ -79,7 +79,7 @@
                     <div class="mt-4 pt-4 border-t border-white/10">
                         <div class="flex items-center justify-center text-[#e6a23c]">
                             <span class="material-icons mr-2">phone</span>
-                            <span class="font-bold">444 1 234</span>
+                            <span class="font-bold">444 06 01</span>
                         </div>
                     </div>
                 </div>

@@ -228,11 +228,11 @@
                     <div class="text-white text-center">
                         <span class="material-icons text-4xl text-[#e6a23c] mb-2">business</span>
                         <h3 class="text-xl font-semibold mb-2">Müdürlük Bilgileri</h3>
-                        <p class="text-sm text-white/80">Bu müdürlük hakkında önemli bilgiler ve istatistikler aşağıda listelenmiştir.</p>
+                        <p class="text-sm text-white/80">Bilgi almak için bizi arayabilirsiniz.</p>
                         <div class="mt-4 pt-4 border-t border-white/10">
                             <div class="flex items-center justify-center text-[#e6a23c]">
                                 <span class="material-icons mr-2">phone</span>
-                                <span class="font-bold">444 1 234</span>
+                                <span class="font-bold">444 06 01</span>
                             </div>
                         </div>
                     </div>

@@ -151,7 +151,7 @@
                     <span class="material-icons text-white">phone</span>
                 </div>
                 <h3 class="font-bold text-gray-800 mb-2">Telefon</h3>
-                <p class="text-gray-600">444 1 234</p>
+                <p class="text-gray-600">444 06 01</p>
             </div>
             
             <div class="text-center p-6 bg-slate-50 rounded-lg">

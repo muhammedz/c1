@@ -47,10 +47,24 @@ class FooterController extends Controller
         if ($request->hasFile('logo')) {
             // Eski logoyu sil
             if ($settings->logo) {
-                Storage::disk('public')->delete($settings->logo);
+                $oldLogoPath = public_path('uploads/' . $settings->logo);
+                if (file_exists($oldLogoPath)) {
+                    unlink($oldLogoPath);
+                }
             }
             
-            $logoPath = $request->file('logo')->store('footer/logos', 'public');
+            $logoFile = $request->file('logo');
+            $logoName = time() . '_' . $logoFile->getClientOriginalName();
+            $logoPath = 'footer/logos/' . $logoName;
+            
+            // uploads klasörünü oluştur (yoksa)
+            $uploadDir = public_path('uploads/footer/logos');
+            if (!file_exists($uploadDir)) {
+                mkdir($uploadDir, 0755, true);
+            }
+            
+            // uploads klasörüne kaydet
+            $logoFile->move($uploadDir, $logoName);
             $settings->logo = $logoPath;
         }
 
@@ -64,7 +78,10 @@ class FooterController extends Controller
     {
         $settings = FooterSetting::first();
         if ($settings && $settings->logo) {
-            Storage::disk('public')->delete($settings->logo);
+            $logoPath = public_path('uploads/' . $settings->logo);
+            if (file_exists($logoPath)) {
+                unlink($logoPath);
+            }
             $settings->logo = null;
             $settings->save();
         }
