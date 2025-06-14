@@ -35,6 +35,9 @@
                         <i class="fas fa-link"></i> Link Listesi
                     </h3>
                     <div class="card-tools">
+                        <button type="button" class="btn btn-sm btn-info mr-2" id="sort-alphabetically">
+                            <i class="fas fa-sort-alpha-down"></i> Alfabetik Sırala
+                        </button>
                         <span class="badge badge-info">{{ $links->count() }} link</span>
                     </div>
                 </div>
@@ -235,6 +238,55 @@
                         }
                     });
                 }
+            });
+
+            // Alfabetik sıralama
+            $('#sort-alphabetically').click(function() {
+                const rows = $('#sortable-links tr').get();
+                
+                rows.sort(function(a, b) {
+                    const titleA = $(a).find('td:nth-child(2) strong').text().trim();
+                    const titleB = $(b).find('td:nth-child(2) strong').text().trim();
+                    return titleA.localeCompare(titleB, 'tr-TR', { 
+                        sensitivity: 'base',
+                        numeric: true,
+                        ignorePunctuation: true
+                    });
+                });
+                
+                // Sıralanmış satırları tabloya ekle
+                $.each(rows, function(index, row) {
+                    $('#sortable-links').append(row);
+                    $(row).find('td:first').html(
+                        '<i class="fas fa-grip-vertical handle" style="cursor: move;"></i> ' + 
+                        (index + 1)
+                    );
+                });
+                
+                // Sıralamayı kaydet
+                let orders = {};
+                $('#sortable-links tr').each(function(index) {
+                    let id = $(this).data('id');
+                    orders[id] = index + 1;
+                });
+                
+                // AJAX ile sıralama güncelleme
+                $.ajax({
+                    url: '{{ route("admin.footer.menus.links.order", $menu) }}',
+                    method: 'POST',
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                        orders: orders
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            toastr.success('Linkler alfabetik sıraya göre düzenlendi');
+                        }
+                    },
+                    error: function() {
+                        toastr.error('Sıralama güncellenirken hata oluştu');
+                    }
+                });
             });
 
             // DataTable

@@ -90,6 +90,16 @@
                             @enderror
                         </div>
 
+                        <!-- Direkt Link -->
+                        <div class="form-group">
+                            <label for="direct_link">Direkt Link <small class="text-muted">(Slider'a tıklandığında gidilecek sayfa)</small></label>
+                            <input type="text" class="form-control @error('direct_link') is-invalid @enderror" id="direct_link" name="direct_link" value="{{ old('direct_link', $slider->direct_link) }}" placeholder="Örn: /hakkimizda veya https://example.com">
+                            @error('direct_link')
+                                <span class="invalid-feedback">{{ $message }}</span>
+                            @enderror
+                            <small class="form-text text-muted">Bu alan doldurulursa, slider'a tıklandığında bu adrese yönlendirilir.</small>
+                        </div>
+
                         <!-- FileManagerSystem Görsel -->
                         <div class="form-group">
                             <label for="filemanagersystem_image">Slider Görseli</label>

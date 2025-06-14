@@ -14,7 +14,7 @@ class FooterMenuLinkController extends Controller
      */
     public function index(FooterMenu $footerMenu)
     {
-        $links = $footerMenu->links()->ordered()->get();
+        $links = $footerMenu->links()->orderByRaw('LOWER(title) COLLATE utf8mb4_turkish_ci ASC')->get(); // Türkçe alfabetik sıralama
         $menu = $footerMenu; // View'da $menu değişkeni kullanılıyor
         return view('admin.footer.links.index', compact('menu', 'links'));
     }
@@ -195,16 +195,39 @@ class FooterMenuLinkController extends Controller
      */
     public function destroy(FooterMenu $footerMenu, FooterMenuLink $link)
     {
-        // DESTROY METODU GEÇİCİ OLARAK DEVRE DIŞI BIRAKILDI
-        \Illuminate\Support\Facades\Log::info('FooterMenuLink Destroy Called - DISABLED: ', [
-            'menu_id' => $footerMenu->id,
-            'link_id' => $link->id,
-            'request_method' => request()->method(),
-            'request_all' => request()->all()
-        ]);
+        // Link'in doğru menu'ye ait olup olmadığını kontrol et
+        if ($link->footer_menu_id !== $footerMenu->id) {
+            \Illuminate\Support\Facades\Log::error('FooterMenuLink Destroy - Link does not belong to menu: ', [
+                'link_id' => $link->id,
+                'link_menu_id' => $link->footer_menu_id,
+                'expected_menu_id' => $footerMenu->id
+            ]);
+            
+            return redirect()->route('admin.footer.menus.links.index', $footerMenu)
+                            ->with('error', 'Link bu menüye ait değil.');
+        }
 
-        return redirect()->route('admin.footer.menus.links.index', $footerMenu)
-                        ->with('error', 'Silme işlemi geçici olarak devre dışı bırakıldı.');
+        try {
+            \Illuminate\Support\Facades\Log::info('FooterMenuLink Destroy: ', [
+                'menu_id' => $footerMenu->id,
+                'link_id' => $link->id,
+                'link_title' => $link->title
+            ]);
+
+            $linkTitle = $link->title;
+            $link->delete();
+
+            return redirect()->route('admin.footer.menus.links.index', $footerMenu)
+                            ->with('success', "'{$linkTitle}' linki başarıyla silindi.");
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('FooterMenuLink Destroy Error: ', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return redirect()->route('admin.footer.menus.links.index', $footerMenu)
+                            ->with('error', 'Link silinirken bir hata oluştu: ' . $e->getMessage());
+        }
     }
 
     public function updateOrder(Request $request, FooterMenu $footerMenu)

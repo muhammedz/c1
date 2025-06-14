@@ -21,10 +21,20 @@ class FooterMenu extends Model
 
     public function links()
     {
+        return $this->hasMany(FooterMenuLink::class)->orderByRaw('LOWER(title) COLLATE utf8mb4_turkish_ci ASC');
+    }
+
+    public function linksByOrder()
+    {
         return $this->hasMany(FooterMenuLink::class)->orderBy('order');
     }
 
     public function activeLinks()
+    {
+        return $this->hasMany(FooterMenuLink::class)->where('is_active', true)->orderByRaw('LOWER(title) COLLATE utf8mb4_turkish_ci ASC');
+    }
+
+    public function activeLinksByOrder()
     {
         return $this->hasMany(FooterMenuLink::class)->where('is_active', true)->orderBy('order');
     }

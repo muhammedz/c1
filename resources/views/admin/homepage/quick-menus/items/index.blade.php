@@ -55,7 +55,10 @@
                         </div>
                     </div>
                     <div class="col-md-4 text-right">
-                        <a href="{{ route('admin.homepage.quick-menus.edit', $category->id) }}" class="btn btn-warning btn-sm">
+                        <button type="button" class="btn btn-info btn-sm" id="sort-alphabetically">
+                            <i class="fas fa-sort-alpha-down"></i> Alfabetik Sırala
+                        </button>
+                        <a href="{{ route('admin.homepage.quick-menus.edit', $category->id) }}" class="btn btn-warning btn-sm ml-2">
                             <i class="fas fa-edit"></i> Kategoriyi Düzenle
                         </a>
                         <span class="badge badge-{{ $category->is_active ? 'success' : 'danger' }} ml-2">
@@ -229,6 +232,52 @@
                 const id = $(this).data('id');
                 $('#delete-form').attr('action', "{{ route('admin.homepage.quick-menus.items.delete', ['category_id' => $category->id, 'id' => ':id']) }}".replace(':id', id));
                 $('#delete-modal').modal('show');
+            });
+            
+            // Alfabetik sıralama
+            $('#sort-alphabetically').click(function() {
+                const rows = $('#sortable-items tr').get();
+                
+                rows.sort(function(a, b) {
+                    const titleA = $(a).find('td:nth-child(4)').text().trim();
+                    const titleB = $(b).find('td:nth-child(4)').text().trim();
+                    return titleA.localeCompare(titleB, 'tr-TR', { 
+                        sensitivity: 'base',
+                        numeric: true,
+                        ignorePunctuation: true
+                    });
+                });
+                
+                // Sıralanmış satırları tabloya ekle
+                $.each(rows, function(index, row) {
+                    $('#sortable-items').append(row);
+                    $(row).find('.order-number').text(index);
+                });
+                
+                // Sıralamayı kaydet
+                let items = [];
+                $('#sortable-items tr').each(function(index) {
+                    items.push({
+                        id: $(this).data('id'),
+                        order: index
+                    });
+                });
+                
+                // AJAX ile sıralama güncelleme
+                $.ajax({
+                    url: "{{ route('admin.homepage.quick-menus.items.order', $category->id) }}",
+                    method: 'POST',
+                    data: {
+                        _token: "{{ csrf_token() }}",
+                        items: items
+                    },
+                    success: function(response) {
+                        toastr.success('Öğeler alfabetik sıraya göre düzenlendi');
+                    },
+                    error: function(xhr) {
+                        toastr.error('Sıralama güncellenirken bir hata oluştu');
+                    }
+                });
             });
         });
     </script>

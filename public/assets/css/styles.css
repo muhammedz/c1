@@ -180,20 +180,10 @@ html {
     overflow: hidden;
 }
 
-.heroSwiper .swiper-slide::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(180deg, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.2) 100%);
-    z-index: 1;
-}
+/* Overlay kaldırıldı - slider resmi direkt görünecek */
 
 .heroSwiper .swiper-slide img {
     transition: transform 8s ease;
-    filter: brightness(0.9);
 }
 
 .heroSwiper .swiper-slide-active img {

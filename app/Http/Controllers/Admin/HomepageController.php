@@ -61,6 +61,7 @@ class HomepageController extends Controller
             'subtitle' => 'nullable|string|max:255',
             'button_text' => 'nullable|string|max:50',
             'button_url' => 'nullable|string|max:255',
+            'direct_link' => 'nullable|string|max:255',
             'order' => 'nullable|integer|min:0',
             'is_active' => 'nullable|boolean',
             'filemanagersystem_image' => 'nullable|string',
@@ -156,6 +157,7 @@ class HomepageController extends Controller
             'subtitle' => 'nullable|string|max:255',
             'button_text' => 'nullable|string|max:50',
             'button_url' => 'nullable|string|max:255',
+            'direct_link' => 'nullable|string|max:255',
             'order' => 'nullable|integer|min:0',
             'is_active' => 'nullable|boolean',
             'filemanagersystem_image' => 'nullable|string',
@@ -418,7 +420,7 @@ class HomepageController extends Controller
     public function quickMenuItems($category_id)
     {
         $category = QuickMenuCategory::findOrFail($category_id);
-        $items = $category->items;
+        $items = $category->items()->orderByRaw('LOWER(title) COLLATE utf8mb4_turkish_ci ASC')->get(); // Türkçe alfabetik sıralama
         
         return view('admin.homepage.quick-menus.items.index', compact('category', 'items'));
     }

@@ -38,6 +38,16 @@ class QuickMenuCategory extends Model
      */
     public function items()
     {
+        return $this->hasMany(QuickMenuItem::class, 'category_id')->orderByRaw('LOWER(title) COLLATE utf8mb4_turkish_ci ASC');
+    }
+    
+    /**
+     * Bu kategoriye ait menü öğeleri (order'a göre)
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function itemsByOrder()
+    {
         return $this->hasMany(QuickMenuItem::class, 'category_id')->orderBy('order');
     }
     
@@ -47,6 +57,18 @@ class QuickMenuCategory extends Model
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function activeItems()
+    {
+        return $this->hasMany(QuickMenuItem::class, 'category_id')
+            ->where('is_active', true)
+            ->orderByRaw('LOWER(title) COLLATE utf8mb4_turkish_ci ASC');
+    }
+    
+    /**
+     * Sadece aktif öğeleri order'a göre getir
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function activeItemsByOrder()
     {
         return $this->hasMany(QuickMenuItem::class, 'category_id')
             ->where('is_active', true)

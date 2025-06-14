@@ -42,6 +42,7 @@
                                 <th style="width: 150px">Görsel</th>
                                 <th>Başlık</th>
                                 <th>Alt Başlık</th>
+                                <th>Direkt Link</th>
                                 <th style="width: 100px">Durum</th>
                                 <th style="width: 200px">İşlemler</th>
                             </tr>
@@ -66,6 +67,15 @@
                                     </td>
                                     <td>{{ $slider->title }}</td>
                                     <td>{{ $slider->subtitle ?? '-' }}</td>
+                                    <td>
+                                        @if($slider->direct_link)
+                                            <a href="{{ $slider->direct_link }}" target="_blank" class="text-primary">
+                                                <i class="fas fa-external-link-alt"></i> {{ Str::limit($slider->direct_link, 30) }}
+                                            </a>
+                                        @else
+                                            <span class="text-muted">-</span>
+                                        @endif
+                                    </td>
                                     <td>
                                         <button type="button" class="btn btn-sm {{ $slider->is_active ? 'btn-success' : 'btn-danger' }} toggle-status" data-id="{{ $slider->id }}">
                                             <i class="fas {{ $slider->is_active ? 'fa-eye' : 'fa-eye-slash' }}"></i>

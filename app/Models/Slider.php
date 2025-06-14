@@ -22,6 +22,7 @@ class Slider extends Model
         'subtitle',
         'button_text',
         'button_url',
+        'direct_link',
         'order',
         'is_active',
         'filemanagersystem_image',
