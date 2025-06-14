@@ -46,6 +46,8 @@ use App\Http\Controllers\Admin\ServiceTopicController;
 use App\Http\Controllers\Admin\FooterController;
 use App\Http\Controllers\Admin\FooterMenuController;
 use App\Http\Controllers\Admin\FooterMenuLinkController;
+use App\Http\Controllers\Admin\NotFoundController;
+use App\Http\Controllers\Admin\RedirectController;
 
 /*
 |--------------------------------------------------------------------------
@@ -452,11 +454,30 @@ Route::middleware(['auth', 'role:admin'])->name('admin.')->prefix('admin')->grou
             Route::post('/', [App\Http\Controllers\Admin\FooterMenuLinkController::class, 'store'])->name('store');
             Route::get('/{link}/edit', [App\Http\Controllers\Admin\FooterMenuLinkController::class, 'edit'])->name('edit');
             Route::put('/{link}', [App\Http\Controllers\Admin\FooterMenuLinkController::class, 'update'])->name('update');
-            Route::delete('/{link}', [App\Http\Controllers\Admin\FooterMenuLinkController::class, 'destroy'])->name('destroy');
+            Route::delete('/{link}', [App\Http\Controllers\Admin\FooterMenuLinkController::class, 'destroy'])->name('destroy'); // Tekrar aktif - ama destroy metodu devre dışı
             Route::post('/order', [App\Http\Controllers\Admin\FooterMenuLinkController::class, 'updateOrder'])->name('order');
             Route::post('/{link}/toggle', [App\Http\Controllers\Admin\FooterMenuLinkController::class, 'toggleStatus'])->name('toggle');
         });
     });
+    
+    // 404 Takip ve Yönlendirme Yönetimi
+    Route::prefix('404-management')->name('404-logs.')->group(function () {
+        Route::get('/', [App\Http\Controllers\Admin\NotFoundController::class, 'index'])->name('index');
+        Route::get('/{notFoundLog}', [App\Http\Controllers\Admin\NotFoundController::class, 'show'])->name('show');
+        Route::post('/{notFoundLog}/resolve', [App\Http\Controllers\Admin\NotFoundController::class, 'resolve'])->name('resolve');
+        Route::post('/bulk-resolve', [App\Http\Controllers\Admin\NotFoundController::class, 'bulkResolve'])->name('bulk-resolve');
+        Route::post('/bulk-delete', [App\Http\Controllers\Admin\NotFoundController::class, 'bulkDelete'])->name('bulk-delete');
+        Route::delete('/{notFoundLog}', [App\Http\Controllers\Admin\NotFoundController::class, 'destroy'])->name('destroy');
+        Route::get('/{notFoundLog}/create-redirect', [App\Http\Controllers\Admin\NotFoundController::class, 'createRedirect'])->name('create-redirect');
+        Route::get('/dashboard-widget', [App\Http\Controllers\Admin\NotFoundController::class, 'dashboardWidget'])->name('dashboard-widget');
+    });
+    
+    // Yönlendirme Kuralları Yönetimi
+    Route::resource('redirects', App\Http\Controllers\Admin\RedirectController::class);
+    Route::post('redirects/{redirect}/toggle', [App\Http\Controllers\Admin\RedirectController::class, 'toggle'])->name('redirects.toggle');
+    Route::post('redirects/{redirect}/test', [App\Http\Controllers\Admin\RedirectController::class, 'test'])->name('redirects.test');
+    Route::post('redirects/bulk-delete', [App\Http\Controllers\Admin\RedirectController::class, 'bulkDelete'])->name('redirects.bulk-delete');
+    Route::post('redirects/bulk-toggle', [App\Http\Controllers\Admin\RedirectController::class, 'bulkToggle'])->name('redirects.bulk-toggle');
 });
 
 // Etkinlik Yönetimi Rotaları

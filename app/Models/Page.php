@@ -57,9 +57,17 @@ class Page extends Model
     {
         parent::boot();
         
-        // Otomatik slug oluşturma
+        // Otomatik slug oluşturma (yeni kayıt için)
         static::creating(function ($page) {
             if (empty($page->slug)) {
+                $page->slug = Str::slug($page->title);
+            }
+        });
+        
+        // Slug güncelleme (mevcut kayıt için)
+        static::updating(function ($page) {
+            // Eğer slug boşsa title'dan oluştur
+            if (empty($page->slug) && !empty($page->title)) {
                 $page->slug = Str::slug($page->title);
             }
         });

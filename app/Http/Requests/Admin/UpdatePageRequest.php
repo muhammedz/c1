@@ -21,6 +21,7 @@ class UpdatePageRequest extends FormRequest
     {
         return [
             'title' => 'required|string|max:255',
+            'slug' => 'nullable|string|max:255',
             'content' => 'required|string',
             'image' => 'nullable|string',
             'status' => 'required|in:published,draft',

@@ -314,6 +314,20 @@ return [
             'classes'      => 'btn btn-success btn-sm mr-2',
         ],
         [
+            'text'         => '404 Takip',
+            'url'          => 'admin/404-management',
+            'icon'         => 'fas fa-fw fa-exclamation-triangle',
+            'topnav_right' => true,
+            'classes'      => 'btn btn-warning btn-sm mr-2',
+        ],
+        [
+            'text'         => 'Yönlendirmeler',
+            'url'          => 'admin/redirects',
+            'icon'         => 'fas fa-fw fa-route',
+            'topnav_right' => true,
+            'classes'      => 'btn btn-info btn-sm mr-2',
+        ],
+        [
             'type'         => 'fullscreen-widget',
             'topnav_right' => true,
         ],

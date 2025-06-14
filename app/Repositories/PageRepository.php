@@ -108,6 +108,34 @@ class PageRepository extends BaseRepository
     {
         $page = $this->find($id);
         
+        // Slug kontrolü ve güncelleme
+        if (isset($data['slug']) && !empty($data['slug'])) {
+            $baseSlug = Str::slug($data['slug']);
+            $slug = $baseSlug;
+            $counter = 1;
+            
+            // Eğer slug zaten varsa ve mevcut sayfanın slug'ı değilse, sonuna numara ekle
+            while ($this->model->where('slug', $slug)->where('id', '!=', $id)->exists()) {
+                $slug = $baseSlug . '-' . $counter;
+                $counter++;
+            }
+            
+            $data['slug'] = $slug;
+        } elseif (isset($data['title']) && (empty($data['slug']) || $data['slug'] === '')) {
+            // Slug boşsa title'dan oluştur
+            $baseSlug = Str::slug($data['title']);
+            $slug = $baseSlug;
+            $counter = 1;
+            
+            // Eğer slug zaten varsa ve mevcut sayfanın slug'ı değilse, sonuna numara ekle
+            while ($this->model->where('slug', $slug)->where('id', '!=', $id)->exists()) {
+                $slug = $baseSlug . '-' . $counter;
+                $counter++;
+            }
+            
+            $data['slug'] = $slug;
+        }
+        
         // Temel verileri güncelle
         $updated = $page->update($data);
         

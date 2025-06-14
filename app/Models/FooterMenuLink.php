@@ -26,6 +26,11 @@ class FooterMenuLink extends Model
         return $this->belongsTo(FooterMenu::class, 'footer_menu_id');
     }
 
+    public function footerMenu()
+    {
+        return $this->belongsTo(FooterMenu::class, 'footer_menu_id');
+    }
+
     public function scopeActive($query)
     {
         return $query->where('is_active', true);
@@ -34,5 +39,13 @@ class FooterMenuLink extends Model
     public function scopeOrdered($query)
     {
         return $query->orderBy('order');
+    }
+
+    /**
+     * Get the route key for the model.
+     */
+    public function getRouteKeyName()
+    {
+        return 'id';
     }
 }

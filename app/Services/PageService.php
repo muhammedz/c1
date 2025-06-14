@@ -118,6 +118,8 @@ class PageService
             Log::info('updatePage başlangıç: ', [
                 'page_id' => $id,
                 'data' => $data,
+                'slug_exists' => isset($data['slug']),
+                'slug_value' => $data['slug'] ?? 'yok',
                 'gallery_exists' => isset($data['gallery']),
                 'gallery_type' => isset($data['gallery']) ? gettype($data['gallery']) : 'yok',
                 'gallery_count' => isset($data['gallery']) && is_array($data['gallery']) ? count($data['gallery']) : 0

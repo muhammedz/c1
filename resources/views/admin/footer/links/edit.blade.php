@@ -23,9 +23,9 @@
                         <i class="fas fa-edit"></i> Link Bilgileri
                     </h3>
                 </div>
-                <form action="{{ route('admin.footer.menus.links.update', [$menu, $link]) }}" method="POST">
+                <form id="updateForm" action="{{ route('admin.footer.menus.links.update', [$menu, $link]) }}" method="POST">
                     @csrf
-                    @method('PUT')
+                    <input type="hidden" name="_method" value="PUT">
                     <div class="card-body">
                         <div class="form-group">
                             <label for="title">Link Başlığı <span class="text-danger">*</span></label>
@@ -50,6 +50,7 @@
                             @enderror
                             <small class="form-text text-muted">
                                 Tam URL adresi girin (http:// veya https:// ile başlamalı).
+                                <br><strong>Debug:</strong> Mevcut değer: {{ $link->url }}
                             </small>
                         </div>
 
@@ -85,15 +86,8 @@
                             <i class="fas fa-times"></i> İptal
                         </a>
                         <div class="float-right">
-                            <form action="{{ route('admin.footer.menus.links.destroy', [$menu, $link]) }}" method="POST" 
-                                  style="display: inline;" 
-                                  onsubmit="return confirm('Bu link silinsin mi?')">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn btn-danger">
-                                    <i class="fas fa-trash"></i> Sil
-                                </button>
-                            </form>
+                            <!-- Silme butonu geçici olarak kaldırıldı -->
+                            <span class="text-muted">Silme işlemi geçici olarak devre dışı</span>
                         </div>
                     </div>
                 </form>
@@ -203,10 +197,17 @@
 @section('js')
     <script>
         $(document).ready(function() {
-            // Form validasyonu
-            $('form').on('submit', function(e) {
+            // Sayfa yüklendiğinde URL field'ının değerini logla
+            console.log('Page loaded, URL field value:', $('#url').val());
+            
+            // Ana form'u seç (güncelleme formu)
+            $('#updateForm').on('submit', function(e) {
+                console.log('Update form submitted');
+                
                 let title = $('#title').val().trim();
                 let url = $('#url').val().trim();
+                
+                console.log('Form submit - Title:', title, 'URL:', url);
                 
                 if (title === '') {
                     e.preventDefault();
@@ -221,24 +222,37 @@
                     toastr.error('URL gereklidir');
                     return false;
                 }
+                
+                // Method spoofing kontrolü
+                let methodField = $(this).find('input[name="_method"]');
+                if (!methodField.length || methodField.val() !== 'PUT') {
+                    console.error('PUT method spoofing field missing or incorrect!', methodField.val());
+                    e.preventDefault();
+                    toastr.error('Form method hatası - PUT method eksik');
+                    return false;
+                }
+                
+                console.log('Method field found:', methodField.val());
+                
+                console.log('Form validation passed, submitting...');
             });
 
-            // URL validasyonu
+            // URL validasyonu - sadece boş değilse ve geçerli protokol yoksa https ekle
             $('#url').on('blur', function() {
                 let url = $(this).val().trim();
-                if (url && !url.match(/^https?:\/\//) && !url.match(/^mailto:/) && !url.match(/^tel:/)) {
+                console.log('URL blur event - Original URL:', url);
+                if (url && url !== '#' && !url.match(/^https?:\/\//) && !url.match(/^mailto:/) && !url.match(/^tel:/) && !url.match(/^#/)) {
                     $(this).val('https://' + url);
+                    console.log('URL blur event - Modified URL:', $(this).val());
                 }
             });
 
-            // URL önizleme
+            // URL önizleme - güvenli hale getirildi
             $('#url').on('input', function() {
                 let url = $(this).val().trim();
+                $('#url-preview').remove();
                 if (url && url.match(/^https?:\/\//)) {
-                    $('#url-preview').remove();
                     $(this).after('<small id="url-preview" class="form-text text-info"><i class="fas fa-external-link-alt"></i> <a href="' + url + '" target="_blank">Önizleme</a></small>');
-                } else {
-                    $('#url-preview').remove();
                 }
             });
         });

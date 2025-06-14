@@ -406,7 +406,6 @@ $(document).ready(function () {
                     <tr>
                         <td>{{ $page->id }}</td>
                         <td>
-                            <img src="{{ $page->image }}" alt="{{ $page->title }}" class="img-thumbnail mr-2" style="max-width: 50px;">
                             {{ $page->title }}
                         </td>
                         <td>

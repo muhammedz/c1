@@ -21,6 +21,7 @@ class Kernel extends HttpKernel
         \Illuminate\Foundation\Http\Middleware\ValidatePostSize::class,
         \App\Http\Middleware\TrimStrings::class,
         \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class,
+        \App\Http\Middleware\RedirectMiddleware::class,
     ];
 
     /**
@@ -37,6 +38,7 @@ class Kernel extends HttpKernel
             \App\Http\Middleware\VerifyCsrfToken::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
             \App\Http\Middleware\PasswordProtection::class,
+            \App\Http\Middleware\Track404Middleware::class,
         ],
 
         'api' => [
@@ -74,6 +76,8 @@ class Kernel extends HttpKernel
         'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
         'api.key' => \App\Http\Middleware\ApiKeyMiddleware::class,
         'filemanagersystem.upload.security' => \App\Http\Middleware\FilemanagersystemUploadSecurity::class,
+        'track.404' => \App\Http\Middleware\Track404Middleware::class,
+        'redirect' => \App\Http\Middleware\RedirectMiddleware::class,
     ];
 
     /**
