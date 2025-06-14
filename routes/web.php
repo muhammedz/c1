@@ -386,10 +386,10 @@ Route::middleware(['auth', 'role:admin'])->name('admin.')->prefix('admin')->grou
     Route::post('cankaya-houses/{cankayaHouse}/toggle-status', [App\Http\Controllers\Admin\CankayaHouseController::class, 'toggleStatus'])->name('cankaya-houses.toggle-status');
     Route::delete('cankaya-houses/{cankayaHouse}/remove-image', [App\Http\Controllers\Admin\CankayaHouseController::class, 'removeImage'])->name('cankaya-houses.remove-image');
     
-    // Çankaya Evi Kursları Yönetimi
-    Route::resource('cankaya-house-courses', App\Http\Controllers\Admin\CankayaHouseCourseController::class)->names('cankaya-house-courses');
-    Route::post('cankaya-house-courses/{cankayaHouseCourse}/toggle-status', [App\Http\Controllers\Admin\CankayaHouseCourseController::class, 'toggleStatus'])->name('cankaya-house-courses.toggle-status');
-    Route::get('cankaya-houses/{cankayaHouse}/courses', [App\Http\Controllers\Admin\CankayaHouseCourseController::class, 'getCoursesByHouse'])->name('cankaya-houses.courses');
+    // Çankaya Evi Kursları Yönetimi - Geçici olarak kapatıldı
+    // Route::resource('cankaya-house-courses', App\Http\Controllers\Admin\CankayaHouseCourseController::class)->names('cankaya-house-courses');
+    // Route::post('cankaya-house-courses/{cankayaHouseCourse}/toggle-status', [App\Http\Controllers\Admin\CankayaHouseCourseController::class, 'toggleStatus'])->name('cankaya-house-courses.toggle-status');
+    // Route::get('cankaya-houses/{cankayaHouse}/courses', [App\Http\Controllers\Admin\CankayaHouseCourseController::class, 'getCoursesByHouse'])->name('cankaya-houses.courses');
 
     // Menü Sistemi Rotaları
     Route::prefix('menusystem')->as('menusystem.')->group(function () {

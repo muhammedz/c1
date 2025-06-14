@@ -134,12 +134,13 @@
                             <div class="card">
                                 <div class="card-header">
                                     <h3 class="card-title">Kurslar ({{ $cankayaHouse->courses->count() }})</h3>
-                                    <div class="card-tools">
+                                    {{-- Kurs ekleme butonu geçici olarak kapatıldı --}}
+                                    {{-- <div class="card-tools">
                                         <a href="{{ route('admin.cankaya-house-courses.create', ['cankaya_house_id' => $cankayaHouse->id]) }}" class="btn btn-primary btn-sm">
                                             <i class="fas fa-plus mr-1"></i>
                                             Yeni Kurs Ekle
                                         </a>
-                                    </div>
+                                    </div> --}}
                                 </div>
                                 <div class="card-body">
                                     @if($cankayaHouse->courses->count() > 0)
@@ -168,7 +169,8 @@
                                                         </span>
                                                     </td>
                                                     <td>
-                                                        <div class="btn-group" role="group">
+                                                        {{-- Kurs düzenleme butonları geçici olarak kapatıldı --}}
+                                                        {{-- <div class="btn-group" role="group">
                                                             <a href="{{ route('admin.cankaya-house-courses.edit', $course) }}" 
                                                                class="btn btn-sm btn-warning" title="Düzenle">
                                                                 <i class="fas fa-edit"></i>
@@ -177,7 +179,7 @@
                                                                     onclick="deleteCourse({{ $course->id }})" title="Sil">
                                                                 <i class="fas fa-trash"></i>
                                                             </button>
-                                                        </div>
+                                                        </div> --}}
                                                     </td>
                                                 </tr>
                                                 @endforeach
@@ -188,10 +190,11 @@
                                     <div class="text-center py-4">
                                         <i class="fas fa-graduation-cap fa-3x text-muted mb-3"></i>
                                         <p class="text-muted">Bu Çankaya Evi'nde henüz kurs bulunmamaktadır.</p>
-                                        <a href="{{ route('admin.cankaya-house-courses.create', ['cankaya_house_id' => $cankayaHouse->id]) }}" class="btn btn-primary">
+                                        {{-- Kurs ekleme butonu geçici olarak kapatıldı --}}
+                                        {{-- <a href="{{ route('admin.cankaya-house-courses.create', ['cankaya_house_id' => $cankayaHouse->id]) }}" class="btn btn-primary">
                                             <i class="fas fa-plus mr-1"></i>
                                             İlk Kursu Ekle
-                                        </a>
+                                        </a> --}}
                                     </div>
                                     @endif
                                 </div>
@@ -249,10 +252,11 @@
                                         Düzenle
                                     </a>
                                     
-                                    <a href="{{ route('admin.cankaya-house-courses.create', ['cankaya_house_id' => $cankayaHouse->id]) }}" class="btn btn-success btn-block">
+                                    {{-- Kurs ekleme butonu geçici olarak kapatıldı --}}
+                                    {{-- <a href="{{ route('admin.cankaya-house-courses.create', ['cankaya_house_id' => $cankayaHouse->id]) }}" class="btn btn-success btn-block">
                                         <i class="fas fa-plus mr-1"></i>
                                         Yeni Kurs Ekle
-                                    </a>
+                                    </a> --}}
 
                                     @if($cankayaHouse->location_link)
                                     <a href="{{ $cankayaHouse->location_link }}" target="_blank" class="btn btn-info btn-block">
@@ -336,6 +340,8 @@ function deleteHouse(id) {
     });
 }
 
+// Kurs silme fonksiyonu geçici olarak kapatıldı
+/*
 function deleteCourse(id) {
     Swal.fire({
         title: 'Emin misiniz?',
@@ -370,5 +376,6 @@ function deleteCourse(id) {
         }
     });
 }
+*/
 </script>
 @endpush

@@ -35,6 +35,11 @@ class FooterController extends Controller
             'kep_address' => 'required|string|max:255',
             'copyright_left' => 'required|string',
             'copyright_right' => 'required|string',
+            'facebook_url' => 'nullable|url|max:255',
+            'instagram_url' => 'nullable|url|max:255',
+            'twitter_url' => 'nullable|url|max:255',
+            'youtube_url' => 'nullable|url|max:255',
+            'linkedin_url' => 'nullable|url|max:255',
             'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048'
         ]);
 

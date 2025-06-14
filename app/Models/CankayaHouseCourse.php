@@ -13,13 +13,15 @@ class CankayaHouseCourse extends Model
     protected $fillable = [
         'cankaya_house_id',
         'name',
+        'icon',
         'description',
         'start_date',
         'end_date',
         'instructor',
         'capacity',
         'price',
-        'status'
+        'status',
+        'order'
     ];
 
     protected $casts = [

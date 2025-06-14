@@ -631,10 +631,12 @@
                     <span class="course-house-badge">{{ $course->cankayaHouse->name }}</span>
                 </div>
                 
+                @if($course->start_date && $course->end_date)
                 <div class="course-card-dates">
                     <i class="fas fa-calendar-alt"></i>
                     <span>{{ $course->start_date->format('d.m.Y') }} - {{ $course->end_date->format('d.m.Y') }}</span>
                 </div>
+                @endif
                 
                 @if($course->instructor)
                     <div class="course-card-instructor">

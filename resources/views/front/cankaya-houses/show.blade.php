@@ -795,61 +795,42 @@ document.addEventListener('DOMContentLoaded', function() {
         <div class="page-content-section">
             <h2 class="mb-6">Kurslar</h2>
             
-            @if($cankayaHouse->courses->count() > 0)
-                <div class="courses-grid">
-                    @foreach($cankayaHouse->courses as $course)
-                    <div class="course-card">
-                        <div class="d-flex justify-content-between align-items-start mb-2">
-                            <h3 class="course-title">{{ $course->name }}</h3>
-                            @if($course->start_date > now())
-                                <span class="status-badge status-upcoming">Yaklaşan</span>
-                            @elseif($course->start_date <= now() && $course->end_date >= now())
-                                <span class="status-badge status-ongoing">Devam Ediyor</span>
+            @if($cankayaHouse->courses && $cankayaHouse->courses->where('status', 'active')->count() > 0)
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    @foreach($cankayaHouse->courses->where('status', 'active')->sortBy('order') as $course)
+                    <div class="course-card-modern group relative overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100 hover:from-gray-100 hover:to-gray-150 border-gray-200 flex items-center p-3 rounded-lg border-2 shadow-sm hover:shadow-md transition-all duration-300 transform hover:scale-102 hover:-translate-y-0.5 cursor-pointer">
+                        <!-- İkon -->
+                        <div class="icon-container w-10 h-10 flex items-center justify-center rounded-full mr-3 flex-shrink-0 bg-white/80 group-hover:bg-white transition-all duration-300 group-hover:rotate-3 group-hover:scale-105 shadow-sm">
+                            @if($course->icon)
+                                <i class="{{ $course->icon }} text-[#007b32] text-lg group-hover:text-[#00352b] transition-colors duration-300"></i>
                             @else
-                                <span class="status-badge status-completed">Tamamlandı</span>
+                                <i class="fas fa-graduation-cap text-[#007b32] text-lg group-hover:text-[#00352b] transition-colors duration-300"></i>
                             @endif
                         </div>
                         
-                        @if($course->description)
-                            <p class="text-muted mb-3" style="font-size: 0.875rem;">
-                                {{ Str::limit($course->description, 100) }}
-                            </p>
-                        @endif
-                        
-                        <div class="course-dates">
-                            <i class="fas fa-calendar-alt"></i>
-                            <span>{{ $course->start_date->format('d.m.Y') }} - {{ $course->end_date->format('d.m.Y') }}</span>
+                        <!-- Başlık -->
+                        <div class="flex flex-col flex-1 min-w-0">
+                            <h3 class="font-semibold text-[#00352b] text-sm group-hover:text-[#007b32] transition-colors duration-300 leading-tight">{{ $course->name }}</h3>
                         </div>
                         
-                        @if($course->instructor)
-                            <div class="course-instructor">
-                                <i class="fas fa-user-tie"></i>
-                                Eğitmen: {{ $course->instructor }}
-                            </div>
-                        @endif
-                        
-                        @if($course->capacity)
-                            <div class="course-instructor">
-                                <i class="fas fa-users"></i>
-                                Kapasite: {{ $course->capacity }} kişi
-                            </div>
-                        @endif
-                        
-                        <div class="course-price">
-                            @if($course->price)
-                                {{ number_format($course->price, 0, ',', '.') }} ₺
-                            @else
-                                Ücretsiz
-                            @endif
+                        <!-- Sağ Ok İkonu -->
+                        <div class="ml-2 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-1 group-hover:translate-x-0">
+                            <span class="material-icons text-[#007b32] text-base">arrow_forward</span>
                         </div>
+                        
+                        <!-- Hover overlay efekti -->
+                        <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/15 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform -skew-x-12 translate-x-full group-hover:translate-x-[-100%] transition-transform duration-700"></div>
+                        
+                        <!-- Sol kenar vurgu çizgisi -->
+                        <div class="absolute left-0 top-0 bottom-0 w-0 bg-[#007b32] group-hover:w-1 transition-all duration-300 rounded-l-lg"></div>
                     </div>
                     @endforeach
                 </div>
             @else
-                <div class="text-center py-5">
-                    <i class="fas fa-graduation-cap fa-3x text-muted mb-3"></i>
-                    <h4 class="text-muted">Henüz kurs bulunmamaktadır</h4>
-                    <p class="text-muted">Bu Çankaya evinde henüz aktif kurs bulunmamaktadır.</p>
+                <div class="text-center py-8">
+                    <i class="fas fa-graduation-cap fa-3x text-gray-400 mb-4"></i>
+                    <h4 class="text-gray-600 text-lg font-medium mb-2">Henüz kurs bulunmamaktadır</h4>
+                    <p class="text-gray-500">Bu Çankaya evinde henüz aktif kurs bulunmamaktadır.</p>
                 </div>
             @endif
         </div>

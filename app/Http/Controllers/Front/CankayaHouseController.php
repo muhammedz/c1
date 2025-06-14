@@ -29,9 +29,11 @@ class CankayaHouseController extends Controller
                                    ->ordered()
                                    ->get();
 
-        // Son eklenen kurslar
+        // Son eklenen kurslar (sadece tarih bilgisi olanlar)
         $recentCourses = CankayaHouseCourse::with('cankayaHouse')
                                          ->active()
+                                         ->whereNotNull('start_date')
+                                         ->whereNotNull('end_date')
                                          ->recent()
                                          ->take(6)
                                          ->get();
@@ -60,7 +62,7 @@ class CankayaHouseController extends Controller
                                  ->ordered()
                                  ->get();
 
-            // Kursları ara
+            // Kursları ara (tüm kurslar)
             $courses = CankayaHouseCourse::with('cankayaHouse')
                                        ->active()
                                        ->where(function($q) use ($searchTerm) {
@@ -68,7 +70,7 @@ class CankayaHouseController extends Controller
                                              ->orWhere('description', 'like', '%' . $searchTerm . '%')
                                              ->orWhere('instructor', 'like', '%' . $searchTerm . '%');
                                        })
-                                       ->orderBy('start_date', 'desc')
+                                       ->orderByRaw('start_date IS NULL, start_date DESC')
                                        ->get();
 
             $results = [
@@ -134,6 +136,8 @@ class CankayaHouseController extends Controller
     {
         return CankayaHouseCourse::with('cankayaHouse')
                                 ->active()
+                                ->whereNotNull('start_date')
+                                ->whereNotNull('end_date')
                                 ->recent()
                                 ->take($limit)
                                 ->get();

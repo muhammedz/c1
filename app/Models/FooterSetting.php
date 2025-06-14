@@ -24,7 +24,12 @@ class FooterSetting extends Model
         'kep_title',
         'kep_address',
         'copyright_left',
-        'copyright_right'
+        'copyright_right',
+        'facebook_url',
+        'instagram_url',
+        'twitter_url',
+        'youtube_url',
+        'linkedin_url'
     ];
 
     public static function getSettings()

@@ -136,7 +136,16 @@ class CankayaHouseController extends Controller
             'images' => 'nullable|array',
             'images.*' => 'nullable|string|url',
             'status' => 'required|in:active,inactive',
-            'order' => 'nullable|integer|min:0'
+            'order' => 'nullable|integer|min:0',
+            'courses' => 'nullable|array',
+            'courses.*.name' => 'required_with:courses.*|string|max:255',
+            'courses.*.icon' => 'nullable|string|max:100',
+            'courses.*.description' => 'nullable|string',
+            'courses.*.status' => 'nullable|in:active,inactive',
+            'courses.*.order' => 'nullable|integer|min:0',
+            'courses.*.id' => 'nullable|integer|exists:cankaya_house_courses,id',
+            'deleted_course_ids' => 'nullable|array',
+            'deleted_course_ids.*' => 'integer|exists:cankaya_house_courses,id'
         ]);
 
         try {
@@ -166,6 +175,14 @@ class CankayaHouseController extends Controller
             $data['images'] = $images;
 
             $cankayaHouse->update($data);
+
+            // Kursları güncelle
+            if ($request->has('courses')) {
+                $this->updateCourses($cankayaHouse, $request->courses, $request->deleted_course_ids ?? []);
+            } elseif ($request->has('deleted_course_ids')) {
+                // Sadece silme işlemi varsa
+                $this->updateCourses($cankayaHouse, [], $request->deleted_course_ids);
+            }
 
             DB::commit();
 
@@ -245,5 +262,52 @@ class CankayaHouseController extends Controller
         $cankayaHouse->update(['images' => $images]);
 
         return response()->json(['success' => true]);
+    }
+
+    /**
+     * Update courses for the Cankaya House.
+     */
+    private function updateCourses(CankayaHouse $cankayaHouse, array $coursesData, array $deletedCourseIds = [])
+    {
+        $submittedCourseIds = [];
+
+        // Önce silinen kursları sil
+        if (!empty($deletedCourseIds)) {
+            $cankayaHouse->courses()->whereIn('id', $deletedCourseIds)->delete();
+        }
+
+        foreach ($coursesData as $courseData) {
+            if (empty($courseData['name'])) {
+                continue; // Boş kurs adı varsa atla
+            }
+
+            $courseData['status'] = $courseData['status'] ?? 'active';
+            $courseData['order'] = $courseData['order'] ?? 0;
+
+            if (isset($courseData['id']) && !empty($courseData['id'])) {
+                // Mevcut kursu güncelle (silinmemişse)
+                $course = $cankayaHouse->courses()->find($courseData['id']);
+                if ($course) {
+                    $course->update([
+                        'name' => $courseData['name'],
+                        'icon' => $courseData['icon'] ?? null,
+                        'description' => $courseData['description'] ?? null,
+                        'status' => $courseData['status'],
+                        'order' => $courseData['order']
+                    ]);
+                    $submittedCourseIds[] = $course->id;
+                }
+            } else {
+                // Yeni kurs oluştur
+                $course = $cankayaHouse->courses()->create([
+                    'name' => $courseData['name'],
+                    'icon' => $courseData['icon'] ?? null,
+                    'description' => $courseData['description'] ?? null,
+                    'status' => $courseData['status'],
+                    'order' => $courseData['order']
+                ]);
+                $submittedCourseIds[] = $course->id;
+            }
+        }
     }
 }

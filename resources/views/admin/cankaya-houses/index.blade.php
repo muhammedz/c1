@@ -116,10 +116,11 @@
                                                class="btn btn-sm btn-warning" title="Düzenle">
                                                 <i class="fas fa-edit"></i>
                                             </a>
-                                            <a href="{{ route('admin.cankaya-house-courses.create', ['cankaya_house_id' => $house->id]) }}" 
+                                            {{-- Kurs ekleme butonu geçici olarak kapatıldı --}}
+                                            {{-- <a href="{{ route('admin.cankaya-house-courses.create', ['cankaya_house_id' => $house->id]) }}" 
                                                class="btn btn-sm btn-success" title="Kurs Ekle">
                                                 <i class="fas fa-plus"></i>
-                                            </a>
+                                            </a> --}}
                                             <button type="button" class="btn btn-sm btn-danger" 
                                                     onclick="deleteHouse({{ $house->id }})" title="Sil">
                                                 <i class="fas fa-trash"></i>

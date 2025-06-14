@@ -127,6 +127,85 @@
                                         </div>
                                     </div>
                                 </div>
+
+                                <!-- Kurslar -->
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h3 class="card-title">Kurslar</h3>
+                                        <div class="card-tools">
+                                            <button type="button" class="btn btn-primary btn-sm" id="add-course">
+                                                <i class="fas fa-plus mr-1"></i>
+                                                Kurs Ekle
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="card-body">
+                                        <div id="courses-container">
+                                            @if($cankayaHouse->courses && $cankayaHouse->courses->count() > 0)
+                                                @foreach($cankayaHouse->courses as $index => $course)
+                                                <div class="course-item border rounded p-3 mb-3" data-index="{{ $index }}">
+                                                    <div class="row">
+                                                        <div class="col-md-6">
+                                                            <div class="form-group">
+                                                                <label>Kurs Adı <span class="text-danger">*</span></label>
+                                                                <input type="text" class="form-control" name="courses[{{ $index }}][name]" 
+                                                                       value="{{ $course->name }}" required>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <div class="form-group">
+                                                                <label>İkon (FontAwesome)</label>
+                                                                <input type="text" class="form-control" name="courses[{{ $index }}][icon]" 
+                                                                       value="{{ $course->icon }}" placeholder="fas fa-palette">
+                                                                <small class="text-muted">Örnek: fas fa-palette, fas fa-music, fas fa-language</small>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-md-12">
+                                                            <div class="form-group">
+                                                                <label>Açıklama</label>
+                                                                <textarea class="form-control" name="courses[{{ $index }}][description]" 
+                                                                          rows="2">{{ $course->description }}</textarea>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-md-6">
+                                                            <div class="form-group">
+                                                                <label>Durum</label>
+                                                                <select class="form-control" name="courses[{{ $index }}][status]">
+                                                                    <option value="active" {{ $course->status == 'active' ? 'selected' : '' }}>Aktif</option>
+                                                                    <option value="inactive" {{ $course->status == 'inactive' ? 'selected' : '' }}>Pasif</option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <div class="form-group">
+                                                                <label>Sıralama</label>
+                                                                <input type="number" class="form-control" name="courses[{{ $index }}][order]" 
+                                                                       value="{{ $course->order ?? 0 }}" min="0">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="text-right">
+                                                        <button type="button" class="btn btn-danger btn-sm remove-course">
+                                                            <i class="fas fa-trash mr-1"></i>
+                                                            Kaldır
+                                                        </button>
+                                                    </div>
+                                                    <input type="hidden" name="courses[{{ $index }}][id]" value="{{ $course->id }}">
+                                                </div>
+                                                @endforeach
+                                            @endif
+                                        </div>
+                                        
+                                        <div id="no-courses" class="text-center text-muted py-4" style="{{ $cankayaHouse->courses && $cankayaHouse->courses->count() > 0 ? 'display: none;' : '' }}">
+                                            <i class="fas fa-graduation-cap fa-3x mb-3"></i>
+                                            <p>Henüz kurs eklenmemiş. Yukarıdaki "Kurs Ekle" butonunu kullanarak kurs ekleyebilirsiniz.</p>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
 
                             <!-- Sağ Kolon -->
@@ -366,6 +445,102 @@ $(document).ready(function() {
         updateGalleryDisplay();
     });
 
+    // Kurs yönetimi
+    let courseIndex = {{ $cankayaHouse->courses ? $cankayaHouse->courses->count() : 0 }};
+    let deletedCourseIds = [];
+    
+    // Kurs ekleme
+    $('#add-course').on('click', function() {
+        const courseHtml = `
+            <div class="course-item border rounded p-3 mb-3" data-index="${courseIndex}">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>Kurs Adı <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" name="courses[${courseIndex}][name]" required>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>İkon (FontAwesome)</label>
+                            <input type="text" class="form-control" name="courses[${courseIndex}][icon]" placeholder="fas fa-palette">
+                            <small class="text-muted">Örnek: fas fa-palette, fas fa-music, fas fa-language</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label>Açıklama</label>
+                            <textarea class="form-control" name="courses[${courseIndex}][description]" rows="2"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>Durum</label>
+                            <select class="form-control" name="courses[${courseIndex}][status]">
+                                <option value="active" selected>Aktif</option>
+                                <option value="inactive">Pasif</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>Sıralama</label>
+                            <input type="number" class="form-control" name="courses[${courseIndex}][order]" value="0" min="0">
+                        </div>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <button type="button" class="btn btn-danger btn-sm remove-course">
+                        <i class="fas fa-trash mr-1"></i>
+                        Kaldır
+                    </button>
+                </div>
+            </div>
+        `;
+        
+        $('#courses-container').append(courseHtml);
+        $('#no-courses').hide();
+        courseIndex++;
+    });
+    
+    // Kurs silme (event delegation)
+    $(document).on('click', '.remove-course', function() {
+        const courseItem = $(this).closest('.course-item');
+        const courseId = courseItem.find('input[name*="[id]"]').val();
+        
+        // Eğer mevcut bir kurs ise (ID'si varsa) silinen listesine ekle
+        if (courseId) {
+            deletedCourseIds.push(courseId);
+            updateDeletedCoursesInput();
+        }
+        
+        courseItem.remove();
+        
+        // Eğer hiç kurs kalmadıysa boş mesajı göster
+        if ($('#courses-container .course-item').length === 0) {
+            $('#no-courses').show();
+        }
+    });
+    
+    // Silinen kursları hidden input olarak güncelle
+    function updateDeletedCoursesInput() {
+        // Mevcut silinen kurs input'larını temizle
+        $('input[name="deleted_course_ids[]"]').remove();
+        
+        // Yeni input'ları ekle
+        deletedCourseIds.forEach(function(courseId) {
+            $('<input>').attr({
+                type: 'hidden',
+                name: 'deleted_course_ids[]',
+                value: courseId
+            }).appendTo('form');
+        });
+    }
+
     // Form validasyonu
     $('form').on('submit', function(e) {
         let isValid = true;
@@ -379,6 +554,17 @@ $(document).ready(function() {
                 isValid = false;
             } else {
                 input.removeClass('is-invalid');
+            }
+        });
+        
+        // Kurs adlarını kontrol et
+        $('.course-item').each(function() {
+            const nameInput = $(this).find('input[name*="[name]"]');
+            if (!nameInput.val().trim()) {
+                nameInput.addClass('is-invalid');
+                isValid = false;
+            } else {
+                nameInput.removeClass('is-invalid');
             }
         });
         

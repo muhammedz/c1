@@ -566,12 +566,13 @@ return [
                     'icon' => 'fas fa-plus',
                     'active' => ['admin/cankaya-houses/create']
                 ],
-                [
-                    'text' => 'Kurslar',
-                    'url'  => 'admin/cankaya-house-courses',
-                    'icon' => 'fas fa-graduation-cap',
-                    'active' => ['admin/cankaya-house-courses', 'admin/cankaya-house-courses/*']
-                ],
+                // Kurslar - Geçici olarak kapatıldı
+                // [
+                //     'text' => 'Kurslar',
+                //     'url'  => 'admin/cankaya-house-courses',
+                //     'icon' => 'fas fa-graduation-cap',
+                //     'active' => ['admin/cankaya-house-courses', 'admin/cankaya-house-courses/*']
+                // ],
             ],
         ],
         // İhaleler Modülü

@@ -185,10 +185,12 @@
                                                                 {{ $course->cankayaHouse->name }}
                                                             </p>
                                                         </div>
+                                                        @if($course->start_date)
                                                         <div class="flex items-center text-gray-500 text-xs ml-2 whitespace-nowrap">
                                                             <span class="material-icons text-xs mr-1">calendar_today</span>
                                                             <span>{{ $course->start_date->format('d.m.Y') }}</span>
                                                         </div>
+                                                        @endif
                                                     </div>
                                                     @if($course->description)
                                                         <p class="text-xs text-gray-600 mt-2">{{ Str::limit($course->description, 100) }}</p>

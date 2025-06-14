@@ -110,17 +110,25 @@
                                         <span class="badge badge-info">{{ $course->cankayaHouse->name }}</span>
                                     </td>
                                     <td>
-                                        {{ $course->start_date->format('d.m.Y') }}
-                                        @if($course->is_upcoming)
-                                            <span class="badge badge-warning badge-sm ml-1">Yaklaşan</span>
-                                        @elseif($course->is_ongoing)
-                                            <span class="badge badge-success badge-sm ml-1">Devam Ediyor</span>
+                                        @if($course->start_date)
+                                            {{ $course->start_date->format('d.m.Y') }}
+                                            @if($course->is_upcoming)
+                                                <span class="badge badge-warning badge-sm ml-1">Yaklaşan</span>
+                                            @elseif($course->is_ongoing)
+                                                <span class="badge badge-success badge-sm ml-1">Devam Ediyor</span>
+                                            @endif
+                                        @else
+                                            <span class="text-muted">-</span>
                                         @endif
                                     </td>
                                     <td>
-                                        {{ $course->end_date->format('d.m.Y') }}
-                                        @if($course->is_completed)
-                                            <span class="badge badge-secondary badge-sm ml-1">Tamamlandı</span>
+                                        @if($course->end_date)
+                                            {{ $course->end_date->format('d.m.Y') }}
+                                            @if($course->is_completed)
+                                                <span class="badge badge-secondary badge-sm ml-1">Tamamlandı</span>
+                                            @endif
+                                        @else
+                                            <span class="text-muted">-</span>
                                         @endif
                                     </td>
                                     <td>

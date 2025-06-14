@@ -231,6 +231,78 @@
                                 </div>
                             </div>
                         </div>
+
+                        <!-- Sosyal Medya Linkleri -->
+                        <hr>
+                        <h5><i class="fab fa-facebook mr-2"></i>Sosyal Medya Linkleri</h5>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="facebook_url"><i class="fab fa-facebook-f mr-1"></i>Facebook URL</label>
+                                    <input type="url" class="form-control @error('facebook_url') is-invalid @enderror" 
+                                           id="facebook_url" name="facebook_url" 
+                                           value="{{ old('facebook_url', $settings->facebook_url) }}"
+                                           placeholder="https://facebook.com/cankayabelediyesi">
+                                    @error('facebook_url')
+                                        <span class="invalid-feedback">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="instagram_url"><i class="fab fa-instagram mr-1"></i>Instagram URL</label>
+                                    <input type="url" class="form-control @error('instagram_url') is-invalid @enderror" 
+                                           id="instagram_url" name="instagram_url" 
+                                           value="{{ old('instagram_url', $settings->instagram_url) }}"
+                                           placeholder="https://instagram.com/cankayabelediyesi">
+                                    @error('instagram_url')
+                                        <span class="invalid-feedback">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="twitter_url"><i class="fab fa-x-twitter mr-1"></i>Twitter/X URL</label>
+                                    <input type="url" class="form-control @error('twitter_url') is-invalid @enderror" 
+                                           id="twitter_url" name="twitter_url" 
+                                           value="{{ old('twitter_url', $settings->twitter_url) }}"
+                                           placeholder="https://twitter.com/cankayabelediye">
+                                    @error('twitter_url')
+                                        <span class="invalid-feedback">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="youtube_url"><i class="fab fa-youtube mr-1"></i>YouTube URL</label>
+                                    <input type="url" class="form-control @error('youtube_url') is-invalid @enderror" 
+                                           id="youtube_url" name="youtube_url" 
+                                           value="{{ old('youtube_url', $settings->youtube_url) }}"
+                                           placeholder="https://youtube.com/@cankayabelediyesi">
+                                    @error('youtube_url')
+                                        <span class="invalid-feedback">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="linkedin_url"><i class="fab fa-linkedin mr-1"></i>LinkedIn URL</label>
+                                    <input type="url" class="form-control @error('linkedin_url') is-invalid @enderror" 
+                                           id="linkedin_url" name="linkedin_url" 
+                                           value="{{ old('linkedin_url', $settings->linkedin_url) }}"
+                                           placeholder="https://linkedin.com/company/cankaya-belediyesi">
+                                    @error('linkedin_url')
+                                        <span class="invalid-feedback">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <div class="card-footer">
                         <button type="submit" class="btn btn-primary">
