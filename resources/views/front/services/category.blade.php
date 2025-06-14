@@ -4,8 +4,14 @@
 
 @section('meta_description', $category->name . ' kategorisindeki profesyonel hizmetlerimiz hakkında bilgi alın')
 
+@include('helpers.functions')
+
+@php
+    $serviceSettings = \App\Models\ServiceSetting::getSettings();
+@endphp
+
 @section('content')
-<!-- Hero Bölümü - Yeniden Tasarlandı -->
+<!-- Hero Bölümü - Split Layout -->
 <div class="relative bg-gradient-to-r from-[#00352b] to-[#20846c] overflow-hidden">
     <div class="absolute inset-0 opacity-20">
         <!-- Pattern overlay -->
@@ -27,29 +33,37 @@
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8 items-center">
             <div class="md:col-span-2">
                 <div class="inline-block bg-white/10 backdrop-blur-sm px-4 py-1 rounded-full text-white/90 text-sm mb-3 border border-white/10">
-                    @if($category->icon)
-                        <i class="{{ $category->icon }} text-xs align-middle mr-1"></i>
-                    @else
-                        <span class="material-icons text-xs align-middle mr-1">category</span>
-                    @endif
-                    <span>Hizmet Kategorisi</span>
+                    <span class="material-icons text-xs align-middle mr-1">handyman</span>
+                    <span>{{ $serviceSettings->hero_badge_text ?? 'Belediye Hizmetleri' }}</span>
                 </div>
-                <h1 class="text-3xl md:text-4xl font-bold text-white mb-4">{{ $category->name }}</h1>
-                <p class="text-white/80 text-lg mb-5">{{ $category->description ?? 'Bu kategorideki hizmetlerimizi inceleyebilir, ihtiyacınız olan hizmeti bulabilirsiniz.' }}</p>
+                <h1 class="text-3xl md:text-4xl font-bold text-white mb-4">
+                    @if(!empty($serviceSettings->hero_title))
+                        @if(!empty($serviceSettings->hero_title_highlight))
+                            {!! str_replace($serviceSettings->hero_title_highlight, '<span class="text-[#e6a23c]">' . $serviceSettings->hero_title_highlight . '</span>', $serviceSettings->hero_title) !!}
+                        @else
+                            {{ $serviceSettings->hero_title }}
+                        @endif
+                    @else
+                        Tüm Hizmetlerimiz
+                    @endif
+                </h1>
+                <p class="text-white/80 text-lg mb-5">
+                    {{ $serviceSettings->hero_description ?? 'Belediyemiz tarafından sunulan tüm hizmetleri inceleyebilir, ihtiyacınız olan hizmeti bulabilirsiniz.' }}
+                </p>
                 
-                <!-- Modern Arama Kutusu -->
+                <!-- Arama Kutusu -->
                 <form action="{{ route('services.category', $category->slug) }}" method="GET" class="mt-6">
                     <div class="bg-white/10 backdrop-blur-sm rounded-lg p-1 flex items-center shadow-lg hover:bg-white/20 transition duration-300 border border-white/20">
                         <input 
                             type="text" 
                             name="search" 
-                            placeholder="Hangi hizmeti arıyorsunuz?" 
+                            placeholder="{{ $serviceSettings->search_placeholder ?? 'Hangi hizmeti arıyorsunuz?' }}" 
                             class="w-full bg-transparent px-4 py-3 text-white placeholder-white/70 outline-none"
                             value="{{ request()->get('search') }}"
                         >
                         <button type="submit" class="bg-[#e6a23c] hover:bg-[#e6a23c]/90 text-white font-medium px-6 py-3 rounded-md transition duration-300 flex items-center shadow-lg shadow-[#e6a23c]/20">
                             <span class="material-icons mr-1">search</span>
-                            Ara
+                            {{ $serviceSettings->search_button_text ?? 'Ara' }}
                         </button>
                     </div>
                 </form>

@@ -68,7 +68,8 @@
     </div>
 </div>
 
-<!-- Basit Hikaye Çerçeveleri -->
+<!-- Basit Hikaye Çerçeveleri - GEÇİCİ OLARAK GİZLENDİ -->
+{{-- 
 @if($stories->count() > 0)
 <div class="py-8 bg-slate-50 shadow-sm">
     <div class="container max-w-7xl mx-auto px-4">
@@ -88,6 +89,7 @@
     </div>
 </div>
 @endif
+--}}
 
 <!-- Basit Lightbox -->
 <div id="lightbox" class="fixed inset-0 w-full h-full z-50 hidden bg-black/90" onclick="kapatLightbox()">
@@ -140,6 +142,41 @@
 <!-- İçerik Bölümü -->
 <section class="py-12 bg-slate-100">
     <div class="container max-w-7xl mx-auto px-4">
+        <!-- Video ve Resim Bölümü -->
+        <div class="bg-white shadow-md rounded-xl overflow-hidden mb-8">
+            <div class="p-6">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <!-- Sol Video -->
+                    <div class="relative rounded-lg overflow-hidden shadow-lg">
+                        <div class="aspect-video">
+                            <iframe 
+                                width="100%" 
+                                height="100%" 
+                                src="https://www.youtube.com/embed/mbsG4TDQjqA?si=DX7e-_puTrfmSIQ4" 
+                                title="YouTube video player" 
+                                frameborder="0" 
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                                referrerpolicy="strict-origin-when-cross-origin" 
+                                allowfullscreen
+                                class="rounded-lg">
+                            </iframe>
+                        </div>
+                    </div>
+                    
+                    <!-- Sağ Resim -->
+                    <div class="relative rounded-lg overflow-hidden shadow-lg">
+                        <div class="aspect-video">
+                            <img 
+                                src="https://cankaya.bel.tr/uploads/images/neleryaptik_1749920348_uHQvvq4j.webp" 
+                                alt="Neler Yaptık - Projelerimiz" 
+                                class="w-full h-full object-cover rounded-lg hover:scale-105 transition-transform duration-500"
+                            >
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
         <!-- Biyografi Kartı -->
         <div class="bg-white shadow-md rounded-xl overflow-hidden mb-8">
             <div class="px-6 py-4 border-b border-slate-100">

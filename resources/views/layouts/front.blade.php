@@ -5,8 +5,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', 'Anasayfa') - {{ config('app.name', 'CMS Sistem') }}</title>
-    <meta name="description" content="@yield('meta_description', 'Daha iyi bir gelecek için çalışıyoruz')">
+    @if(View::hasSection('title'))
+        <title>@yield('title') - {{ \App\Helpers\SeoHelper::getHomepageTitle() }}</title>
+    @else
+        <title>{{ \App\Helpers\SeoHelper::getHomepageTitle() }}</title>
+    @endif
+    
+    @if(View::hasSection('meta_description'))
+        <meta name="description" content="@yield('meta_description')">
+    @else
+        <meta name="description" content="{{ \App\Helpers\SeoHelper::getHomepageDescription() }}">
+    @endif
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>

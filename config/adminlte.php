@@ -612,6 +612,14 @@ return [
                 ],
             ],
         ],
+        
+        ['header' => 'SİSTEM YÖNETİMİ'],
+        [
+            'text' => 'Ayarlar',
+            'url'  => 'admin/settings',
+            'icon' => 'fas fa-fw fa-cogs',
+            'active' => ['admin/settings', 'admin/settings/*']
+        ],
     ],
 
     /*

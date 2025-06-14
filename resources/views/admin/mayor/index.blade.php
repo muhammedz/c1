@@ -231,12 +231,16 @@
                                         <i class="fas fa-file-alt mr-1"></i>
                                         Biyografi
                                     </label>
-                                    <textarea class="form-control @error('biography') is-invalid @enderror" 
-                                              id="biography" name="biography" rows="8" 
+                                    <textarea class="form-control tinymce-editor @error('biography') is-invalid @enderror" 
+                                              id="biography" name="biography" rows="15" 
                                               placeholder="Başkanın biyografisini buraya yazın...">{{ old('biography', $mayor->biography) }}</textarea>
                                     @error('biography')
                                         <span class="invalid-feedback">{{ $message }}</span>
                                     @enderror
+                                    <small class="form-text text-muted">
+                                        <i class="fas fa-info-circle mr-1"></i>
+                                        Zengin metin editörü ile biyografiyi düzenleyebilirsiniz. Resim, link ve formatlamalar ekleyebilirsiniz.
+                                    </small>
                                 </div>
                             </div>
                         </div>
@@ -436,7 +440,7 @@
 
 </div>
 
-@push('css')
+@section('css')
 <style>
 .card-light {
     border: 1px solid #dee2e6;
@@ -465,12 +469,81 @@
 .font-weight-bold {
     font-weight: 600!important;
 }
-</style>
-@endpush
 
-@push('scripts')
+/* TinyMCE Editör Stilleri */
+.tox-tinymce {
+    border: 1px solid #ced4da !important;
+    border-radius: 0.25rem !important;
+}
+.tox-editor-header {
+    border-bottom: 1px solid #ced4da !important;
+}
+.tinymce-editor {
+    visibility: hidden;
+}
+.form-group .tox-tinymce {
+    margin-top: 5px;
+}
+</style>
+@stop
+
+@section('js')
+<!-- TinyMCE -->
+<script src="{{ asset('js/tinymce/tinymce.min.js') }}"></script>
 <script>
 $(document).ready(function() {
+    // TinyMCE Editör Başlatma
+    tinymce.init({
+        selector: '.tinymce-editor',
+        height: 400,
+        menubar: true,
+        plugins: [
+            'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
+            'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
+            'insertdatetime', 'media', 'table', 'help', 'wordcount', 'emoticons'
+        ],
+        toolbar: 'undo redo | blocks | bold italic underline strikethrough | ' +
+                'alignleft aligncenter alignright alignjustify | ' +
+                'bullist numlist outdent indent | removeformat | ' +
+                'link image media table | code preview fullscreen | help',
+        content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, San Francisco, Segoe UI, Roboto, Helvetica Neue, sans-serif; font-size: 14px; line-height: 1.4; }',
+        language: 'tr',
+        language_url: '/js/tinymce/langs/tr.js',
+        branding: false,
+        promotion: false,
+        images_upload_url: '{{ route("admin.tinymce.upload") }}',
+        images_upload_handler: function (blobInfo, success, failure) {
+            var xhr, formData;
+            xhr = new XMLHttpRequest();
+            xhr.withCredentials = false;
+            xhr.open('POST', '{{ route("admin.tinymce.upload") }}');
+            xhr.setRequestHeader('X-CSRF-TOKEN', '{{ csrf_token() }}');
+            
+            xhr.onload = function() {
+                var json;
+                if (xhr.status != 200) {
+                    failure('HTTP Error: ' + xhr.status);
+                    return;
+                }
+                json = JSON.parse(xhr.responseText);
+                if (!json || typeof json.location != 'string') {
+                    failure('Invalid JSON: ' + xhr.responseText);
+                    return;
+                }
+                success(json.location);
+            };
+            
+            formData = new FormData();
+            formData.append('file', blobInfo.blob(), blobInfo.filename());
+            xhr.send(formData);
+        },
+        setup: function (editor) {
+            editor.on('change', function () {
+                editor.save();
+            });
+        }
+    });
+
     // Custom file input labels
     $('.custom-file-input').on('change', function() {
         let fileName = $(this).val().split('\\').pop();
@@ -502,6 +575,6 @@ $(document).ready(function() {
     });
 });
 </script>
-@endpush
+@stop
 
 @stop 

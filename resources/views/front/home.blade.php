@@ -1,7 +1,5 @@
 @extends('layouts.front')
 
-@section('title', 'Ana Sayfa')
-
 @section('content')
     <div class="relative z-0">
         @include('front.sections.slider')

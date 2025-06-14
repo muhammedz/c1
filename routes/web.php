@@ -142,6 +142,13 @@ Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name
 // Arama Test Rotası - şimdilik devre dışı
 // Route::get('/arama-test', [App\Http\Controllers\SearchPageController::class, 'index'])->name('search.test');
 
+// Test rotası - SEO ayarlarını kontrol etmek için
+Route::get('/test-seo', function() {
+    return view('layouts.front', [
+        'content' => '<div class="container mx-auto py-8"><h1 class="text-3xl font-bold">SEO Test Sayfası</h1><p>Bu sayfa SEO ayarlarını test etmek için oluşturulmuştur.</p></div>'
+    ]);
+})->name('test.seo');
+
 // Admin Panel Route Tanımlamaları
 Route::middleware(['auth', 'role:admin'])->name('admin.')->prefix('admin')->group(function () {
     // Dashboard
@@ -679,7 +686,7 @@ Route::post('/check-site-password', [App\Http\Controllers\PasswordProtectionCont
 // Şifre Değiştirme Route
 Route::post('/update-password', [App\Http\Controllers\Auth\UpdatePasswordController::class, 'update'])->name('profile.password.update');
 
-// Admin Panel Arama Ayarları Routes
+    // Admin Panel Arama Ayarları Routes
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->group(function () {
     // Ana Arama Ayarları
     Route::get('/search-settings', [App\Http\Controllers\Admin\SearchSettingController::class, 'index'])->name('search-settings.index');
@@ -699,6 +706,10 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     Route::post('/search-popular-queries/order', [App\Http\Controllers\Admin\SearchPopularQueryController::class, 'updateOrder'])->name('search-popular-queries.order');
     Route::patch('/search-popular-queries/{popularQuery}/toggle-active', [App\Http\Controllers\Admin\SearchPopularQueryController::class, 'toggleActive'])->name('search-popular-queries.toggle-active');
     Route::get('/search-icons', [App\Http\Controllers\Admin\SearchPopularQueryController::class, 'getIcons'])->name('search-icons');
+    
+    // Genel Ayarlar Routes
+    Route::get('/settings', [App\Http\Controllers\Admin\SettingsController::class, 'index'])->name('settings.index');
+    Route::post('/settings/seo', [App\Http\Controllers\Admin\SettingsController::class, 'updateSeo'])->name('settings.seo.update');
 });
 
 // Duplicate services route'u kaldırıldı - admin içindeki yeterli

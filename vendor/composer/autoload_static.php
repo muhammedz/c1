@@ -42,6 +42,7 @@ class ComposerStaticInit9f30d1e8d9e748d9125f846e3929e9a2
         '320163ac6b93aebe3dc25b60a0533d56' => __DIR__ . '/..' . '/spatie/laravel-ignition/src/helpers.php',
         '377b22b161c09ed6e5152de788ca020a' => __DIR__ . '/..' . '/spatie/laravel-permission/src/helpers.php',
         'e39892c32b450c8756eb382a7e111156' => __DIR__ . '/../..' . '/app/Helpers/FileManagerHelper.php',
+        'cb1c3e487c37bcb88f67df7ab7b26b8c' => __DIR__ . '/../..' . '/app/Helpers/SeoHelper.php',
     );
 
     public static $prefixLengthsPsr4 = array (
@@ -743,6 +744,7 @@ class ComposerStaticInit9f30d1e8d9e748d9125f846e3929e9a2
         'App\\Helpers\\CharacterFixer' => __DIR__ . '/../..' . '/app/Helpers/CharacterFixer.php',
         'App\\Helpers\\FileManagerHelper' => __DIR__ . '/../..' . '/app/Helpers/FileManagerHelper.php',
         'App\\Helpers\\ImageHelper' => __DIR__ . '/../..' . '/app/Helpers/ImageHelper.php',
+        'App\\Helpers\\SeoHelper' => __DIR__ . '/../..' . '/app/Helpers/SeoHelper.php',
         'App\\Helpers\\SlugHelper' => __DIR__ . '/../..' . '/app/Helpers/SlugHelper.php',
         'App\\Http\\Controllers\\Admin\\AdminController' => __DIR__ . '/../..' . '/app/Http/Controllers/Admin/AdminController.php',
         'App\\Http\\Controllers\\Admin\\AnnouncementController' => __DIR__ . '/../..' . '/app/Http/Controllers/Admin/AnnouncementController.php',
@@ -789,6 +791,7 @@ class ComposerStaticInit9f30d1e8d9e748d9125f846e3929e9a2
         'App\\Http\\Controllers\\Admin\\ServiceTagController' => __DIR__ . '/../..' . '/app/Http/Controllers/Admin/ServiceTagController.php',
         'App\\Http\\Controllers\\Admin\\ServiceTopicController' => __DIR__ . '/../..' . '/app/Http/Controllers/Admin/ServiceTopicController.php',
         'App\\Http\\Controllers\\Admin\\ServicesUnitController' => __DIR__ . '/../..' . '/app/Http/Controllers/Admin/ServicesUnitController.php',
+        'App\\Http\\Controllers\\Admin\\SettingsController' => __DIR__ . '/../..' . '/app/Http/Controllers/Admin/SettingsController.php',
         'App\\Http\\Controllers\\Admin\\TenderController' => __DIR__ . '/../..' . '/app/Http/Controllers/Admin/TenderController.php',
         'App\\Http\\Controllers\\Admin\\TestController' => __DIR__ . '/../..' . '/app/Http/Controllers/Admin/TestController.php',
         'App\\Http\\Controllers\\Admin\\TestDepartmentController' => __DIR__ . '/../..' . '/app/Http/Controllers/Admin/TestDepartmentController.php',
@@ -1128,6 +1131,7 @@ class ComposerStaticInit9f30d1e8d9e748d9125f846e3929e9a2
         'Database\\Seeders\\MenuCardSeeder' => __DIR__ . '/../..' . '/database/seeders/MenuCardSeeder.php',
         'Database\\Seeders\\MenuTagSeeder' => __DIR__ . '/../..' . '/database/seeders/MenuTagSeeder.php',
         'Database\\Seeders\\NewsAndCategoriesSeeder' => __DIR__ . '/../..' . '/database/seeders/NewsAndCategoriesSeeder.php',
+        'Database\\Seeders\\SeoSettingsSeeder' => __DIR__ . '/../..' . '/database/seeders/SeoSettingsSeeder.php',
         'Database\\Seeders\\ServiceTopicSeeder' => __DIR__ . '/../..' . '/database/seeders/ServiceTopicSeeder.php',
         'Database\\Seeders\\ServiceTopicsMenuSeeder' => __DIR__ . '/../..' . '/database/seeders/ServiceTopicsMenuSeeder.php',
         'Database\\Seeders\\TenderSeeder' => __DIR__ . '/../..' . '/database/seeders/TenderSeeder.php',
