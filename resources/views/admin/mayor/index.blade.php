@@ -2,69 +2,183 @@
 
 @section('title', 'Başkan Sayfası Yönetimi')
 
+@section('content_header')
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1 class="m-0">
+                    <i class="fas fa-user-tie text-primary mr-2"></i>
+                    Başkan Sayfası Yönetimi
+                </h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Ana Sayfa</a></li>
+                    <li class="breadcrumb-item active">Başkan Sayfası</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+@stop
+
 @section('content')
-<div class="content-wrapper">
-    <!-- Content Header -->
-    <div class="content-header">
-        <div class="container-fluid">
-            <div class="row mb-2">
-                <div class="col-sm-6">
-                    <h1 class="m-0">Başkan Sayfası</h1>
+<div class="container-fluid">
+    
+    @if(session('success'))
+        <div class="alert alert-success alert-dismissible fade show">
+            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+            <i class="fas fa-check-circle mr-2"></i>
+            {{ session('success') }}
+        </div>
+    @endif
+
+    @if(session('error'))
+        <div class="alert alert-danger alert-dismissible fade show">
+            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+            <i class="fas fa-exclamation-triangle mr-2"></i>
+            {{ session('error') }}
+        </div>
+    @endif
+
+    <!-- İçerik Yönetimi Kartları -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h4 class="mb-3">
+                <i class="fas fa-layer-group text-info mr-2"></i>
+                İçerik Yönetimi
+            </h4>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <!-- Hikayeler -->
+        <div class="col-lg-4 col-md-6">
+            <div class="card card-widget widget-user-2 shadow-sm">
+                <div class="widget-user-header bg-warning">
+                    <div class="widget-user-image">
+                        <i class="fas fa-book fa-2x"></i>
+                    </div>
+                    <h3 class="widget-user-username">Hikayeler</h3>
+                    <h5 class="widget-user-desc">Başkanın hikayeleri</h5>
                 </div>
-                <div class="col-sm-6">
-                    <ol class="breadcrumb float-sm-right">
-                        <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Ana Sayfa</a></li>
-                        <li class="breadcrumb-item active">Başkan Sayfası</li>
-                    </ol>
+                <div class="card-footer p-0">
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a href="{{ route('admin.mayor-content.index', ['type' => 'story']) }}" class="nav-link">
+                                <i class="fas fa-list mr-2"></i>
+                                Hikayeleri Yönet
+                                <span class="float-right badge bg-warning">{{ $mayor->stories->count() }}</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('admin.mayor-content.create', ['type' => 'story']) }}" class="nav-link">
+                                <i class="fas fa-plus mr-2"></i>
+                                Yeni Hikaye Ekle
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gündem -->
+        <div class="col-lg-4 col-md-6">
+            <div class="card card-widget widget-user-2 shadow-sm">
+                <div class="widget-user-header bg-info">
+                    <div class="widget-user-image">
+                        <i class="fas fa-calendar fa-2x"></i>
+                    </div>
+                    <h3 class="widget-user-username">Gündem</h3>
+                    <h5 class="widget-user-desc">Güncel etkinlikler</h5>
+                </div>
+                <div class="card-footer p-0">
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a href="{{ route('admin.mayor-content.index', ['type' => 'agenda']) }}" class="nav-link">
+                                <i class="fas fa-list mr-2"></i>
+                                Gündemi Yönet
+                                <span class="float-right badge bg-info">{{ $mayor->agenda->count() }}</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('admin.mayor-content.create', ['type' => 'agenda']) }}" class="nav-link">
+                                <i class="fas fa-plus mr-2"></i>
+                                Yeni Gündem Ekle
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Galeri -->
+        <div class="col-lg-4 col-md-6">
+            <div class="card card-widget widget-user-2 shadow-sm">
+                <div class="widget-user-header bg-purple">
+                    <div class="widget-user-image">
+                        <i class="fas fa-images fa-2x"></i>
+                    </div>
+                    <h3 class="widget-user-username">Galeri</h3>
+                    <h5 class="widget-user-desc">Fotoğraf galerisi</h5>
+                </div>
+                <div class="card-footer p-0">
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a href="{{ route('admin.mayor-content.index', ['type' => 'gallery']) }}" class="nav-link">
+                                <i class="fas fa-images mr-2"></i>
+                                Galeriyi Yönet
+                                <span class="float-right badge bg-purple">{{ $mayor->gallery->count() }}</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('admin.mayor-content.create', ['type' => 'gallery']) }}" class="nav-link">
+                                <i class="fas fa-plus mr-2"></i>
+                                Yeni Fotoğraf Ekle
+                            </a>
+                        </li>
+                    </ul>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Main content -->
-    <section class="content">
-        <div class="container-fluid">
+    <!-- Başkan Profili Kartı -->
+    <div class="card card-primary card-outline">
+        <div class="card-header">
+            <h3 class="card-title">
+                <i class="fas fa-user-edit mr-2"></i>
+                Başkan Profili & Sayfa Ayarları
+            </h3>
+            <div class="card-tools">
+                <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                    <i class="fas fa-minus"></i>
+                </button>
+            </div>
+        </div>
+        
+        <form action="{{ route('admin.mayor.update', $mayor) }}" method="POST" enctype="multipart/form-data">
+            @csrf
+            @method('PUT')
             
-            @if(session('success'))
-                <div class="alert alert-success alert-dismissible">
-                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-                    {{ session('success') }}
-                </div>
-            @endif
-
-            @if(session('error'))
-                <div class="alert alert-danger alert-dismissible">
-                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-                    {{ session('error') }}
-                </div>
-            @endif
-
-            <!-- Başkan Profili Kartı -->
-            <div class="card card-primary">
-                <div class="card-header">
-                    <h3 class="card-title">
-                        <i class="fas fa-user-tie mr-2"></i>
-                        Başkan Profili & Sayfa Ayarları
-                    </h3>
-                </div>
-                
-                <form action="{{ route('admin.mayor.update', $mayor) }}" method="POST" enctype="multipart/form-data">
-                    @csrf
-                    @method('PUT')
-                    
-                    <div class="card-body">
-                        <div class="row">
-                            <!-- Sol Kolon -->
-                            <div class="col-md-6">
-                                <h5 class="text-primary mb-3">
-                                    <i class="fas fa-user mr-1"></i>
+            <div class="card-body">
+                <div class="row">
+                    <!-- Sol Kolon -->
+                    <div class="col-lg-6">
+                        <div class="card card-light">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">
+                                    <i class="fas fa-user text-primary mr-2"></i>
                                     Kişisel Bilgiler
                                 </h5>
-                                
+                            </div>
+                            <div class="card-body">
                                 <!-- Ad Soyad -->
                                 <div class="form-group">
-                                    <label for="name">Ad Soyad <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control @error('name') is-invalid @enderror" 
+                                    <label for="name" class="font-weight-bold">
+                                        <i class="fas fa-signature mr-1"></i>
+                                        Ad Soyad <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="text" class="form-control form-control-lg @error('name') is-invalid @enderror" 
                                            id="name" name="name" value="{{ old('name', $mayor->name) }}" required>
                                     @error('name')
                                         <span class="invalid-feedback">{{ $message }}</span>
@@ -73,7 +187,10 @@
 
                                 <!-- Unvan -->
                                 <div class="form-group">
-                                    <label for="title">Unvan <span class="text-danger">*</span></label>
+                                    <label for="title" class="font-weight-bold">
+                                        <i class="fas fa-medal mr-1"></i>
+                                        Unvan <span class="text-danger">*</span>
+                                    </label>
                                     <input type="text" class="form-control @error('title') is-invalid @enderror" 
                                            id="title" name="title" value="{{ old('title', $mayor->title) }}" required>
                                     @error('title')
@@ -83,7 +200,10 @@
 
                                 <!-- Profil Fotoğrafı -->
                                 <div class="form-group">
-                                    <label for="profile_image">Profil Fotoğrafı</label>
+                                    <label for="profile_image" class="font-weight-bold">
+                                        <i class="fas fa-camera mr-1"></i>
+                                        Profil Fotoğrafı
+                                    </label>
                                     <div class="input-group">
                                         <div class="custom-file">
                                             <input type="file" class="custom-file-input @error('profile_image') is-invalid @enderror" 
@@ -92,9 +212,12 @@
                                         </div>
                                     </div>
                                     @if($mayor->profile_image)
-                                        <div class="mt-2">
+                                        <div class="mt-3 text-center">
                                             <img src="{{ $mayor->profile_image_url }}" alt="Profil Fotoğrafı" 
-                                                 class="img-thumbnail" style="max-width: 150px;">
+                                                 class="img-thumbnail shadow-sm" style="max-width: 200px; border-radius: 10px;">
+                                            <p class="text-muted mt-2 mb-0">
+                                                <small><i class="fas fa-info-circle mr-1"></i>Mevcut profil fotoğrafı</small>
+                                            </p>
                                         </div>
                                     @endif
                                     @error('profile_image')
@@ -104,28 +227,38 @@
 
                                 <!-- Biyografi -->
                                 <div class="form-group">
-                                    <label for="biography">Biyografi</label>
+                                    <label for="biography" class="font-weight-bold">
+                                        <i class="fas fa-file-alt mr-1"></i>
+                                        Biyografi
+                                    </label>
                                     <textarea class="form-control @error('biography') is-invalid @enderror" 
-                                              id="biography" name="biography" rows="8">{{ old('biography', $mayor->biography) }}</textarea>
+                                              id="biography" name="biography" rows="8" 
+                                              placeholder="Başkanın biyografisini buraya yazın...">{{ old('biography', $mayor->biography) }}</textarea>
                                     @error('biography')
                                         <span class="invalid-feedback">{{ $message }}</span>
                                     @enderror
                                 </div>
                             </div>
+                        </div>
+                    </div>
 
-                            <!-- Sağ Kolon -->
-                            <div class="col-md-6">
-                                <h5 class="text-success mb-3">
-                                    <i class="fas fa-share-alt mr-1"></i>
+                    <!-- Sağ Kolon -->
+                    <div class="col-lg-6">
+                        <!-- Sosyal Medya -->
+                        <div class="card card-light">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">
+                                    <i class="fas fa-share-alt text-success mr-2"></i>
                                     Sosyal Medya Hesapları
                                 </h5>
-                                
+                            </div>
+                            <div class="card-body">
                                 <!-- Twitter -->
                                 <div class="form-group">
-                                    <label for="social_twitter">
-                                        <i class="fab fa-twitter text-info mr-1"></i>
-                                        Twitter
-                                    </label>
+                                                    <label for="social_twitter" class="font-weight-bold">
+                    <i class="fab fa-x-twitter text-info mr-1"></i>
+                    Twitter
+                </label>
                                     <input type="url" class="form-control @error('social_twitter') is-invalid @enderror" 
                                            id="social_twitter" name="social_twitter" 
                                            value="{{ old('social_twitter', $mayor->social_twitter) }}"
@@ -137,7 +270,7 @@
 
                                 <!-- Instagram -->
                                 <div class="form-group">
-                                    <label for="social_instagram">
+                                    <label for="social_instagram" class="font-weight-bold">
                                         <i class="fab fa-instagram text-danger mr-1"></i>
                                         Instagram
                                     </label>
@@ -152,7 +285,7 @@
 
                                 <!-- Facebook -->
                                 <div class="form-group">
-                                    <label for="social_facebook">
+                                    <label for="social_facebook" class="font-weight-bold">
                                         <i class="fab fa-facebook text-primary mr-1"></i>
                                         Facebook
                                     </label>
@@ -167,7 +300,7 @@
 
                                 <!-- LinkedIn -->
                                 <div class="form-group">
-                                    <label for="social_linkedin">
+                                    <label for="social_linkedin" class="font-weight-bold">
                                         <i class="fab fa-linkedin text-info mr-1"></i>
                                         LinkedIn
                                     </label>
@@ -182,7 +315,7 @@
 
                                 <!-- Email -->
                                 <div class="form-group">
-                                    <label for="social_email">
+                                    <label for="social_email" class="font-weight-bold">
                                         <i class="fas fa-envelope text-secondary mr-1"></i>
                                         E-posta
                                     </label>
@@ -194,17 +327,24 @@
                                         <span class="invalid-feedback">{{ $message }}</span>
                                     @enderror
                                 </div>
+                            </div>
+                        </div>
 
-                                <hr>
-
-                                <h5 class="text-warning mb-3">
-                                    <i class="fas fa-cog mr-1"></i>
+                        <!-- Sayfa Ayarları -->
+                        <div class="card card-light">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">
+                                    <i class="fas fa-cog text-warning mr-2"></i>
                                     Sayfa Ayarları
                                 </h5>
-
+                            </div>
+                            <div class="card-body">
                                 <!-- Sayfa Başlığı -->
                                 <div class="form-group">
-                                    <label for="page_title">Sayfa Başlığı <span class="text-danger">*</span></label>
+                                    <label for="page_title" class="font-weight-bold">
+                                        <i class="fas fa-heading mr-1"></i>
+                                        Sayfa Başlığı <span class="text-danger">*</span>
+                                    </label>
                                     <input type="text" class="form-control @error('page_title') is-invalid @enderror" 
                                            id="page_title" name="page_title" 
                                            value="{{ old('page_title', $mayor->page_title) }}" required>
@@ -215,7 +355,10 @@
 
                                 <!-- Meta Açıklama -->
                                 <div class="form-group">
-                                    <label for="meta_description">Meta Açıklama</label>
+                                    <label for="meta_description" class="font-weight-bold">
+                                        <i class="fas fa-search mr-1"></i>
+                                        Meta Açıklama
+                                    </label>
                                     <textarea class="form-control @error('meta_description') is-invalid @enderror" 
                                               id="meta_description" name="meta_description" rows="3"
                                               placeholder="SEO için sayfa açıklaması">{{ old('meta_description', $mayor->meta_description) }}</textarea>
@@ -226,7 +369,10 @@
 
                                 <!-- Hero Arka Plan Rengi -->
                                 <div class="form-group">
-                                    <label for="hero_bg_color">Hero Arka Plan Rengi</label>
+                                    <label for="hero_bg_color" class="font-weight-bold">
+                                        <i class="fas fa-palette mr-1"></i>
+                                        Hero Arka Plan Rengi
+                                    </label>
                                     <input type="color" class="form-control @error('hero_bg_color') is-invalid @enderror" 
                                            id="hero_bg_color" name="hero_bg_color" 
                                            value="{{ old('hero_bg_color', $mayor->hero_bg_color) }}">
@@ -237,7 +383,10 @@
 
                                 <!-- Hero Arka Plan Görseli -->
                                 <div class="form-group">
-                                    <label for="hero_bg_image">Hero Arka Plan Görseli</label>
+                                    <label for="hero_bg_image" class="font-weight-bold">
+                                        <i class="fas fa-image mr-1"></i>
+                                        Hero Arka Plan Görseli
+                                    </label>
                                     <div class="input-group">
                                         <div class="custom-file">
                                             <input type="file" class="custom-file-input @error('hero_bg_image') is-invalid @enderror" 
@@ -246,9 +395,12 @@
                                         </div>
                                     </div>
                                     @if($mayor->hero_bg_image)
-                                        <div class="mt-2">
+                                        <div class="mt-3 text-center">
                                             <img src="{{ $mayor->hero_bg_image_url }}" alt="Hero Arka Plan" 
-                                                 class="img-thumbnail" style="max-width: 200px;">
+                                                 class="img-thumbnail shadow-sm" style="max-width: 250px; border-radius: 10px;">
+                                            <p class="text-muted mt-2 mb-0">
+                                                <small><i class="fas fa-info-circle mr-1"></i>Mevcut hero arka plan görseli</small>
+                                            </p>
                                         </div>
                                     @endif
                                     @error('hero_bg_image')
@@ -258,127 +410,98 @@
                             </div>
                         </div>
                     </div>
-
-                    <div class="card-footer">
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-save mr-1"></i>
-                            Kaydet
+                </div>
+            </div>
+            
+            <div class="card-footer">
+                <div class="row">
+                    <div class="col-md-6">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="fas fa-save mr-2"></i>
+                            Değişiklikleri Kaydet
                         </button>
-                        <a href="{{ url('/baskan') }}" target="_blank" class="btn btn-info">
-                            <i class="fas fa-eye mr-1"></i>
-                            Önizleme
-                        </a>
                     </div>
-                </form>
-            </div>
-
-            <!-- İçerik Yönetimi Kartları -->
-            <div class="row">
-                <div class="col-md-3">
-                    <div class="card card-widget widget-user-2">
-                        <div class="widget-user-header bg-warning">
-                            <h3 class="widget-user-username">Hikayeler</h3>
-                            <h5 class="widget-user-desc">İnstagram tarzı hikaye kartları</h5>
-                        </div>
-                        <div class="card-footer p-0">
-                            <ul class="nav flex-column">
-                                <li class="nav-item">
-                                    <a href="{{ route('admin.mayor-content.index', ['type' => 'story']) }}" class="nav-link">
-                                        <i class="fas fa-book mr-2"></i>
-                                        Hikayeleri Yönet
-                                        <span class="float-right badge bg-warning">{{ $mayor->stories->count() }}</span>
-                                    </a>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-md-3">
-                    <div class="card card-widget widget-user-2">
-                        <div class="widget-user-header bg-info">
-                            <h3 class="widget-user-username">Gündem</h3>
-                            <h5 class="widget-user-desc">Etkinlikler ve toplantılar</h5>
-                        </div>
-                        <div class="card-footer p-0">
-                            <ul class="nav flex-column">
-                                <li class="nav-item">
-                                    <a href="{{ route('admin.mayor-content.index', ['type' => 'agenda']) }}" class="nav-link">
-                                        <i class="fas fa-calendar mr-2"></i>
-                                        Gündemi Yönet
-                                        <span class="float-right badge bg-info">{{ $mayor->agenda->count() }}</span>
-                                    </a>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-md-3">
-                    <div class="card card-widget widget-user-2">
-                        <div class="widget-user-header bg-success">
-                            <h3 class="widget-user-username">Değerler</h3>
-                            <h5 class="widget-user-desc">Kurumsal değerler</h5>
-                        </div>
-                        <div class="card-footer p-0">
-                            <ul class="nav flex-column">
-                                <li class="nav-item">
-                                    <a href="{{ route('admin.mayor-content.index', ['type' => 'value']) }}" class="nav-link">
-                                        <i class="fas fa-star mr-2"></i>
-                                        Değerleri Yönet
-                                        <span class="float-right badge bg-success">{{ $mayor->values->count() }}</span>
-                                    </a>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-md-3">
-                    <div class="card card-widget widget-user-2">
-                        <div class="widget-user-header bg-purple">
-                            <h3 class="widget-user-username">Galeri</h3>
-                            <h5 class="widget-user-desc">Fotoğraf galerisi</h5>
-                        </div>
-                        <div class="card-footer p-0">
-                            <ul class="nav flex-column">
-                                <li class="nav-item">
-                                    <a href="{{ route('admin.mayor-content.index', ['type' => 'gallery']) }}" class="nav-link">
-                                        <i class="fas fa-images mr-2"></i>
-                                        Galeriyi Yönet
-                                        <span class="float-right badge bg-purple">{{ $mayor->gallery->count() }}</span>
-                                    </a>
-                                </li>
-                            </ul>
+                    <div class="col-md-6 text-right">
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-info toggle-status" data-id="{{ $mayor->id }}">
+                                <i class="fas {{ $mayor->is_active ? 'fa-eye-slash' : 'fa-eye' }} mr-1"></i>
+                                {{ $mayor->is_active ? 'Pasif Yap' : 'Aktif Yap' }}
+                            </button>
                         </div>
                     </div>
                 </div>
             </div>
+        </form>
+    </div>
 
-        </div>
-    </section>
 </div>
+
+@push('css')
+<style>
+.card-light {
+    border: 1px solid #dee2e6;
+}
+.card-light .card-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+}
+.widget-user-2 .widget-user-header {
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    padding: 20px;
+}
+.widget-user-image {
+    float: left;
+    margin-right: 15px;
+    margin-top: -5px;
+}
+.shadow-sm {
+    box-shadow: 0 .125rem .25rem rgba(0,0,0,.075)!important;
+}
+.form-control-lg {
+    font-size: 1.1rem;
+    font-weight: 500;
+}
+.font-weight-bold {
+    font-weight: 600!important;
+}
+</style>
+@endpush
 
 @push('scripts')
 <script>
 $(document).ready(function() {
-    // TinyMCE for biography
-    if (typeof tinymce !== 'undefined') {
-        tinymce.init({
-            selector: '#biography',
-            height: 300,
-            plugins: 'advlist autolink lists link image charmap print preview anchor searchreplace visualblocks code fullscreen insertdatetime media table paste code help wordcount',
-            toolbar: 'undo redo | formatselect | bold italic backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | help',
-            content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }'
-        });
-    }
-
-    // File input labels
+    // Custom file input labels
     $('.custom-file-input').on('change', function() {
         let fileName = $(this).val().split('\\').pop();
         $(this).next('.custom-file-label').addClass("selected").html(fileName);
     });
+
+    // Toggle status
+    $('.toggle-status').on('click', function() {
+        var button = $(this);
+        var mayorId = button.data('id');
+        
+        $.ajax({
+            url: '/admin/mayor/' + mayorId + '/toggle-status',
+            type: 'POST',
+            data: {
+                _token: '{{ csrf_token() }}'
+            },
+            success: function(response) {
+                if (response.success) {
+                    location.reload();
+                } else {
+                    alert('Bir hata oluştu: ' + response.message);
+                }
+            },
+            error: function() {
+                alert('Bir hata oluştu. Lütfen tekrar deneyin.');
+            }
+        });
+    });
 });
 </script>
 @endpush
-@endsection 
+
+@stop 

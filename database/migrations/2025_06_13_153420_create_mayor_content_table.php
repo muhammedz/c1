@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('mayor_content', function (Blueprint $table) {
             $table->id();
             $table->foreignId('mayor_id')->constrained('mayors')->onDelete('cascade'); // Foreign Key
-            $table->enum('type', ['story', 'agenda', 'value', 'gallery']); // İçerik türü
+            $table->enum('type', ['story', 'agenda', 'gallery']); // İçerik türü
             $table->string('title'); // Başlık
             $table->text('description')->nullable(); // Açıklama/İçerik
             $table->string('image')->nullable(); // Görsel

@@ -57,7 +57,7 @@ class MayorContentController extends Controller
         }
 
         $request->validate([
-            'type' => 'required|in:story,agenda,value,gallery',
+            'type' => 'required|in:story,agenda,gallery',
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
@@ -141,15 +141,37 @@ class MayorContentController extends Controller
     {
         $type = $mayorContent->type;
         
-        // Görseli sil
-        if ($mayorContent->image && Storage::disk('uploads')->exists($mayorContent->image)) {
-            Storage::disk('uploads')->delete($mayorContent->image);
+        try {
+            // Görseli sil
+            if ($mayorContent->image && Storage::disk('uploads')->exists($mayorContent->image)) {
+                Storage::disk('uploads')->delete($mayorContent->image);
+            }
+
+            $mayorContent->delete();
+
+            // AJAX isteği ise JSON response döndür
+            if (request()->ajax()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Fotoğraf başarıyla silindi.'
+                ]);
+            }
+
+            return redirect()->route('admin.mayor-content.index', ['type' => $type])
+                ->with('success', 'Fotoğraf başarıyla silindi.');
+                
+        } catch (\Exception $e) {
+            // AJAX isteği ise JSON error response döndür
+            if (request()->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Silme işlemi sırasında bir hata oluştu: ' . $e->getMessage()
+                ], 500);
+            }
+
+            return redirect()->route('admin.mayor-content.index', ['type' => $type])
+                ->with('error', 'Silme işlemi sırasında bir hata oluştu.');
         }
-
-        $mayorContent->delete();
-
-        return redirect()->route('admin.mayor-content.index', ['type' => $type])
-            ->with('success', 'İçerik başarıyla silindi.');
     }
 
     /**

@@ -144,10 +144,10 @@
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-group">
-                                            <label for="twitter"><i class="fab fa-twitter text-info mr-1"></i> Twitter/X</label>
+                                            <label for="twitter"><i class="fab fa-x-twitter text-info mr-1"></i> Twitter/X</label>
                                             <div class="input-group">
                                                 <div class="input-group-prepend">
-                                                    <span class="input-group-text"><i class="fab fa-twitter"></i></span>
+                                                    <span class="input-group-text"><i class="fab fa-x-twitter"></i></span>
                                                 </div>
                                                 <input type="url" class="form-control @error('twitter') is-invalid @enderror" id="twitter" name="twitter" value="{{ old('twitter', $member->twitter) }}" placeholder="https://twitter.com/...">
                                             </div>

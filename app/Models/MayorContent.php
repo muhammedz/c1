@@ -32,7 +32,6 @@ class MayorContent extends Model
      */
     const TYPE_STORY = 'story';
     const TYPE_AGENDA = 'agenda';
-    const TYPE_VALUE = 'value';
     const TYPE_GALLERY = 'gallery';
 
     /**
@@ -99,13 +98,7 @@ class MayorContent extends Model
         return $query->ofType(self::TYPE_AGENDA);
     }
 
-    /**
-     * Değerler
-     */
-    public function scopeValues($query)
-    {
-        return $query->ofType(self::TYPE_VALUE);
-    }
+
 
     /**
      * Galeri

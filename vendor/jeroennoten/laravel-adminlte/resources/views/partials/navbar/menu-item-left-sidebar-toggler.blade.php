@@ -37,3 +37,9 @@
         <span class="ml-1">Duyurular</span>
     </a>
 </li>
+<li class="nav-item">
+    <a class="nav-link btn btn-primary btn-sm text-white mr-2" href="{{ url('admin/mayor') }}" style="border-radius: 20px; padding: 8px 16px;">
+        <i class="fas fa-user-tie"></i>
+        <span class="ml-1">Başkan Sayfası</span>
+    </a>
+</li>

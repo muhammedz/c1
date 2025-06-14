@@ -15,7 +15,8 @@ class FooterMenuLinkController extends Controller
     public function index(FooterMenu $footerMenu)
     {
         $links = $footerMenu->links()->ordered()->get();
-        return view('admin.footer.links.index', compact('footerMenu', 'links'));
+        $menu = $footerMenu; // View'da $menu değişkeni kullanılıyor
+        return view('admin.footer.links.index', compact('menu', 'links'));
     }
 
     /**
@@ -23,7 +24,8 @@ class FooterMenuLinkController extends Controller
      */
     public function create(FooterMenu $footerMenu)
     {
-        return view('admin.footer.links.create', compact('footerMenu'));
+        $menu = $footerMenu; // View'da $menu değişkeni kullanılıyor
+        return view('admin.footer.links.create', compact('menu'));
     }
 
     /**
@@ -54,7 +56,8 @@ class FooterMenuLinkController extends Controller
      */
     public function show(FooterMenu $footerMenu, FooterMenuLink $link)
     {
-        return view('admin.footer.links.show', compact('footerMenu', 'link'));
+        $menu = $footerMenu; // View'da $menu değişkeni kullanılıyor
+        return view('admin.footer.links.show', compact('menu', 'link'));
     }
 
     /**
@@ -62,7 +65,8 @@ class FooterMenuLinkController extends Controller
      */
     public function edit(FooterMenu $footerMenu, FooterMenuLink $link)
     {
-        return view('admin.footer.links.edit', compact('footerMenu', 'link'));
+        $menu = $footerMenu; // View'da $menu değişkeni kullanılıyor
+        return view('admin.footer.links.edit', compact('menu', 'link'));
     }
 
     /**

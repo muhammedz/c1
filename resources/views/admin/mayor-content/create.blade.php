@@ -189,9 +189,7 @@
                                             @case('agenda')
                                                 Etkinlik Görseli
                                                 @break
-                                            @case('value')
-                                                Değer Görseli
-                                                @break
+                                            
                                             @case('gallery')
                                                 Fotoğraf <span class="text-danger">*</span>
                                                 @break

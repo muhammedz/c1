@@ -60,16 +60,7 @@ class Mayor extends Model
             ->orderBy('sort_order');
     }
 
-    /**
-     * Değerler
-     */
-    public function values()
-    {
-        return $this->hasMany(MayorContent::class)
-            ->where('type', 'value')
-            ->where('is_active', true)
-            ->orderBy('sort_order');
-    }
+
 
     /**
      * Galeri

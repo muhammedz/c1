@@ -380,7 +380,7 @@
                         <i class="fab fa-facebook-f"></i>
                     </a>
                     <a href="https://twitter.com/intent/tweet?url={{ urlencode(route('pages.show', $page->slug)) }}&text={{ urlencode($page->title) }}" target="_blank" class="w-10 h-10 bg-blue-400 text-white flex items-center justify-center rounded-full hover:bg-blue-500 transition-all shadow-sm hover:shadow-md">
-                        <i class="fab fa-twitter"></i>
+                        <i class="fab fa-x-twitter"></i>
                     </a>
                     <a href="https://wa.me/?text={{ urlencode($page->title . ' - ' . route('pages.show', $page->slug)) }}" target="_blank" class="w-10 h-10 bg-green-500 text-white flex items-center justify-center rounded-full hover:bg-green-600 transition-all shadow-sm hover:shadow-md">
                         <i class="fab fa-whatsapp"></i>

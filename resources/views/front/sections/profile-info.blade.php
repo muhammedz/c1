@@ -27,7 +27,7 @@
                                     
                                     @if($profileSettings->twitter_url)
                                         <a href="{{ $profileSettings->twitter_url }}" target="_blank" class="w-8 h-8 bg-[#007d32] rounded-lg flex items-center justify-center hover:bg-[#003d24] transition-colors">
-                                            <i class="fab fa-twitter text-white text-xs"></i>
+                                            <i class="fab fa-x-twitter text-white text-xs"></i>
                                         </a>
                                     @endif
                                     
@@ -73,7 +73,7 @@
                                     
                                     @if($profileSettings->twitter_url)
                                         <a href="{{ $profileSettings->twitter_url }}" target="_blank" class="w-8 h-8 bg-[#007d32] rounded-lg flex items-center justify-center hover:bg-[#003d24] transition-colors">
-                                            <i class="fab fa-twitter text-white text-xs"></i>
+                                            <i class="fab fa-x-twitter text-white text-xs"></i>
                                         </a>
                                     @endif
                                     
@@ -119,7 +119,7 @@
                                     
                                     @if($profileSettings->twitter_url)
                                         <a href="{{ $profileSettings->twitter_url }}" target="_blank" class="w-8 h-8 bg-[#007d32] rounded-lg flex items-center justify-center hover:bg-[#003d24] transition-colors">
-                                            <i class="fab fa-twitter text-white text-xs"></i>
+                                            <i class="fab fa-x-twitter text-white text-xs"></i>
                                         </a>
                                     @endif
                                     
