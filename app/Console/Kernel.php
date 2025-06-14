@@ -26,6 +26,6 @@ class Kernel extends ConsoleKernel
     }
 
     protected $commands = [
-        Commands\FixFileUrls::class,
+        // Tüm komutlar silindi - Commands klasörü boş
     ];
 }

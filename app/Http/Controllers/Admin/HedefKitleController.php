@@ -180,22 +180,42 @@ class HedefKitleController extends Controller
      */
     public function destroy(HedefKitle $hedefKitle)
     {
-        // İlişkili haber kontrolü
-        if ($hedefKitle->news()->count() > 0) {
-            return redirect()->back()
-                ->with('error', 'Bu hedef kitleye ait haberler bulunduğu için silinemez. Önce haberleri başka hedef kitlelere taşıyın veya hedef kitle ilişkisini kaldırın.');
-        }
-        
-        // İlişkili hizmet kontrolü
-        if ($hedefKitle->services()->count() > 0) {
-            return redirect()->back()
-                ->with('error', 'Bu hedef kitleye ait hizmetler bulunduğu için silinemez. Önce hizmetleri başka hedef kitlelere taşıyın veya hedef kitle ilişkisini kaldırın.');
-        }
+        try {
+            DB::beginTransaction();
             
-        $hedefKitle->delete();
-        
-        return redirect()->route('admin.hedef-kitleler.index')
-            ->with('success', 'Hedef kitle başarıyla silindi.');
+            // İlişkili haberlerin sayısını al
+            $newsCount = $hedefKitle->news()->count();
+            $servicesCount = $hedefKitle->services()->count();
+            
+            // İlişkili haberlerden hedef kitle ilişkisini kaldır
+            if ($newsCount > 0) {
+                $hedefKitle->news()->detach();
+            }
+            
+            // İlişkili hizmetlerden hedef kitle ilişkisini kaldır
+            if ($servicesCount > 0) {
+                $hedefKitle->services()->detach();
+            }
+            
+            // Hedef kitleyi sil
+            $hedefKitle->delete();
+            
+            DB::commit();
+            
+            $message = 'Hedef kitle başarıyla silindi.';
+            if ($newsCount > 0 || $servicesCount > 0) {
+                $message .= " ({$newsCount} haberden ve {$servicesCount} hizmetten hedef kitle ilişkisi kaldırıldı.)";
+            }
+            
+            return redirect()->route('admin.hedef-kitleler.index')
+                ->with('success', $message);
+                
+        } catch (\Exception $e) {
+            DB::rollBack();
+            
+            return redirect()->back()
+                ->with('error', 'Hedef kitle silinirken bir hata oluştu: ' . $e->getMessage());
+        }
     }
     
     /**
