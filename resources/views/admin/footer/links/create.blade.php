@@ -170,6 +170,9 @@
         $(document).ready(function() {
             // Form validasyonu
             $('form').on('submit', function(e) {
+                console.log('Form submit edildi');
+                console.log('Form data:', $(this).serialize());
+                
                 let title = $('#title').val().trim();
                 let url = $('#url').val().trim();
                 
@@ -186,6 +189,8 @@
                     toastr.error('URL gereklidir');
                     return false;
                 }
+                
+                console.log('Form validasyon geçti, submit ediliyor...');
             });
 
             // URL validasyonu

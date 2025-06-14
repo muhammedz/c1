@@ -33,22 +33,60 @@ class FooterMenuLinkController extends Controller
      */
     public function store(Request $request, FooterMenu $footerMenu)
     {
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'url' => 'required|string|max:255',
-            'order' => 'required|integer|min:0',
-            'is_active' => 'boolean'
+        // Debug bilgisi ekle
+        \Illuminate\Support\Facades\Log::info('FooterMenuLink Store Debug: ', [
+            'request_all' => $request->all(),
+            'menu_id' => $footerMenu->id,
+            'request_method' => $request->method(),
+            'request_url' => $request->url()
         ]);
 
-        $footerMenu->links()->create([
-            'title' => $request->title,
-            'url' => $request->url,
-            'order' => $request->order,
-            'is_active' => $request->has('is_active')
-        ]);
+        try {
+            $request->validate([
+                'title' => 'required|string|max:255',
+                'url' => 'required|string|max:255',
+                'order' => 'required|integer|min:0',
+                'is_active' => 'nullable|in:on,1,true'
+            ]);
 
-        return redirect()->route('admin.footer.menus.links.index', $footerMenu)
-                        ->with('success', 'Link başarıyla oluşturuldu.');
+            $linkData = [
+                'title' => $request->title,
+                'url' => $request->url,
+                'order' => $request->order,
+                'is_active' => $request->has('is_active')
+            ];
+
+            \Illuminate\Support\Facades\Log::info('FooterMenuLink Create Data: ', $linkData);
+
+            $link = $footerMenu->links()->create($linkData);
+
+            \Illuminate\Support\Facades\Log::info('FooterMenuLink Created: ', [
+                'link_id' => $link->id,
+                'link_data' => $link->toArray()
+            ]);
+
+            return redirect()->route('admin.footer.menus.links.index', $footerMenu)
+                            ->with('success', 'Link başarıyla oluşturuldu.');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            \Illuminate\Support\Facades\Log::error('FooterMenuLink Store Validation Error: ', [
+                'errors' => $e->errors(),
+                'request_data' => $request->all()
+            ]);
+
+            return redirect()->back()
+                            ->withErrors($e->errors())
+                            ->withInput()
+                            ->with('error', 'Form verilerinde hata var.');
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('FooterMenuLink Store Error: ', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return redirect()->back()
+                            ->withInput()
+                            ->with('error', 'Link oluşturulurken bir hata oluştu: ' . $e->getMessage());
+        }
     }
 
     /**

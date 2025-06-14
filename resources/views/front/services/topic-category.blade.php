@@ -58,31 +58,16 @@
             <!-- Sağ Taraf: İstatistikler -->
             <div class="hidden md:flex justify-end">
                 <div class="bg-white/10 backdrop-blur-sm p-6 rounded-lg border border-white/20 shadow-lg">
-                    <div class="grid grid-cols-2 gap-4">
-                        <div class="text-center">
-                            <div class="text-2xl font-bold text-white mb-1">{{ $services->count() }}</div>
-                            <div class="text-white/70 text-xs">Bu Konuda</div>
-                        </div>
-                        <div class="text-center">
-                            <div class="text-2xl font-bold text-white mb-1">{{ $serviceTopics->count() }}</div>
-                            <div class="text-white/70 text-xs">Toplam Konu</div>
-                        </div>
-                        <div class="text-center">
-                            <div class="text-2xl font-bold text-white mb-1">100%</div>
-                            <div class="text-white/70 text-xs">Memnuniyet</div>
-                        </div>
-                        <div class="text-center">
-                            <div class="text-2xl font-bold text-white mb-1">7/24</div>
-                            <div class="text-white/70 text-xs">Destek</div>
-                        </div>
-                    </div>
+
                     <div class="mt-4 pt-4 border-t border-white/10">
                         <div class="text-center">
                             <h4 class="text-white font-semibold mb-2">Hizmet Bilgilendirme</h4>
                             <p class="text-white/80 text-sm mb-3">Bu konudaki hizmetlerimiz hakkında detaylı bilgi almak ve başvuru süreçleri için uzman ekibimizle iletişime geçebilirsiniz.</p>
                             <div class="flex items-center justify-center text-[#e6a23c]">
                                 <span class="material-icons mr-2">support_agent</span>
-                                <span class="font-bold">Destek Hattı</span>
+                                <div class="text-center">
+                                    <div class="font-bold">444 06 01</div>
+                                </div>
                             </div>
                         </div>
                     </div>
