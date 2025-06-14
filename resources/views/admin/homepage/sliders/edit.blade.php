@@ -2,6 +2,10 @@
 
 @section('title', 'Slider Düzenle')
 
+@section('adminlte_css_pre')
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+@stop
+
 @section('content_header')
     <div class="d-flex justify-content-between">
         <h1>Slider Düzenle: {{ $slider->title }}</h1>
@@ -109,11 +113,26 @@
                                     <button type="button" class="btn btn-primary" id="filemanagersystem_image_button">
                                         <i class="fas fa-image"></i> Görsel Seç
                                     </button>
+                                    <button type="button" class="btn btn-success" id="direct_upload_button">
+                                        <i class="fas fa-upload"></i> Direkt Yükle
+                                    </button>
                                 </div>
                             </div>
                             @error('filemanagersystem_image')
                                 <span class="invalid-feedback">{{ $message }}</span>
                             @enderror
+                            
+                            <!-- Direkt dosya yükleme input'u (gizli) -->
+                            <input type="file" id="direct_file_input" accept="image/*" style="display: none;">
+                            
+                            <!-- Yükleme progress bar'ı -->
+                            <div id="upload_progress" class="mt-2" style="display: none;">
+                                <div class="progress">
+                                    <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%"></div>
+                                </div>
+                                <small class="text-muted">Dosya yükleniyor...</small>
+                            </div>
+                            
                             <div id="filemanagersystem_image_preview" class="mt-2" style="{{ $slider->filemanagersystem_image ? '' : 'display: none;' }}">
                                 <img src="{{ $slider->filemanagersystem_image_url ?? $slider->filemanagersystem_image }}" alt="Önizleme" class="img-thumbnail" style="max-height: 200px;">
                             </div>
@@ -253,6 +272,118 @@
                 console.error('MediaPicker iframe yüklenirken hata oluştu');
                 alert('Medya seçici yüklenirken bir hata oluştu. Lütfen sayfayı yenileyip tekrar deneyin.');
                 $('#mediapickerModal').modal('hide');
+            });
+        });
+
+        // Direkt dosya yükleme
+        $('#direct_upload_button').on('click', function() {
+            $('#direct_file_input').click();
+        });
+
+        $('#direct_file_input').on('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            // Dosya tipini kontrol et
+            if (!file.type.startsWith('image/')) {
+                alert('Lütfen sadece görsel dosyası seçin.');
+                return;
+            }
+
+            // Dosya boyutunu kontrol et (10MB limit)
+            if (file.size > 10 * 1024 * 1024) {
+                alert('Dosya boyutu 10MB\'dan küçük olmalıdır.');
+                return;
+            }
+
+            // FormData oluştur
+            const formData = new FormData();
+            formData.append('files[]', file); // Controller'ın beklediği format
+            formData.append('_token', $('meta[name="csrf-token"]').attr('content'));
+            formData.append('related_type', 'homepage_slider');
+            formData.append('related_id', {{ $slider->id }});
+            formData.append('is_public', '1'); // Public olarak işaretle
+
+            // Progress bar'ı göster
+            const progressBar = $('#upload_progress');
+            const progressBarFill = progressBar.find('.progress-bar');
+            progressBar.show();
+            progressBarFill.css('width', '0%');
+
+            // AJAX ile dosyayı yükle
+            $.ajax({
+                url: '{{ route("admin.filemanagersystem.media.store") }}',
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json'
+                },
+                xhr: function() {
+                    const xhr = new window.XMLHttpRequest();
+                    xhr.upload.addEventListener('progress', function(e) {
+                        if (e.lengthComputable) {
+                            const percentComplete = (e.loaded / e.total) * 100;
+                            progressBarFill.css('width', percentComplete + '%');
+                        }
+                    });
+                    return xhr;
+                },
+                success: function(response) {
+                    console.log('Dosya yükleme başarılı:', response);
+                    
+                    // Controller'dan dönen response'u kontrol et
+                    if (response && response.uploaded_files && response.uploaded_files.length > 0) {
+                        const uploadedFile = response.uploaded_files[0];
+                        
+                        // Başarılı yükleme
+                        $('#filemanagersystem_image').val(uploadedFile.url);
+                        
+                        // Önizlemeyi güncelle
+                        const preview = $('#filemanagersystem_image_preview');
+                        const previewImg = preview.find('img');
+                        previewImg.attr('src', uploadedFile.url);
+                        preview.show();
+                        
+                        // Progress bar'ı gizle
+                        progressBar.hide();
+                        
+                        // Başarı mesajı
+                        if (typeof toastr !== 'undefined') {
+                            toastr.success('Görsel başarıyla yüklendi!');
+                        } else {
+                            alert('Görsel başarıyla yüklendi!');
+                        }
+                        
+                    } else {
+                        throw new Error(response.message || 'Dosya yükleme başarısız');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('Dosya yükleme hatası:', xhr.responseText);
+                    
+                    let errorMessage = 'Dosya yüklenirken bir hata oluştu.';
+                    
+                    try {
+                        const response = JSON.parse(xhr.responseText);
+                        if (response.message) {
+                            errorMessage = response.message;
+                        } else if (response.errors) {
+                            errorMessage = Object.values(response.errors).flat().join(', ');
+                        }
+                    } catch (e) {
+                        // JSON parse hatası, varsayılan mesajı kullan
+                    }
+                    
+                    alert(errorMessage);
+                    progressBar.hide();
+                },
+                complete: function() {
+                    // Input'u temizle
+                    $('#direct_file_input').val('');
+                }
             });
         });
 

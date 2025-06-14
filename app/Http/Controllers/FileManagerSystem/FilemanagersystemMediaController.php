@@ -222,6 +222,51 @@ class FilemanagersystemMediaController extends Controller
         $successCount = count($uploadedFiles);
         $errorCount = count($errors);
         
+        // AJAX isteği ise JSON response döndür
+        if ($request->ajax() || $request->wantsJson()) {
+            if ($successCount > 0 && $errorCount === 0) {
+                return response()->json([
+                    'success' => true,
+                    'message' => $successCount . ' adet dosya başarıyla yüklendi.',
+                    'uploaded_files' => collect($uploadedFiles)->map(function($media) {
+                        return [
+                            'id' => $media->id,
+                            'name' => $media->name,
+                            'original_name' => $media->original_name,
+                            'url' => $media->url,
+                            'mime_type' => $media->mime_type,
+                            'size' => $media->size
+                        ];
+                    })->toArray(),
+                    'errors' => []
+                ]);
+            } elseif ($successCount > 0 && $errorCount > 0) {
+                return response()->json([
+                    'success' => true,
+                    'message' => $successCount . ' dosya yüklendi, ' . $errorCount . ' dosyada hata oluştu.',
+                    'uploaded_files' => collect($uploadedFiles)->map(function($media) {
+                        return [
+                            'id' => $media->id,
+                            'name' => $media->name,
+                            'original_name' => $media->original_name,
+                            'url' => $media->url,
+                            'mime_type' => $media->mime_type,
+                            'size' => $media->size
+                        ];
+                    })->toArray(),
+                    'errors' => $errors
+                ], 206); // Partial Content
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Hiçbir dosya yüklenemedi.',
+                    'uploaded_files' => [],
+                    'errors' => $errors
+                ], 400);
+            }
+        }
+        
+        // Normal form isteği ise redirect döndür
         if ($successCount > 0 && $errorCount === 0) {
             return redirect()->route('admin.filemanagersystem.media.index', ['folder_id' => $request->folder_id])
                 ->with('success', $successCount . ' adet dosya başarıyla yüklendi.');

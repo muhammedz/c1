@@ -438,48 +438,28 @@ const categoryTitles = {
     'sosyal': 'Sosyal Projeler'
 };
 
-// Kategori değiştirme işlevi
+// Eski projeler sistemi - Yeni sistem tarafından devre dışı bırakıldı
+// Bu kodlar artık çalışmayacak, yeni izole sistem kullanılıyor
+
+/*
+// Kategori değiştirme işlevi - DEVRE DIŞI
 function changeCategory(category) {
-    // Tüm kategorilerin stilini sıfırla
-    projectCategories.forEach(cat => {
-        cat.classList.remove('bg-gray-300', 'text-gray-700');
-        cat.classList.add('bg-white', 'text-gray-700');
-    });
-
-    // Seçili kategorinin stilini güncelle
-    const selectedCategory = document.querySelector(`.project-category[data-category="${category}"]`);
-    selectedCategory.classList.remove('bg-gray-300', 'text-gray-700');
-    selectedCategory.classList.add('bg-white', 'text-gray-700');
-
-    // Başlığı güncelle
-    projectTitle.textContent = categoryTitles[category];
-
-    // Tüm slider'ları gizle
-    projectSliders.forEach(slider => slider.classList.add('hidden'));
-
-    // Seçili slider'ı göster
-    const selectedSlider = document.querySelector(`.project-slider[data-category="${category}"]`);
-    selectedSlider.classList.remove('hidden');
-
-    // Seçili slider'ın Swiper'ını güncelle
-    if (swipers[category]) {
-        swipers[category].update();
-        swipers[category].slideTo(0);
-    }
+    console.log('Bu fonksiyon yeni projeler sistemi tarafından devre dışı bırakıldı');
+    return false;
 }
 
-// Kategori tıklama olaylarını ekle
-projectCategories.forEach(category => {
-    category.addEventListener('click', () => {
-        const selectedCategory = category.dataset.category;
-        changeCategory(selectedCategory);
+// Kategori tıklama olaylarını ekle - DEVRE DIŞI
+if (typeof projectCategories !== 'undefined') {
+    projectCategories.forEach(category => {
+        // Bu event listener'lar artık çalışmayacak
     });
-});
+}
 
-// Sayfa yüklendiğinde varsayılan kategoriyi göster
+// Sayfa yüklendiğinde varsayılan kategoriyi göster - DEVRE DIŞI
 document.addEventListener('DOMContentLoaded', () => {
-    changeCategory('gerceklesen');
+    // Bu kod artık çalışmayacak
 });
+*/
 
 // Mevcut script içeriğine eklenecek
 const timelineSwiper = new Swiper('.timelineSwiper', {
