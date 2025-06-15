@@ -79,6 +79,17 @@ class News extends Model
                    ->withTimestamps();
     }
     
+    // Belgeler
+    public function documents()
+    {
+        return $this->hasMany(NewsDocument::class)->where('is_active', true)->orderBy('sort_order');
+    }
+    
+    public function allDocuments()
+    {
+        return $this->hasMany(NewsDocument::class)->orderBy('sort_order');
+    }
+    
     // Kapsamlar (Scopes)
     
     // Yayında olan haberler

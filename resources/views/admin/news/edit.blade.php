@@ -198,6 +198,32 @@
         color: #dc3545;
         cursor: pointer;
     }
+
+    /* Belge yönetimi stilleri */
+    .document-item {
+        transition: all 0.3s ease;
+        background-color: #f8f9fa;
+    }
+    
+    .document-item:hover {
+        background-color: #e9ecef;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    
+    .document-icon {
+        font-size: 1.5rem;
+        width: 40px;
+        text-align: center;
+    }
+    
+    .file-icon-pdf { color: #dc3545; }
+    .file-icon-doc, .file-icon-docx { color: #2b579a; }
+    .file-icon-xls, .file-icon-xlsx { color: #217346; }
+    .file-icon-ppt, .file-icon-pptx { color: #d24726; }
+    .file-icon-txt { color: #6c757d; }
+    .file-icon-zip, .file-icon-rar { color: #ffc107; }
+    .file-icon-default { color: #6c757d; }
     
     .tag-item {
         display: inline-flex;
@@ -612,7 +638,7 @@
                 </div>
             @endif
             
-            <form action="{{ route('admin.news.update', $news->id) }}" method="POST" id="news-form">
+            <form action="{{ route('admin.news.update', $news->id) }}" method="POST" id="news-form" enctype="multipart/form-data">
                 @csrf
                 @method('PUT')
                 
@@ -990,6 +1016,114 @@
                                 </div>
                             </div>
                             @endforeach
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Belgeler -->
+                <div class="card mb-4">
+                    <div class="card-header d-flex align-items-center justify-content-between">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-file-alt me-2 text-primary"></i>
+                            <h5 class="mb-0">Belgeler</h5>
+                            <span class="badge bg-secondary ms-2">{{ $news->documents->count() }}</span>
+                        </div>
+                        <div>
+                            <button type="button" class="btn btn-sm btn-primary" id="add-new-document">
+                                <i class="fas fa-plus"></i> Yeni Belge Ekle
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        @if($news->documents->count() > 0)
+                            <!-- Mevcut Belgeler -->
+                            <div class="mb-4">
+                                <h6 class="mb-3">
+                                    <i class="fas fa-list me-1"></i> Mevcut Belgeler
+                                </h6>
+                                
+                                <div class="row">
+                                    @foreach($news->documents as $document)
+                                    <div class="col-md-6 mb-3">
+                                        <div class="border rounded p-3 document-item" data-id="{{ $document->id }}">
+                                            <div class="d-flex align-items-center">
+                                                <i class="{{ $document->icon_class }} me-2"></i>
+                                                <div class="flex-grow-1">
+                                                    <h6 class="mb-1">{{ $document->name }}</h6>
+                                                    @if($document->description)
+                                                        <p class="text-muted small mb-1">{{ $document->description }}</p>
+                                                    @endif
+                                                    <small class="text-muted">{{ $document->file_name }} ({{ $document->formatted_size }})</small>
+                                                </div>
+                                                <div class="dropdown">
+                                                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                                        <i class="fas fa-ellipsis-v"></i>
+                                                    </button>
+                                                    <ul class="dropdown-menu">
+                                                        <li><a class="dropdown-item" href="{{ route('admin.news.documents.download', [$news, $document]) }}" target="_blank">
+                                                            <i class="fas fa-download me-1"></i> İndir
+                                                        </a></li>
+                                                        <li><button class="dropdown-item edit-document" data-id="{{ $document->id }}" data-name="{{ $document->name }}" data-description="{{ $document->description }}">
+                                                            <i class="fas fa-edit me-1"></i> Düzenle
+                                                        </button></li>
+                                                        <li><hr class="dropdown-divider"></li>
+                                                        <li><button class="dropdown-item text-danger delete-document" data-id="{{ $document->id }}">
+                                                            <i class="fas fa-trash me-1"></i> Sil
+                                                        </button></li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                        @else
+                            <div class="text-center py-4">
+                                <i class="fas fa-file-alt fa-3x text-muted mb-3"></i>
+                                <p class="text-muted">Henüz belge eklenmemiş.</p>
+                            </div>
+                        @endif
+
+                        <!-- Yeni Belge Ekleme Formu -->
+                        <div id="new-document-form" style="display: none;">
+                            <hr>
+                            <h6 class="mb-3">
+                                <i class="fas fa-plus me-1"></i> Yeni Belge Ekle
+                            </h6>
+                            
+                            <form id="document-upload-form" enctype="multipart/form-data">
+                                @csrf
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-3">
+                                            <label for="document_name">Belge Adı <span class="text-danger">*</span></label>
+                                            <input type="text" class="form-control" id="document_name" name="name" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-3">
+                                            <label for="document_file">Dosya <span class="text-danger">*</span></label>
+                                            <input type="file" class="form-control" id="document_file" name="file" required
+                                                   accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.zip,.rar">
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group mb-3">
+                                    <label for="document_description">Açıklama</label>
+                                    <textarea class="form-control" id="document_description" name="description" rows="2"></textarea>
+                                </div>
+                                
+                                <div class="d-flex gap-2">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-upload"></i> Belge Yükle
+                                    </button>
+                                    <button type="button" class="btn btn-secondary" id="cancel-document-form">
+                                        <i class="fas fa-times"></i> İptal
+                                    </button>
+                                </div>
+                            </form>
                         </div>
                     </div>
                 </div>
@@ -1659,6 +1793,129 @@ $(document).ready(function() {
         $('#filemanagersystem_image_preview').hide();
         $('#image-warning').show();
     });
+
+    // ===== BELGE YÖNETİMİ BAŞLANGIÇ =====
+    
+    // Yeni belge ekleme formunu göster/gizle
+    $('#add-new-document').on('click', function() {
+        $('#new-document-form').toggle();
+        if ($('#new-document-form').is(':visible')) {
+            $(this).html('<i class="fas fa-minus"></i> İptal');
+        } else {
+            $(this).html('<i class="fas fa-plus"></i> Yeni Belge Ekle');
+        }
+    });
+
+    $('#cancel-document-form').on('click', function() {
+        $('#new-document-form').hide();
+        $('#add-new-document').html('<i class="fas fa-plus"></i> Yeni Belge Ekle');
+        $('#document-upload-form')[0].reset();
+    });
+
+    // Belge yükleme formu
+    $('#document-upload-form').on('submit', function(e) {
+        e.preventDefault();
+        
+        var formData = new FormData(this);
+        var submitBtn = $(this).find('button[type="submit"]');
+        var originalText = submitBtn.html();
+        
+        submitBtn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Yükleniyor...');
+        
+        $.ajax({
+            url: '{{ route("admin.news.documents.store", $news) }}',
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(response) {
+                if (response.success) {
+                    // Formu temizle
+                    $('#document-upload-form')[0].reset();
+                    $('#new-document-form').hide();
+                    $('#add-new-document').html('<i class="fas fa-plus"></i> Yeni Belge Ekle');
+                    
+                    // Başarı mesajı
+                    alert('Belge başarıyla yüklendi!');
+                    
+                    // Sayfayı yenile
+                    location.reload();
+                }
+            },
+            error: function(xhr) {
+                var errors = xhr.responseJSON.errors;
+                if (errors) {
+                    var errorMsg = '';
+                    $.each(errors, function(key, value) {
+                        errorMsg += value[0] + '\n';
+                    });
+                    alert('Hata: ' + errorMsg);
+                } else {
+                    alert('Bir hata oluştu.');
+                }
+            },
+            complete: function() {
+                submitBtn.prop('disabled', false).html(originalText);
+            }
+        });
+    });
+
+    // Belge düzenleme
+    $(document).on('click', '.edit-document', function() {
+        var documentId = $(this).data('id');
+        var documentName = $(this).data('name');
+        var documentDescription = $(this).data('description');
+        
+        var newName = prompt('Belge adını düzenleyin:', documentName);
+        if (newName && newName !== documentName) {
+            var newDescription = prompt('Belge açıklamasını düzenleyin:', documentDescription || '');
+            
+            $.ajax({
+                url: '{{ route("admin.news.documents.update", [$news, "__DOCUMENT_ID__"]) }}'.replace('__DOCUMENT_ID__', documentId),
+                type: 'PUT',
+                data: {
+                    _token: '{{ csrf_token() }}',
+                    name: newName,
+                    description: newDescription
+                },
+                success: function(response) {
+                    if (response.success) {
+                        alert('Belge başarıyla güncellendi!');
+                        location.reload();
+                    }
+                },
+                error: function() {
+                    alert('Belge güncellenirken bir hata oluştu.');
+                }
+            });
+        }
+    });
+
+    // Belge silme
+    $(document).on('click', '.delete-document', function() {
+        var documentId = $(this).data('id');
+        
+        if (confirm('Bu belgeyi silmek istediğinizden emin misiniz?')) {
+            $.ajax({
+                url: '{{ route("admin.news.documents.destroy", [$news, "__DOCUMENT_ID__"]) }}'.replace('__DOCUMENT_ID__', documentId),
+                type: 'DELETE',
+                data: {
+                    _token: '{{ csrf_token() }}'
+                },
+                success: function(response) {
+                    if (response.success) {
+                        alert('Belge başarıyla silindi!');
+                        location.reload();
+                    }
+                },
+                error: function() {
+                    alert('Belge silinirken bir hata oluştu.');
+                }
+            });
+        }
+    });
+
+    // ===== BELGE YÖNETİMİ BİTİŞ =====
     });
 </script>
 @endsection 

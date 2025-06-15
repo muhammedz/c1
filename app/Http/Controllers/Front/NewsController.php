@@ -66,7 +66,10 @@ class NewsController extends Controller
      */
     public function show($slug)
     {
-        $news = News::where('slug', $slug)
+        $news = News::with(['documents' => function($query) {
+                $query->where('is_active', true)->orderBy('sort_order');
+            }])
+            ->where('slug', $slug)
             ->where('status', true)
             ->firstOrFail();
 
@@ -74,5 +77,26 @@ class NewsController extends Controller
         $news->increment('views');
 
         return view('front.news.show', compact('news'));
+    }
+
+    /**
+     * Haber belgesini indir
+     */
+    public function downloadDocument($newsSlug, $documentId)
+    {
+        $news = News::where('slug', $newsSlug)
+            ->where('status', true)
+            ->firstOrFail();
+
+        $document = $news->documents()
+            ->where('id', $documentId)
+            ->where('is_active', true)
+            ->firstOrFail();
+
+        if (!$document->fileExists()) {
+            abort(404, 'Dosya bulunamadı.');
+        }
+
+        return response()->download(public_path($document->file_path), $document->file_name);
     }
 } 

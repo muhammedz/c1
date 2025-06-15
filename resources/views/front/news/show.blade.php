@@ -277,6 +277,152 @@
         line-height: 1.2;
     }
     
+    /* Belgeler Bölümü Stilleri */
+    .documents-section {
+        border-top: 2px solid #f3f4f6;
+        padding-top: 2rem;
+        margin-top: 2rem;
+    }
+    
+    .documents-header {
+        margin-bottom: 1.5rem;
+    }
+    
+    .documents-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #00352b;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+    }
+    
+    .documents-count {
+        background-color: #e6a23c;
+        color: white;
+        font-size: 0.875rem;
+        padding: 0.25rem 0.75rem;
+        border-radius: 9999px;
+        margin-left: 0.75rem;
+        font-weight: 500;
+    }
+    
+    .documents-subtitle {
+        color: #6b7280;
+        font-size: 0.875rem;
+        margin: 0;
+    }
+    
+    .documents-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1rem;
+    }
+    
+    .document-card {
+        background-color: #f8f9fa;
+        border: 1px solid #e9ecef;
+        border-radius: 0.75rem;
+        padding: 1.25rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .document-card:hover {
+        background-color: #e9ecef;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        border-color: #e6a23c;
+    }
+    
+    .document-icon {
+        width: 48px;
+        height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 0.5rem;
+        background-color: white;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        flex-shrink: 0;
+    }
+    
+    .document-icon i {
+        font-size: 1.5rem;
+    }
+    
+    .document-info {
+        flex: 1;
+        min-width: 0;
+    }
+    
+    .document-name {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #1f2937;
+        margin: 0 0 0.25rem 0;
+        line-height: 1.3;
+    }
+    
+    .document-description {
+        font-size: 0.875rem;
+        color: #6b7280;
+        margin: 0 0 0.5rem 0;
+        line-height: 1.4;
+    }
+    
+    .document-meta {
+        display: flex;
+        flex-direction: column;
+        gap: 0.125rem;
+    }
+    
+    .document-filename,
+    .document-size {
+        font-size: 0.75rem;
+        color: #9ca3af;
+    }
+    
+    .document-actions {
+        flex-shrink: 0;
+    }
+    
+    .document-download-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background-color: #e6a23c;
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 0.5rem;
+        text-decoration: none;
+        font-size: 0.875rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        border: none;
+        cursor: pointer;
+    }
+    
+    .document-download-btn:hover {
+        background-color: #d69e2e;
+        color: white;
+        text-decoration: none;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(230, 162, 60, 0.3);
+    }
+    
+    /* Dosya türü renkleri */
+    .fa-file-pdf { color: #dc3545; }
+    .fa-file-word { color: #2b579a; }
+    .fa-file-excel { color: #217346; }
+    .fa-file-powerpoint { color: #d24726; }
+    .fa-file-alt { color: #6c757d; }
+    .fa-file-archive { color: #ffc107; }
+
     @media (max-width: 768px) {
         .news-detail-grid {
             grid-template-columns: 1fr;
@@ -292,6 +438,24 @@
         
         .news-header {
             padding: 1.5rem 0;
+        }
+        
+        .documents-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .document-card {
+            flex-direction: column;
+            text-align: center;
+            gap: 0.75rem;
+        }
+        
+        .document-info {
+            text-align: center;
+        }
+        
+        .document-meta {
+            align-items: center;
         }
     }
 </style>
@@ -353,6 +517,47 @@
                     <div class="news-content">
                         {!! html_entity_decode($news->content) !!}
                     </div>
+
+                    <!-- Belgeler Bölümü -->
+                    @if($news->documents && $news->documents->count() > 0)
+                    <div class="documents-section mt-8">
+                        <div class="documents-header">
+                            <h3 class="documents-title">
+                                <i class="fas fa-file-alt mr-2"></i>
+                                İlgili Belgeler
+                                <span class="documents-count">{{ $news->documents->count() }}</span>
+                            </h3>
+                            <p class="documents-subtitle">Bu haber ile ilgili belgeleri indirebilirsiniz.</p>
+                        </div>
+                        
+                        <div class="documents-grid">
+                            @foreach($news->documents as $document)
+                            <div class="document-card">
+                                <div class="document-icon">
+                                    <i class="{{ $document->icon_class }}"></i>
+                                </div>
+                                <div class="document-info">
+                                    <h4 class="document-name">{{ $document->name }}</h4>
+                                    @if($document->description)
+                                        <p class="document-description">{{ $document->description }}</p>
+                                    @endif
+                                    <div class="document-meta">
+                                        <span class="document-filename">{{ $document->file_name }}</span>
+                                        <span class="document-size">{{ $document->formatted_size }}</span>
+                                    </div>
+                                </div>
+                                <div class="document-actions">
+                                    <a href="{{ route('news.documents.download', [$news->slug, $document->id]) }}" 
+                                       class="document-download-btn">
+                                        <i class="fas fa-download"></i>
+                                        İndir
+                                    </a>
+                                </div>
+                            </div>
+                            @endforeach
+                        </div>
+                    </div>
+                    @endif
                     
                     @if($news->meta_keywords)
                     <div class="tag-list mt-6">

@@ -35,7 +35,11 @@ class StoreNewsRequest extends FormRequest
             'gallery.*' => 'string',
             'is_headline' => 'nullable|boolean',
             'is_featured' => 'nullable|boolean',
-            'tags' => 'nullable|string'
+            'tags' => 'nullable|string',
+            'files' => 'nullable|array',
+            'files.*' => 'file|max:51200|mimes:pdf,doc,docx,xls,xlsx,ppt,pptx,txt,zip,rar',
+            'names' => 'nullable|array',
+            'names.*' => 'nullable|string|max:255'
         ];
     }
 

@@ -101,6 +101,11 @@ class NewsController extends Controller
                 $news->hedefKitleler()->sync($request->hedef_kitleler);
             }
 
+            // Belgeleri yükle (eğer varsa)
+            if ($request->hasFile('files')) {
+                $this->uploadDocuments($request, $news);
+            }
+
             DB::commit();
             
             return redirect()->route('admin.news.index')->with('success', 'Haber başarıyla oluşturuldu.');
@@ -158,6 +163,9 @@ class NewsController extends Controller
      */
     public function edit(News $news)
     {
+        // Documents ilişkisini yükle
+        $news->load('documents');
+        
         $headlineCount = News::where('is_headline', true)->count();
         $maxHeadlinesReached = $headlineCount >= 4 && !$news->is_headline;
         $newsCategories = NewsCategory::where('is_active', true)->orderBy('name')->get();
@@ -353,5 +361,62 @@ class NewsController extends Controller
             'success' => false,
             'message' => $result['message'] ?? 'İşlem sırasında bir hata oluştu.'
         ]);
+    }
+
+    /**
+     * Upload documents for news
+     */
+    private function uploadDocuments(Request $request, News $news)
+    {
+        $files = $request->file('files');
+        $names = $request->input('names', []);
+        
+        // Klasör yoksa oluştur
+        $uploadPath = 'uploads/news/documents';
+        if (!file_exists(public_path($uploadPath))) {
+            mkdir(public_path($uploadPath), 0755, true);
+        }
+
+        // En yüksek sıra numarasını bul
+        $maxSortOrder = $news->allDocuments()->max('sort_order') ?? 0;
+
+        foreach ($files as $index => $file) {
+            try {
+                // Dosya bilgilerini al
+                $originalFileName = $file->getClientOriginalName();
+                $fileSize = $file->getSize();
+                $mimeType = $file->getMimeType();
+                
+                // Dosya adını temizle ve benzersiz yap
+                $originalName = pathinfo($originalFileName, PATHINFO_FILENAME);
+                $extension = $file->getClientOriginalExtension();
+                $fileName = Str::slug($originalName) . '_' . time() . '_' . $index . '.' . $extension;
+                
+                $filePath = $uploadPath . '/' . $fileName;
+                
+                // Dosyayı taşı
+                $file->move(public_path($uploadPath), $fileName);
+                
+                // Belge adını belirle
+                $documentName = isset($names[$index]) && !empty($names[$index]) 
+                    ? $names[$index] 
+                    : pathinfo($originalFileName, PATHINFO_FILENAME);
+                
+                // Veritabanına kaydet
+                $news->allDocuments()->create([
+                    'name' => $documentName,
+                    'description' => null,
+                    'file_path' => $filePath,
+                    'file_name' => $originalFileName,
+                    'file_size' => $fileSize,
+                    'mime_type' => $mimeType,
+                    'sort_order' => $maxSortOrder + count($files) - $index,
+                    'is_active' => true,
+                ]);
+
+            } catch (\Exception $e) {
+                Log::error('Belge yükleme hatası: ' . $e->getMessage());
+            }
+        }
     }
 }

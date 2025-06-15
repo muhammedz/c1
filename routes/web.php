@@ -86,6 +86,7 @@ Route::get('/iletisim', [App\Http\Controllers\FrontController::class, 'iletisim'
 Route::prefix('haberler')->name('news.')->group(function () {
     Route::get('/', [App\Http\Controllers\Front\NewsController::class, 'index'])->name('index');
     Route::get('/kategori/{slug}', [App\Http\Controllers\Front\NewsController::class, 'category'])->name('category');
+    Route::get('/{newsSlug}/belgeler/{document}/indir', [App\Http\Controllers\Front\NewsController::class, 'downloadDocument'])->name('documents.download');
     Route::get('/{slug}', [App\Http\Controllers\Front\NewsController::class, 'show'])->name('show');
 });
 
@@ -214,6 +215,14 @@ Route::middleware(['auth', 'role:admin'])->name('admin.')->prefix('admin')->grou
     Route::get('/news/{news}/toggle-archive', [NewsController::class, 'toggleArchive'])->name('news.toggle-archive');
     Route::post('/news/upload-gallery-image', [NewsController::class, 'uploadGalleryImage'])->name('news.upload-gallery-image');
     Route::post('/news/bulk-action', [NewsController::class, 'bulkAction'])->name('news.bulk-action');
+    
+    // Haber Belgeleri Yönetimi
+    Route::post('/news/{news}/documents', [App\Http\Controllers\Admin\NewsDocumentController::class, 'store'])->name('news.documents.store');
+    Route::post('/news/{news}/documents/bulk', [App\Http\Controllers\Admin\NewsDocumentController::class, 'bulkStore'])->name('news.documents.bulk-store');
+    Route::put('/news/{news}/documents/{document}', [App\Http\Controllers\Admin\NewsDocumentController::class, 'update'])->name('news.documents.update');
+    Route::delete('/news/{news}/documents/{document}', [App\Http\Controllers\Admin\NewsDocumentController::class, 'destroy'])->name('news.documents.destroy');
+    Route::delete('/news/{news}/documents', [App\Http\Controllers\Admin\NewsDocumentController::class, 'bulkDestroy'])->name('news.documents.bulk-destroy');
+    Route::get('/news/{news}/documents/{document}/download', [App\Http\Controllers\Admin\NewsDocumentController::class, 'download'])->name('news.documents.download');
     
     // Kategori Yönetimi
     Route::resource('news-categories', NewsCategoryController::class)->names('news-categories');
