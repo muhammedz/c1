@@ -166,11 +166,13 @@
                     <!-- Sağ Resim -->
                     <div class="relative rounded-lg overflow-hidden shadow-lg">
                         <div class="aspect-video">
-                            <img 
-                                src="https://cankaya.bel.tr/uploads/images/neleryaptik_1749920348_uHQvvq4j.webp" 
-                                alt="Neler Yaptık - Projelerimiz" 
-                                class="w-full h-full object-cover rounded-lg hover:scale-105 transition-transform duration-500"
-                            >
+                            <a href="https://cankaya.bel.tr/uploads/documents/dijital_1749997259_JMPX5Xpn.pdf" target="_blank" class="block w-full h-full">
+                                <img 
+                                    src="https://cankaya.bel.tr/uploads/images/neleryaptik_1749920348_uHQvvq4j.webp" 
+                                    alt="Neler Yaptık - Projelerimiz" 
+                                    class="w-full h-full object-cover rounded-lg hover:scale-105 transition-transform duration-500"
+                                >
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -324,7 +326,7 @@
 @endsection
 
 <!-- Fotoğraf Lightbox -->
-<div id="fotoLightbox" class="fixed inset-0 bg-black bg-opacity-90 z-50 hidden flex items-center justify-center p-4" onclick="kapatFotoLightbox()">
+<div id="fotoLightbox" class="fixed inset-0 bg-black bg-opacity-90 z-50 items-center justify-center p-4" style="display: none;" onclick="kapatFotoLightbox()">
     <!-- Kapatma butonu - siyah alanda üstte -->
     <button onclick="kapatFotoLightbox()" class="absolute top-6 right-6 text-white hover:text-gray-300 z-20 text-4xl">
         <span class="material-icons text-4xl">close</span>
@@ -442,21 +444,21 @@
     // Fotoğraf Lightbox fonksiyonları
     function acFotoLightbox(fotoUrl, baslik) {
         document.getElementById('lightboxFoto').src = fotoUrl;
-        document.getElementById('fotoLightbox').classList.remove('hidden');
+        document.getElementById('fotoLightbox').style.display = 'flex';
         document.body.style.overflow = 'hidden';
     }
     
     function kapatFotoLightbox() {
-        document.getElementById('fotoLightbox').classList.add('hidden');
+        document.getElementById('fotoLightbox').style.display = 'none';
         document.body.style.overflow = '';
     }
     
     // Fotoğraf lightbox için ESC tuşu desteği
     document.addEventListener('keydown', function(event) {
         if (event.key === 'Escape') {
-            if (!document.getElementById('fotoLightbox').classList.contains('hidden')) {
+            if (document.getElementById('fotoLightbox').style.display === 'flex') {
                 kapatFotoLightbox();
-            } else {
+            } else if (!document.getElementById('lightbox').classList.contains('hidden')) {
                 kapatLightbox();
             }
         } else if (event.key === 'ArrowRight') {
