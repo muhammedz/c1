@@ -1,7 +1,7 @@
 <!-- Header kısmı buraya gelecek -->
 <!-- #### Header Section -->
-<section id="header-section" class="header-section relative w-full h-24 pt-1 bg-white" style="z-index: 100;">
-    <div class="head w-full h-24 bg-white relative" style="z-index: 100;">
+<section id="header-section" class="header-section relative w-full h-24 pt-1 bg-white" style="z-index: 999997;">
+    <div class="head w-full h-24 bg-white relative" style="z-index: 999997;">
         <nav class="container max-w-7xl h-full mx-auto px-4">
             <div class="flex items-center justify-between h-24">
                 <!-- Logo Alanı -->

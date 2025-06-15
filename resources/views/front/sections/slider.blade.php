@@ -1,6 +1,18 @@
 <!-- #### Hero Slider Section -->
 <section id="hero-slider-section" class="hero-slider-section relative w-full overflow-hidden" style="margin-top: -100px;">
-    <div class="swiper heroSwiper h-screen">
+    <!-- Mobil Görsel -->
+    <div class="block md:hidden w-full bg-white" style="margin-top: 0;">
+        <div class="w-full">
+            <a href="/baskan" class="block w-full">
+                <img src="https://cankaya.bel.tr/uploads/images/cankayamobil_1749978637_aJd14YaH.jpg" 
+                     alt="Çankaya Belediyesi Mobil" 
+                     class="w-full aspect-square object-cover cursor-pointer">
+            </a>
+        </div>
+    </div>
+    
+    <!-- Desktop Slider -->
+    <div class="swiper heroSwiper h-screen hidden md:block">
         <div class="swiper-wrapper">
             @php
             // Aktif sliderları sıralı bir şekilde getir
@@ -160,13 +172,15 @@
             // Sayfa yüklendiğinde scroll pozisyonunu en üste getir
             window.scrollTo(0, 0);
             
-            // Eğer zaten heroSwiper initialize edilmişse temizle (çakışmayı önlemek için)
-            if (window.heroSwiperInstance) {
-                window.heroSwiperInstance.destroy(true, true);
-            }
-            
-            // Yeni swiper oluştur ve global değişkene kaydet
-            window.heroSwiperInstance = new Swiper('.heroSwiper', {
+            // Sadece desktop görünümde slider'ı başlat
+            if (window.innerWidth >= 768) {
+                // Eğer zaten heroSwiper initialize edilmişse temizle (çakışmayı önlemek için)
+                if (window.heroSwiperInstance) {
+                    window.heroSwiperInstance.destroy(true, true);
+                }
+                
+                // Yeni swiper oluştur ve global değişkene kaydet
+                window.heroSwiperInstance = new Swiper('.heroSwiper', {
                 loop: true,
                 effect: 'fade', // Fade efekti kullanıyoruz
                 fadeEffect: {
@@ -241,6 +255,7 @@
                     if (nextSlide) nextSlide.style.transform = 'scale(1.05)';
                 }, 6000); // Autoplay süresine eşit
             });
+            }
         });
     </script>
     
@@ -273,6 +288,35 @@
             .hero-slider-section {
                 height: 100vh;
                 min-height: 500px;
+            }
+        }
+        
+        /* Mobil görsel için özel stiller */
+        @media (max-width: 767px) {
+            .hero-slider-section {
+                height: auto !important;
+                min-height: auto !important;
+                margin-top: 0 !important;
+                padding-top: 0 !important;
+            }
+            
+            /* Mobil resim için kare format */
+            .hero-slider-section .aspect-square {
+                aspect-ratio: 1 / 1;
+                width: 100vw !important;
+                max-width: none !important;
+            }
+            
+            /* Mobil layout düzenlemesi - padding'leri kaldır */
+            .hero-slider-section > div:first-child {
+                margin-top: 0 !important;
+                padding: 0 !important;
+            }
+            
+            /* Mobil container'ı tam genişlik yap */
+            .hero-slider-section > div:first-child > div {
+                padding: 0 !important;
+                margin: 0 !important;
             }
         }
         

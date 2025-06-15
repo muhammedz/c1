@@ -98,8 +98,22 @@ class EventScrapeController extends Controller
             
             $httpClient = Http::withOptions([
                 'verify' => false,       // SSL doğrulamasını atla
-                'timeout' => 30,         // 30 saniye timeout
-                'connect_timeout' => 10  // 10 saniye bağlantı timeout
+                'timeout' => 60,         // 60 saniye timeout (artırıldı)
+                'connect_timeout' => 30, // 30 saniye bağlantı timeout (artırıldı)
+                'allow_redirects' => [
+                    'max' => 10,
+                    'strict' => false,
+                    'referer' => true,
+                    'protocols' => ['http', 'https']
+                ],
+                'headers' => [
+                    'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+                    'Accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+                    'Accept-Language' => 'tr-TR,tr;q=0.9,en;q=0.8',
+                    'Accept-Encoding' => 'gzip, deflate',
+                    'Connection' => 'keep-alive',
+                    'Upgrade-Insecure-Requests' => '1'
+                ]
             ]);
             
             $response = $httpClient->get($url);
@@ -285,16 +299,39 @@ class EventScrapeController extends Controller
                 'events' => $events
             ]);
             
-        } catch (\Exception $e) {
-            Log::error('Etkinlik önizleme hatası: ' . $e->getMessage(), [
+        } catch (\Illuminate\Http\Client\ConnectionException $e) {
+            Log::error('Bağlantı hatası: ' . $e->getMessage(), [
                 'url' => $url,
                 'limit' => $limit,
-                'trace' => $e->getTraceAsString()
+                'error_type' => 'connection_timeout'
             ]);
             
             return response()->json([
                 'success' => false,
-                'message' => 'Etkinlik önizleme sırasında bir hata oluştu: ' . $e->getMessage()
+                'message' => 'Hedef web sitesine bağlanılamadı. Lütfen internet bağlantınızı kontrol edin veya daha sonra tekrar deneyin. Hata: ' . $e->getMessage()
+            ], 500);
+        } catch (\Illuminate\Http\Client\RequestException $e) {
+            Log::error('HTTP istek hatası: ' . $e->getMessage(), [
+                'url' => $url,
+                'limit' => $limit,
+                'error_type' => 'http_request'
+            ]);
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Web sitesinden veri alınırken hata oluştu. Hedef site geçici olarak erişilemeyebilir. Hata: ' . $e->getMessage()
+            ], 500);
+        } catch (\Exception $e) {
+            Log::error('Etkinlik önizleme hatası: ' . $e->getMessage(), [
+                'url' => $url,
+                'limit' => $limit,
+                'trace' => $e->getTraceAsString(),
+                'error_type' => 'general'
+            ]);
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Etkinlik önizleme sırasında beklenmeyen bir hata oluştu. Lütfen daha sonra tekrar deneyin. Hata: ' . $e->getMessage()
             ], 500);
         }
     }

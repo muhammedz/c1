@@ -61,6 +61,33 @@ function titleCase($string) {
             line-height: 1.4;
         }
         
+        @media (max-width: 640px) {
+            .event-featured-content {
+                padding: 1rem;
+            }
+            
+            .event-featured-title {
+                font-size: 0.875rem;
+                margin-bottom: 0.5rem;
+            }
+            
+            .event-featured-meta {
+                font-size: 0.75rem;
+            }
+            
+            .event-featured-category {
+                font-size: 0.625rem;
+                padding: 0.25rem 0.5rem;
+                top: 0.5rem;
+                right: 0.5rem;
+            }
+            
+            .event-featured-date-overlay {
+                padding: 0.75rem;
+                font-size: 0.75rem;
+            }
+        }
+        
         .event-featured-meta {
             display: flex;
             align-items: center;
@@ -103,7 +130,7 @@ function titleCase($string) {
         }
     </style>
     
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+    <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">
         @foreach($upcomingEvents->take(4) as $event)
         <div>
             <div class="event-featured-card">

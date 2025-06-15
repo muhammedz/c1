@@ -1,5 +1,5 @@
 <!-- #### Quick Menu Section -->
-<div id="quick-menu-section" class="quick-menu-section w-full rounded-md bg-gradient-radial text-white mt-[-30px] relative z-50">
+<div id="quick-menu-section" class="quick-menu-section w-full rounded-md bg-gradient-radial text-white mt-[-10px] md:mt-[-10px] relative" style="z-index: 50;">
     <!-- Desktop Menu -->
     <div class="hidden md:flex ">
         @if(isset($quickMenuCategories) && $quickMenuCategories->count() > 0)
@@ -28,7 +28,7 @@
                         </div>
                         <span class="material-icons rot text-base transition-transform duration-300 group-hover:rotate-180 ml-auto">expand_more</span>
                     </a>
-                    <div class="quick-menu-dropdown" style="position: absolute; left: 0; bottom: 100%; width: 100%; background: white; z-index: 999; display: none;">
+                    <div class="quick-menu-dropdown" style="position: absolute; left: 0; bottom: 100%; width: 100%; background: white; z-index: 100; display: none;">
                         <div class="py-1">
                             @foreach($category->activeItems as $item)
                             <a href="{{ $item->url }}" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
@@ -48,53 +48,38 @@
         @else
         <!-- Online Hizmetler -->
         <div class="group relative w-[300px] border-r border-white/20">
-            <a href="#"
-                class=" group flex items-center h-full px-6 py-4 space-x-3 transition-colors duration-300">
+            <a href="#" class=" group flex items-center h-full px-6 py-4 space-x-3 transition-colors duration-300">
                 <span class="material-icons text-2xl">language</span>
                 <div class="flex flex-col">
                     <span class="text-base font-semibold">ONLINE HİZMETLER</span>
-                    <span class=" group-hover:text-black text-xs text-white/60">Büyükşehir Online
-                        İşlemler</span>
+                    <span class=" group-hover:text-black text-xs text-white/60">Büyükşehir Online İşlemler</span>
                 </div>
-                <span
-                    class="material-icons rot text-base transition-transform duration-300 group-hover:rotate-180 ml-auto">expand_more</span>
+                <span class="material-icons rot text-base transition-transform duration-300 group-hover:rotate-180 ml-auto">expand_more</span>
             </a>
-            <div class="quick-menu-dropdown" style="position: absolute; left: 0; bottom: 100%; width: 100%; background: white; z-index: 999; display: none;">
+            <div class="quick-menu-dropdown" style="position: absolute; left: 0; bottom: 100%; width: 100%; background: white; z-index: 100; display: none;">
                 <div class="py-2">
-                    <a href="#"
-                        class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                        <span
-                            class="material-icons text-gray-400 mr-2 text-base">arrow_forward</span>
+                    <a href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                        <span class="material-icons text-gray-400 mr-2 text-base">arrow_forward</span>
                         Mebis
                     </a>
-                    <a href="#"
-                        class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                        <span
-                            class="material-icons text-gray-400 mr-2 text-base">arrow_forward</span>
+                    <a href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                        <span class="material-icons text-gray-400 mr-2 text-base">arrow_forward</span>
                         Ulaşım Bilgi Sistemi
                     </a>
-                    <a href="#"
-                        class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                        <span
-                            class="material-icons text-gray-400 mr-2 text-base">arrow_forward</span>
+                    <a href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                        <span class="material-icons text-gray-400 mr-2 text-base">arrow_forward</span>
                         EBYS Evrak Doğrulama
                     </a>
-                    <a href="#"
-                        class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                        <span
-                            class="material-icons text-gray-400 mr-2 text-base">arrow_forward</span>
+                    <a href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                        <span class="material-icons text-gray-400 mr-2 text-base">arrow_forward</span>
                         E-Posta
                     </a>
-                    <a href="#"
-                        class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                        <span
-                            class="material-icons text-gray-400 mr-2 text-base">arrow_forward</span>
+                    <a href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                        <span class="material-icons text-gray-400 mr-2 text-base">arrow_forward</span>
                         E-Bordro
                     </a>
-                    <a href="#"
-                        class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                        <span
-                            class="material-icons text-gray-400 mr-2 text-base">arrow_forward</span>
+                    <a href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                        <span class="material-icons text-gray-400 mr-2 text-base">arrow_forward</span>
                         E-Belediye
                     </a>
                 </div>
@@ -102,35 +87,26 @@
         </div>
         <!-- Sosyal Hizmetler -->
         <div class="group relative w-[300px] border-r border-white/20">
-            <a href="#"
-                class=" group flex items-center h-full px-6 py-4 space-x-3 transition-colors duration-300">
+            <a href="#" class=" group flex items-center h-full px-6 py-4 space-x-3 transition-colors duration-300">
                 <span class="material-icons text-2xl">people</span>
                 <div class="flex flex-col">
                     <span class="text-base font-semibold">SOSYAL HİZMETLER</span>
-                    <span class=" group-hover:text-black text-xs text-white/60">Sosyal yardımlar,
-                        faaliyetler</span>
+                    <span class=" group-hover:text-black text-xs text-white/60">Sosyal yardımlar, faaliyetler</span>
                 </div>
-                <span
-                    class="material-icons rot text-base transition-transform duration-300 group-hover:rotate-180 ml-auto">expand_more</span>
+                <span class="material-icons rot text-base transition-transform duration-300 group-hover:rotate-180 ml-auto">expand_more</span>
             </a>
-            <div class="quick-menu-dropdown" style="position: absolute; left: 0; bottom: 100%; width: 100%; background: white; z-index: 999; display: none;">
+            <div class="quick-menu-dropdown" style="position: absolute; left: 0; bottom: 100%; width: 100%; background: white; z-index: 100; display: none;">
                 <div class="py-2">
-                    <a href="#"
-                        class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                        <span
-                            class="material-icons text-gray-400 mr-2 text-base">arrow_forward</span>
+                    <a href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                        <span class="material-icons text-gray-400 mr-2 text-base">arrow_forward</span>
                         Sosyal Yardımlar
                     </a>
-                    <a href="#"
-                        class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                        <span
-                            class="material-icons text-gray-400 mr-2 text-base">arrow_forward</span>
+                    <a href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                        <span class="material-icons text-gray-400 mr-2 text-base">arrow_forward</span>
                         Etkinlikler
                     </a>
-                    <a href="#"
-                        class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                        <span
-                            class="material-icons text-gray-400 mr-2 text-base">arrow_forward</span>
+                    <a href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                        <span class="material-icons text-gray-400 mr-2 text-base">arrow_forward</span>
                         Kurslar
                     </a>
                 </div>
@@ -138,35 +114,26 @@
         </div>
         <!-- E-Belediye -->
         <div class="group relative w-[300px] border-r border-white/20">
-            <a href="#"
-                class="group flex items-center h-full px-6 py-4 space-x-3 transition-colors duration-300">
+            <a href="#" class="group flex items-center h-full px-6 py-4 space-x-3 transition-colors duration-300">
                 <span class="material-icons text-2xl">computer</span>
                 <div class="flex flex-col">
                     <span class="text-base font-semibold">E-BELEDİYE</span>
-                    <span class=" group-hover:text-black text-xs text-white/60">Büyükşehir
-                        e-Belediye</span>
+                    <span class=" group-hover:text-black text-xs text-white/60">Büyükşehir e-Belediye</span>
                 </div>
-                <span
-                    class="material-icons rot text-base transition-transform duration-300 group-hover:rotate-180 ml-auto">expand_more</span>
+                <span class="material-icons rot text-base transition-transform duration-300 group-hover:rotate-180 ml-auto">expand_more</span>
             </a>
-            <div class="quick-menu-dropdown" style="position: absolute; left: 0; bottom: 100%; width: 100%; background: white; z-index: 999; display: none;">
+            <div class="quick-menu-dropdown" style="position: absolute; left: 0; bottom: 100%; width: 100%; background: white; z-index: 100; display: none;">
                 <div class="py-2">
-                    <a href="#"
-                        class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                        <span
-                            class="material-icons text-gray-400 mr-2 text-base">arrow_forward</span>
+                    <a href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                        <span class="material-icons text-gray-400 mr-2 text-base">arrow_forward</span>
                         Online İşlemler
                     </a>
-                    <a href="#"
-                        class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                        <span
-                            class="material-icons text-gray-400 mr-2 text-base">arrow_forward</span>
+                    <a href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                        <span class="material-icons text-gray-400 mr-2 text-base">arrow_forward</span>
                         Ödemeler
                     </a>
-                    <a href="#"
-                        class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                        <span
-                            class="material-icons text-gray-400 mr-2 text-base">arrow_forward</span>
+                    <a href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                        <span class="material-icons text-gray-400 mr-2 text-base">arrow_forward</span>
                         Başvurular
                     </a>
                 </div>
@@ -174,35 +141,26 @@
         </div>
         <!-- Belediye Rehberi -->
         <div class="group relative w-[300px]">
-            <a href="#"
-                class=" group flex items-center h-full px-6 py-4 space-x-3 transition-colors duration-300">
+            <a href="#" class=" group flex items-center h-full px-6 py-4 space-x-3 transition-colors duration-300">
                 <span class="material-icons text-2xl">menu_book</span>
                 <div class="flex flex-col">
                     <span class="text-base font-semibold">BELEDİYE REHBERİ</span>
-                    <span class=" group-hover:text-black text-xs text-white/60">Belediyeniz
-                        Faaliyetleri</span>
+                    <span class=" group-hover:text-black text-xs text-white/60">Belediyeniz Faaliyetleri</span>
                 </div>
-                <span
-                    class="material-icons rot text-base transition-transform duration-300 group-hover:rotate-180 ml-auto">expand_more</span>
+                <span class="material-icons rot text-base transition-transform duration-300 group-hover:rotate-180 ml-auto">expand_more</span>
             </a>
-            <div class="quick-menu-dropdown" style="position: absolute; left: 0; bottom: 100%; width: 100%; background: white; z-index: 999; display: none;">
+            <div class="quick-menu-dropdown" style="position: absolute; left: 0; bottom: 100%; width: 100%; background: white; z-index: 100; display: none;">
                 <div class="py-2">
-                    <a href="#"
-                        class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                        <span
-                            class="material-icons text-gray-400 mr-2 text-base">arrow_forward</span>
+                    <a href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                        <span class="material-icons text-gray-400 mr-2 text-base">arrow_forward</span>
                         Hizmetler
                     </a>
-                    <a href="#"
-                        class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                        <span
-                            class="material-icons text-gray-400 mr-2 text-base">arrow_forward</span>
+                    <a href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                        <span class="material-icons text-gray-400 mr-2 text-base">arrow_forward</span>
                         Projeler
                     </a>
-                    <a href="#"
-                        class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                        <span
-                            class="material-icons text-gray-400 mr-2 text-base">arrow_forward</span>
+                    <a href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                        <span class="material-icons text-gray-400 mr-2 text-base">arrow_forward</span>
                         İletişim
                     </a>
                 </div>
@@ -262,40 +220,28 @@
                 </a>
                 <div class="quick-menu-dropdown bg-white">
                     <div class="py-2">
-                        <a href="#"
-                            class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                            <span
-                                class="material-icons text-gray-400 mr-2 text-base">arrow_forward</span>
+                        <a href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                            <span class="material-icons text-gray-400 mr-2 text-base">arrow_forward</span>
                             Mebis
                         </a>
-                        <a href="#"
-                            class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                            <span
-                                class="material-icons text-gray-400 mr-2 text-base">arrow_forward</span>
+                        <a href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                            <span class="material-icons text-gray-400 mr-2 text-base">arrow_forward</span>
                             Ulaşım Bilgi Sistemi
                         </a>
-                        <a href="#"
-                            class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                            <span
-                                class="material-icons text-gray-400 mr-2 text-base">arrow_forward</span>
+                        <a href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                            <span class="material-icons text-gray-400 mr-2 text-base">arrow_forward</span>
                             EBYS Evrak Doğrulama
                         </a>
-                        <a href="#"
-                            class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                            <span
-                                class="material-icons text-gray-400 mr-2 text-base">arrow_forward</span>
+                        <a href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                            <span class="material-icons text-gray-400 mr-2 text-base">arrow_forward</span>
                             E-Posta
                         </a>
-                        <a href="#"
-                            class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                            <span
-                                class="material-icons text-gray-400 mr-2 text-base">arrow_forward</span>
+                        <a href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                            <span class="material-icons text-gray-400 mr-2 text-base">arrow_forward</span>
                             E-Bordro
                         </a>
-                        <a href="#"
-                            class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                            <span
-                                class="material-icons text-gray-400 mr-2 text-base">arrow_forward</span>
+                        <a href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                            <span class="material-icons text-gray-400 mr-2 text-base">arrow_forward</span>
                             E-Belediye
                         </a>
                     </div>
@@ -314,22 +260,16 @@
                 </a>
                 <div class="quick-menu-dropdown bg-white">
                     <div class="py-2">
-                        <a href="#"
-                            class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                            <span
-                                class="material-icons text-gray-400 mr-2 text-base">arrow_forward</span>
+                        <a href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                            <span class="material-icons text-gray-400 mr-2 text-base">arrow_forward</span>
                             Sosyal Yardımlar
                         </a>
-                        <a href="#"
-                            class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                            <span
-                                class="material-icons text-gray-400 mr-2 text-base">arrow_forward</span>
+                        <a href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                            <span class="material-icons text-gray-400 mr-2 text-base">arrow_forward</span>
                             Etkinlikler
                         </a>
-                        <a href="#"
-                            class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                            <span
-                                class="material-icons text-gray-400 mr-2 text-base">arrow_forward</span>
+                        <a href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                            <span class="material-icons text-gray-400 mr-2 text-base">arrow_forward</span>
                             Kurslar
                         </a>
                     </div>
@@ -348,22 +288,16 @@
                 </a>
                 <div class="quick-menu-dropdown bg-white">
                     <div class="py-2">
-                        <a href="#"
-                            class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                            <span
-                                class="material-icons text-gray-400 mr-2 text-base">arrow_forward</span>
+                        <a href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                            <span class="material-icons text-gray-400 mr-2 text-base">arrow_forward</span>
                             Online İşlemler
                         </a>
-                        <a href="#"
-                            class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                            <span
-                                class="material-icons text-gray-400 mr-2 text-base">arrow_forward</span>
+                        <a href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                            <span class="material-icons text-gray-400 mr-2 text-base">arrow_forward</span>
                             Ödemeler
                         </a>
-                        <a href="#"
-                            class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                            <span
-                                class="material-icons text-gray-400 mr-2 text-base">arrow_forward</span>
+                        <a href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                            <span class="material-icons text-gray-400 mr-2 text-base">arrow_forward</span>
                             Başvurular
                         </a>
                     </div>
@@ -382,22 +316,16 @@
                 </a>
                 <div class="quick-menu-dropdown bg-white">
                     <div class="py-2">
-                        <a href="#"
-                            class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                            <span
-                                class="material-icons text-gray-400 mr-2 text-base">arrow_forward</span>
+                        <a href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                            <span class="material-icons text-gray-400 mr-2 text-base">arrow_forward</span>
                             Hizmetler
                         </a>
-                        <a href="#"
-                            class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                            <span
-                                class="material-icons text-gray-400 mr-2 text-base">arrow_forward</span>
+                        <a href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                            <span class="material-icons text-gray-400 mr-2 text-base">arrow_forward</span>
                             Projeler
                         </a>
-                        <a href="#"
-                            class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                            <span
-                                class="material-icons text-gray-400 mr-2 text-base">arrow_forward</span>
+                        <a href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                            <span class="material-icons text-gray-400 mr-2 text-base">arrow_forward</span>
                             İletişim
                         </a>
                     </div>
@@ -412,17 +340,18 @@
     /* Quick menu için ek stiller */
     #quick-menu-section {
         position: relative;
-        z-index: 60;
+        z-index: 50;
     }
     
-    .quick-menu-dropdown {
+    /* Desktop dropdown styles */
+    .hidden .quick-menu-dropdown {
         position: absolute !important;
         left: 0 !important;
         bottom: 100% !important;
         top: auto !important;
         width: 100% !important;
         background: rgba(255, 255, 255, 0.98) !important;
-        z-index: 999 !important;
+        z-index: 100 !important;
         box-shadow: 0 -4px 12px -3px rgba(0, 0, 0, 0.08) !important;
         display: none !important;
         border-radius: 12px 12px 0 0 !important;
@@ -438,7 +367,7 @@
         backdrop-filter: blur(5px) !important;
     }
     
-    .group:hover .quick-menu-dropdown {
+    .hidden .group:hover .quick-menu-dropdown {
         display: block !important;
         transform: translateY(0) !important;
         opacity: 1 !important;
@@ -501,7 +430,20 @@
 
     /* Mobile Menu Styles */
     @media (max-width: 768px) {
-        .quick-menu-dropdown {
+        /* Mobilde hızlı menü için özel margin */
+        #quick-menu-section {
+            margin-top: 0 !important;
+            margin-bottom: 1rem;
+            border-radius: 0 !important;
+        }
+        
+        /* Mobilde container padding'i sıfırla */
+        .w-full.relative.z-50.-mt-11.md\\:-mt-11.mt-0 .container {
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+        }
+        
+        #quick-menu-section .quick-menu-dropdown {
             position: static !important;
             bottom: auto !important;
             width: 100% !important;
@@ -511,77 +453,190 @@
             border-radius: 0 !important;
             border: none !important;
             border-left: 2px solid #007d32 !important;
-        }
-
-        .group.active .quick-menu-dropdown {
-            display: block !important;
+            display: none !important;
             opacity: 1 !important;
+            background: white !important;
+            z-index: 10 !important;
         }
 
-        .quick-menu-dropdown a {
+        #quick-menu-section .group.active .quick-menu-dropdown {
+            display: block !important;
+            visibility: visible !important;
+            height: auto !important;
+            max-height: 500px !important;
+            overflow: visible !important;
+        }
+
+        #quick-menu-section .quick-menu-dropdown a {
             color: black !important;
             padding: 8px 12px !important;
-            font-size: 0.7rem !important;
+            font-size: 0.8rem !important;
             white-space: normal !important;
         }
 
-        .quick-menu-dropdown a:hover {
+        #quick-menu-section .quick-menu-dropdown a:hover {
             background-color: rgba(0, 77, 46, 0.1) !important;
             color: #007d32 !important;
+        }
+        
+        /* Mobil menü ok ikonları için animasyon */
+        #quick-menu-section .group a .material-icons:last-child {
+            transition: transform 0.3s ease !important;
+        }
+        
+        #quick-menu-section .group.active a .material-icons:last-child {
+            transform: rotate(180deg) !important;
+        }
+        
+        /* Mobil menü tıklanabilirlik için - daha spesifik seçici */
+        #quick-menu-section .md\\:hidden .group > a {
+            cursor: pointer !important;
+            user-select: none !important;
+            -webkit-tap-highlight-color: rgba(0,0,0,0.1) !important;
+            transition: all 0.3s ease !important;
+        }
+        
+        /* Normal durumda yazı renklerini belirle - daha spesifik seçici */
+        #quick-menu-section .md\\:hidden .group > a .font-semibold {
+            color: white !important;
+            transition: color 0.3s ease !important;
+        }
+        
+        #quick-menu-section .md\\:hidden .group > a .text-white\/60,
+        #quick-menu-section .md\\:hidden .group > a .text-xs {
+            color: rgba(255, 255, 255, 0.6) !important;
+            transition: color 0.3s ease !important;
+        }
+        
+        /* Açıklama yazıları için özel seçici - text-white/60 sınıfı için */
+        #quick-menu-section .md\\:hidden .group > a span.text-white\/60 {
+            color: rgba(255, 255, 255, 0.6) !important;
+            transition: color 0.3s ease !important;
+        }
+        
+        #quick-menu-section .md\\:hidden .group > a .group-hover\:text-black {
+            color: rgba(255, 255, 255, 0.6) !important;
+            transition: color 0.3s ease !important;
+        }
+        
+        /* Sadece gerçek hover destekleyen cihazlarda hover efekti - spesifik seçici */
+        @media (hover: hover) and (pointer: fine) {
+            #quick-menu-section .md\\:hidden .group > a:hover {
+                background-color: white !important;
+                border-radius: 8px !important;
+            }
+            
+            #quick-menu-section .md\\:hidden .group > a:hover .font-semibold {
+                color: #333 !important;
+            }
+            
+            #quick-menu-section .md\\:hidden .group > a:hover .text-white\/60,
+            #quick-menu-section .md\\:hidden .group > a:hover .text-xs {
+                color: #666 !important;
+            }
+            
+            /* Açıklama yazıları için özel hover seçici */
+            #quick-menu-section .md\\:hidden .group > a:hover span.text-white\/60 {
+                color: #666 !important;
+            }
+            
+            #quick-menu-section .md\\:hidden .group > a:hover .group-hover\:text-black {
+                color: #333 !important;
+            }
+        }
+        
+        /* Touch cihazlarda sadece active efekti - spesifik seçici */
+        #quick-menu-section .md\\:hidden .group > a:active {
+            background-color: white !important;
+            border-radius: 8px !important;
+        }
+        
+        #quick-menu-section .md\\:hidden .group > a:active .font-semibold {
+            color: #333 !important;
+        }
+        
+        #quick-menu-section .md\\:hidden .group > a:active .text-white\/60,
+        #quick-menu-section .md\\:hidden .group > a:active .text-xs {
+            color: #666 !important;
+        }
+        
+        /* Açıklama yazıları için özel active seçici */
+        #quick-menu-section .md\\:hidden .group > a:active span.text-white\/60 {
+            color: #666 !important;
+        }
+        
+        #quick-menu-section .md\\:hidden .group > a:active .group-hover\:text-black {
+            color: #333 !important;
+        }
+        
+        /* Desktop menüyü mobilde gizle */
+        #quick-menu-section .hidden {
+            display: none !important;
+        }
+        
+        /* Mobilde tüm hover efektlerini devre dışı bırak - spesifik seçici */
+        @media (hover: none) and (pointer: coarse) {
+            #quick-menu-section .md\\:hidden .group > a:hover {
+                background-color: transparent !important;
+            }
+            
+            #quick-menu-section .md\\:hidden .group > a:hover .group-hover\:text-black {
+                color: rgba(255, 255, 255, 0.6) !important;
+            }
         }
     }
 </style>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Desktop dropdown hover işlevselliği
-        const desktopGroups = document.querySelectorAll('#quick-menu-section .md\\:flex .group');
-        desktopGroups.forEach(group => {
-            const dropdown = group.querySelector('.quick-menu-dropdown');
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Quick menu script loaded');
+    
+    // Desktop hover functionality - basit CSS hover kullanıyoruz, JavaScript'e gerek yok
+    
+    // Mobile menu functionality - Daha spesifik seçici kullan
+    const quickMenuSection = document.getElementById('quick-menu-section');
+    if (quickMenuSection) {
+        const mobileContainer = quickMenuSection.querySelector('.md\\:hidden');
+        if (mobileContainer) {
+            const mobileGroups = mobileContainer.querySelectorAll('.group');
+            console.log('Mobile groups found:', mobileGroups.length);
             
-            if (dropdown) {
-                // Hover işlevselliği - üzerine gelince dropdown'ı göster
-                group.addEventListener('mouseenter', function() {
-                    dropdown.style.display = 'block';
-                });
+            mobileGroups.forEach((group, index) => {
+                const link = group.querySelector('a');
                 
-                // Hover işlevselliği - üzerinden ayrılınca dropdown'ı gizle
-                group.addEventListener('mouseleave', function() {
-                    dropdown.style.display = 'none';
-                });
-            }
-        });
-        
-        // Mobil menü dropdown işlevselliği
-        const mobileGroups = document.querySelectorAll('#quick-menu-section .md\\:hidden .group');
-        mobileGroups.forEach(group => {
-            const link = group.querySelector('a');
-            const dropdown = group.querySelector('.quick-menu-dropdown');
-            const icon = link.querySelector('.material-icons:last-child');
-            
-            link.addEventListener('click', function(e) {
-                e.preventDefault();
-                
-                // Diğer tüm açık olan menüleri kapat
-                mobileGroups.forEach(otherGroup => {
-                    if (otherGroup !== group && otherGroup.classList.contains('active')) {
-                        otherGroup.classList.remove('active');
-                        const otherDropdown = otherGroup.querySelector('.quick-menu-dropdown');
-                        if (otherDropdown) otherDropdown.style.display = 'none';
-                        const otherIcon = otherGroup.querySelector('a .material-icons:last-child');
-                        if (otherIcon) otherIcon.style.transform = 'rotate(0deg)';
+                if (link) {
+                    console.log(`Mobile Group ${index} found with link`);
+                    
+                    // Çakışmayı önlemek için event'i sadece bir kez ekle
+                    if (!link.hasAttribute('data-quick-menu-handled')) {
+                        link.setAttribute('data-quick-menu-handled', 'true');
+                        
+                        link.addEventListener('click', function(e) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            console.log(`Quick menu clicked: ${index}`);
+                            
+                            // Diğer tüm açık olan menüleri kapat
+                            mobileGroups.forEach(otherGroup => {
+                                if (otherGroup !== group) {
+                                    otherGroup.classList.remove('active');
+                                }
+                            });
+                            
+                            // Bu menüyü aç/kapat
+                            const wasActive = group.classList.contains('active');
+                            group.classList.toggle('active');
+                            console.log(`Quick menu ${index} toggled to:`, !wasActive);
+                        });
+                        
+                        // Touch event de ekle
+                        link.addEventListener('touchstart', function(e) {
+                            console.log(`Quick menu touched: ${index}`);
+                        });
                     }
-                });
-                
-                // Bu menüyü aç/kapat
-                group.classList.toggle('active');
-                if (dropdown) {
-                    dropdown.style.display = group.classList.contains('active') ? 'block' : 'none';
-                }
-                if (icon) {
-                    icon.style.transform = group.classList.contains('active') ? 'rotate(180deg)' : 'rotate(0deg)';
                 }
             });
-        });
-    });
+        }
+    }
+});
 </script> 

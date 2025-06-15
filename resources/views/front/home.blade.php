@@ -4,8 +4,8 @@
     <div class="relative z-0">
         @include('front.sections.slider')
     </div>
-    <div class="w-full relative z-50 -mt-11">
-        <div class="container max-w-[1235px] mx-auto px-4">
+    <div class="w-full relative z-50 md:-mt-11 -mt-0">
+        <div class="container max-w-[1235px] mx-auto md:px-4 px-0">
             <div class="flex items-center justify-center">
                 @include('front.sections.quickmenu')
             </div>
@@ -83,19 +83,7 @@
             },
         });
 
-        // Mobil Menü Toggle İşlevi
-        document.addEventListener('DOMContentLoaded', function() {
-            const menuItems = document.querySelectorAll('.md\\:hidden .group');
-            menuItems.forEach(item => {
-                const link = item.querySelector('a');
-                if (link) {
-                    link.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        item.classList.toggle('active');
-                    });
-                }
-            });
-        });
+        // Mobil Menü Toggle İşlevi - quickmenu.blade.php dosyasında tanımlandı
     </script>
 @endsection
 

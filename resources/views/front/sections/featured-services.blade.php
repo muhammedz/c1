@@ -52,118 +52,126 @@
             margin-top: 0.25rem;
             font-family: 'Poppins', sans-serif;
         }
+        
+        /* Services Grid Base Styles */
+        .services-grid {
+            display: grid;
+            gap: 1rem;
+            grid-template-columns: repeat(2, 1fr); /* Varsayılan: mobil için 2 sütun */
+        }
+        
+        /* Tablet için */
+        @media (min-width: 641px) {
+            .services-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1.5rem;
+            }
+        }
+        
+        /* Orta ekranlar için */
+        @media (min-width: 769px) {
+            .services-grid {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 1.5rem;
+            }
+        }
+        
+        /* Büyük ekranlar için */
+        @media (min-width: 1025px) {
+            .services-grid {
+                grid-template-columns: repeat(5, 1fr);
+                gap: 1.5rem;
+            }
+        }
+        
+        /* Mobilde sadece ilk 4 elementi göster */
+        @media (max-width: 640px) {
+            .service-item:nth-child(n+5) {
+                display: none;
+            }
+        }
+        
+        /* Tablet için sadece ilk 4 elementi göster */
+        @media (min-width: 641px) and (max-width: 768px) {
+            .service-item:nth-child(n+5) {
+                display: none;
+            }
+        }
     </style>
 
-    <!-- Swiper Container -->
-    <div class="swiper servicesSwiper">
-        <div class="swiper-wrapper">
-            @forelse($featuredServices as $service)
-            <!-- Hizmet {{ $loop->iteration }} -->
-            <div class="swiper-slide">
-                <div class="featured-service-card">
-                    <div class="featured-service-icon">
-                        {!! $service->icon_html !!}
-                    </div>
-                    @if($service->url)
-                        <a href="{{ $service->url }}" class="featured-service-title">{{ $service->title }}</a>
-                    @else
-                        <h3 class="featured-service-title">{{ $service->title }}</h3>
-                    @endif
+    <!-- Services Grid Container -->
+    <div class="services-grid">
+        @forelse($featuredServices as $service)
+        <!-- Hizmet {{ $loop->iteration }} -->
+        <div class="service-item">
+            <div class="featured-service-card">
+                <div class="featured-service-icon">
+                    {!! $service->icon_html !!}
                 </div>
+                @if($service->url)
+                    <a href="{{ $service->url }}" class="featured-service-title">{{ $service->title }}</a>
+                @else
+                    <h3 class="featured-service-title">{{ $service->title }}</h3>
+                @endif
             </div>
-            @empty
-            <!-- Örnek Hizmetler (Veri yoksa gösterilir) -->
-            <div class="swiper-slide">
-                <div class="featured-service-card">
-                    <div class="featured-service-icon">
-                        <i class="fas fa-home"></i>
-                    </div>
-                    <h3 class="featured-service-title">Örnek Hizmet 1</h3>
-                </div>
-            </div>
-            
-            <div class="swiper-slide">
-                <div class="featured-service-card">
-                    <div class="featured-service-icon">
-                        <i class="fas fa-graduation-cap"></i>
-                    </div>
-                    <h3 class="featured-service-title">Örnek Hizmet 2</h3>
-                </div>
-            </div>
-            
-            <div class="swiper-slide">
-                <div class="featured-service-card">
-                    <div class="featured-service-icon">
-                        <i class="fas fa-users"></i>
-                    </div>
-                    <h3 class="featured-service-title">Örnek Hizmet 3</h3>
-                </div>
-            </div>
-            @endforelse
         </div>
+        @empty
+        <!-- Örnek Hizmetler (Veri yoksa gösterilir) -->
+        <div class="service-item">
+            <div class="featured-service-card">
+                <div class="featured-service-icon">
+                    <i class="fas fa-home"></i>
+                </div>
+                <h3 class="featured-service-title">Örnek Hizmet 1</h3>
+            </div>
+        </div>
+        
+        <div class="service-item">
+            <div class="featured-service-card">
+                <div class="featured-service-icon">
+                    <i class="fas fa-graduation-cap"></i>
+                </div>
+                <h3 class="featured-service-title">Örnek Hizmet 2</h3>
+            </div>
+        </div>
+        
+        <div class="service-item">
+            <div class="featured-service-card">
+                <div class="featured-service-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <h3 class="featured-service-title">Örnek Hizmet 3</h3>
+            </div>
+        </div>
+        
+        <div class="service-item">
+            <div class="featured-service-card">
+                <div class="featured-service-icon">
+                    <i class="fas fa-cog"></i>
+                </div>
+                <h3 class="featured-service-title">Örnek Hizmet 4</h3>
+            </div>
+        </div>
+        
+        <div class="service-item">
+            <div class="featured-service-card">
+                <div class="featured-service-icon">
+                    <i class="fas fa-phone"></i>
+                </div>
+                <h3 class="featured-service-title">Örnek Hizmet 5</h3>
+            </div>
+        </div>
+        
+        <div class="service-item">
+            <div class="featured-service-card">
+                <div class="featured-service-icon">
+                    <i class="fas fa-envelope"></i>
+                </div>
+                <h3 class="featured-service-title">Örnek Hizmet 6</h3>
+            </div>
+        </div>
+        @endforelse
     </div>
 </section>
 @endif
 
-<!-- Services Slider Initialize -->
-@if(isset($featuredServiceSettings) && $featuredServiceSettings->is_active)
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    new Swiper('.servicesSwiper', {
-        slidesPerView: {{ $featuredServiceSettings->swiper_items_per_view ?? 4 }},
-        spaceBetween: 20,
-        @if($featuredServiceSettings->swiper_autoplay)
-        autoplay: {
-            delay: {{ $featuredServiceSettings->swiper_autoplay }},
-            disableOnInteraction: false,
-        },
-        @endif
-        breakpoints: {
-            320: {
-                slidesPerView: 1,
-                spaceBetween: 15
-            },
-            640: {
-                slidesPerView: 2,
-                spaceBetween: 15
-            },
-            768: {
-                slidesPerView: 3,
-                spaceBetween: 20
-            },
-            1024: {
-                slidesPerView: {{ $featuredServiceSettings->swiper_items_per_view ?? 4 }},
-                spaceBetween: 20
-            }
-        }
-    });
-});
-</script>
-@else
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    new Swiper('.servicesSwiper', {
-        slidesPerView: 4,
-        spaceBetween: 20,
-        breakpoints: {
-            320: {
-                slidesPerView: 1,
-                spaceBetween: 15
-            },
-            640: {
-                slidesPerView: 2,
-                spaceBetween: 15
-            },
-            768: {
-                slidesPerView: 3,
-                spaceBetween: 20
-            },
-            1024: {
-                slidesPerView: 4,
-                spaceBetween: 20
-            }
-        }
-    });
-});
-</script>
-@endif

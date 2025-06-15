@@ -45,7 +45,14 @@ class EventScraperService
         $errors = [];
         
         // İlk sayfayı çek ve toplam sayfa sayısını belirle
-        $content = Http::get($baseUrl)->body();
+        $content = Http::withOptions([
+            'verify' => false,
+            'timeout' => 60,
+            'connect_timeout' => 30,
+            'headers' => [
+                'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+            ]
+        ])->get($baseUrl)->body();
         $totalPages = $this->getTotalPageCount($content);
         
         $results = [
@@ -101,7 +108,22 @@ class EventScraperService
             // Sayfayı HTTP ile çek - SSL doğrulamasını devre dışı bırak
             $response = Http::withOptions([
                 'verify' => false,
-                'timeout' => 30
+                'timeout' => 60,         // 60 saniye timeout (artırıldı)
+                'connect_timeout' => 30, // 30 saniye bağlantı timeout (artırıldı)
+                'allow_redirects' => [
+                    'max' => 10,
+                    'strict' => false,
+                    'referer' => true,
+                    'protocols' => ['http', 'https']
+                ],
+                'headers' => [
+                    'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+                    'Accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+                    'Accept-Language' => 'tr-TR,tr;q=0.9,en;q=0.8',
+                    'Accept-Encoding' => 'gzip, deflate',
+                    'Connection' => 'keep-alive',
+                    'Upgrade-Insecure-Requests' => '1'
+                ]
             ])->get($url);
             $content = $response->body();
             
@@ -399,7 +421,11 @@ class EventScraperService
             
             $response = Http::withOptions([
                 'verify' => false,
-                'timeout' => 30
+                'timeout' => 60,
+                'connect_timeout' => 30,
+                'headers' => [
+                    'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+                ]
             ])->get($url);
             $content = $response->body();
             
@@ -635,7 +661,14 @@ class EventScraperService
             $imageUrl = str_replace(['%2F', '%3A'], ['/', ':'], $imageUrl);
             
             // HTTP isteği gönder
-            $response = Http::timeout(30)->get($imageUrl);
+            $response = Http::withOptions([
+                'verify' => false,
+                'timeout' => 60,
+                'connect_timeout' => 30,
+                'headers' => [
+                    'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+                ]
+            ])->get($imageUrl);
             
             if ($response->status() !== 200) {
                 Log::error('Görsel indirilemedi - HTTP hatası', [

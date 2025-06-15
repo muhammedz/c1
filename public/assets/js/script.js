@@ -93,29 +93,37 @@ document.addEventListener('DOMContentLoaded', function () {
         }, 150);
     });
     
-    // Mobil menü kodları
-    const mobileMenuItems = document.querySelectorAll('.md\\:hidden .group');
+    // Mobil menü kodları - Bu kod quickmenu.blade.php'deki kodla çakışıyor
+    // Çakışmayı önlemek için daha spesifik seçici kullan veya kaldır
+    const mobileMenuItems = document.querySelectorAll('.md\\:hidden .group:not([data-quick-menu-handled])');
 
     mobileMenuItems.forEach(item => {
         const link = item.querySelector('a');
         const dropdown = item.querySelector('.quick-menu-dropdown');
-        const icon = link.querySelector('.material-icons:last-child');
+        const icon = link ? link.querySelector('.material-icons:last-child') : null;
 
-        link.addEventListener('click', (e) => {
-            e.preventDefault();
+        if (link && !link.hasAttribute('data-quick-menu-handled')) {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
 
-            // Diğer tüm dropdownları kapat
-            mobileMenuItems.forEach(otherItem => {
-                if (otherItem !== item) {
-                    otherItem.classList.remove('active');
-                    otherItem.querySelector('.material-icons:last-child').style.transform = 'rotate(0deg)';
+                // Diğer tüm dropdownları kapat
+                mobileMenuItems.forEach(otherItem => {
+                    if (otherItem !== item) {
+                        otherItem.classList.remove('active');
+                        const otherIcon = otherItem.querySelector('.material-icons:last-child');
+                        if (otherIcon) {
+                            otherIcon.style.transform = 'rotate(0deg)';
+                        }
+                    }
+                });
+
+                // Tıklanan dropdownı aç/kapat
+                item.classList.toggle('active');
+                if (icon) {
+                    icon.style.transform = item.classList.contains('active') ? 'rotate(180deg)' : 'rotate(0deg)';
                 }
             });
-
-            // Tıklanan dropdownı aç/kapat
-            item.classList.toggle('active');
-            icon.style.transform = item.classList.contains('active') ? 'rotate(180deg)' : 'rotate(0deg)';
-        });
+        }
     });
     
     // Mega menü kategorileri için hover efekti
@@ -153,26 +161,8 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 
-// Mobile Menu Toggle
-document.querySelectorAll('.md\\:hidden .group button').forEach(button => {
-    button.addEventListener('click', () => {
-        const group = button.parentElement;
-        const dropdown = group.querySelector('.quick-menu-dropdown');
-        const icon = button.querySelector('.material-icons');
-
-        // Close other dropdowns
-        document.querySelectorAll('.md\\:hidden .group').forEach(otherGroup => {
-            if (otherGroup !== group) {
-                otherGroup.classList.remove('active');
-                otherGroup.querySelector('.material-icons').style.transform = 'rotate(0deg)';
-            }
-        });
-
-        // Toggle current dropdown
-        group.classList.toggle('active');
-        icon.style.transform = group.classList.contains('active') ? 'rotate(180deg)' : 'rotate(0deg)';
-    });
-});
+// Mobile Menu Toggle - Bu kod quickmenu.blade.php'de handle ediliyor
+// Çakışmayı önlemek için kaldırıldı
 
 document.addEventListener('DOMContentLoaded', function () {
     // Thumbs Swiper
