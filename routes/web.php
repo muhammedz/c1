@@ -710,6 +710,8 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     // Genel Ayarlar Routes
     Route::get('/settings', [App\Http\Controllers\Admin\SettingsController::class, 'index'])->name('settings.index');
     Route::post('/settings/seo', [App\Http\Controllers\Admin\SettingsController::class, 'updateSeo'])->name('settings.seo.update');
+    Route::post('/settings/favicon', [App\Http\Controllers\Admin\SettingsController::class, 'updateFavicon'])->name('settings.favicon.update');
+    Route::get('/settings/favicon/delete', [App\Http\Controllers\Admin\SettingsController::class, 'deleteFavicon'])->name('settings.favicon.delete');
 });
 
 // Duplicate services route'u kaldırıldı - admin içindeki yeterli

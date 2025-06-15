@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\Blade;
 use App\Helpers\ImageHelper;
 use App\Helpers\SlugHelper;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\View;
+use App\Models\Setting;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -72,5 +74,31 @@ class AppServiceProvider extends ServiceProvider
         
         // JSON kodlama ayarlarını düzenle
         config(['app.json_encoding_options' => JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES]);
+
+        // AdminLTE sayfalarına favicon bilgisini gönder
+        View::composer(['adminlte::page', 'adminlte::master'], function ($view) {
+            try {
+                $siteFavicon = Setting::where('key', 'site_favicon')->first();
+                $view->with('siteFavicon', $siteFavicon);
+                
+                // Eğer özel favicon varsa, AdminLTE'nin varsayılan favicon'unu devre dışı bırak
+                if ($siteFavicon && $siteFavicon->value) {
+                    $view->with('customFaviconUrl', asset('uploads/' . $siteFavicon->value));
+                }
+            } catch (\Exception $e) {
+                $view->with('siteFavicon', null);
+                $view->with('customFaviconUrl', null);
+            }
+        });
+
+        // Frontend sayfalarına da favicon bilgisini gönder
+        View::composer('layouts.front', function ($view) {
+            try {
+                $siteFavicon = Setting::where('key', 'site_favicon')->first();
+                $view->with('siteFavicon', $siteFavicon);
+            } catch (\Exception $e) {
+                $view->with('siteFavicon', null);
+            }
+        });
     }
 }

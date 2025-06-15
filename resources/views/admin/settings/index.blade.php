@@ -1,4 +1,4 @@
-@extends('adminlte::page')
+@extends('admin.layouts.app')
 
 @section('title', 'Ayarlar')
 
@@ -110,6 +110,86 @@
         </div>
     </div>
 
+    <!-- Favicon Ayarları -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card card-info">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-star"></i> Favicon Ayarları
+                    </h3>
+                </div>
+                <form action="{{ route('admin.settings.favicon.update') }}" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="favicon">
+                                        <i class="fas fa-image"></i> Favicon Dosyası
+                                    </label>
+                                    <div class="input-group">
+                                        <div class="custom-file">
+                                            <input type="file" class="custom-file-input @error('favicon') is-invalid @enderror" 
+                                                   id="favicon" name="favicon" accept="image/*">
+                                            <label class="custom-file-label" for="favicon">Favicon seçin...</label>
+                                        </div>
+                                    </div>
+                                    @error('favicon')
+                                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                                    @enderror
+                                    <small class="form-text text-muted">
+                                        <i class="fas fa-info-circle"></i> 
+                                        Önerilen boyut: 32x32 piksel, PNG veya ICO formatı. Maksimum dosya boyutu: 2MB
+                                    </small>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Mevcut Favicon</label>
+                                    <div class="mt-2">
+                                        @if(isset($settings['site_favicon']) && $settings['site_favicon']->value)
+                                            <div class="d-flex align-items-center">
+                                                <img src="{{ asset('uploads/' . $settings['site_favicon']->value) }}" 
+                                                     alt="Mevcut Favicon" 
+                                                     class="img-thumbnail mr-3" 
+                                                     style="width: 32px; height: 32px;">
+                                                <div>
+                                                    <p class="mb-1"><strong>Aktif favicon</strong></p>
+                                                    <a href="{{ route('admin.settings.favicon.delete') }}" 
+                                                       class="btn btn-sm btn-danger" 
+                                                       onclick="return confirm('Favicon silinsin mi?')">
+                                                        <i class="fas fa-trash"></i> Sil
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        @else
+                                            <div class="alert alert-warning">
+                                                <i class="fas fa-exclamation-triangle"></i>
+                                                Henüz favicon yüklenmemiş. Varsayılan favicon kullanılıyor.
+                                            </div>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="alert alert-info">
+                            <i class="fas fa-lightbulb"></i>
+                            <strong>Bilgi:</strong> Favicon, web sitenizin tarayıcı sekmesinde görünen küçük simgedir. 
+                            Yüklediğiniz favicon tüm sitede kullanılacaktır.
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <button type="submit" class="btn btn-info">
+                            <i class="fas fa-upload"></i> Favicon Yükle
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <!-- Gelecekte eklenecek diğer ayar bölümleri için yer -->
     <div class="row">
         <div class="col-12">
@@ -141,6 +221,9 @@
     .card-primary .card-header {
         background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
     }
+    .card-info .card-header {
+        background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+    }
     .form-control:focus {
         border-color: #28a745;
         box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
@@ -152,8 +235,17 @@
     .btn-primary:hover {
         background: linear-gradient(135deg, #1e7e34 0%, #155724 100%);
     }
+    .btn-info {
+        background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+        border: none;
+    }
+    .btn-info:hover {
+        background: linear-gradient(135deg, #138496 0%, #0f6674 100%);
+    }
 </style>
 @stop
+
+
 
 @section('js')
 <script>
@@ -179,6 +271,12 @@ $(document).ready(function() {
             $(this).next('.invalid-feedback').remove();
             $(this).after('<div class="text-warning small">Kalan karakter: ' + remaining + '</div>');
         }
+    });
+    
+    // Custom file input label
+    $('.custom-file-input').on('change', function() {
+        var fileName = $(this).val().split('\\').pop();
+        $(this).siblings('.custom-file-label').addClass('selected').html(fileName);
     });
     
     // Form gönderilmeden önce doğrulama

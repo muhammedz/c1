@@ -252,8 +252,8 @@ class EventScraperService
         $title = preg_replace('/\s+/', ' ', $title);
         $title = trim($title);
         
-        // Başlığı ilk harfleri büyük olacak şekilde düzenle
-        $title = mb_convert_case($title, MB_CASE_TITLE, "UTF-8");
+        // Başlığı Türkçe karakter duyarlı şekilde formatla
+        $title = $this->formatTurkishTitle($title);
         
         // Çok kısa başlıkları atla
         if (strlen($title) < 3) {
@@ -740,15 +740,80 @@ class EventScraperService
     }
 
     /**
+     * Türkçe karakter destekli başlık formatlaması
+     */
+    protected function formatTurkishTitle($title)
+    {
+        if (empty($title)) {
+            return $title;
+        }
+        
+        // Önce boşlukları temizle
+        $title = trim($title);
+        $title = preg_replace('/\s+/', ' ', $title);
+        
+        // Türkçe karakter dönüşüm tablosu
+        $upperToLower = [
+            'A' => 'a', 'B' => 'b', 'C' => 'c', 'Ç' => 'ç', 'D' => 'd', 'E' => 'e', 'F' => 'f',
+            'G' => 'g', 'Ğ' => 'ğ', 'H' => 'h', 'I' => 'ı', 'İ' => 'i', 'J' => 'j', 'K' => 'k',
+            'L' => 'l', 'M' => 'm', 'N' => 'n', 'O' => 'o', 'Ö' => 'ö', 'P' => 'p', 'Q' => 'q',
+            'R' => 'r', 'S' => 's', 'Ş' => 'ş', 'T' => 't', 'U' => 'u', 'Ü' => 'ü', 'V' => 'v',
+            'W' => 'w', 'X' => 'x', 'Y' => 'y', 'Z' => 'z'
+        ];
+        
+        $lowerToUpper = [
+            'a' => 'A', 'b' => 'B', 'c' => 'C', 'ç' => 'Ç', 'd' => 'D', 'e' => 'E', 'f' => 'F',
+            'g' => 'G', 'ğ' => 'Ğ', 'h' => 'H', 'ı' => 'I', 'i' => 'İ', 'j' => 'J', 'k' => 'K',
+            'l' => 'L', 'm' => 'M', 'n' => 'N', 'o' => 'O', 'ö' => 'Ö', 'p' => 'P', 'q' => 'Q',
+            'r' => 'R', 's' => 'S', 'ş' => 'Ş', 't' => 'T', 'u' => 'U', 'ü' => 'Ü', 'v' => 'V',
+            'w' => 'W', 'x' => 'X', 'y' => 'Y', 'z' => 'Z'
+        ];
+        
+        // Önce tüm karakterleri küçük harfe çevir
+        $lowerTitle = '';
+        for ($i = 0; $i < mb_strlen($title, 'UTF-8'); $i++) {
+            $char = mb_substr($title, $i, 1, 'UTF-8');
+            $lowerTitle .= isset($upperToLower[$char]) ? $upperToLower[$char] : $char;
+        }
+        
+        // Kelimeleri ayır ve her kelimenin ilk harfini büyük yap
+        $words = explode(' ', $lowerTitle);
+        $formattedWords = [];
+        
+        foreach ($words as $word) {
+            if (empty($word)) continue;
+            
+            $firstChar = mb_substr($word, 0, 1, 'UTF-8');
+            $restChars = mb_substr($word, 1, null, 'UTF-8');
+            
+            // İlk harfi büyük yap
+            $upperFirstChar = isset($lowerToUpper[$firstChar]) ? $lowerToUpper[$firstChar] : $firstChar;
+            
+            $formattedWords[] = $upperFirstChar . $restChars;
+        }
+        
+        return implode(' ', $formattedWords);
+    }
+
+    /**
      * Tekil etkinlik ekleme
      */
     public function addSingleEventFromData($eventData)
     {
         try {
-            // Başlık formatı düzenle
+            Log::info('Tek etkinlik ekleme başladı', [
+                'gelen_veri' => $eventData
+            ]);
+            
+            // Başlık formatı düzenle - Türkçe karakter duyarlı
             if (isset($eventData['title'])) {
-                $eventData['title'] = mb_convert_case(trim($eventData['title']), MB_CASE_TITLE, "UTF-8");
-                $eventData['title'] = preg_replace('/\s+/', ' ', $eventData['title']);
+                $originalTitle = $eventData['title'];
+                $eventData['title'] = $this->formatTurkishTitle($eventData['title']);
+                
+                Log::info('Başlık formatlaması', [
+                    'orijinal' => $originalTitle,
+                    'formatlanmış' => $eventData['title']
+                ]);
             }
             
             // Kategori kontrolü
@@ -765,17 +830,36 @@ class EventScraperService
                 unset($eventData['imageUrl']);
             }
             
+            // Tarih ve saat ayrıştırma
+            $startDate = now(); // Varsayılan olarak şimdi
+            
+            if (isset($eventData['dateText']) && isset($eventData['timeText'])) {
+                try {
+                    $startDate = $this->parseDate($eventData['dateText'], $eventData['timeText']);
+                } catch (\Exception $e) {
+                    Log::warning('Tarih ayrıştırılamadı, varsayılan tarih kullanılıyor', [
+                        'dateText' => $eventData['dateText'],
+                        'timeText' => $eventData['timeText'],
+                        'error' => $e->getMessage()
+                    ]);
+                }
+            }
+            
             // Event verilerini hazırla
             $processedData = [
                 'title' => $eventData['title'] ?? 'İsimsiz Etkinlik',
                 'description' => $eventData['description'] ?? 'Etkinlik açıklaması belirtilmemiş.',
-                'start_date' => isset($eventData['start_date']) ? Carbon::parse($eventData['start_date']) : now(),
-                'end_date' => isset($eventData['end_date']) ? Carbon::parse($eventData['end_date']) : null,
+                'start_date' => $startDate,
+                'end_date' => isset($eventData['end_date']) ? Carbon::parse($eventData['end_date']) : (clone $startDate)->addHours(2),
                 'location' => $eventData['location'] ?? 'Belirtilmemiş',
-                'image_url' => $eventData['image_url'] ?? null,
+                'image_url' => $eventData['image_url'] ?? $eventData['imageUrl'] ?? null,
                 'slug' => $uniqueSlug,
                 'category' => $categoryName
             ];
+            
+            Log::info('İşlenmiş etkinlik verisi', [
+                'processed_data' => $processedData
+            ]);
             
             // Mevcut etkinlik kontrolü
             $existingEvent = $this->checkExistingEvent($processedData);
@@ -784,29 +868,38 @@ class EventScraperService
                 return [
                     'success' => false,
                     'message' => 'Bu etkinlik zaten mevcut.',
-                    'event' => $existingEvent
+                    'event_id' => $existingEvent->id
                 ];
             }
             
             // Etkinlik oluştur
             $event = $this->createEvent($processedData, $category->id);
             
+            Log::info('Etkinlik başarıyla oluşturuldu', [
+                'event_id' => $event->id,
+                'event_title' => $event->title
+            ]);
+            
             return [
                 'success' => true,
-                'message' => 'Etkinlik başarıyla eklendi.',
+                'message' => 'Etkinlik başarıyla eklendi: ' . $event->title,
+                'event_id' => $event->id,
                 'event' => $event
             ];
             
         } catch (\Exception $e) {
             Log::error('Tek etkinlik ekleme hatası', [
                 'error' => $e->getMessage(),
-                'event_data' => $eventData
+                'line' => $e->getLine(),
+                'file' => $e->getFile(),
+                'event_data' => $eventData,
+                'trace' => $e->getTraceAsString()
             ]);
             
             return [
                 'success' => false,
                 'message' => 'Etkinlik eklenirken hata oluştu: ' . $e->getMessage(),
-                'event' => null
+                'event_id' => null
             ];
         }
     }

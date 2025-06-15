@@ -13,7 +13,7 @@ function titleCase($string) {
 <section id="events-alternative-section" class="container max-w-7xl mx-auto px-4 py-12">
     <div class="flex items-center justify-between mb-8">
         <h2 class="text-2xl font-bold text-gray-800">{{ $eventSettings->section_title ?? 'Etkinlikler' }}</h2>
-        <a href="{{ route('events.index') }}" class="text-[#004d2e] font-medium text-sm hover:underline flex items-center gap-1">
+        <a href="https://kultursanat.cankaya.bel.tr/" target="_blank" class="text-[#004d2e] font-medium text-sm hover:underline flex items-center gap-1">
             Tümünü Gör
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
@@ -31,10 +31,15 @@ function titleCase($string) {
             transition: all 0.3s ease;
             overflow: hidden;
             height: 100%;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
         }
         
         .event-featured-card:hover {
             transform: translateY(-5px);
+            text-decoration: none;
+            color: inherit;
         }
         
         .event-featured-image {
@@ -81,11 +86,6 @@ function titleCase($string) {
                 top: 0.5rem;
                 right: 0.5rem;
             }
-            
-            .event-featured-date-overlay {
-                padding: 0.75rem;
-                font-size: 0.75rem;
-            }
         }
         
         .event-featured-meta {
@@ -114,26 +114,12 @@ function titleCase($string) {
             border-radius: 20px;
             border: 1px solid rgba(0,77,46,0.1);
         }
-        
-        .event-featured-date-overlay {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
-            padding: 1rem;
-            color: white;
-            font-size: 0.875rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
     </style>
     
     <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">
         @foreach($upcomingEvents->take(4) as $event)
         <div>
-            <div class="event-featured-card">
+            <a href="https://kultursanat.cankaya.bel.tr/" target="_blank" class="event-featured-card">
                 <!-- Etkinlik Görseli -->
                 <div class="event-featured-image">
                     @if($event->cover_image)
@@ -148,14 +134,6 @@ function titleCase($string) {
                     <div class="event-featured-category">
                         {{ titleCase($event->category->name ?? 'Genel') }}
                     </div>
-                    
-                    <!-- Tarih Overlay -->
-                    <div class="event-featured-date-overlay">
-                        <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" />
-                        </svg>
-                        <span>{{ $event->turkish_start_date }}</span>
-                    </div>
                 </div>
                 
                 <!-- Etkinlik Bilgileri -->
@@ -165,13 +143,9 @@ function titleCase($string) {
                     <div class="space-y-2 mt-auto">
                         <div class="event-featured-meta">
                             <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                <path d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V5z" />
+                                <path d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" />
                             </svg>
-                            <span>{{ $event->start_date->format('H:i') }}
-                            @if($event->end_date)
-                             - {{ $event->end_date->format('H:i') }}
-                            @endif
-                            </span>
+                            <span>{{ $event->turkish_start_date }}</span>
                         </div>
                         
                         <div class="event-featured-meta">
@@ -182,7 +156,7 @@ function titleCase($string) {
                         </div>
                     </div>
                 </div>
-            </div>
+            </a>
         </div>
         @endforeach
     </div>
@@ -195,7 +169,7 @@ function titleCase($string) {
     <div class="bg-white rounded-2xl shadow-lg p-6">
         <p class="text-center text-gray-500">Şu anda gösterilecek yaklaşan etkinlik bulunmamaktadır.</p>
         <p class="text-center mt-2">
-            <a href="{{ route('events.index') }}" class="text-[#004d2e] font-medium hover:underline">Tüm etkinlikleri görüntüle</a>
+            <a href="https://kultursanat.cankaya.bel.tr/" target="_blank" class="text-[#004d2e] font-medium hover:underline">Tüm etkinlikleri görüntüle</a>
         </p>
     </div>
 </section>

@@ -655,4 +655,50 @@ class EventScrapeController extends Controller
             ]);
         }
     }
+
+    /**
+     * Tek bir etkinliği ekle (addSingleEvent alias)
+     */
+    public function addSingleEvent(Request $request)
+    {
+        try {
+            // Post edilen etkinlik verilerini al - event_data parametresinden
+            $eventData = $request->input('event_data', []);
+            
+            // Eğer event_data boşsa, tüm request verilerini al
+            if (empty($eventData)) {
+                $eventData = $request->all();
+            }
+            
+            // Loglama ekle
+            Log::info('Tek etkinlik ekleme isteği', [
+                'etkinlik_verisi' => $eventData,
+                'request_all' => $request->all()
+            ]);
+            
+            // Etkinlik servisini çağır
+            $service = new EventScraperService();
+            $result = $service->addSingleEventFromData($eventData);
+            
+            // Sonucu logla
+            Log::info('Tek etkinlik ekleme sonucu', [
+                'sonuç' => $result
+            ]);
+            
+            return response()->json($result);
+            
+        } catch (\Exception $e) {
+            Log::error('Tek etkinlik ekleme hatası', [
+                'hata' => $e->getMessage(),
+                'satır' => $e->getLine(),
+                'dosya' => $e->getFile(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Sistem hatası: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 } 

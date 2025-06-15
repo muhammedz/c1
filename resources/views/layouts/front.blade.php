@@ -17,6 +17,19 @@
         <meta name="description" content="{{ \App\Helpers\SeoHelper::getHomepageDescription() }}">
     @endif
     
+    <!-- Favicon -->
+    @php
+        $siteFavicon = \App\Models\Setting::where('key', 'site_favicon')->first();
+    @endphp
+    @if($siteFavicon && $siteFavicon->value)
+        <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('uploads/' . $siteFavicon->value) }}">
+        <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('uploads/' . $siteFavicon->value) }}">
+        <link rel="shortcut icon" href="{{ asset('uploads/' . $siteFavicon->value) }}">
+    @else
+        <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
+        <link rel="shortcut icon" href="{{ asset('favicon.ico') }}">
+    @endif
+    
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
