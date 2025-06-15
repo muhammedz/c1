@@ -64,45 +64,81 @@ class FilemanagersystemMediaController extends Controller
      */
     public function store(Request $request)
     {
-        // Güçlendirilmiş validation kuralları
-        $request->validate([
-            'files' => 'required|array|max:10', // Maksimum 10 dosya
-            'files.*' => [
-                'required',
-                'file',
-                'max:10240', // 10MB (kilobyte cinsinden)
-                function ($attribute, $value, $fail) {
-                    // Dosya uzantısı kontrolü
-                    $allowedExtensions = config('filemanagersystem.security.allowed_extensions', []);
-                    $extension = strtolower($value->getClientOriginalExtension());
-                    
-                    if (!in_array($extension, $allowedExtensions)) {
-                        $fail('Bu dosya uzantısı desteklenmiyor: ' . $extension);
-                    }
-                    
-                    // MIME type kontrolü
-                    $allowedMimeTypes = config('filemanagersystem.security.allowed_mime_types', []);
-                    $mimeType = $value->getMimeType();
-                    
-                    if (!in_array($mimeType, $allowedMimeTypes)) {
-                        $fail('Bu dosya türü desteklenmiyor: ' . $mimeType);
-                    }
-                    
-                    // Dosya adı güvenlik kontrolü
-                    $filename = $value->getClientOriginalName();
-                    if (strpos($filename, '../') !== false || strpos($filename, '..\\') !== false) {
-                        $fail('Güvenli olmayan dosya adı.');
-                    }
-                    
-                    // Null byte kontrolü
-                    if (strpos($filename, "\0") !== false) {
-                        $fail('Geçersiz dosya adı.');
-                    }
-                }
-            ],
-            'folder_id' => 'nullable|exists:filemanagersystem_folders,id',
-            'is_public' => 'boolean',
+        // Debug: İstek bilgilerini logla
+        Log::info('Dosya yükleme isteği başladı', [
+            'user_id' => Auth::id(),
+            'ip' => $request->ip(),
+            'content_length' => $request->header('Content-Length'),
+            'content_type' => $request->header('Content-Type'),
+            'files_count' => $request->hasFile('files') ? count($request->file('files')) : 0,
+            'post_max_size' => ini_get('post_max_size'),
+            'upload_max_filesize' => ini_get('upload_max_filesize'),
+            'memory_limit' => ini_get('memory_limit'),
+            'max_execution_time' => ini_get('max_execution_time')
         ]);
+
+        // Debug: Dosya bilgilerini logla
+        if ($request->hasFile('files')) {
+            foreach ($request->file('files') as $index => $file) {
+                Log::info("Dosya {$index} bilgileri", [
+                    'original_name' => $file->getClientOriginalName(),
+                    'size' => $file->getSize(),
+                    'mime_type' => $file->getMimeType(),
+                    'extension' => $file->getClientOriginalExtension(),
+                    'is_valid' => $file->isValid(),
+                    'error' => $file->getError()
+                ]);
+            }
+        }
+
+        // Güçlendirilmiş validation kuralları
+        try {
+            $request->validate([
+                'files' => 'required|array|max:10', // Maksimum 10 dosya
+                'files.*' => [
+                    'required',
+                    'file',
+                    'max:51200', // 50MB (kilobyte cinsinden)
+                    function ($attribute, $value, $fail) {
+                        // Dosya uzantısı kontrolü
+                        $allowedExtensions = config('filemanagersystem.security.allowed_extensions', []);
+                        $extension = strtolower($value->getClientOriginalExtension());
+                        
+                        if (!in_array($extension, $allowedExtensions)) {
+                            $fail('Bu dosya uzantısı desteklenmiyor: ' . $extension);
+                        }
+                        
+                        // MIME type kontrolü
+                        $allowedMimeTypes = config('filemanagersystem.security.allowed_mime_types', []);
+                        $mimeType = $value->getMimeType();
+                        
+                        if (!in_array($mimeType, $allowedMimeTypes)) {
+                            $fail('Bu dosya türü desteklenmiyor: ' . $mimeType);
+                        }
+                        
+                        // Dosya adı güvenlik kontrolü
+                        $filename = $value->getClientOriginalName();
+                        if (strpos($filename, '../') !== false || strpos($filename, '..\\') !== false) {
+                            $fail('Güvenli olmayan dosya adı.');
+                        }
+                        
+                        // Null byte kontrolü
+                        if (strpos($filename, "\0") !== false) {
+                            $fail('Geçersiz dosya adı.');
+                        }
+                    }
+                ],
+                'folder_id' => 'nullable|exists:filemanagersystem_folders,id',
+                'is_public' => 'boolean',
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            Log::error('Validation hatası', [
+                'errors' => $e->errors(),
+                'user_id' => Auth::id(),
+                'ip' => $request->ip()
+            ]);
+            throw $e;
+        }
         
         $uploadedFiles = [];
         $errors = [];

@@ -17,16 +17,31 @@
             @endif
             
             <div class="float-right">
-                <a href="{{ route('admin.filemanagersystem.media.edit', ['media' => $media->id]) }}" class="btn btn-primary">
+                <div class="btn-group mr-2" role="group">
+                    <button type="button" class="btn btn-outline-primary btn-sm" onclick="copyToClipboard('quick_copy_url')" title="URL'yi Kopyala">
+                        <i class="fas fa-copy"></i>
+                    </button>
+                    <a href="{{ $media->url }}" target="_blank" class="btn btn-outline-success btn-sm" title="Yeni Sekmede Aç">
+                        <i class="fas fa-external-link-alt"></i>
+                    </a>
+                    <a href="{{ route('admin.filemanagersystem.media.download', $media) }}" class="btn btn-outline-info btn-sm" title="İndir">
+                        <i class="fas fa-download"></i>
+                    </a>
+                </div>
+                
+                <a href="{{ route('admin.filemanagersystem.media.edit', ['media' => $media->id]) }}" class="btn btn-primary btn-sm">
                     <i class="fas fa-edit"></i> Düzenle
                 </a>
                 <form action="{{ route('admin.filemanagersystem.media.destroy', ['media' => $media->id]) }}" method="POST" class="d-inline" id="delete-form">
                     @csrf
                     @method('DELETE')
-                    <button type="submit" class="btn btn-danger" onclick="return confirm('Bu dosyayı silmek istediğinizden emin misiniz?')">
+                    <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Bu dosyayı silmek istediğinizden emin misiniz?')">
                         <i class="fas fa-trash"></i> Sil
                     </button>
                 </form>
+                
+                <!-- Gizli input hızlı kopyalama için -->
+                <input type="hidden" id="quick_copy_url" value="{{ $media->url }}">
             </div>
         </div>
     </div>
@@ -213,6 +228,32 @@
                                                 <td>{{ $media->updated_at->format('d.m.Y H:i') }}</td>
                                             </tr>
                                             @endif
+                                            <tr>
+                                                <th>Dosya Linki:</th>
+                                                <td>
+                                                    <div class="input-group input-group-sm">
+                                                        <input type="text" id="file_link" class="form-control" value="{{ $media->url }}" readonly>
+                                                        <div class="input-group-append">
+                                                            <button class="btn btn-outline-primary btn-sm" type="button" onclick="copyToClipboard('file_link')" title="Linki Kopyala">
+                                                                <i class="fas fa-copy"></i>
+                                                            </button>
+                                                            <a href="{{ $media->url }}" target="_blank" class="btn btn-outline-success btn-sm" title="Yeni Sekmede Aç">
+                                                                <i class="fas fa-external-link-alt"></i>
+                                                            </a>
+                                                            <a href="{{ route('admin.filemanagersystem.media.download', $media) }}" class="btn btn-outline-info btn-sm" title="İndir">
+                                                                <i class="fas fa-download"></i>
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                    <small class="form-text text-muted">
+                                                        <i class="fas fa-info-circle"></i> 
+                                                        Bu dosyaya doğrudan erişim linki
+                                                        @if(!$media->is_public)
+                                                            <span class="text-warning">(Sadece yetkililer erişebilir)</span>
+                                                        @endif
+                                                    </small>
+                                                </td>
+                                            </tr>
                                         </tbody>
                                     </table>
                                     
@@ -259,28 +300,115 @@
 <script>
 function copyToClipboard(elementId) {
     var copyText = document.getElementById(elementId);
+    
+    // Modern clipboard API kullanmayı dene
+    if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(copyText.value).then(function() {
+            showCopyNotification("URL başarıyla kopyalandı!");
+        }).catch(function() {
+            // Fallback yöntemi
+            fallbackCopyToClipboard(copyText);
+        });
+    } else {
+        // Fallback yöntemi
+        fallbackCopyToClipboard(copyText);
+    }
+}
+
+function fallbackCopyToClipboard(copyText) {
     copyText.select();
     copyText.setSelectionRange(0, 99999);
-    document.execCommand("copy");
     
-    // Kopya bildirimini göster
+    try {
+        var successful = document.execCommand("copy");
+        if (successful) {
+            showCopyNotification("URL başarıyla kopyalandı!");
+        } else {
+            showCopyNotification("Kopyalama başarısız!", "error");
+        }
+    } catch (err) {
+        showCopyNotification("Kopyalama desteklenmiyor!", "error");
+    }
+}
+
+function showCopyNotification(message, type = "success") {
+    // Mevcut bildirimi kaldır
+    var existingTooltip = document.getElementById("copy-tooltip");
+    if (existingTooltip) {
+        document.body.removeChild(existingTooltip);
+    }
+    
+    // Yeni bildirim oluştur
     var tooltip = document.createElement("div");
-    tooltip.textContent = "Kopyalandı!";
+    tooltip.id = "copy-tooltip";
+    tooltip.innerHTML = '<i class="fas fa-' + (type === "success" ? "check" : "exclamation-triangle") + '"></i> ' + message;
     tooltip.style.position = "fixed";
     tooltip.style.left = "50%";
-    tooltip.style.top = "20%";
-    tooltip.style.transform = "translate(-50%, -50%)";
-    tooltip.style.padding = "8px 16px";
-    tooltip.style.background = "rgba(0,0,0,0.7)";
+    tooltip.style.top = "20px";
+    tooltip.style.transform = "translateX(-50%)";
+    tooltip.style.padding = "12px 20px";
+    tooltip.style.background = type === "success" ? "#28a745" : "#dc3545";
     tooltip.style.color = "white";
-    tooltip.style.borderRadius = "4px";
+    tooltip.style.borderRadius = "6px";
     tooltip.style.zIndex = "9999";
+    tooltip.style.fontSize = "14px";
+    tooltip.style.fontWeight = "500";
+    tooltip.style.boxShadow = "0 4px 12px rgba(0,0,0,0.15)";
+    tooltip.style.animation = "slideDown 0.3s ease-out";
+    
+    // CSS animasyonu ekle
+    if (!document.getElementById("copy-notification-styles")) {
+        var style = document.createElement("style");
+        style.id = "copy-notification-styles";
+        style.textContent = `
+            @keyframes slideDown {
+                from { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+                to { opacity: 1; transform: translateX(-50%) translateY(0); }
+            }
+            @keyframes slideUp {
+                from { opacity: 1; transform: translateX(-50%) translateY(0); }
+                to { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+            }
+        `;
+        document.head.appendChild(style);
+    }
+    
     document.body.appendChild(tooltip);
     
+    // 3 saniye sonra kaldır
     setTimeout(function() {
-        document.body.removeChild(tooltip);
-    }, 1500);
+        if (tooltip && tooltip.parentNode) {
+            tooltip.style.animation = "slideUp 0.3s ease-out";
+            setTimeout(function() {
+                if (tooltip && tooltip.parentNode) {
+                    document.body.removeChild(tooltip);
+                }
+            }, 300);
+        }
+    }, 3000);
 }
+
+// Sayfa yüklendiğinde URL'yi otomatik seç
+document.addEventListener('DOMContentLoaded', function() {
+    // Dosya linkine tıklandığında otomatik seç
+    var fileLinkInput = document.getElementById('file_link');
+    if (fileLinkInput) {
+        fileLinkInput.addEventListener('click', function() {
+            this.select();
+        });
+    }
+    
+    // Diğer URL inputları için de aynı işlemi yap
+    var urlInputs = ['public_url', 'webp_url'];
+    urlInputs.forEach(function(inputId) {
+        var input = document.getElementById(inputId);
+        if (input) {
+            input.addEventListener('click', function() {
+                this.select();
+            });
+        }
+    });
+});
 </script>
 @endpush
 @endsection 

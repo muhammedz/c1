@@ -131,7 +131,7 @@ class MediaPickerController extends Controller
             'file' => [
                 'required',
                 'file',
-                'max:10240', // 10MB (kilobyte cinsinden)
+                'max:51200', // 50MB (kilobyte cinsinden)
                 function ($attribute, $value, $fail) {
                     // Dosya uzantısı kontrolü
                     $allowedExtensions = config('filemanagersystem.security.allowed_extensions', []);

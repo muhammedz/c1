@@ -37,6 +37,7 @@ use App\Http\Controllers\FileManagerSystem\FilemanagersystemCategoryController;
 use App\Http\Controllers\FileManagerSystem\MediaPickerController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
 use App\Http\Controllers\PasswordProtectionController;
 use App\Http\Controllers\Auth\UpdatePasswordController;
 use App\Http\Controllers\SearchController;
@@ -734,6 +735,46 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
 */
 
 // UYARI: Bu route'lar çok genel olduğu için en sonda tanımlanmalıdır!
+
+// 404 Fallback Route - Tüm eşleşmeyen URL'leri yakalar ve 404 loglarına ekler
+Route::fallback(function (Request $request) {
+    // 404 hatasını manuel olarak logla
+    try {
+        $url = $request->getPathInfo();
+        $referer = $request->header('referer');
+        $userAgent = $request->header('user-agent');
+        $ipAddress = $request->ip();
+        
+        // Admin paneli ve API isteklerini hariç tut
+        $ignoredPaths = ['/admin', '/api', '/favicon.ico', '/robots.txt', '/sitemap.xml', '/.well-known'];
+        $shouldIgnore = false;
+        
+        foreach ($ignoredPaths as $path) {
+            if (str_starts_with($url, $path)) {
+                $shouldIgnore = true;
+                break;
+            }
+        }
+        
+        // Dosya uzantıları kontrolü
+        $ignoredExtensions = ['.css', '.js', '.png', '.jpg', '.jpeg', '.gif', '.svg', '.ico', '.woff', '.woff2', '.ttf'];
+        foreach ($ignoredExtensions as $ext) {
+            if (str_ends_with($url, $ext)) {
+                $shouldIgnore = true;
+                break;
+            }
+        }
+        
+        if (!$shouldIgnore) {
+            \App\Models\NotFoundLog::logNotFound($url, $referer, $userAgent, $ipAddress);
+        }
+    } catch (\Exception $e) {
+        \Log::error('Fallback 404 logging error: ' . $e->getMessage());
+    }
+    
+    // 404 sayfasını göster
+    abort(404);
+});
 
 
 

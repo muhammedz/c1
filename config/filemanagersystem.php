@@ -29,7 +29,7 @@ return [
         'block_executable_files' => true,
         
         // Maksimum dosya boyutu (MB)
-        'max_file_size' => 10,
+        'max_file_size' => 50,
         
         // İzin verilen dosya uzantıları
         'allowed_extensions' => [
@@ -208,5 +208,5 @@ return [
     ],
     
     // Eski max_file_size ayarı (MB cinsinden)
-    'max_file_size' => 10,
+    'max_file_size' => 50,
 ]; 

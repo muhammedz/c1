@@ -42,6 +42,29 @@
                             @enderror
                         </div>
 
+                        <!-- Slug -->
+                        <div class="form-group">
+                            <label for="slug">URL Slug</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">{{ url('/') }}/archives/</span>
+                                </div>
+                                <input type="text" class="form-control @error('slug') is-invalid @enderror" 
+                                       id="slug" name="slug" value="{{ old('slug') }}">
+                                <div class="input-group-append">
+                                    <button type="button" class="btn btn-outline-secondary" id="generate-slug" title="Başlıktan otomatik oluştur">
+                                        <i class="fas fa-sync-alt"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <small class="form-text text-muted">
+                                URL'de görünecek kısa isim. Boş bırakılırsa başlıktan otomatik oluşturulur.
+                            </small>
+                            @error('slug')
+                                <span class="invalid-feedback">{{ $message }}</span>
+                            @enderror
+                        </div>
+
                         <!-- Özet -->
                         <div class="form-group">
                             <label for="excerpt">Kısa Açıklama</label>
@@ -143,6 +166,53 @@ document.head.appendChild(script);
 
 script.onload = function() {
     console.log('TinyMCE yüklendi');
+    
+    // Slug otomatik oluşturma
+    function generateSlug(text) {
+        return text
+            .toLowerCase()
+            .replace(/ğ/g, 'g')
+            .replace(/ü/g, 'u')
+            .replace(/ş/g, 's')
+            .replace(/ı/g, 'i')
+            .replace(/ö/g, 'o')
+            .replace(/ç/g, 'c')
+            .replace(/[^a-z0-9\s-]/g, '')
+            .replace(/\s+/g, '-')
+            .replace(/-+/g, '-')
+            .replace(/^-|-$/g, '');
+    }
+
+    // Başlık değiştiğinde slug'ı otomatik güncelle (sadece slug boşsa)
+    $('#title').on('input', function() {
+        var title = $(this).val();
+        var currentSlug = $('#slug').val();
+        
+        // Eğer slug boşsa otomatik güncelle
+        if (!currentSlug) {
+            $('#slug').val(generateSlug(title));
+        }
+    });
+
+    // Slug oluştur butonu
+    $('#generate-slug').on('click', function() {
+        var title = $('#title').val();
+        if (title) {
+            $('#slug').val(generateSlug(title));
+            $(this).find('i').addClass('fa-spin');
+            setTimeout(() => {
+                $(this).find('i').removeClass('fa-spin');
+            }, 500);
+        } else {
+            alert('Önce başlık alanını doldurun.');
+        }
+    });
+
+    // Slug input'unu temizle
+    $('#slug').on('input', function() {
+        var slug = $(this).val();
+        $(this).val(generateSlug(slug));
+    });
     
     // TinyMCE Editör
     tinymce.init({

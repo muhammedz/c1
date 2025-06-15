@@ -51,19 +51,24 @@ class ArchiveController extends Controller
     {
         $request->validate([
             'title' => 'required|string|max:255',
+            'slug' => 'nullable|string|max:255|unique:archives,slug,NULL,id,deleted_at,NULL',
             'content' => 'nullable|string',
             'excerpt' => 'nullable|string|max:500',
             'status' => 'required|in:draft,published,archived',
             'is_featured' => 'boolean',
             'published_at' => 'nullable|date',
+        ], [
+            'slug.unique' => 'Bu slug zaten kullanılıyor. Lütfen farklı bir slug girin.',
         ]);
 
         $data = $request->all();
         $data['user_id'] = Auth::id();
 
-        // Slug oluşturma (model'de otomatik yapılıyor ama manuel de eklenebilir)
+        // Slug oluşturma
         if (empty($data['slug'])) {
             $data['slug'] = Str::slug($data['title']);
+        } else {
+            $data['slug'] = Str::slug($data['slug']);
         }
 
         // Yayın tarihi ayarlama
@@ -102,14 +107,23 @@ class ArchiveController extends Controller
     {
         $request->validate([
             'title' => 'required|string|max:255',
+            'slug' => 'required|string|max:255|unique:archives,slug,' . $archive->id . ',id,deleted_at,NULL',
             'content' => 'nullable|string',
             'excerpt' => 'nullable|string|max:500',
             'status' => 'required|in:draft,published,archived',
             'is_featured' => 'boolean',
             'published_at' => 'nullable|date',
+        ], [
+            'slug.unique' => 'Bu slug zaten kullanılıyor. Lütfen farklı bir slug girin.',
+            'slug.required' => 'Slug alanı zorunludur.',
         ]);
 
         $data = $request->all();
+
+        // Slug temizleme
+        if (!empty($data['slug'])) {
+            $data['slug'] = Str::slug($data['slug']);
+        }
 
         // Yayın tarihi ayarlama
         if ($data['status'] === 'published' && empty($data['published_at']) && $archive->status !== 'published') {

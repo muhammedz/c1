@@ -225,7 +225,7 @@ class FilemanagersystemUploadSecurity
      */
     private function validateFileSize($size)
     {
-        $maxSize = 10 * 1024 * 1024; // 10MB sabit limit
+        $maxSize = 50 * 1024 * 1024; // 50MB sabit limit
         return $size <= $maxSize;
     }
 
