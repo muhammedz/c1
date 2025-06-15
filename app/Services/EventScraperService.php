@@ -47,10 +47,12 @@ class EventScraperService
         // İlk sayfayı çek ve toplam sayfa sayısını belirle
         $content = Http::withOptions([
             'verify' => false,
-            'timeout' => 60,
-            'connect_timeout' => 30,
+            'timeout' => 90,
+            'connect_timeout' => 60,
             'headers' => [
-                'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+                'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+                'Cache-Control' => 'no-cache',
+                'Pragma' => 'no-cache'
             ]
         ])->get($baseUrl)->body();
         $totalPages = $this->getTotalPageCount($content);
@@ -108,8 +110,8 @@ class EventScraperService
             // Sayfayı HTTP ile çek - SSL doğrulamasını devre dışı bırak
             $response = Http::withOptions([
                 'verify' => false,
-                'timeout' => 60,         // 60 saniye timeout (artırıldı)
-                'connect_timeout' => 30, // 30 saniye bağlantı timeout (artırıldı)
+                'timeout' => 90,         // 90 saniye timeout (daha da artırıldı)
+                'connect_timeout' => 60, // 60 saniye bağlantı timeout (artırıldı)
                 'allow_redirects' => [
                     'max' => 10,
                     'strict' => false,
@@ -122,7 +124,9 @@ class EventScraperService
                     'Accept-Language' => 'tr-TR,tr;q=0.9,en;q=0.8',
                     'Accept-Encoding' => 'gzip, deflate',
                     'Connection' => 'keep-alive',
-                    'Upgrade-Insecure-Requests' => '1'
+                    'Upgrade-Insecure-Requests' => '1',
+                    'Cache-Control' => 'no-cache',
+                    'Pragma' => 'no-cache'
                 ]
             ])->get($url);
             $content = $response->body();
@@ -421,10 +425,12 @@ class EventScraperService
             
             $response = Http::withOptions([
                 'verify' => false,
-                'timeout' => 60,
-                'connect_timeout' => 30,
+                'timeout' => 90,
+                'connect_timeout' => 60,
                 'headers' => [
-                    'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+                    'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+                    'Cache-Control' => 'no-cache',
+                    'Pragma' => 'no-cache'
                 ]
             ])->get($url);
             $content = $response->body();
@@ -663,10 +669,12 @@ class EventScraperService
             // HTTP isteği gönder
             $response = Http::withOptions([
                 'verify' => false,
-                'timeout' => 60,
-                'connect_timeout' => 30,
+                'timeout' => 90,
+                'connect_timeout' => 60,
                 'headers' => [
-                    'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+                    'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+                    'Cache-Control' => 'no-cache',
+                    'Pragma' => 'no-cache'
                 ]
             ])->get($imageUrl);
             

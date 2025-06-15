@@ -96,27 +96,59 @@ class EventScrapeController extends Controller
             // HTML içeriğini çek - daha fazla seçenek ile
             Log::info('HTTP isteği gönderiliyor', ['url' => $url]);
             
-            $httpClient = Http::withOptions([
-                'verify' => false,       // SSL doğrulamasını atla
-                'timeout' => 60,         // 60 saniye timeout (artırıldı)
-                'connect_timeout' => 30, // 30 saniye bağlantı timeout (artırıldı)
-                'allow_redirects' => [
-                    'max' => 10,
-                    'strict' => false,
-                    'referer' => true,
-                    'protocols' => ['http', 'https']
-                ],
-                'headers' => [
-                    'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
-                    'Accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-                    'Accept-Language' => 'tr-TR,tr;q=0.9,en;q=0.8',
-                    'Accept-Encoding' => 'gzip, deflate',
-                    'Connection' => 'keep-alive',
-                    'Upgrade-Insecure-Requests' => '1'
-                ]
-            ]);
+            // Retry mekanizması ile HTTP istemcisi
+            $maxRetries = 3;
+            $retryDelay = 2; // saniye
             
-            $response = $httpClient->get($url);
+            for ($attempt = 1; $attempt <= $maxRetries; $attempt++) {
+                try {
+                    Log::info("HTTP isteği deneme #{$attempt}", ['url' => $url]);
+                    
+                    $httpClient = Http::withOptions([
+                        'verify' => false,       // SSL doğrulamasını atla
+                        'timeout' => 90,         // 90 saniye timeout (daha da artırıldı)
+                        'connect_timeout' => 60, // 60 saniye bağlantı timeout (artırıldı)
+                        'allow_redirects' => [
+                            'max' => 10,
+                            'strict' => false,
+                            'referer' => true,
+                            'protocols' => ['http', 'https']
+                        ],
+                        'headers' => [
+                            'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+                            'Accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+                            'Accept-Language' => 'tr-TR,tr;q=0.9,en;q=0.8',
+                            'Accept-Encoding' => 'gzip, deflate',
+                            'Connection' => 'keep-alive',
+                            'Upgrade-Insecure-Requests' => '1',
+                            'Cache-Control' => 'no-cache',
+                            'Pragma' => 'no-cache'
+                        ]
+                    ]);
+                    
+                    $response = $httpClient->get($url);
+                    
+                    // Başarılı ise döngüden çık
+                    break;
+                    
+                } catch (\Illuminate\Http\Client\ConnectionException $e) {
+                    Log::warning("Bağlantı hatası deneme #{$attempt}", [
+                        'url' => $url,
+                        'error' => $e->getMessage(),
+                        'attempt' => $attempt,
+                        'max_retries' => $maxRetries
+                    ]);
+                    
+                    if ($attempt === $maxRetries) {
+                        // Son deneme de başarısız
+                        throw $e;
+                    }
+                    
+                    // Bir sonraki deneme için bekle
+                    sleep($retryDelay * $attempt); // Her denemede bekleme süresini artır
+                    continue;
+                                 }
+             }
             
             if ($response->failed()) {
                 Log::error('URL yanıtı başarısız', [
