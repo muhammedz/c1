@@ -28,7 +28,7 @@ class CorporateController extends Controller
             
         $members = CorporateMember::where('corporate_category_id', $category->id)
             ->active()
-            ->ordered()
+            ->orderBy('created_at', 'asc')
             ->get();
             
         return view('frontend.corporate.category', compact('category', 'members'));
