@@ -15,6 +15,45 @@ class StoreNewsRequest extends FormRequest
     }
 
     /**
+     * Prepare the data for validation.
+     */
+    protected function prepareForValidation()
+    {
+        // Türkçe tarih formatını (dd.mm.yyyy) Y-m-d formatına çevir
+        if ($this->published_at) {
+            $this->merge([
+                'published_at' => $this->convertDateFormat($this->published_at)
+            ]);
+        }
+        
+        if ($this->end_date) {
+            $this->merge([
+                'end_date' => $this->convertDateFormat($this->end_date)
+            ]);
+        }
+    }
+    
+    /**
+     * Convert Turkish date format (dd.mm.yyyy) to Y-m-d format
+     */
+    private function convertDateFormat($date)
+    {
+        if (!$date) return null;
+        
+        // Eğer zaten doğru formattaysa olduğu gibi döndür
+        if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) {
+            return $date;
+        }
+        
+        // dd.mm.yyyy formatını Y-m-d formatına çevir
+        if (preg_match('/^(\d{2})\.(\d{2})\.(\d{4})$/', $date, $matches)) {
+            return $matches[3] . '-' . $matches[2] . '-' . $matches[1];
+        }
+        
+        return $date;
+    }
+
+    /**
      * Get the validation rules that apply to the request.
      */
     public function rules(): array

@@ -72,9 +72,15 @@ class NewsRepository extends BaseRepository
         }
         
         // Sıralama
-        $sortField = $filters['sort'] ?? 'created_at';
+        $sortField = $filters['sort'] ?? 'published_at';
         $sortDirection = $filters['direction'] ?? 'desc';
-        $query->orderBy($sortField, $sortDirection);
+        
+        // published_at null ise created_at'e göre sırala
+        if ($sortField === 'published_at') {
+            $query->orderByRaw('COALESCE(published_at, created_at) ' . $sortDirection);
+        } else {
+            $query->orderBy($sortField, $sortDirection);
+        }
         
         return $query->paginate(40)->appends($filters);
     }

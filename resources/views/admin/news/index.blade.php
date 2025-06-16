@@ -1228,7 +1228,7 @@ $(document).ready(function () {
                             <th>Kategoriler</th>
                             <th>Durum</th>
                             <th>Özellikler</th>
-                            <th>Tarih</th>
+                            <th>Yayın Tarihi</th>
                             <th>İşlemler</th>
                         </tr>
                     </thead>
@@ -1283,8 +1283,8 @@ $(document).ready(function () {
                             </td>
                             <td>
                                 <div class="small">
-                                    <div><i class="far fa-calendar-alt me-1"></i> {{ $item->created_at->format('d.m.Y') }}</div>
-                                    <div class="text-muted">{{ $item->created_at->format('H:i') }}</div>
+                                    <div><i class="far fa-calendar-alt me-1"></i> {{ $item->published_at ? $item->published_at->format('d.m.Y') : $item->created_at->format('d.m.Y') }}</div>
+                                    <div class="text-muted">{{ $item->published_at ? $item->published_at->format('H:i') : $item->created_at->format('H:i') }}</div>
                                 </div>
                             </td>
                             <td>

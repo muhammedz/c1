@@ -834,7 +834,7 @@
                         
                         <div class="mb-4">
                                     <label for="published_at" class="form-label">Yayın Tarihi</label>
-                            <input type="text" class="form-control datepicker @error('published_at') is-invalid @enderror" id="published_at" name="published_at" value="{{ old('published_at', $news->published_at ? $news->published_at->format('Y-m-d') : '') }}" autocomplete="off">
+                            <input type="text" class="form-control datepicker @error('published_at') is-invalid @enderror" id="published_at" name="published_at" value="{{ old('published_at', $news->published_at ? $news->published_at->format('d.m.Y') : '') }}" autocomplete="off">
                                     @error('published_at')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
@@ -842,7 +842,7 @@
                                 
                         <div class="mb-4">
                                     <label for="end_date" class="form-label">Bitiş Tarihi</label>
-                            <input type="text" class="form-control datepicker @error('end_date') is-invalid @enderror" id="end_date" name="end_date" value="{{ old('end_date', $news->end_date ? $news->end_date->format('Y-m-d') : '') }}" autocomplete="off">
+                            <input type="text" class="form-control datepicker @error('end_date') is-invalid @enderror" id="end_date" name="end_date" value="{{ old('end_date', $news->end_date ? $news->end_date->format('d.m.Y') : '') }}" autocomplete="off">
                                     @error('end_date')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
@@ -1092,38 +1092,10 @@
                                 <i class="fas fa-plus me-1"></i> Yeni Belge Ekle
                             </h6>
                             
-                            <form id="document-upload-form" enctype="multipart/form-data">
-                                @csrf
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="form-group mb-3">
-                                            <label for="document_name">Belge Adı <span class="text-danger">*</span></label>
-                                            <input type="text" class="form-control" id="document_name" name="name" required>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group mb-3">
-                                            <label for="document_file">Dosya <span class="text-danger">*</span></label>
-                                            <input type="file" class="form-control" id="document_file" name="file" required
-                                                   accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.zip,.rar">
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div class="form-group mb-3">
-                                    <label for="document_description">Açıklama</label>
-                                    <textarea class="form-control" id="document_description" name="description" rows="2"></textarea>
-                                </div>
-                                
-                                <div class="d-flex gap-2">
-                                    <button type="submit" class="btn btn-primary">
-                                        <i class="fas fa-upload"></i> Belge Yükle
-                                    </button>
-                                    <button type="button" class="btn btn-secondary" id="cancel-document-form">
-                                        <i class="fas fa-times"></i> İptal
-                                    </button>
-                                </div>
-                            </form>
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-1"></i>
+                                Bu form ana formdan bağımsızdır. Belge yükledikten sonra sayfa yenilenecektir.
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1139,6 +1111,51 @@
     </div>
         </div>
     </form>
+</div>
+
+<!-- Belge Yükleme Formu (Ana formdan bağımsız) -->
+<div id="document-upload-form-container" style="display: none;">
+    <div class="card mt-4">
+        <div class="card-header">
+            <h5 class="mb-0">
+                <i class="fas fa-upload me-1"></i> Yeni Belge Yükle
+            </h5>
+        </div>
+        <div class="card-body">
+            <form id="document-upload-form" enctype="multipart/form-data">
+                @csrf
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group mb-3">
+                            <label for="document_name">Belge Adı <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="document_name" name="name" required>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group mb-3">
+                            <label for="document_file">Dosya <span class="text-danger">*</span></label>
+                            <input type="file" class="form-control" id="document_file" name="file" required
+                                   accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.zip,.rar">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group mb-3">
+                    <label for="document_description">Açıklama</label>
+                    <textarea class="form-control" id="document_description" name="description" rows="2"></textarea>
+                </div>
+                
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-upload"></i> Belge Yükle
+                    </button>
+                    <button type="button" class="btn btn-secondary" id="cancel-document-form">
+                        <i class="fas fa-times"></i> İptal
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
 
 <div class="mt-4">
@@ -1161,6 +1178,7 @@
 
 @section('js')
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/locales/bootstrap-datepicker.tr.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/6.4.2/tinymce.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/js/tom-select.complete.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
@@ -1456,10 +1474,14 @@
 
         // Datepicker
     $('.datepicker').datepicker({
-        format: 'yyyy-mm-dd',
+        format: 'dd.mm.yyyy',
         autoclose: true,
         todayHighlight: true,
-        language: 'tr'
+        language: 'tr',
+        weekStart: 1, // Pazartesi ile başla
+        daysOfWeekDisabled: [], // Hiçbir günü devre dışı bırakma
+        clearBtn: true, // Temizle butonu
+        todayBtn: 'linked' // Bugün butonu
     });
 
     // Slug Oluşturma Fonksiyonu - SlugHelper kullanımı
@@ -1798,16 +1820,20 @@ $(document).ready(function() {
     
     // Yeni belge ekleme formunu göster/gizle
     $('#add-new-document').on('click', function() {
-        $('#new-document-form').toggle();
-        if ($('#new-document-form').is(':visible')) {
+        $('#document-upload-form-container').toggle();
+        if ($('#document-upload-form-container').is(':visible')) {
             $(this).html('<i class="fas fa-minus"></i> İptal');
+            // Sayfayı forma kaydır
+            $('html, body').animate({
+                scrollTop: $('#document-upload-form-container').offset().top - 100
+            }, 500);
         } else {
             $(this).html('<i class="fas fa-plus"></i> Yeni Belge Ekle');
         }
     });
 
     $('#cancel-document-form').on('click', function() {
-        $('#new-document-form').hide();
+        $('#document-upload-form-container').hide();
         $('#add-new-document').html('<i class="fas fa-plus"></i> Yeni Belge Ekle');
         $('#document-upload-form')[0].reset();
     });
@@ -1832,7 +1858,7 @@ $(document).ready(function() {
                 if (response.success) {
                     // Formu temizle
                     $('#document-upload-form')[0].reset();
-                    $('#new-document-form').hide();
+                    $('#document-upload-form-container').hide();
                     $('#add-new-document').html('<i class="fas fa-plus"></i> Yeni Belge Ekle');
                     
                     // Başarı mesajı

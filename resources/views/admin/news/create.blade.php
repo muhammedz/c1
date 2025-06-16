@@ -822,7 +822,7 @@
                         
                         <div class="mb-4">
                                     <label for="published_at" class="form-label">Yayın Tarihi</label>
-                            <input type="text" class="form-control datepicker @error('published_at') is-invalid @enderror" id="published_at" name="published_at" value="{{ old('published_at') }}" autocomplete="off">
+                            <input type="text" class="form-control datepicker @error('published_at') is-invalid @enderror" id="published_at" name="published_at" value="{{ old('published_at', now()->format('d.m.Y')) }}" autocomplete="off">
                                     @error('published_at')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
@@ -1065,6 +1065,7 @@
 
 @section('js')
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/locales/bootstrap-datepicker.tr.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/6.4.2/tinymce.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/js/tom-select.complete.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
@@ -1360,10 +1361,14 @@
 
         // Datepicker
     $('.datepicker').datepicker({
-        format: 'yyyy-mm-dd',
+        format: 'dd.mm.yyyy',
         autoclose: true,
         todayHighlight: true,
-        language: 'tr'
+        language: 'tr',
+        weekStart: 1, // Pazartesi ile başla
+        daysOfWeekDisabled: [], // Hiçbir günü devre dışı bırakma
+        clearBtn: true, // Temizle butonu
+        todayBtn: 'linked' // Bugün butonu
     });
 
     // Slug Oluşturma Fonksiyonu - SlugHelper kullanımı

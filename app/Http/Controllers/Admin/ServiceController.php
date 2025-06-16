@@ -179,6 +179,18 @@ class ServiceController extends Controller
             $service->refresh();
         }
         
+        // Features alanının null olması durumunda boş dizi olarak ayarla
+        if (is_null($service->features)) {
+            $service->features = [];
+        }
+        
+        // Documents anahtarının bulunmaması durumunda boş dizi olarak ayarla
+        if (!isset($service->features['documents'])) {
+            $features = $service->features;
+            $features['documents'] = [];
+            $service->features = $features;
+        }
+        
         $headlineCount = Service::where('is_headline', true)->count();
         $maxHeadlinesReached = $headlineCount >= 4 && !$service->is_headline;
         $categories = ServiceCategory::where('is_active', true)->orderBy('name')->get();
