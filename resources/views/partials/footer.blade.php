@@ -36,8 +36,16 @@
                         @endif
                     </div>
                     @if($footerSettings)
-                        <h4 class="text-lg font-bold text-white">{{ $footerSettings->company_name }}</h4>
-                        <p class="text-sm text-white/80">{{ $footerSettings->company_subtitle }}</p>
+                        @if($footerSettings->company_name)
+                            <h4 class="text-lg font-bold text-white">{{ $footerSettings->company_name }}</h4>
+                        @else
+                            <h4 class="text-lg font-bold text-white">Çankaya</h4>
+                        @endif
+                        @if($footerSettings->company_subtitle)
+                            <p class="text-sm text-white/80">{{ $footerSettings->company_subtitle }}</p>
+                        @else
+                            <p class="text-sm text-white/80">BELEDİYESİ</p>
+                        @endif
                     @else
                         <h4 class="text-lg font-bold text-white">Çankaya</h4>
                         <p class="text-sm text-white/80">BELEDİYESİ</p>
@@ -47,30 +55,60 @@
                 <!-- İletişim Bilgileri -->
                 <div class="text-sm space-y-3 mb-6">
                     @if($footerSettings)
+                        @if($footerSettings->address_line1 || $footerSettings->address_line2)
                         <div>
-                            <p class="font-semibold text-white">{{ $footerSettings->address_line1 }}</p>
-                            <p class="text-white/80">{{ $footerSettings->address_line2 }}</p>
+                            @if($footerSettings->address_line1)
+                                <p class="font-semibold text-white">{{ $footerSettings->address_line1 }}</p>
+                            @endif
+                            @if($footerSettings->address_line2)
+                                <p class="text-white/80">{{ $footerSettings->address_line2 }}</p>
+                            @endif
                         </div>
+                        @endif
                         
+                        @if($footerSettings->contact_center_title || $footerSettings->contact_center_phone)
                         <div>
-                            <p class="font-semibold text-white">{{ $footerSettings->contact_center_title }}</p>
-                            <p class="text-white/80">{{ $footerSettings->contact_center_phone }}</p>
+                            @if($footerSettings->contact_center_title)
+                                <p class="font-semibold text-white">{{ $footerSettings->contact_center_title }}</p>
+                            @endif
+                            @if($footerSettings->contact_center_phone)
+                                <p class="text-white/80">{{ $footerSettings->contact_center_phone }}</p>
+                            @endif
                         </div>
+                        @endif
                         
+                        @if($footerSettings->whatsapp_title || $footerSettings->whatsapp_number)
                         <div>
-                            <p class="font-semibold text-white">{{ $footerSettings->whatsapp_title }}</p>
-                            <p class="text-white/80">{{ $footerSettings->whatsapp_number }}</p>
+                            @if($footerSettings->whatsapp_title)
+                                <p class="font-semibold text-white">{{ $footerSettings->whatsapp_title }}</p>
+                            @endif
+                            @if($footerSettings->whatsapp_number)
+                                <p class="text-white/80">{{ $footerSettings->whatsapp_number }}</p>
+                            @endif
                         </div>
+                        @endif
                         
+                        @if($footerSettings->email_title || $footerSettings->email_address)
                         <div>
-                            <p class="font-semibold text-white">{{ $footerSettings->email_title }}</p>
-                            <p class="text-white/80 break-all">{{ $footerSettings->email_address }}</p>
+                            @if($footerSettings->email_title)
+                                <p class="font-semibold text-white">{{ $footerSettings->email_title }}</p>
+                            @endif
+                            @if($footerSettings->email_address)
+                                <p class="text-white/80 break-all">{{ $footerSettings->email_address }}</p>
+                            @endif
                         </div>
+                        @endif
                         
+                        @if($footerSettings->kep_title || $footerSettings->kep_address)
                         <div>
-                            <p class="font-semibold text-white">{{ $footerSettings->kep_title }}</p>
-                            <p class="text-white/80 break-all">{{ $footerSettings->kep_address }}</p>
+                            @if($footerSettings->kep_title)
+                                <p class="font-semibold text-white">{{ $footerSettings->kep_title }}</p>
+                            @endif
+                            @if($footerSettings->kep_address)
+                                <p class="text-white/80 break-all">{{ $footerSettings->kep_address }}</p>
+                            @endif
                         </div>
+                        @endif
                     @else
                         <div>
                             <p class="font-semibold text-white">Ziya Gökalp Caddesi</p>

@@ -24,23 +24,23 @@
     <div class="absolute -right-20 -bottom-20 w-64 h-64 rounded-full bg-[#e6a23c]/10 blur-3xl"></div>
     <div class="absolute -left-10 top-10 w-40 h-40 rounded-full bg-white/5 blur-2xl"></div>
     
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-10 relative z-10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-10 relative z-10">
         <div class="flex flex-col items-center text-center">
-            <h1 class="text-3xl md:text-4xl font-bold text-white mb-4">{{ $category->name }}</h1>
-            <p class="text-white/80 text-lg mb-5 max-w-2xl">{{ $category->description ?? 'Bu kategorideki içerikleri inceleyebilirsiniz.' }}</p>
+            <h1 class="text-2xl md:text-3xl lg:text-4xl font-bold text-white mb-3 md:mb-4">{{ $category->name }}</h1>
+            <p class="text-white/80 text-base md:text-lg mb-4 md:mb-5 max-w-2xl px-2 md:px-0">{{ $category->description ?? 'Bu kategorideki içerikleri inceleyebilirsiniz.' }}</p>
             
             <!-- Modern Arama Kutusu -->
             <form action="{{ route('pages.category', $category->slug) }}" method="GET" class="mt-6 w-full max-w-2xl">
-                <div class="bg-white/10 backdrop-blur-sm rounded-lg p-1 flex items-center shadow-lg hover:bg-white/20 transition duration-300 border border-white/20">
+                <div class="bg-white/10 backdrop-blur-sm rounded-lg p-1 flex flex-col sm:flex-row items-stretch sm:items-center shadow-lg hover:bg-white/20 transition duration-300 border border-white/20 gap-2 sm:gap-0">
                     <input 
                         type="text" 
                         name="search" 
                         placeholder="Bu kategorideki hangi sayfayı arıyorsunuz?" 
-                        class="w-full bg-transparent px-4 py-3 text-white placeholder-white/70 outline-none"
+                        class="w-full bg-transparent px-4 py-3 text-white placeholder-white/70 outline-none text-sm sm:text-base"
                         value="{{ request()->get('search') }}"
                     >
-                    <button type="submit" class="bg-[#e6a23c] hover:bg-[#e6a23c]/90 text-white font-medium px-6 py-3 rounded-md transition duration-300 flex items-center shadow-lg shadow-[#e6a23c]/20">
-                        <span class="material-icons mr-1">search</span>
+                    <button type="submit" class="bg-[#e6a23c] hover:bg-[#e6a23c]/90 text-white font-medium px-4 sm:px-6 py-3 rounded-md transition duration-300 flex items-center justify-center shadow-lg shadow-[#e6a23c]/20 text-sm sm:text-base">
+                        <span class="material-icons text-sm sm:text-base mr-1 sm:mr-1">search</span>
                         Ara
                     </button>
                 </div>
@@ -52,7 +52,7 @@
 
 
 <!-- Ana İçerik -->
-<section class="py-12 bg-slate-100">
+<section class="py-8 md:py-12 bg-slate-100">
     <div class="container max-w-7xl mx-auto px-4">
         @if($pages->isEmpty())
             <div class="bg-white p-8 rounded-lg shadow-md text-center">
@@ -67,19 +67,19 @@
         @else
 
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-6">
                 @foreach($pages as $page)
                 <a href="{{ route('pages.show', $page->slug) }}" class="page-card-enhanced group block">
-                    <div class="bg-white hover:bg-gradient-to-br hover:from-white hover:to-gray-50 border border-gray-200 hover:border-[#00352b] p-6 rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 min-h-[120px] flex items-center justify-center relative overflow-hidden">
+                    <div class="bg-white hover:bg-gradient-to-br hover:from-white hover:to-gray-50 border border-gray-200 hover:border-[#00352b] p-3 md:p-6 rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 min-h-[100px] md:min-h-[120px] flex items-center justify-center relative overflow-hidden">
                         <!-- Dekoratif köşe elementi -->
-                        <div class="absolute top-0 right-0 w-8 h-8 bg-gradient-to-br from-[#00352b]/10 to-transparent rounded-bl-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                        <div class="absolute top-0 right-0 w-6 h-6 md:w-8 md:h-8 bg-gradient-to-br from-[#00352b]/10 to-transparent rounded-bl-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                         
                         <!-- Başlık -->
                         <div class="text-center relative z-10">
-                            <div class="flex items-center justify-center mb-2">
-                                <span class="material-icons text-[#00352b] group-hover:text-[#007b32] text-xl transition-colors duration-300">description</span>
+                            <div class="flex items-center justify-center mb-1 md:mb-2">
+                                <span class="material-icons text-[#00352b] group-hover:text-[#007b32] text-lg md:text-xl transition-colors duration-300">description</span>
                             </div>
-                            <h3 class="font-semibold text-[#00352b] group-hover:text-[#007b32] text-base leading-snug transition-colors duration-300 px-2">{{ $page->title }}</h3>
+                            <h3 class="font-semibold text-[#00352b] group-hover:text-[#007b32] text-sm md:text-base leading-snug transition-colors duration-300 px-1 md:px-2">{{ $page->title }}</h3>
                         </div>
                         
                         <!-- Hover efekti için arka plan -->
@@ -106,7 +106,13 @@
 
 <style>
 .page-card-enhanced {
-    min-height: 120px;
+    min-height: 100px;
+}
+
+@media (min-width: 768px) {
+    .page-card-enhanced {
+        min-height: 120px;
+    }
 }
 
 .page-card-enhanced:hover {
@@ -122,6 +128,18 @@
     display: none;
 }
 
+/* Mobile specific styles */
+@media (max-width: 767px) {
+    .page-card-enhanced h3 {
+        font-size: 0.875rem;
+        line-height: 1.2;
+    }
+    
+    .page-card-enhanced .material-icons {
+        font-size: 1.125rem !important;
+    }
+}
+
 /* Subtle animation for icons */
 @keyframes gentle-pulse {
     0%, 100% { transform: scale(1); }
@@ -130,6 +148,14 @@
 
 .page-card-enhanced:hover .material-icons {
     animation: gentle-pulse 2s ease-in-out infinite;
+}
+
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+    .page-card-enhanced:active {
+        transform: translateY(0);
+        box-shadow: 0 4px 6px -1px rgba(0, 53, 43, 0.1), 0 2px 4px -1px rgba(0, 53, 43, 0.06);
+    }
 }
 </style>
 @endsection 

@@ -62,7 +62,7 @@
                                     <label for="company_name">Şirket Adı</label>
                                     <input type="text" class="form-control @error('company_name') is-invalid @enderror" 
                                            id="company_name" name="company_name" 
-                                           value="{{ old('company_name', $settings->company_name) }}" required>
+                                           value="{{ old('company_name', $settings->company_name) }}">
                                     @error('company_name')
                                         <span class="invalid-feedback">{{ $message }}</span>
                                     @enderror
@@ -73,7 +73,7 @@
                                     <label for="company_subtitle">Alt Başlık</label>
                                     <input type="text" class="form-control @error('company_subtitle') is-invalid @enderror" 
                                            id="company_subtitle" name="company_subtitle" 
-                                           value="{{ old('company_subtitle', $settings->company_subtitle) }}" required>
+                                           value="{{ old('company_subtitle', $settings->company_subtitle) }}">
                                     @error('company_subtitle')
                                         <span class="invalid-feedback">{{ $message }}</span>
                                     @enderror
@@ -88,7 +88,7 @@
                                     <label for="address_line1">Adres 1. Satır</label>
                                     <input type="text" class="form-control @error('address_line1') is-invalid @enderror" 
                                            id="address_line1" name="address_line1" 
-                                           value="{{ old('address_line1', $settings->address_line1) }}" required>
+                                           value="{{ old('address_line1', $settings->address_line1) }}">
                                     @error('address_line1')
                                         <span class="invalid-feedback">{{ $message }}</span>
                                     @enderror
@@ -99,7 +99,7 @@
                                     <label for="address_line2">Adres 2. Satır</label>
                                     <input type="text" class="form-control @error('address_line2') is-invalid @enderror" 
                                            id="address_line2" name="address_line2" 
-                                           value="{{ old('address_line2', $settings->address_line2) }}" required>
+                                           value="{{ old('address_line2', $settings->address_line2) }}">
                                     @error('address_line2')
                                         <span class="invalid-feedback">{{ $message }}</span>
                                     @enderror
@@ -114,7 +114,7 @@
                                     <label for="contact_center_title">İletişim Merkezi Başlığı</label>
                                     <input type="text" class="form-control @error('contact_center_title') is-invalid @enderror" 
                                            id="contact_center_title" name="contact_center_title" 
-                                           value="{{ old('contact_center_title', $settings->contact_center_title) }}" required>
+                                           value="{{ old('contact_center_title', $settings->contact_center_title) }}">
                                     @error('contact_center_title')
                                         <span class="invalid-feedback">{{ $message }}</span>
                                     @enderror
@@ -125,7 +125,7 @@
                                     <label for="contact_center_phone">İletişim Merkezi Telefonu</label>
                                     <input type="text" class="form-control @error('contact_center_phone') is-invalid @enderror" 
                                            id="contact_center_phone" name="contact_center_phone" 
-                                           value="{{ old('contact_center_phone', $settings->contact_center_phone) }}" required>
+                                           value="{{ old('contact_center_phone', $settings->contact_center_phone) }}">
                                     @error('contact_center_phone')
                                         <span class="invalid-feedback">{{ $message }}</span>
                                     @enderror
@@ -139,7 +139,7 @@
                                     <label for="whatsapp_title">WhatsApp Başlığı</label>
                                     <input type="text" class="form-control @error('whatsapp_title') is-invalid @enderror" 
                                            id="whatsapp_title" name="whatsapp_title" 
-                                           value="{{ old('whatsapp_title', $settings->whatsapp_title) }}" required>
+                                           value="{{ old('whatsapp_title', $settings->whatsapp_title) }}">
                                     @error('whatsapp_title')
                                         <span class="invalid-feedback">{{ $message }}</span>
                                     @enderror
@@ -150,7 +150,7 @@
                                     <label for="whatsapp_number">WhatsApp Numarası</label>
                                     <input type="text" class="form-control @error('whatsapp_number') is-invalid @enderror" 
                                            id="whatsapp_number" name="whatsapp_number" 
-                                           value="{{ old('whatsapp_number', $settings->whatsapp_number) }}" required>
+                                           value="{{ old('whatsapp_number', $settings->whatsapp_number) }}">
                                     @error('whatsapp_number')
                                         <span class="invalid-feedback">{{ $message }}</span>
                                     @enderror
@@ -164,7 +164,7 @@
                                     <label for="email_title">E-posta Başlığı</label>
                                     <input type="text" class="form-control @error('email_title') is-invalid @enderror" 
                                            id="email_title" name="email_title" 
-                                           value="{{ old('email_title', $settings->email_title) }}" required>
+                                           value="{{ old('email_title', $settings->email_title) }}">
                                     @error('email_title')
                                         <span class="invalid-feedback">{{ $message }}</span>
                                     @enderror
@@ -175,7 +175,7 @@
                                     <label for="email_address">E-posta Adresi</label>
                                     <input type="email" class="form-control @error('email_address') is-invalid @enderror" 
                                            id="email_address" name="email_address" 
-                                           value="{{ old('email_address', $settings->email_address) }}" required>
+                                           value="{{ old('email_address', $settings->email_address) }}">
                                     @error('email_address')
                                         <span class="invalid-feedback">{{ $message }}</span>
                                     @enderror
@@ -189,7 +189,7 @@
                                     <label for="kep_title">KEP Başlığı</label>
                                     <input type="text" class="form-control @error('kep_title') is-invalid @enderror" 
                                            id="kep_title" name="kep_title" 
-                                           value="{{ old('kep_title', $settings->kep_title) }}" required>
+                                           value="{{ old('kep_title', $settings->kep_title) }}">
                                     @error('kep_title')
                                         <span class="invalid-feedback">{{ $message }}</span>
                                     @enderror
@@ -200,7 +200,7 @@
                                     <label for="kep_address">KEP Adresi</label>
                                     <input type="text" class="form-control @error('kep_address') is-invalid @enderror" 
                                            id="kep_address" name="kep_address" 
-                                           value="{{ old('kep_address', $settings->kep_address) }}" required>
+                                           value="{{ old('kep_address', $settings->kep_address) }}">
                                     @error('kep_address')
                                         <span class="invalid-feedback">{{ $message }}</span>
                                     @enderror
@@ -214,7 +214,7 @@
                                 <div class="form-group">
                                     <label for="copyright_left">Sol Copyright Metni</label>
                                     <textarea class="form-control @error('copyright_left') is-invalid @enderror" 
-                                              id="copyright_left" name="copyright_left" rows="3" required>{{ old('copyright_left', $settings->copyright_left) }}</textarea>
+                                              id="copyright_left" name="copyright_left" rows="3">{{ old('copyright_left', $settings->copyright_left) }}</textarea>
                                     @error('copyright_left')
                                         <span class="invalid-feedback">{{ $message }}</span>
                                     @enderror
@@ -224,7 +224,7 @@
                                 <div class="form-group">
                                     <label for="copyright_right">Sağ Copyright Metni</label>
                                     <textarea class="form-control @error('copyright_right') is-invalid @enderror" 
-                                              id="copyright_right" name="copyright_right" rows="3" required>{{ old('copyright_right', $settings->copyright_right) }}</textarea>
+                                              id="copyright_right" name="copyright_right" rows="3">{{ old('copyright_right', $settings->copyright_right) }}</textarea>
                                     @error('copyright_right')
                                         <span class="invalid-feedback">{{ $message }}</span>
                                     @enderror

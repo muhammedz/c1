@@ -22,14 +22,14 @@
     <div class="absolute -right-20 -bottom-20 w-64 h-64 rounded-full bg-[#e6a23c]/10 blur-3xl"></div>
     <div class="absolute -left-10 top-10 w-40 h-40 rounded-full bg-white/5 blur-2xl"></div>
     
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 md:py-4 relative z-10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8 relative z-10">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
             <div class="md:col-span-2">
-                <h1 class="text-2xl md:text-3xl font-bold text-white mb-2">{{ $category->name }}</h1>
+                <h1 class="text-xl md:text-2xl lg:text-3xl font-bold text-white mb-2">{{ $category->name }}</h1>
                 @if($category->description)
-                <p class="text-white/80 text-base mb-2">{{ $category->description }}</p>
+                <p class="text-white/80 text-sm md:text-base mb-3 md:mb-2">{{ $category->description }}</p>
                 @else
-                <p class="text-white/80 text-base mb-2">{{ $category->name }} kategorisinde görev yapan yetkililerimiz hakkında bilgi alabilirsiniz.</p>
+                <p class="text-white/80 text-sm md:text-base mb-3 md:mb-2">{{ $category->name }} kategorisinde görev yapan yetkililerimiz hakkında bilgi alabilirsiniz.</p>
                 @endif
                 
                 <nav class="flex" aria-label="Breadcrumb">
@@ -62,7 +62,6 @@
                     <div class="text-white text-center">
                         <span class="material-icons text-3xl text-[#e6a23c] mb-1">groups</span>
                         <h3 class="text-lg font-semibold mb-1">{{ $category->name }}</h3>
-                        <p class="text-sm text-white/80">Bu kategoride {{ $category->members()->active()->count() }} aktif üye bulunmaktadır.</p>
                     </div>
                 </div>
                 @endif
@@ -72,10 +71,10 @@
 </div>
 
 <!-- Üyeler Bölümü -->
-<section class="py-12 bg-slate-100">
+<section class="py-8 md:py-12 bg-slate-100">
     <div class="container max-w-7xl mx-auto px-4">
         @if(count($members) > 0)
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-5">
+        <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 md:gap-5">
             @foreach($members as $member)
                 @if($member->use_custom_link && $member->custom_link)
                 <a href="{{ $member->custom_link }}" 
@@ -93,16 +92,16 @@
                             @if($member->image)
                             <img src="{{ asset($member->image) }}" alt="{{ $member->name }}" class="w-full h-full object-cover">
                             @else
-                            <span class="material-icons text-gray-300 text-7xl">person</span>
+                            <span class="material-icons text-gray-300 text-4xl md:text-7xl">person</span>
                             @endif
                         </div>
                     </div>
                     
                     <!-- İsim ve Unvan -->
-                    <div class="text-center p-4 flex-grow flex flex-col">
-                        <h3 class="text-gray-900 font-bold text-lg mb-1">{{ $member->name }}</h3>
+                    <div class="text-center p-2 md:p-4 flex-grow flex flex-col">
+                        <h3 class="text-gray-900 font-bold text-sm md:text-lg mb-1">{{ $member->name }}</h3>
                         @if($member->title)
-                        <span class="text-gray-700 text-sm block">{{ $member->title }}</span>
+                        <span class="text-gray-700 text-xs md:text-sm block">{{ $member->title }}</span>
                         @endif
                     </div>
                 @if($member->use_custom_link && $member->custom_link)
@@ -143,10 +142,41 @@
         overflow: hidden;
     }
     
-    /* Responsive Ayarları */
+    /* Mobile optimizations */
+    @media (max-width: 767px) {
+        .member-card h3 {
+            font-size: 0.875rem;
+            line-height: 1.2;
+        }
+        
+        .member-card span {
+            font-size: 0.75rem;
+            line-height: 1.2;
+        }
+        
+        .member-card .material-icons {
+            font-size: 2.5rem !important;
+        }
+    }
+    
+    /* Touch device optimizations */
+    @media (hover: none) and (pointer: coarse) {
+        .member-card:active {
+            transform: scale(0.98);
+            transition: transform 0.1s ease-in-out;
+        }
+    }
+    
+    /* Responsive grid gap adjustments */
     @media (max-width: 640px) {
         .grid {
-            gap: 12px;
+            gap: 0.75rem;
+        }
+    }
+    
+    @media (min-width: 768px) {
+        .grid {
+            gap: 1.25rem;
         }
     }
 </style>
