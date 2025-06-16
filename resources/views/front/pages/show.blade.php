@@ -336,43 +336,7 @@
             </div>
         @endif
         
-        <!-- Etiketler ve Paylaşım -->
-        <div class="page-content-section">
-            <h2 class="mb-6">Paylaşım</h2>
-            
-            <!-- Etiketler -->
-            @if(isset($page->tags) && count($page->tags) > 0)
-                <div class="mb-6">
-                    <div class="font-medium text-gray-700 mb-3">Etiketler:</div>
-                    <div class="flex flex-wrap gap-2">
-                        @foreach($page->tags as $tag)
-                            <a href="{{ route('pages.tag', $tag->slug) }}" class="px-3.5 py-1.5 bg-slate-100 text-gray-700 text-sm rounded-full hover:bg-[#00352b] hover:text-white transition-all shadow-sm hover:shadow">
-                                {{ $tag->name }}
-                            </a>
-                        @endforeach
-                    </div>
-                </div>
-            @endif
-            
-            <!-- Paylaşım Butonları -->
-            <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 pt-5">
-                <div class="font-medium text-gray-700">Bu sayfayı paylaşın:</div>
-                <div class="flex gap-3">
-                    <a href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode(route('pages.show', $page->slug)) }}" target="_blank" class="w-10 h-10 bg-blue-600 text-white flex items-center justify-center rounded-full hover:bg-blue-700 transition-all shadow-sm hover:shadow-md">
-                        <i class="fab fa-facebook-f"></i>
-                    </a>
-                    <a href="https://twitter.com/intent/tweet?url={{ urlencode(route('pages.show', $page->slug)) }}&text={{ urlencode($page->title) }}" target="_blank" class="w-10 h-10 bg-blue-400 text-white flex items-center justify-center rounded-full hover:bg-blue-500 transition-all shadow-sm hover:shadow-md">
-                        <i class="fab fa-x-twitter"></i>
-                    </a>
-                    <a href="https://wa.me/?text={{ urlencode($page->title . ' - ' . route('pages.show', $page->slug)) }}" target="_blank" class="w-10 h-10 bg-green-500 text-white flex items-center justify-center rounded-full hover:bg-green-600 transition-all shadow-sm hover:shadow-md">
-                        <i class="fab fa-whatsapp"></i>
-                    </a>
-                    <a href="https://www.linkedin.com/shareArticle?mini=true&url={{ urlencode(route('pages.show', $page->slug)) }}&title={{ urlencode($page->title) }}" target="_blank" class="w-10 h-10 bg-blue-700 text-white flex items-center justify-center rounded-full hover:bg-blue-800 transition-all shadow-sm hover:shadow-md">
-                        <i class="fab fa-linkedin-in"></i>
-                    </a>
-                </div>
-            </div>
-        </div>
+
     </div>
 </div>
 
