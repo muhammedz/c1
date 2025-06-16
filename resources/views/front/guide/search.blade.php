@@ -1,119 +1,117 @@
 @extends('layouts.front')
 
-@section('title', $pageTitle)
+@section('title', 'Arama Sonuçları - ' . $pageTitle)
 @section('meta_description', $pageDescription)
 
 @section('css')
 <style>
     .search-hero {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #004d2e 0%, #006b3f 100%);
     }
     
-    .search-results-card {
-        background: white;
+    .search-box {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
         border-radius: 16px;
-        overflow: hidden;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    }
+    
+    .result-card {
+        background: white;
+        border-radius: 24px;
+        box-shadow: 0 2px 20px rgba(0,0,0,0.05);
         transition: all 0.3s ease;
-        margin-bottom: 20px;
-    }
-    
-    .search-results-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-    }
-    
-    .result-image {
-        width: 120px;
-        height: 120px;
-        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-        border-radius: 12px;
         overflow: hidden;
-        flex-shrink: 0;
     }
     
-    .result-image img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
+    .result-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 2px 20px rgba(0,0,0,0.1);
     }
     
     .category-result {
+        border-left: 4px solid #004d2e;
+    }
+    
+    .place-result {
+        border-left: 4px solid #6c757d;
+    }
+    
+    .filter-sidebar {
         background: white;
+        border-radius: 24px;
+        box-shadow: 0 2px 20px rgba(0,0,0,0.05);
+    }
+    
+    .filter-item {
+        padding: 0.75rem 1rem;
         border-radius: 12px;
-        padding: 20px;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-        transition: all 0.3s ease;
-        border-left: 4px solid #3b82f6;
-    }
-    
-    .category-result:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-    }
-    
-    .search-stats {
-        background: rgba(255, 255, 255, 0.1);
-        backdrop-filter: blur(10px);
-        border-radius: 12px;
-        padding: 16px 24px;
-        margin-top: 20px;
-    }
-    
-    .search-filter {
-        background: white;
-        border-radius: 12px;
-        padding: 20px;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-        margin-bottom: 24px;
-    }
-    
-    .filter-button {
-        padding: 8px 16px;
-        border-radius: 20px;
-        border: 2px solid #e5e7eb;
-        background: white;
-        color: #6b7280;
-        font-weight: 500;
         transition: all 0.2s ease;
         cursor: pointer;
-        margin: 4px;
+        border: 1px solid transparent;
     }
     
-    .filter-button.active {
-        background: #3b82f6;
-        border-color: #3b82f6;
+    .filter-item:hover {
+        background-color: #f8f9fa;
+        border-color: #e9ecef;
+    }
+    
+    .filter-item.active {
+        background-color: #004d2e;
         color: white;
-    }
-    
-    .filter-button:hover:not(.active) {
-        border-color: #3b82f6;
-        color: #3b82f6;
+        border-color: #004d2e;
     }
     
     .highlight {
-        background: #fef3c7;
-        padding: 2px 4px;
-        border-radius: 4px;
+        background-color: #fff3cd;
+        padding: 0.125rem 0.25rem;
+        border-radius: 0.25rem;
         font-weight: 600;
     }
     
-    .no-results {
-        text-align: center;
-        padding: 60px 20px;
+    .breadcrumb-item {
+        color: rgba(255, 255, 255, 0.8);
     }
     
-    .no-results-icon {
-        width: 80px;
-        height: 80px;
-        background: #f3f4f6;
-        border-radius: 50%;
-        display: flex;
+    .breadcrumb-item:hover {
+        color: white;
+    }
+    
+    .breadcrumb-separator {
+        color: rgba(255, 255, 255, 0.6);
+        margin: 0 0.5rem;
+    }
+    
+    .action-btn {
+        display: inline-flex;
         align-items: center;
-        justify-content: center;
-        margin: 0 auto 24px;
-        font-size: 2rem;
-        color: #9ca3af;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        transition: all 0.2s ease;
+        text-decoration: none;
+    }
+    
+    .action-btn-primary {
+        background-color: #004d2e;
+        color: white;
+    }
+    
+    .action-btn-primary:hover {
+        background-color: #006b3f;
+        color: white;
+    }
+    
+    .action-btn-secondary {
+        background-color: #f8f9fa;
+        color: #6c757d;
+        border: 1px solid #e9ecef;
+    }
+    
+    .action-btn-secondary:hover {
+        background-color: #e9ecef;
+        color: #495057;
     }
 </style>
 @endsection
@@ -121,156 +119,144 @@
 @section('content')
 <!-- Hero Section -->
 <section class="search-hero py-16 text-white">
-    <div class="container max-w-[1235px] mx-auto px-4">
+    <div class="container max-w-7xl mx-auto px-4">
         <!-- Breadcrumb -->
         <nav class="mb-8">
-            <ol class="flex items-center space-x-2 text-sm opacity-80">
-                <li><a href="{{ route('home') }}" class="hover:text-white">Ana Sayfa</a></li>
-                <li><i class="fas fa-chevron-right mx-2"></i></li>
-                <li><a href="{{ route('guide.index') }}" class="hover:text-white">Rehber</a></li>
-                <li><i class="fas fa-chevron-right mx-2"></i></li>
+            <ol class="flex items-center space-x-2 text-sm">
+                <li><a href="{{ route('guide.index') }}" class="breadcrumb-item hover:underline">Rehber</a></li>
+                <li><span class="breadcrumb-separator">></span></li>
                 <li class="text-white font-medium">Arama Sonuçları</li>
             </ol>
         </nav>
         
         <div class="text-center">
-            <h1 class="text-3xl md:text-4xl font-bold mb-4">Arama Sonuçları</h1>
-            <p class="text-lg md:text-xl opacity-90 mb-8">
-                "<span class="font-semibold">{{ $query }}</span>" için bulunan sonuçlar
-            </p>
-            
-            <!-- Yeni Arama -->
-            <div class="max-w-2xl mx-auto">
-                <form action="{{ route('guide.search') }}" method="GET" class="flex flex-col md:flex-row gap-4">
+            <h1 class="text-4xl md:text-5xl font-bold mb-4">Arama Sonuçları</h1>
+            @if(request('q'))
+                <p class="text-xl md:text-2xl mb-6 opacity-90">
+                    "<strong>{{ request('q') }}</strong>" için sonuçlar
+                </p>
+                <div class="inline-flex items-center bg-white/20 rounded-full px-4 py-2">
+                    <span class="material-icons mr-2">search</span>
+                    <span class="font-medium">{{ $totalResults }} sonuç bulundu</span>
+                </div>
+            @else
+                <p class="text-xl md:text-2xl mb-6 opacity-90">
+                    Arama yapmak için aşağıdaki kutuyu kullanın
+                </p>
+            @endif
+        </div>
+        
+        <!-- Arama Kutusu -->
+        <div class="max-w-2xl mx-auto mt-8">
+            <form action="{{ route('guide.search') }}" method="GET" class="search-box p-6">
+                <div class="flex flex-col md:flex-row gap-4">
                     <div class="flex-1">
                         <input type="text" 
                                name="q" 
-                               value="{{ $query }}"
-                               placeholder="Yeni arama yapın..." 
-                               class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-800">
+                               value="{{ request('q') }}"
+                               placeholder="Aradığınız hizmet, kurum veya yer..." 
+                               class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#004d2e] focus:border-transparent text-gray-800"
+                               required>
                     </div>
                     <button type="submit" 
-                            class="px-8 py-3 bg-white bg-opacity-20 hover:bg-opacity-30 text-white rounded-lg font-semibold transition-all duration-200 backdrop-filter backdrop-blur-sm">
-                        <i class="fas fa-search mr-2"></i>Ara
+                            class="action-btn action-btn-primary px-8 py-3">
+                        <span class="material-icons mr-2">search</span>Ara
                     </button>
-                </form>
-            </div>
-            
-            <!-- Arama İstatistikleri -->
-            <div class="search-stats">
-                <div class="flex flex-col md:flex-row items-center justify-center gap-6 text-sm">
-                    <div class="flex items-center">
-                        <i class="fas fa-map-marker-alt mr-2"></i>
-                        <span>{{ $places->total() }} yer bulundu</span>
-                    </div>
-                    <div class="flex items-center">
-                        <i class="fas fa-layer-group mr-2"></i>
-                        <span>{{ $categories->count() }} kategori bulundu</span>
-                    </div>
-                    <div class="flex items-center">
-                        <i class="fas fa-clock mr-2"></i>
-                        <span>{{ number_format(microtime(true) - LARAVEL_START, 3) }} saniye</span>
-                    </div>
                 </div>
-            </div>
+            </form>
         </div>
     </div>
 </section>
 
-<!-- Arama Sonuçları -->
-<section class="py-16 bg-gray-50">
-    <div class="container max-w-[1235px] mx-auto px-4">
+@if(request('q'))
+<!-- Sonuçlar -->
+<section class="py-12 bg-gray-50">
+    <div class="container max-w-7xl mx-auto px-4">
         <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
-            <!-- Sol Kolon - Filtreler -->
+            <!-- Filtre Sidebar -->
             <div class="lg:col-span-1">
-                <div class="search-filter">
-                    <h3 class="text-lg font-bold text-gray-800 mb-4">
-                        <i class="fas fa-filter mr-2 text-blue-600"></i>Filtreler
-                    </h3>
+                <div class="filter-sidebar p-6 sticky top-8">
+                    <h3 class="text-lg font-bold text-gray-800 mb-6">Sonuç Türü</h3>
                     
-                    <div class="mb-6">
-                        <h4 class="font-semibold text-gray-700 mb-3">Sonuç Türü</h4>
-                        <div class="space-y-2">
-                            <button class="filter-button active w-full text-left" data-filter="all">
-                                <i class="fas fa-list mr-2"></i>Tümü ({{ $places->total() + $categories->count() }})
-                            </button>
-                            <button class="filter-button w-full text-left" data-filter="places">
-                                <i class="fas fa-map-marker-alt mr-2"></i>Yerler ({{ $places->total() }})
-                            </button>
-                            <button class="filter-button w-full text-left" data-filter="categories">
-                                <i class="fas fa-layer-group mr-2"></i>Kategoriler ({{ $categories->count() }})
-                            </button>
-                        </div>
-                    </div>
-                    
-                    @if($categories->count() > 0)
-                        <div class="mb-6">
-                            <h4 class="font-semibold text-gray-700 mb-3">Kategoriler</h4>
-                            <div class="space-y-2">
-                                @foreach($categories as $category)
-                                    <a href="{{ route('guide.category', $category->slug) }}" 
-                                       class="block p-2 rounded-lg hover:bg-gray-100 transition-colors">
-                                        <div class="flex items-center">
-                                            @if($category->icon)
-                                                <i class="{{ $category->icon }} mr-2 text-blue-600"></i>
-                                            @else
-                                                <i class="fas fa-folder mr-2 text-blue-600"></i>
-                                            @endif
-                                            <span class="text-sm">{{ $category->name }}</span>
-                                        </div>
-                                    </a>
-                                @endforeach
+                    <div class="space-y-2">
+                        <div class="filter-item {{ !request('type') ? 'active' : '' }}" 
+                             onclick="filterResults('')">
+                            <div class="flex items-center justify-between">
+                                <span>Tümü</span>
+                                <span class="text-sm">{{ $totalResults }}</span>
                             </div>
                         </div>
-                    @endif
+                        
+                        @if($categories->count() > 0)
+                            <div class="filter-item {{ request('type') === 'categories' ? 'active' : '' }}" 
+                                 onclick="filterResults('categories')">
+                                <div class="flex items-center justify-between">
+                                    <span>Kategoriler</span>
+                                    <span class="text-sm">{{ $categories->count() }}</span>
+                                </div>
+                            </div>
+                        @endif
+                        
+                        @if($places->count() > 0)
+                            <div class="filter-item {{ request('type') === 'places' ? 'active' : '' }}" 
+                                 onclick="filterResults('places')">
+                                <div class="flex items-center justify-between">
+                                    <span>Yerler</span>
+                                    <span class="text-sm">{{ $places->count() }}</span>
+                                </div>
+                            </div>
+                        @endif
+                    </div>
                 </div>
             </div>
             
-            <!-- Sağ Kolon - Sonuçlar -->
+            <!-- Ana İçerik -->
             <div class="lg:col-span-3">
-                @if($categories->count() > 0 || $places->count() > 0)
+                @if($totalResults > 0)
                     <!-- Kategori Sonuçları -->
-                    @if($categories->count() > 0)
-                        <div class="category-results mb-8" data-result-type="categories">
+                    @if($categories->count() > 0 && (!request('type') || request('type') === 'categories'))
+                        <div class="mb-12" id="category-results">
                             <h2 class="text-2xl font-bold text-gray-800 mb-6">
-                                <i class="fas fa-layer-group mr-2 text-blue-600"></i>
-                                Bulunan Kategoriler ({{ $categories->count() }})
+                                <span class="material-icons mr-2 text-[#004d2e]">category</span>
+                                Kategoriler ({{ $categories->count() }})
                             </h2>
                             
                             <div class="space-y-4">
                                 @foreach($categories as $category)
-                                    <div class="category-result">
+                                    <div class="result-card category-result p-6">
                                         <div class="flex items-start gap-4">
-                                            <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                            <div class="w-16 h-16 bg-[#004d2e] rounded-full flex items-center justify-center flex-shrink-0">
                                                 @if($category->icon)
-                                                    <i class="{{ $category->icon }} text-blue-600 text-xl"></i>
+                                                    @if(Str::startsWith($category->icon, 'fas ') || Str::startsWith($category->icon, 'far ') || Str::startsWith($category->icon, 'fab '))
+                                                        <i class="{{ $category->icon }} text-white text-xl"></i>
+                                                    @else
+                                                        <span class="material-icons text-white text-xl">{{ $category->icon }}</span>
+                                                    @endif
                                                 @else
-                                                    <i class="fas fa-folder text-blue-600 text-xl"></i>
+                                                    <span class="material-icons text-white text-xl">location_on</span>
                                                 @endif
                                             </div>
                                             
                                             <div class="flex-1">
-                                                <h3 class="text-lg font-bold text-gray-800 mb-2">
-                                                    <a href="{{ route('guide.category', $category->slug) }}" 
-                                                       class="hover:text-blue-600 transition-colors">
-                                                        {!! str_ireplace($query, '<span class="highlight">'.$query.'</span>', $category->name) !!}
-                                                    </a>
+                                                <h3 class="text-xl font-bold text-gray-800 mb-2">
+                                                    {!! highlightSearchTerm($category->name, request('q')) !!}
                                                 </h3>
                                                 
                                                 @if($category->description)
-                                                    <p class="text-gray-600 mb-3">
-                                                        {!! str_ireplace($query, '<span class="highlight">'.$query.'</span>', Str::limit($category->description, 150)) !!}
+                                                    <p class="text-gray-600 mb-4">
+                                                        {!! highlightSearchTerm(Str::limit($category->description, 150), request('q')) !!}
                                                     </p>
                                                 @endif
                                                 
-                                                <div class="flex items-center gap-4 text-sm text-gray-500">
-                                                    <span>
-                                                        <i class="fas fa-map-marker-alt mr-1"></i>
-                                                        {{ $category->active_places_count }} yer
-                                                    </span>
+                                                <div class="flex items-center justify-between">
+                                                    <div class="flex items-center text-sm text-gray-500">
+                                                        <span class="material-icons mr-1 text-sm">location_on</span>
+                                                        <span>{{ $category->active_places_count }} yer</span>
+                                                    </div>
+                                                    
                                                     <a href="{{ route('guide.category', $category->slug) }}" 
-                                                       class="text-blue-600 hover:text-blue-800 font-medium">
-                                                        Yerleri Gör <i class="fas fa-arrow-right ml-1"></i>
+                                                       class="action-btn action-btn-primary">
+                                                        <span class="material-icons mr-2">visibility</span>Görüntüle
                                                     </a>
                                                 </div>
                                             </div>
@@ -282,133 +268,120 @@
                     @endif
                     
                     <!-- Yer Sonuçları -->
-                    @if($places->count() > 0)
-                        <div class="place-results" data-result-type="places">
+                    @if($places->count() > 0 && (!request('type') || request('type') === 'places'))
+                        <div id="place-results">
                             <h2 class="text-2xl font-bold text-gray-800 mb-6">
-                                <i class="fas fa-map-marker-alt mr-2 text-blue-600"></i>
-                                Bulunan Yerler ({{ $places->total() }})
+                                <span class="material-icons mr-2 text-[#004d2e]">location_on</span>
+                                Yerler ({{ $places->count() }})
                             </h2>
                             
-                            <div class="space-y-6">
+                            <div class="space-y-4">
                                 @foreach($places as $place)
-                                    <div class="search-results-card">
-                                        <div class="p-6">
-                                            <div class="flex flex-col md:flex-row gap-6">
-                                                <!-- Yer Resmi -->
-                                                <div class="result-image">
-                                                    @if($place->featured_image_url)
-                                                        <img src="{{ $place->featured_image_url }}" alt="{{ $place->title }}">
-                                                    @else
-                                                        <div class="w-full h-full flex items-center justify-center text-white text-2xl">
-                                                            <i class="fas fa-building"></i>
+                                    <div class="result-card place-result p-6">
+                                        <div class="flex flex-col md:flex-row gap-4">
+                                            <!-- Resim -->
+                                            <div class="md:w-32 md:h-32 w-full h-48 flex-shrink-0">
+                                                @if($place->featured_image_url)
+                                                    <img src="{{ $place->featured_image_url }}" 
+                                                         alt="{{ $place->title }}"
+                                                         class="w-full h-full object-cover rounded-lg">
+                                                @else
+                                                    <div class="w-full h-full bg-gray-100 rounded-lg flex items-center justify-center">
+                                                        <span class="material-icons text-gray-400 text-3xl">business</span>
+                                                    </div>
+                                                @endif
+                                            </div>
+                                            
+                                            <!-- İçerik -->
+                                            <div class="flex-1">
+                                                <div class="flex items-start justify-between mb-2">
+                                                    <h3 class="text-xl font-bold text-gray-800">
+                                                        {!! highlightSearchTerm($place->title, request('q')) !!}
+                                                    </h3>
+                                                    <span class="text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded-full ml-2">
+                                                        {{ $place->category->name }}
+                                                    </span>
+                                                </div>
+                                                
+                                                @if($place->excerpt)
+                                                    <p class="text-gray-600 mb-4">
+                                                        {!! highlightSearchTerm(Str::limit($place->excerpt, 150), request('q')) !!}
+                                                    </p>
+                                                @endif
+                                                
+                                                <!-- İletişim Bilgileri -->
+                                                <div class="space-y-2 mb-4">
+                                                    @if($place->address)
+                                                        <div class="flex items-start text-sm text-gray-600">
+                                                            <span class="material-icons text-gray-400 mr-2 mt-0.5 text-base">location_on</span>
+                                                            <span class="flex-1">{!! highlightSearchTerm($place->address, request('q')) !!}</span>
+                                                        </div>
+                                                    @endif
+                                                    
+                                                    @if($place->phone)
+                                                        <div class="flex items-center text-sm text-gray-600">
+                                                            <span class="material-icons text-gray-400 mr-2 text-base">phone</span>
+                                                            <span>{{ $place->phone }}</span>
                                                         </div>
                                                     @endif
                                                 </div>
                                                 
-                                                <!-- Yer Bilgileri -->
-                                                <div class="flex-1">
-                                                    <div class="flex items-start justify-between mb-3">
-                                                        <div>
-                                                            <div class="text-sm text-blue-600 font-medium mb-1">
-                                                                {{ $place->category->name }}
-                                                            </div>
-                                                            <h3 class="text-xl font-bold text-gray-800 mb-2">
-                                                                <a href="{{ route('guide.place', [$place->category->slug, $place->slug]) }}" 
-                                                                   class="hover:text-blue-600 transition-colors">
-                                                                    {!! str_ireplace($query, '<span class="highlight">'.$query.'</span>', $place->title) !!}
-                                                                </a>
-                                                            </h3>
-                                                        </div>
-                                                    </div>
+                                                <!-- Aksiyon Butonları -->
+                                                <div class="flex flex-wrap gap-2">
+                                                    <a href="{{ route('guide.place', [$place->category->slug, $place->slug]) }}" 
+                                                       class="action-btn action-btn-primary">
+                                                        <span class="material-icons mr-2">visibility</span>Detaylar
+                                                    </a>
                                                     
-                                                    @if($place->excerpt)
-                                                        <p class="text-gray-600 mb-4 line-clamp-2">
-                                                            {!! str_ireplace($query, '<span class="highlight">'.$query.'</span>', $place->excerpt) !!}
-                                                        </p>
+                                                    @if($place->phone)
+                                                        <a href="tel:{{ $place->phone }}" 
+                                                           class="action-btn action-btn-secondary">
+                                                            <span class="material-icons mr-2">phone</span>Ara
+                                                        </a>
                                                     @endif
                                                     
-                                                    <!-- İletişim Bilgileri -->
-                                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
-                                                        @if($place->address)
-                                                            <div class="flex items-center text-sm text-gray-600">
-                                                                <i class="fas fa-map-marker-alt mr-2 text-blue-600"></i>
-                                                                <span class="line-clamp-1">{{ Str::limit($place->address, 40) }}</span>
-                                                            </div>
-                                                        @endif
-                                                        
-                                                        @if($place->phone)
-                                                            <div class="flex items-center text-sm text-gray-600">
-                                                                <i class="fas fa-phone mr-2 text-blue-600"></i>
-                                                                <a href="tel:{{ $place->phone }}" class="hover:text-blue-600">{{ $place->phone }}</a>
-                                                            </div>
-                                                        @endif
-                                                        
-                                                        @if($place->working_hours)
-                                                            <div class="flex items-center text-sm text-gray-600">
-                                                                <i class="fas fa-clock mr-2 text-blue-600"></i>
-                                                                <span class="line-clamp-1">{{ $place->working_hours }}</span>
-                                                            </div>
-                                                        @endif
-                                                    </div>
-                                                    
-                                                    <!-- Aksiyonlar -->
-                                                    <div class="flex flex-wrap gap-3">
-                                                        <a href="{{ route('guide.place', [$place->category->slug, $place->slug]) }}" 
-                                                           class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors">
-                                                            Detaylar <i class="fas fa-arrow-right ml-2"></i>
+                                                    @if($place->maps_link)
+                                                        <a href="{{ $place->maps_link }}" 
+                                                           target="_blank"
+                                                           class="action-btn action-btn-secondary">
+                                                            <span class="material-icons mr-2">map</span>Konum
                                                         </a>
-                                                        
-                                                        @if($place->phone)
-                                                            <a href="tel:{{ $place->phone }}" 
-                                                               class="inline-flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-colors">
-                                                                <i class="fas fa-phone mr-2"></i>Ara
-                                                            </a>
-                                                        @endif
-                                                        
-                                                        @if($place->maps_link)
-                                                            <a href="{{ $place->maps_link }}" 
-                                                               target="_blank"
-                                                               class="inline-flex items-center px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg font-medium transition-colors">
-                                                                <i class="fas fa-map mr-2"></i>Harita
-                                                            </a>
-                                                        @endif
-                                                    </div>
+                                                    @endif
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                 @endforeach
                             </div>
-                            
-                            <!-- Pagination -->
-                            @if($places->hasPages())
-                                <div class="mt-8 flex justify-center">
-                                    {{ $places->appends(['q' => $query])->links() }}
-                                </div>
-                            @endif
                         </div>
                     @endif
                 @else
                     <!-- Sonuç Bulunamadı -->
-                    <div class="no-results">
-                        <div class="no-results-icon">
-                            <i class="fas fa-search"></i>
+                    <div class="text-center py-16">
+                        <div class="w-24 h-24 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-6">
+                            <span class="material-icons text-gray-400 text-3xl">search_off</span>
                         </div>
-                        <h3 class="text-2xl font-bold text-gray-800 mb-4">Sonuç Bulunamadı</h3>
-                        <p class="text-gray-600 mb-8 max-w-md mx-auto">
-                            "<strong>{{ $query }}</strong>" araması için herhangi bir sonuç bulunamadı. 
-                            Farklı anahtar kelimeler deneyebilir veya tüm kategorilere göz atabilirsiniz.
+                        <h3 class="text-xl font-semibold text-gray-700 mb-2">Sonuç bulunamadı</h3>
+                        <p class="text-gray-500 mb-6">
+                            "<strong>{{ request('q') }}</strong>" için sonuç bulunamadı. Farklı kelimeler deneyin.
                         </p>
                         
-                        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                        <!-- Öneriler -->
+                        <div class="max-w-md mx-auto">
+                            <h4 class="text-lg font-semibold text-gray-700 mb-4">Arama önerileri:</h4>
+                            <ul class="text-left text-gray-600 space-y-2">
+                                <li>• Daha genel kelimeler kullanın</li>
+                                <li>• Yazım hatalarını kontrol edin</li>
+                                <li>• Farklı kelime kombinasyonları deneyin</li>
+                                <li>• Kategori adlarını arayın (örn: zabıta, sağlık)</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="mt-8">
                             <a href="{{ route('guide.index') }}" 
-                               class="inline-flex items-center px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition-colors">
-                                <i class="fas fa-layer-group mr-2"></i>Tüm Kategoriler
+                               class="action-btn action-btn-primary">
+                                <span class="material-icons mr-2">arrow_back</span>Ana Sayfaya Dön
                             </a>
-                            <button onclick="document.querySelector('input[name=q]').focus()" 
-                                    class="inline-flex items-center px-6 py-3 bg-gray-600 hover:bg-gray-700 text-white rounded-lg font-semibold transition-colors">
-                                <i class="fas fa-search mr-2"></i>Yeni Arama
-                            </button>
                         </div>
                     </div>
                 @endif
@@ -416,71 +389,57 @@
         </div>
     </div>
 </section>
+@endif
 @endsection
 
 @section('after_scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Filtre butonları
-    const filterButtons = document.querySelectorAll('.filter-button');
-    const categoryResults = document.querySelector('.category-results');
-    const placeResults = document.querySelector('.place-results');
-    
-    filterButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            const filter = this.dataset.filter;
-            
-            // Aktif butonu güncelle
-            filterButtons.forEach(btn => btn.classList.remove('active'));
-            this.classList.add('active');
-            
-            // Sonuçları filtrele
-            if (filter === 'all') {
-                if (categoryResults) categoryResults.style.display = 'block';
-                if (placeResults) placeResults.style.display = 'block';
-            } else if (filter === 'categories') {
-                if (categoryResults) categoryResults.style.display = 'block';
-                if (placeResults) placeResults.style.display = 'none';
-            } else if (filter === 'places') {
-                if (categoryResults) categoryResults.style.display = 'none';
-                if (placeResults) placeResults.style.display = 'block';
-            }
-        });
-    });
-    
-    // Arama formu geliştirmeleri
-    const searchForm = document.querySelector('form[action*="search"]');
-    const searchInput = searchForm.querySelector('input[name="q"]');
-    
-    // Arama geçmişi (localStorage)
-    const searchHistory = JSON.parse(localStorage.getItem('guideSearchHistory') || '[]');
-    
-    // Arama yapıldığında geçmişe ekle
-    searchForm.addEventListener('submit', function() {
-        const query = searchInput.value.trim();
-        if (query && !searchHistory.includes(query)) {
-            searchHistory.unshift(query);
-            if (searchHistory.length > 5) {
-                searchHistory.pop();
-            }
-            localStorage.setItem('guideSearchHistory', JSON.stringify(searchHistory));
+    // Filtre işlevselliği
+    window.filterResults = function(type) {
+        const currentUrl = new URL(window.location);
+        if (type) {
+            currentUrl.searchParams.set('type', type);
+        } else {
+            currentUrl.searchParams.delete('type');
         }
-    });
+        window.location.href = currentUrl.toString();
+    };
     
-    // Arama önerileri (basit implementasyon)
-    searchInput.addEventListener('focus', function() {
-        if (searchHistory.length > 0) {
-            // Burada arama geçmişini gösterebiliriz
-            console.log('Arama geçmişi:', searchHistory);
+    // Arama geçmişi
+    const searchInput = document.querySelector('input[name="q"]');
+    if (searchInput) {
+        // Arama geçmişini localStorage'dan yükle
+        const searchHistory = JSON.parse(localStorage.getItem('guideSearchHistory') || '[]');
+        
+        // Arama yapıldığında geçmişe ekle
+        const searchForm = searchInput.closest('form');
+        if (searchForm) {
+            searchForm.addEventListener('submit', function() {
+                const query = searchInput.value.trim();
+                if (query && !searchHistory.includes(query)) {
+                    searchHistory.unshift(query);
+                    // Maksimum 10 arama sakla
+                    if (searchHistory.length > 10) {
+                        searchHistory.pop();
+                    }
+                    localStorage.setItem('guideSearchHistory', JSON.stringify(searchHistory));
+                }
+            });
         }
-    });
+        
+        // Arama kutusuna odaklan
+        if (!searchInput.value) {
+            searchInput.focus();
+        }
+    }
     
-    // Sonuç kartlarına hover efekti
-    const resultCards = document.querySelectorAll('.search-results-card, .category-result');
+    // Kart hover efektleri
+    const resultCards = document.querySelectorAll('.result-card');
     
     resultCards.forEach(card => {
         card.addEventListener('mouseenter', function() {
-            this.style.transform = 'translateY(-2px)';
+            this.style.transform = 'translateY(-5px)';
         });
         
         card.addEventListener('mouseleave', function() {
@@ -488,24 +447,39 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
-    // Telefon numarası tıklama analizi
-    const phoneLinks = document.querySelectorAll('a[href^="tel:"]');
-    phoneLinks.forEach(link => {
-        link.addEventListener('click', function() {
-            // Analytics için telefon tıklama kaydı
-            console.log('Telefon tıklandı:', this.textContent);
-        });
-    });
-    
-    // Harita linki tıklama analizi
-    const mapLinks = document.querySelectorAll('a[href*="maps"]');
-    mapLinks.forEach(link => {
-        link.addEventListener('click', function() {
-            // Analytics için harita tıklama kaydı
-            console.log('Harita tıklandı:', this.href);
+    // Smooth scroll for filter results
+    const filterItems = document.querySelectorAll('.filter-item');
+    filterItems.forEach(item => {
+        item.addEventListener('click', function() {
+            // Aktif durumu güncelle
+            filterItems.forEach(f => f.classList.remove('active'));
+            this.classList.add('active');
         });
     });
 });
+
+// Arama terimini vurgulama fonksiyonu (PHP'den gelen veri için)
+@if(request('q'))
+    // Sayfa yüklendikten sonra vurgulamaları kontrol et
+    setTimeout(function() {
+        const highlights = document.querySelectorAll('.highlight');
+        highlights.forEach(highlight => {
+            highlight.style.backgroundColor = '#fff3cd';
+            highlight.style.fontWeight = '600';
+        });
+    }, 100);
+@endif
 </script>
 @endsection
-</rewritten_file>
+
+@php
+// Arama terimini vurgulama helper fonksiyonu
+if (!function_exists('highlightSearchTerm')) {
+    function highlightSearchTerm($text, $searchTerm) {
+        if (!$searchTerm) return $text;
+        
+        $pattern = '/(' . preg_quote($searchTerm, '/') . ')/iu';
+        return preg_replace($pattern, '<span class="highlight">$1</span>', $text);
+    }
+}
+@endphp

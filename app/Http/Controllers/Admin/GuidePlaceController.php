@@ -270,6 +270,19 @@ class GuidePlaceController extends Controller
     }
 
     /**
+     * Display all guide places information in a table format
+     */
+    public function allInfo()
+    {
+        $places = GuidePlace::with(['category'])
+            ->active()
+            ->ordered()
+            ->get();
+        
+        return view('admin.guide.places.all-info', compact('places'));
+    }
+
+    /**
      * Upload images for a place
      */
     public function uploadImages(Request $request, GuidePlace $place)

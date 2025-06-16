@@ -1,349 +1,109 @@
 @extends('layouts.front')
 
-@section('title', $pageTitle)
-@section('meta_description', $pageDescription)
+@section('title', $guidePlace->title . ' - ' . $category->name . ' - ' . $pageTitle)
+@section('meta_description', $guidePlace->meta_description ?: $guidePlace->excerpt)
 
 @section('css')
 <style>
-    .place-hero {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        position: relative;
-        overflow: hidden;
-    }
-    
-    .place-hero::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: rgba(0, 0, 0, 0.3);
-        z-index: 1;
-    }
-    
-    .place-hero-content {
-        position: relative;
-        z-index: 2;
-    }
-    
-    .place-gallery {
-        border-radius: 16px;
-        overflow: hidden;
-        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-    }
-    
-    .gallery-main {
-        height: 400px;
-        position: relative;
-        overflow: hidden;
-    }
-    
-    .gallery-main img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        transition: transform 0.3s ease;
-    }
-    
-    .gallery-main:hover img {
-        transform: scale(1.05);
-    }
-    
-    .gallery-thumbs {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 8px;
-        margin-top: 12px;
-    }
-    
-    .gallery-thumb {
-        height: 80px;
-        border-radius: 8px;
-        overflow: hidden;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        border: 2px solid transparent;
-    }
-    
-    .gallery-thumb:hover,
     .gallery-thumb.active {
-        border-color: #3b82f6;
+        border-color: #004d2e !important;
         transform: scale(1.05);
-    }
-    
-    .gallery-thumb img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }
-    
-    .info-card {
-        background: white;
-        border-radius: 16px;
-        padding: 24px;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-        margin-bottom: 24px;
-    }
-    
-    .contact-item {
-        display: flex;
-        align-items: flex-start;
-        padding: 16px;
-        background: #f8fafc;
-        border-radius: 12px;
-        margin-bottom: 12px;
-        transition: all 0.2s ease;
-    }
-    
-    .contact-item:hover {
-        background: #e2e8f0;
-        transform: translateX(4px);
-    }
-    
-    .contact-icon {
-        width: 40px;
-        height: 40px;
-        background: #3b82f6;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        margin-right: 16px;
-        flex-shrink: 0;
-    }
-    
-    .contact-content {
-        flex: 1;
-    }
-    
-    .contact-label {
-        font-size: 0.875rem;
-        color: #64748b;
-        margin-bottom: 4px;
-    }
-    
-    .contact-value {
-        font-weight: 600;
-        color: #1e293b;
-        word-break: break-word;
-    }
-    
-    .action-button {
-        display: inline-flex;
-        align-items: center;
-        padding: 12px 24px;
-        border-radius: 12px;
-        font-weight: 600;
-        text-decoration: none;
-        transition: all 0.2s ease;
-        margin: 4px;
-    }
-    
-    .action-button:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 25px -8px rgba(0, 0, 0, 0.3);
-    }
-    
-    .action-primary {
-        background: #3b82f6;
-        color: white;
-    }
-    
-    .action-primary:hover {
-        background: #2563eb;
-        color: white;
-    }
-    
-    .action-secondary {
-        background: #10b981;
-        color: white;
-    }
-    
-    .action-secondary:hover {
-        background: #059669;
-        color: white;
-    }
-    
-    .action-tertiary {
-        background: #f59e0b;
-        color: white;
-    }
-    
-    .action-tertiary:hover {
-        background: #d97706;
-        color: white;
-    }
-    
-    .related-place {
-        background: white;
-        border-radius: 12px;
-        overflow: hidden;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-        transition: all 0.3s ease;
-    }
-    
-    .related-place:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-    }
-    
-    .related-image {
-        height: 120px;
-        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-        position: relative;
-        overflow: hidden;
-    }
-    
-    .related-image img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }
-    
-    .content-section {
-        background: white;
-        border-radius: 16px;
-        padding: 32px;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-    }
-    
-    .content-section h2 {
-        color: #1e293b;
-        font-size: 1.5rem;
-        font-weight: 700;
-        margin-bottom: 20px;
-        padding-bottom: 12px;
-        border-bottom: 2px solid #e2e8f0;
-    }
-    
-    .content-section p {
-        color: #475569;
-        line-height: 1.7;
-        margin-bottom: 16px;
-    }
-    
-    .content-section ul,
-    .content-section ol {
-        color: #475569;
-        line-height: 1.7;
-        margin-bottom: 16px;
-        padding-left: 24px;
-    }
-    
-    .content-section li {
-        margin-bottom: 8px;
-    }
-    
-    .breadcrumb-item {
-        color: rgba(255, 255, 255, 0.8);
-    }
-    
-    .breadcrumb-item:hover {
-        color: white;
-    }
-    
-    .breadcrumb-separator {
-        margin: 0 8px;
-        color: rgba(255, 255, 255, 0.6);
     }
 </style>
 @endsection
 
 @section('content')
-<!-- Hero Section -->
-<section class="place-hero py-16 text-white">
-    <div class="container max-w-[1235px] mx-auto px-4">
-        <div class="place-hero-content">
-            <!-- Breadcrumb -->
-            <nav class="mb-8">
-                <ol class="flex items-center space-x-2 text-sm">
-                    @if(isset($breadcrumbs))
-                        @foreach($breadcrumbs as $breadcrumb)
-                            <li>
-                                @if($breadcrumb['url'])
-                                    <a href="{{ $breadcrumb['url'] }}" class="breadcrumb-item">{{ $breadcrumb['title'] }}</a>
-                                @else
-                                    <span class="text-white font-medium">{{ $breadcrumb['title'] }}</span>
-                                @endif
-                            </li>
-                            @if(!$loop->last)
-                                <li class="breadcrumb-separator"><i class="fas fa-chevron-right"></i></li>
-                            @endif
-                        @endforeach
-                    @endif
-                </ol>
-            </nav>
+<!-- Hero Bölümü - Ana Rehber Sayfası ile Aynı -->
+<div class="relative bg-gradient-to-r from-[#00352b] to-[#20846c] overflow-hidden">
+    <div class="absolute inset-0 opacity-20">
+        <!-- Pattern overlay -->
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-full h-full" preserveAspectRatio="none">
+            <defs>
+                <pattern id="hero-pattern" width="40" height="40" patternUnits="userSpaceOnUse">
+                    <path d="M0 20 L40 20 M20 0 L20 40" stroke="currentColor" stroke-width="1" fill="none" />
+                </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#hero-pattern)" />
+        </svg>
+    </div>
+    
+    <!-- Dekoratif şekiller -->
+    <div class="absolute -right-20 -bottom-20 w-64 h-64 rounded-full bg-[#e6a23c]/10 blur-3xl"></div>
+    <div class="absolute -left-10 top-10 w-40 h-40 rounded-full bg-white/5 blur-2xl"></div>
+    
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-10 relative z-10">
+        <div class="flex flex-col items-center text-center">
+            <h1 class="text-3xl md:text-4xl font-bold text-white mb-4">
+                {{ $guidePlace->title }}
+            </h1>
+        </div>
+    </div>
+</div>
+
+<!-- Hızlı Aksiyonlar -->
+<section class="py-8 bg-gray-50">
+    <div class="container max-w-6xl mx-auto px-4">
+        <div class="flex flex-wrap justify-center gap-4">
+            <a href="{{ route('guide.place', [$category->slug, $guidePlace->slug]) }}" 
+               class="inline-flex items-center px-6 py-3 bg-[#004d2e] hover:bg-[#006b3f] text-white rounded-2xl font-medium transition-all duration-300 hover:-translate-y-1 shadow-lg hover:shadow-xl">
+                <span class="material-icons mr-2">visibility</span>Detaylar
+            </a>
             
-            <!-- Yer Bilgileri -->
-            <div class="flex flex-col lg:flex-row items-start gap-8">
-                <div class="flex-1">
-                    <div class="flex items-center gap-4 mb-4">
-                        <div class="w-16 h-16 bg-white bg-opacity-20 rounded-full flex items-center justify-center text-2xl">
-                            @if($category->icon)
-                                <i class="{{ $category->icon }}"></i>
-                            @else
-                                <i class="fas fa-building"></i>
-                            @endif
-                        </div>
-                        <div>
-                            <div class="text-sm opacity-80 mb-1">{{ $category->name }}</div>
-                            <h1 class="text-3xl md:text-4xl font-bold">{{ $place->title }}</h1>
-                        </div>
-                    </div>
-                    
-                    @if($place->excerpt)
-                        <p class="text-lg md:text-xl opacity-90 mb-6">{{ $place->excerpt }}</p>
-                    @endif
-                    
-                    <!-- Hızlı Aksiyonlar -->
-                    <div class="flex flex-wrap gap-3">
-                        @if($place->phone)
-                            <a href="tel:{{ $place->phone }}" class="action-button action-secondary">
-                                <i class="fas fa-phone mr-2"></i>Ara
-                            </a>
-                        @endif
-                        
-                        @if($place->maps_link)
-                            <a href="{{ $place->maps_link }}" target="_blank" class="action-button action-primary">
-                                <i class="fas fa-map-marker-alt mr-2"></i>Haritada Gör
-                            </a>
-                        @endif
-                        
-                        @if($place->website)
-                            <a href="{{ $place->website }}" target="_blank" class="action-button action-tertiary">
-                                <i class="fas fa-globe mr-2"></i>Web Sitesi
-                            </a>
-                        @endif
-                    </div>
-                </div>
-            </div>
+            @if($guidePlace->phone)
+                <a href="tel:{{ $guidePlace->phone }}" 
+                   class="inline-flex items-center px-6 py-3 bg-white hover:bg-gray-50 text-gray-700 rounded-2xl font-medium transition-all duration-300 hover:-translate-y-1 shadow-lg hover:shadow-xl border border-gray-200">
+                    <span class="material-icons mr-2">phone</span>Ara
+                </a>
+            @endif
+            
+            @if($guidePlace->maps_link)
+                <a href="{{ $guidePlace->maps_link }}" target="_blank" 
+                   class="inline-flex items-center px-6 py-3 bg-white hover:bg-gray-50 text-gray-700 rounded-2xl font-medium transition-all duration-300 hover:-translate-y-1 shadow-lg hover:shadow-xl border border-gray-200">
+                    <span class="material-icons mr-2">map</span>Konum
+                </a>
+            @endif
+            
+            @if($guidePlace->email)
+                <a href="mailto:{{ $guidePlace->email }}" 
+                   class="inline-flex items-center px-6 py-3 bg-white hover:bg-gray-50 text-gray-700 rounded-2xl font-medium transition-all duration-300 hover:-translate-y-1 shadow-lg hover:shadow-xl border border-gray-200">
+                    <span class="material-icons mr-2">email</span>E-posta
+                </a>
+            @endif
         </div>
     </div>
 </section>
 
 <!-- Ana İçerik -->
-<section class="py-16 bg-gray-50">
-    <div class="container max-w-[1235px] mx-auto px-4">
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+<section class="py-20 bg-white">
+    <div class="container max-w-6xl mx-auto px-4">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-12">
             <!-- Sol Kolon - Ana İçerik -->
-            <div class="lg:col-span-2">
+            <div class="lg:col-span-2 space-y-8">
                 <!-- Fotoğraf Galerisi -->
-                @if($place->images->count() > 0)
-                    <div class="place-gallery mb-8">
-                        <div class="gallery-main" id="galleryMain">
-                            <img src="{{ $place->images->first()->image_url }}" 
-                                 alt="{{ $place->title }}" 
-                                 id="mainImage">
+                @if($guidePlace->images->count() > 0)
+                    <div class="bg-white rounded-3xl p-8 shadow-sm border border-gray-100">
+                        <h2 class="text-2xl font-bold text-gray-900 mb-8 flex items-center">
+                            <span class="material-icons mr-3 text-[#004d2e]">photo_library</span>
+                            Fotoğraflar
+                        </h2>
+                        
+                        <!-- Ana Resim -->
+                        <div class="rounded-2xl overflow-hidden mb-6 shadow-lg">
+                            <img id="mainImage" 
+                                 src="{{ $guidePlace->featured_image_url ?: $guidePlace->images->first()->image_url }}" 
+                                 alt="{{ $guidePlace->title }}"
+                                 class="w-full h-96 object-cover">
                         </div>
                         
-                        @if($place->images->count() > 1)
-                            <div class="gallery-thumbs">
-                                @foreach($place->images->take(4) as $image)
-                                    <div class="gallery-thumb {{ $loop->first ? 'active' : '' }}" 
+                        <!-- Küçük Resimler -->
+                        @if($guidePlace->images->count() > 1)
+                            <div class="grid grid-cols-4 md:grid-cols-6 gap-4">
+                                @foreach($guidePlace->images as $index => $image)
+                                    <div class="gallery-thumb {{ $index === 0 ? 'active' : '' }} rounded-xl overflow-hidden cursor-pointer transition-all duration-300 hover:scale-105 border-2 {{ $index === 0 ? 'border-[#004d2e]' : 'border-transparent hover:border-[#004d2e]/50' }}" 
                                          onclick="changeMainImage('{{ $image->image_url }}', this)">
-                                        <img src="{{ $image->image_url }}" alt="{{ $place->title }}">
+                                        <img src="{{ $image->image_url }}" 
+                                             alt="{{ $guidePlace->title }}"
+                                             class="w-full h-20 object-cover">
                                     </div>
                                 @endforeach
                             </div>
@@ -351,123 +111,93 @@
                     </div>
                 @endif
                 
-                <!-- Detaylı İçerik -->
-                @if($place->content)
-                    <div class="content-section mb-8">
-                        <h2><i class="fas fa-info-circle mr-3 text-blue-600"></i>Detaylı Bilgi</h2>
-                        <div class="prose max-w-none">
-                            {!! $place->content !!}
+                <!-- İçerik -->
+                @if($guidePlace->content)
+                    <div class="bg-white rounded-3xl p-8 shadow-sm border border-gray-100">
+                        <h2 class="text-2xl font-bold text-gray-900 mb-8 flex items-center">
+                            <span class="material-icons mr-3 text-[#004d2e]">description</span>
+                            Detaylar
+                        </h2>
+                        <div class="prose prose-lg max-w-none prose-headings:text-gray-900 prose-p:text-gray-700 prose-a:text-[#004d2e] prose-a:no-underline hover:prose-a:underline">
+                            {!! $guidePlace->content !!}
                         </div>
                     </div>
                 @endif
             </div>
-            
-            <!-- Sağ Kolon - İletişim ve Bilgiler -->
-            <div class="lg:col-span-1">
-                <!-- İletişim Bilgileri -->
-                <div class="info-card">
-                    <h3 class="text-xl font-bold text-gray-800 mb-6">
-                        <i class="fas fa-address-book mr-2 text-blue-600"></i>İletişim Bilgileri
+
+            <!-- Sağ Kolon - Konum Bilgileri -->
+            <div class="space-y-8">
+                <!-- Konum Bilgileri -->
+                <div class="bg-white rounded-3xl p-8 shadow-sm border border-gray-100 sticky top-8">
+                    <h3 class="text-xl font-bold text-gray-900 mb-8 flex items-center">
+                        <span class="material-icons mr-3 text-[#004d2e]">place</span>
+                        Konum Bilgileri
                     </h3>
                     
-                    @if($place->address)
-                        <div class="contact-item">
-                            <div class="contact-icon">
-                                <i class="fas fa-map-marker-alt"></i>
-                            </div>
-                            <div class="contact-content">
-                                <div class="contact-label">Adres</div>
-                                <div class="contact-value">{{ $place->address }}</div>
-                            </div>
-                        </div>
-                    @endif
-                    
-                    @if($place->phone)
-                        <div class="contact-item">
-                            <div class="contact-icon">
-                                <i class="fas fa-phone"></i>
-                            </div>
-                            <div class="contact-content">
-                                <div class="contact-label">Telefon</div>
-                                <div class="contact-value">
-                                    <a href="tel:{{ $place->phone }}" class="text-blue-600 hover:text-blue-800">
-                                        {{ $place->phone }}
-                                    </a>
+                    <div class="space-y-6">
+                        @if($guidePlace->address)
+                            <div class="flex items-start p-4 bg-gray-50 rounded-2xl hover:bg-gray-100 transition-colors duration-200">
+                                <div class="w-12 h-12 bg-[#004d2e]/10 rounded-xl flex items-center justify-center mr-4 flex-shrink-0">
+                                    <span class="material-icons text-[#004d2e]">location_on</span>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <h4 class="font-semibold text-gray-900 mb-1">Adres</h4>
+                                    <p class="text-gray-600 text-sm leading-relaxed">{{ $guidePlace->address }}</p>
                                 </div>
                             </div>
-                        </div>
-                    @endif
-                    
-                    @if($place->email)
-                        <div class="contact-item">
-                            <div class="contact-icon">
-                                <i class="fas fa-envelope"></i>
-                            </div>
-                            <div class="contact-content">
-                                <div class="contact-label">E-posta</div>
-                                <div class="contact-value">
-                                    <a href="mailto:{{ $place->email }}" class="text-blue-600 hover:text-blue-800">
-                                        {{ $place->email }}
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    @endif
-                    
-                    @if($place->website)
-                        <div class="contact-item">
-                            <div class="contact-icon">
-                                <i class="fas fa-globe"></i>
-                            </div>
-                            <div class="contact-content">
-                                <div class="contact-label">Web Sitesi</div>
-                                <div class="contact-value">
-                                    <a href="{{ $place->website }}" target="_blank" class="text-blue-600 hover:text-blue-800">
-                                        {{ parse_url($place->website, PHP_URL_HOST) }}
-                                        <i class="fas fa-external-link-alt ml-1 text-xs"></i>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    @endif
-                    
-                    @if($place->working_hours)
-                        <div class="contact-item">
-                            <div class="contact-icon">
-                                <i class="fas fa-clock"></i>
-                            </div>
-                            <div class="contact-content">
-                                <div class="contact-label">Çalışma Saatleri</div>
-                                <div class="contact-value">{{ $place->working_hours }}</div>
-                            </div>
-                        </div>
-                    @endif
-                </div>
-                
-                <!-- Paylaşım -->
-                <div class="info-card">
-                    <h3 class="text-xl font-bold text-gray-800 mb-6">
-                        <i class="fas fa-share-alt mr-2 text-blue-600"></i>Paylaş
-                    </h3>
-                    
-                    <div class="flex flex-wrap gap-3">
-                        <a href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode(request()->fullUrl()) }}" 
-                           target="_blank"
-                           class="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-                            <i class="fab fa-facebook-f mr-2"></i>Facebook
-                        </a>
+                        @endif
                         
-                        <a href="https://twitter.com/intent/tweet?url={{ urlencode(request()->fullUrl()) }}&text={{ urlencode($place->title) }}" 
-                           target="_blank"
-                           class="flex items-center px-4 py-2 bg-sky-500 text-white rounded-lg hover:bg-sky-600 transition-colors">
-                            <i class="fab fa-twitter mr-2"></i>Twitter
-                        </a>
+                        @if($guidePlace->phone)
+                            <div class="flex items-start p-4 bg-gray-50 rounded-2xl hover:bg-gray-100 transition-colors duration-200 cursor-pointer group" onclick="copyToClipboard('{{ $guidePlace->phone }}', 'Telefon numarası kopyalandı!')">
+                                <div class="w-12 h-12 bg-[#004d2e]/10 group-hover:bg-[#004d2e] rounded-xl flex items-center justify-center mr-4 flex-shrink-0 transition-colors duration-200">
+                                    <span class="material-icons text-[#004d2e] group-hover:text-white transition-colors duration-200">phone</span>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <h4 class="font-semibold text-gray-900 mb-1">Telefon</h4>
+                                    <p class="text-gray-600 text-sm">{{ $guidePlace->phone }}</p>
+                                    <p class="text-xs text-gray-400 mt-1">Kopyalamak için tıklayın</p>
+                                </div>
+                            </div>
+                        @endif
                         
-                        <a href="https://wa.me/?text={{ urlencode($place->title . ' - ' . request()->fullUrl()) }}" 
-                           target="_blank"
-                           class="flex items-center px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors">
-                            <i class="fab fa-whatsapp mr-2"></i>WhatsApp
-                        </a>
+                        @if($guidePlace->email)
+                            <div class="flex items-start p-4 bg-gray-50 rounded-2xl hover:bg-gray-100 transition-colors duration-200 cursor-pointer group" onclick="copyToClipboard('{{ $guidePlace->email }}', 'E-posta adresi kopyalandı!')">
+                                <div class="w-12 h-12 bg-[#004d2e]/10 group-hover:bg-[#004d2e] rounded-xl flex items-center justify-center mr-4 flex-shrink-0 transition-colors duration-200">
+                                    <span class="material-icons text-[#004d2e] group-hover:text-white transition-colors duration-200">email</span>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <h4 class="font-semibold text-gray-900 mb-1">E-posta</h4>
+                                    <p class="text-gray-600 text-sm break-all">{{ $guidePlace->email }}</p>
+                                    <p class="text-xs text-gray-400 mt-1">Kopyalamak için tıklayın</p>
+                                </div>
+                            </div>
+                        @endif
+                        
+                        @if($guidePlace->website)
+                            <div class="flex items-start p-4 bg-gray-50 rounded-2xl hover:bg-gray-100 transition-colors duration-200">
+                                <div class="w-12 h-12 bg-[#004d2e]/10 rounded-xl flex items-center justify-center mr-4 flex-shrink-0">
+                                    <span class="material-icons text-[#004d2e]">language</span>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <h4 class="font-semibold text-gray-900 mb-1">Website</h4>
+                                    <a href="{{ $guidePlace->website }}" target="_blank" class="text-[#004d2e] hover:text-[#006b3f] text-sm hover:underline transition-colors duration-200">
+                                        {{ parse_url($guidePlace->website, PHP_URL_HOST) }}
+                                    </a>
+                                </div>
+                            </div>
+                        @endif
+                        
+                        @if($guidePlace->working_hours)
+                            <div class="flex items-start p-4 bg-gray-50 rounded-2xl hover:bg-gray-100 transition-colors duration-200">
+                                <div class="w-12 h-12 bg-[#004d2e]/10 rounded-xl flex items-center justify-center mr-4 flex-shrink-0">
+                                    <span class="material-icons text-[#004d2e]">schedule</span>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <h4 class="font-semibold text-gray-900 mb-1">Çalışma Saatleri</h4>
+                                    <p class="text-gray-600 text-sm leading-relaxed">{{ $guidePlace->working_hours }}</p>
+                                </div>
+                            </div>
+                        @endif
                     </div>
                 </div>
             </div>
@@ -477,148 +207,113 @@
 
 <!-- İlgili Yerler -->
 @if($relatedPlaces->count() > 0)
-    <section class="py-16 bg-white">
-        <div class="container max-w-[1235px] mx-auto px-4">
-            <div class="text-center mb-12">
-                <h2 class="text-3xl font-bold text-gray-800 mb-4">İlgili Yerler</h2>
-                <p class="text-gray-600">{{ $category->name }} kategorisindeki diğer yerler</p>
-            </div>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                @foreach($relatedPlaces as $relatedPlace)
-                    <div class="related-place">
-                        <div class="related-image">
-                            @if($relatedPlace->featured_image_url)
-                                <img src="{{ $relatedPlace->featured_image_url }}" alt="{{ $relatedPlace->title }}">
-                            @else
-                                <div class="w-full h-full flex items-center justify-center text-white text-2xl">
-                                    <i class="fas fa-building"></i>
-                                </div>
-                            @endif
+<section class="py-20 bg-gray-50">
+    <div class="container max-w-6xl mx-auto px-4">
+        <div class="text-center mb-16">
+            <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">İlgili Yerler</h2>
+            <div class="w-20 h-1 bg-[#004d2e] mx-auto mb-6"></div>
+            <p class="text-lg text-gray-600">{{ $category->name }} kategorisindeki diğer yerler</p>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            @foreach($relatedPlaces as $relatedPlace)
+                <a href="{{ route('guide.place', [$category->slug, $relatedPlace->slug]) }}" 
+                   class="group block bg-white rounded-3xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-xl hover:-translate-y-2 transition-all duration-300">
+                    @if($relatedPlace->featured_image_url)
+                        <div class="aspect-video overflow-hidden">
+                            <img src="{{ $relatedPlace->featured_image_url }}" 
+                                 alt="{{ $relatedPlace->title }}"
+                                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
                         </div>
+                    @else
+                        <div class="aspect-video bg-gray-50 flex items-center justify-center">
+                            <span class="material-icons text-gray-300 text-4xl">business</span>
+                        </div>
+                    @endif
+                    
+                    <div class="p-6">
+                        <h3 class="text-lg font-bold text-gray-900 mb-2 group-hover:text-[#004d2e] transition-colors duration-300">{{ $relatedPlace->title }}</h3>
+                        @if($relatedPlace->address)
+                            <p class="text-gray-600 text-sm mb-4 leading-relaxed">{{ Str::limit($relatedPlace->address, 60) }}</p>
+                        @endif
                         
-                        <div class="p-4">
-                            <h3 class="font-bold text-gray-800 mb-2 line-clamp-2">{{ $relatedPlace->title }}</h3>
-                            
-                            @if($relatedPlace->address)
-                                <p class="text-sm text-gray-600 mb-3 line-clamp-1">
-                                    <i class="fas fa-map-marker-alt mr-1"></i>{{ $relatedPlace->address }}
-                                </p>
-                            @endif
-                            
-                            <a href="{{ route('guide.place', [$category->slug, $relatedPlace->slug]) }}" 
-                               class="inline-flex items-center text-blue-600 hover:text-blue-800 font-medium">
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm font-medium text-[#004d2e] group-hover:text-[#006b3f] transition-colors duration-300">
                                 Detayları Gör
-                                <i class="fas fa-arrow-right ml-2"></i>
-                            </a>
+                            </span>
+                            <div class="w-8 h-8 bg-[#004d2e]/10 group-hover:bg-[#004d2e] rounded-full flex items-center justify-center transition-all duration-300 group-hover:translate-x-1">
+                                <span class="material-icons text-sm text-[#004d2e] group-hover:text-white transition-colors duration-300">arrow_forward</span>
+                            </div>
                         </div>
                     </div>
-                @endforeach
-            </div>
+                </a>
+            @endforeach
         </div>
-    </section>
+    </div>
+</section>
 @endif
 @endsection
 
 @section('after_scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Galeri fonksiyonları
-    window.changeMainImage = function(imageUrl, thumbElement) {
-        const mainImage = document.getElementById('mainImage');
-        if (mainImage) {
-            mainImage.src = imageUrl;
-            
-            // Aktif thumb'ı güncelle
-            document.querySelectorAll('.gallery-thumb').forEach(thumb => {
-                thumb.classList.remove('active');
+    // Galeri işlevselliği
+    window.changeMainImage = function(imageSrc, thumbElement) {
+        document.getElementById('mainImage').src = imageSrc;
+        
+        // Aktif thumb'ı güncelle
+        document.querySelectorAll('.gallery-thumb').forEach(thumb => {
+            thumb.classList.remove('active');
+        });
+        thumbElement.classList.add('active');
+    };
+    
+    // Kopyalama işlevi
+    window.copyToClipboard = function(text, message) {
+        if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(text).then(function() {
+                showToast(message || 'Kopyalandı!');
             });
-            thumbElement.classList.add('active');
+        } else {
+            // Fallback for older browsers
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            document.body.appendChild(textArea);
+            textArea.select();
+            try {
+                document.execCommand('copy');
+                showToast(message || 'Kopyalandı!');
+            } catch (err) {
+                console.error('Kopyalama başarısız:', err);
+            }
+            document.body.removeChild(textArea);
         }
     };
     
-    // Telefon numarası kopyalama
-    const phoneLinks = document.querySelectorAll('a[href^="tel:"]');
-    phoneLinks.forEach(link => {
-        link.addEventListener('contextmenu', function(e) {
-            e.preventDefault();
-            
-            // Telefon numarasını panoya kopyala
-            const phoneNumber = this.textContent.trim();
-            if (navigator.clipboard) {
-                navigator.clipboard.writeText(phoneNumber).then(() => {
-                    // Başarılı kopyalama bildirimi
-                    showNotification('Telefon numarası kopyalandı: ' + phoneNumber);
-                });
-            }
-        });
-    });
-    
-    // E-posta kopyalama
-    const emailLinks = document.querySelectorAll('a[href^="mailto:"]');
-    emailLinks.forEach(link => {
-        link.addEventListener('contextmenu', function(e) {
-            e.preventDefault();
-            
-            const email = this.textContent.trim();
-            if (navigator.clipboard) {
-                navigator.clipboard.writeText(email).then(() => {
-                    showNotification('E-posta adresi kopyalandı: ' + email);
-                });
-            }
-        });
-    });
-    
-    // Bildirim gösterme fonksiyonu
-    function showNotification(message) {
-        // Basit bir bildirim sistemi
-        const notification = document.createElement('div');
-        notification.className = 'fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 transition-all duration-300';
-        notification.textContent = message;
+    // Toast bildirimi
+    function showToast(message) {
+        const toast = document.createElement('div');
+        toast.className = 'fixed bottom-4 right-4 bg-[#004d2e] text-white px-6 py-3 rounded-lg shadow-lg z-50 transition-all duration-300';
+        toast.textContent = message;
         
-        document.body.appendChild(notification);
+        document.body.appendChild(toast);
         
-        // 3 saniye sonra kaldır
         setTimeout(() => {
-            notification.style.opacity = '0';
-            notification.style.transform = 'translateY(-20px)';
+            toast.style.opacity = '0';
+            toast.style.transform = 'translateY(20px)';
             setTimeout(() => {
-                document.body.removeChild(notification);
+                document.body.removeChild(toast);
             }, 300);
         }, 3000);
     }
     
-    // Smooth scroll için anchor linkler
-    const anchorLinks = document.querySelectorAll('a[href^="#"]');
-    anchorLinks.forEach(link => {
-        link.addEventListener('click', function(e) {
+    // Sağ tık ile kopyalama
+    document.querySelectorAll('.cursor-pointer[onclick*="copyToClipboard"]').forEach(item => {
+        item.addEventListener('contextmenu', function(e) {
             e.preventDefault();
-            const targetId = this.getAttribute('href').substring(1);
-            const targetElement = document.getElementById(targetId);
-            
-            if (targetElement) {
-                targetElement.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start'
-                });
-            }
+            this.click();
         });
     });
-    
-    // Lazy loading için intersection observer
-    const images = document.querySelectorAll('img[data-src]');
-    const imageObserver = new IntersectionObserver((entries, observer) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                const img = entry.target;
-                img.src = img.dataset.src;
-                img.removeAttribute('data-src');
-                observer.unobserve(img);
-            }
-        });
-    });
-    
-    images.forEach(img => imageObserver.observe(img));
 });
 </script>
 @endsection

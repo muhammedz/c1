@@ -1,293 +1,220 @@
 @extends('layouts.front')
 
-@section('title', $pageTitle)
-@section('meta_description', $pageDescription)
+@section('title', $category->name . ' - ' . $pageTitle)
+@section('meta_description', $category->meta_description ?: $category->description)
 
 @section('css')
 <style>
-    .category-hero {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    }
-    
     .place-card {
+        background: white;
+        border-radius: 24px;
+        box-shadow: 0 2px 20px rgba(0,0,0,0.05);
         transition: all 0.3s ease;
-        border-radius: 16px;
         overflow: hidden;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
     }
     
     .place-card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        transform: translateY(-5px);
+        box-shadow: 0 2px 20px rgba(0,0,0,0.1);
     }
     
-    .place-image {
-        height: 200px;
-        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-        position: relative;
-        overflow: hidden;
-    }
-    
-    .place-image img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        transition: transform 0.3s ease;
-    }
-    
-    .place-card:hover .place-image img {
-        transform: scale(1.05);
-    }
-    
-    .place-badge {
-        position: absolute;
-        top: 12px;
-        right: 12px;
-        background: rgba(255, 255, 255, 0.9);
-        backdrop-filter: blur(10px);
-        padding: 4px 12px;
-        border-radius: 20px;
-        font-size: 0.75rem;
-        font-weight: 600;
-        color: #374151;
-    }
-    
-    .contact-info {
-        display: flex;
-        align-items: center;
-        padding: 8px 12px;
-        background: #f8fafc;
-        border-radius: 8px;
-        margin: 4px 0;
-        font-size: 0.875rem;
-        color: #64748b;
-    }
-    
-    .contact-info i {
-        width: 16px;
-        margin-right: 8px;
-        color: #3b82f6;
-    }
-    
-    .filter-tabs {
+    .search-filter-box {
         background: white;
-        border-radius: 12px;
-        padding: 8px;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        border-radius: 16px;
+        box-shadow: 0 2px 20px rgba(0,0,0,0.05);
     }
-    
-    .filter-tab {
-        padding: 8px 16px;
+
+    .action-btn {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.5rem 1rem;
         border-radius: 8px;
+        font-size: 0.875rem;
         font-weight: 500;
         transition: all 0.2s ease;
-        cursor: pointer;
+        text-decoration: none;
     }
-    
-    .filter-tab.active {
-        background: #3b82f6;
+
+    .action-btn-primary {
+        background-color: #004d2e;
         color: white;
     }
-    
-    .filter-tab:not(.active):hover {
-        background: #f1f5f9;
+
+    .action-btn-primary:hover {
+        background-color: #006b3f;
+        color: white;
+    }
+
+    .action-btn-secondary {
+        background-color: #f8f9fa;
+        color: #6c757d;
+        border: 1px solid #e9ecef;
+    }
+
+    .action-btn-secondary:hover {
+        background-color: #e9ecef;
+        color: #495057;
+    }
+
+    .breadcrumb-item {
+        color: rgba(255, 255, 255, 0.8);
+    }
+
+    .breadcrumb-item:hover {
+        color: white;
+    }
+
+    .breadcrumb-separator {
+        color: rgba(255, 255, 255, 0.6);
+        margin: 0 0.5rem;
     }
 </style>
 @endsection
 
 @section('content')
-<!-- Hero Section -->
-<section class="category-hero py-16 text-white">
-    <div class="container max-w-[1235px] mx-auto px-4">
-        <!-- Breadcrumb -->
-        <nav class="mb-8">
-            <ol class="flex items-center space-x-2 text-sm opacity-80">
-                <li><a href="{{ route('home') }}" class="hover:text-white">Ana Sayfa</a></li>
-                <li><i class="fas fa-chevron-right mx-2"></i></li>
-                <li><a href="{{ route('guide.index') }}" class="hover:text-white">Rehber</a></li>
-                <li><i class="fas fa-chevron-right mx-2"></i></li>
-                <li class="text-white font-medium">{{ $category->name }}</li>
-            </ol>
-        </nav>
-        
-        <div class="flex flex-col md:flex-row items-start md:items-center gap-6">
-            <!-- Kategori İkonu -->
-            <div class="w-20 h-20 bg-white bg-opacity-20 rounded-full flex items-center justify-center text-3xl">
-                @if($category->icon)
-                    <i class="{{ $category->icon }}"></i>
-                @else
-                    <i class="fas fa-map-marker-alt"></i>
-                @endif
-            </div>
-            
-            <!-- Kategori Bilgileri -->
-            <div class="flex-1">
-                <h1 class="text-3xl md:text-4xl font-bold mb-4">{{ $category->name }}</h1>
+<!-- Hero Bölümü - Ana Rehber Sayfası ile Aynı -->
+<div class="relative bg-gradient-to-r from-[#00352b] to-[#20846c] overflow-hidden">
+    <div class="absolute inset-0 opacity-20">
+        <!-- Pattern overlay -->
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-full h-full" preserveAspectRatio="none">
+            <defs>
+                <pattern id="hero-pattern" width="40" height="40" patternUnits="userSpaceOnUse">
+                    <path d="M0 20 L40 20 M20 0 L20 40" stroke="currentColor" stroke-width="1" fill="none" />
+                </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#hero-pattern)" />
+        </svg>
+    </div>
+    
+    <!-- Dekoratif şekiller -->
+    <div class="absolute -right-20 -bottom-20 w-64 h-64 rounded-full bg-[#e6a23c]/10 blur-3xl"></div>
+    <div class="absolute -left-10 top-10 w-40 h-40 rounded-full bg-white/5 blur-2xl"></div>
+    
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-10 relative z-10">
+        <div class="flex flex-col items-center text-center">
+            <h1 class="text-3xl md:text-4xl font-bold text-white mb-4">
+                {{ $category->name }} <span class="text-[#e6a23c]">Rehberi</span>
+            </h1>
+            <p class="text-white/80 text-lg mb-5 max-w-4xl">
                 @if($category->description)
-                    <p class="text-lg md:text-xl opacity-90 mb-4">{{ $category->description }}</p>
+                    {{ $category->description }}
+                @else
+                    {{ $category->name }} kategorisindeki tüm lokasyonlara kolayca ulaşın. İhtiyacınız olan bilgilere hızlıca erişin.
                 @endif
-                
-                <div class="flex items-center gap-6 text-sm">
-                    <div class="flex items-center">
-                        <i class="fas fa-map-marker-alt mr-2"></i>
-                        <span>{{ $places->total() }} yer</span>
-                    </div>
-                    <div class="flex items-center">
-                        <i class="fas fa-clock mr-2"></i>
-                        <span>7/24 Erişim</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Arama ve Filtreler -->
-        <div class="mt-8">
-            <form action="{{ route('guide.category', $category->slug) }}" method="GET" class="max-w-2xl">
-                <div class="flex flex-col md:flex-row gap-4">
-                    <div class="flex-1">
-                        <input type="text" 
-                               name="search" 
-                               value="{{ request('search') }}"
-                               placeholder="Bu kategori içinde ara..." 
-                               class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-800">
-                    </div>
-                    <button type="submit" 
-                            class="px-6 py-3 bg-white bg-opacity-20 hover:bg-opacity-30 text-white rounded-lg font-semibold transition-all duration-200 backdrop-filter backdrop-blur-sm">
-                        <i class="fas fa-search mr-2"></i>Ara
+            </p>
+            
+            <!-- Arama Kutusu -->
+            <form method="GET" class="mt-6 w-full max-w-2xl">
+                <div class="bg-white/10 backdrop-blur-sm rounded-lg p-1 flex items-center shadow-lg hover:bg-white/20 transition duration-300 border border-white/20">
+                    <input 
+                        type="text" 
+                        name="search" 
+                        placeholder="Bu kategori içinde ara..." 
+                        class="w-full bg-transparent px-4 py-3 text-white placeholder-white/70 outline-none"
+                        value="{{ request('search') }}"
+                    >
+                    <button type="submit" class="bg-[#e6a23c] hover:bg-[#e6a23c]/90 text-white font-medium px-6 py-3 rounded-md transition duration-300 flex items-center shadow-lg shadow-[#e6a23c]/20">
+                        <span class="material-icons mr-1">search</span>
+                        Ara
                     </button>
                 </div>
+                @if(request('search'))
+                    <div class="text-center mt-4">
+                        <a href="{{ route('guide.category', $category->slug) }}" 
+                           class="inline-flex items-center text-white/80 hover:text-white transition-colors">
+                            <span class="material-icons mr-1 text-sm">clear</span>
+                            Aramayı temizle
+                        </a>
+                    </div>
+                @endif
             </form>
         </div>
     </div>
-</section>
+</div>
 
 <!-- Yerler Listesi -->
-<section class="py-16 bg-gray-50">
-    <div class="container max-w-[1235px] mx-auto px-4">
+<section class="py-20 bg-gray-50">
+    <div class="container max-w-6xl mx-auto px-4">
         @if($places->count() > 0)
-            <!-- Sonuç Bilgisi -->
-            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
-                <div>
-                    <h2 class="text-2xl font-bold text-gray-800 mb-2">
-                        @if(request('search'))
-                            "{{ request('search') }}" için sonuçlar
-                        @else
-                            Tüm Yerler
-                        @endif
-                    </h2>
-                    <p class="text-gray-600">{{ $places->total() }} yer bulundu</p>
-                </div>
-                
-                <!-- Sıralama -->
-                <div class="filter-tabs mt-4 md:mt-0">
-                    <div class="flex items-center gap-2">
-                        <span class="text-sm text-gray-600 mr-2">Sırala:</span>
-                        <div class="filter-tab active">
-                            <i class="fas fa-sort-alpha-down mr-1"></i>A-Z
-                        </div>
-                        <div class="filter-tab">
-                            <i class="fas fa-map-marker-alt mr-1"></i>Konum
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Yerler Grid -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 @foreach($places as $place)
-                    <div class="place-card bg-white">
-                        <!-- Yer Resmi -->
-                        <div class="place-image">
-                            @if($place->featured_image_url)
-                                <img src="{{ $place->featured_image_url }}" alt="{{ $place->title }}">
-                            @else
-                                <div class="w-full h-full flex items-center justify-center text-white text-4xl">
-                                    <i class="fas fa-building"></i>
-                                </div>
-                            @endif
-                            
-                            @if($place->is_featured)
-                                <div class="place-badge">
-                                    <i class="fas fa-star text-yellow-500 mr-1"></i>Öne Çıkan
-                                </div>
-                            @endif
-                        </div>
+                    <a href="{{ route('guide.place', [$category->slug, $place->slug]) }}" 
+                       class="group block bg-white rounded-3xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-xl hover:-translate-y-2 transition-all duration-300">
+                        <!-- Resim -->
+                        @if($place->featured_image_url)
+                            <div class="aspect-video overflow-hidden">
+                                <img src="{{ $place->featured_image_url }}" 
+                                     alt="{{ $place->title }}"
+                                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                            </div>
+                        @else
+                            <div class="aspect-video bg-gray-50 flex items-center justify-center">
+                                <span class="material-icons text-gray-300 text-4xl">business</span>
+                            </div>
+                        @endif
                         
-                        <!-- Yer Bilgileri -->
+                        <!-- İçerik -->
                         <div class="p-6">
-                            <h3 class="text-lg font-bold text-gray-800 mb-3 line-clamp-2">{{ $place->title }}</h3>
+                            <h3 class="text-xl font-bold text-gray-900 mb-3 group-hover:text-[#004d2e] transition-colors duration-300">{{ $place->title }}</h3>
                             
                             @if($place->excerpt)
-                                <p class="text-gray-600 text-sm mb-4 line-clamp-3">{{ $place->excerpt }}</p>
+                                <p class="text-gray-600 mb-4 line-clamp-2 leading-relaxed">{{ $place->excerpt }}</p>
                             @endif
                             
                             <!-- İletişim Bilgileri -->
-                            <div class="space-y-2 mb-6">
+                            <div class="space-y-3 mb-6">
                                 @if($place->address)
-                                    <div class="contact-info">
-                                        <i class="fas fa-map-marker-alt"></i>
-                                        <span class="line-clamp-1">{{ $place->address }}</span>
+                                    <div class="flex items-start text-sm text-gray-600">
+                                        <span class="material-icons text-[#004d2e] mr-3 mt-0.5 text-base">location_on</span>
+                                        <span class="flex-1 leading-relaxed">{{ Str::limit($place->address, 60) }}</span>
                                     </div>
                                 @endif
                                 
                                 @if($place->phone)
-                                    <div class="contact-info">
-                                        <i class="fas fa-phone"></i>
-                                        <a href="tel:{{ $place->phone }}" class="hover:text-blue-600">{{ $place->phone }}</a>
+                                    <div class="flex items-center text-sm text-gray-600">
+                                        <span class="material-icons text-[#004d2e] mr-3 text-base">phone</span>
+                                        <span>{{ $place->phone }}</span>
                                     </div>
                                 @endif
                                 
                                 @if($place->working_hours)
-                                    <div class="contact-info">
-                                        <i class="fas fa-clock"></i>
-                                        <span class="line-clamp-1">{{ $place->working_hours }}</span>
+                                    <div class="flex items-center text-sm text-gray-600">
+                                        <span class="material-icons text-[#004d2e] mr-3 text-base">schedule</span>
+                                        <span>{{ $place->working_hours }}</span>
                                     </div>
                                 @endif
                             </div>
                             
-                            <!-- Aksiyonlar -->
+                            <!-- Aksiyon Butonları -->
                             <div class="flex items-center justify-between">
-                                <a href="{{ route('guide.place', [$category->slug, $place->slug]) }}" 
-                                   class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors duration-200">
-                                    Detaylar
-                                    <i class="fas fa-arrow-right ml-2"></i>
-                                </a>
-                                
-                                <div class="flex items-center gap-2">
-                                    @if($place->maps_link)
-                                        <a href="{{ $place->maps_link }}" 
-                                           target="_blank"
-                                           class="w-10 h-10 bg-gray-100 hover:bg-gray-200 rounded-lg flex items-center justify-center text-gray-600 hover:text-gray-800 transition-colors duration-200"
-                                           title="Haritada Göster">
-                                            <i class="fas fa-map"></i>
-                                        </a>
-                                    @endif
-                                    
-                                    @if($place->phone)
-                                        <a href="tel:{{ $place->phone }}" 
-                                           class="w-10 h-10 bg-green-100 hover:bg-green-200 rounded-lg flex items-center justify-center text-green-600 hover:text-green-800 transition-colors duration-200"
-                                           title="Ara">
-                                            <i class="fas fa-phone"></i>
-                                        </a>
-                                    @endif
+                                <span class="text-sm font-medium text-[#004d2e] group-hover:text-[#006b3f] transition-colors duration-300">
+                                    Detayları Gör
+                                </span>
+                                <div class="w-8 h-8 bg-[#004d2e]/10 group-hover:bg-[#004d2e] rounded-full flex items-center justify-center transition-all duration-300 group-hover:translate-x-1">
+                                    <span class="material-icons text-sm text-[#004d2e] group-hover:text-white transition-colors duration-300">arrow_forward</span>
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </a>
                 @endforeach
             </div>
             
             <!-- Pagination -->
             @if($places->hasPages())
-                <div class="mt-12 flex justify-center">
+                <div class="mt-16 flex justify-center">
                     {{ $places->appends(request()->query())->links() }}
                 </div>
             @endif
         @else
-            <!-- Boş Durum -->
-            <div class="text-center py-16">
-                <div class="w-24 h-24 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <i class="fas fa-search text-gray-400 text-3xl"></i>
+            <div class="text-center py-20">
+                <div class="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <span class="material-icons text-gray-400 text-3xl">
+                        @if(request('search'))
+                            search_off
+                        @else
+                            location_off
+                        @endif
+                    </span>
                 </div>
                 <h3 class="text-xl font-semibold text-gray-700 mb-2">
                     @if(request('search'))
@@ -296,23 +223,17 @@
                         Bu kategoride henüz yer bulunmuyor
                     @endif
                 </h3>
-                <p class="text-gray-500 mb-6">
+                <p class="text-gray-500 mb-8">
                     @if(request('search'))
-                        Farklı anahtar kelimeler deneyebilirsiniz.
+                        "{{ request('search') }}" için sonuç bulunamadı. Farklı kelimeler deneyin.
                     @else
-                        Yakında yeni yerler eklenecek.
+                        Yakında bu kategoriye yerler eklenecek.
                     @endif
                 </p>
-                
                 @if(request('search'))
                     <a href="{{ route('guide.category', $category->slug) }}" 
-                       class="inline-block px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition-colors duration-200">
-                        Tüm Yerleri Gör
-                    </a>
-                @else
-                    <a href="{{ route('guide.index') }}" 
-                       class="inline-block px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition-colors duration-200">
-                        Diğer Kategoriler
+                       class="inline-flex items-center px-6 py-3 bg-[#004d2e] hover:bg-[#006b3f] text-white rounded-2xl font-medium transition-all duration-300 hover:-translate-y-1 shadow-lg hover:shadow-xl">
+                        <span class="material-icons mr-2">arrow_back</span>Tüm Yerleri Gör
                     </a>
                 @endif
             </div>
@@ -324,12 +245,12 @@
 @section('after_scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Yer kartlarına hover efekti
+    // Kart hover efektleri
     const placeCards = document.querySelectorAll('.place-card');
     
     placeCards.forEach(card => {
         card.addEventListener('mouseenter', function() {
-            this.style.transform = 'translateY(-4px)';
+            this.style.transform = 'translateY(-5px)';
         });
         
         card.addEventListener('mouseleave', function() {
@@ -337,32 +258,11 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
-    // Filtre tabları
-    const filterTabs = document.querySelectorAll('.filter-tab');
-    
-    filterTabs.forEach(tab => {
-        tab.addEventListener('click', function() {
-            // Aktif tab'ı kaldır
-            filterTabs.forEach(t => t.classList.remove('active'));
-            // Yeni tab'ı aktif yap
-            this.classList.add('active');
-            
-            // Burada sıralama işlemi yapılabilir
-            // Şimdilik sadece görsel değişiklik
-        });
-    });
-    
-    // Telefon linklerini formatla
-    const phoneLinks = document.querySelectorAll('a[href^="tel:"]');
-    phoneLinks.forEach(link => {
-        link.addEventListener('click', function(e) {
-            // Mobil cihazlarda telefon uygulamasını aç
-            if (!/Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
-                e.preventDefault();
-                alert('Telefon numarası: ' + this.textContent);
-            }
-        });
-    });
+    // Arama formu odaklanma
+    const searchInput = document.querySelector('input[name="search"]');
+    if (searchInput && !searchInput.value) {
+        searchInput.focus();
+    }
 });
 </script>
 @endsection

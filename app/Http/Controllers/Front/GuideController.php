@@ -94,20 +94,20 @@ class GuideController extends Controller
         
         // Breadcrumb
         $breadcrumbs = [
-            ['title' => 'Ana Sayfa', 'url' => route('home')],
+            ['title' => 'Ana Sayfa', 'url' => route('front.home')],
             ['title' => 'Rehber', 'url' => route('guide.index')],
             ['title' => $category->name, 'url' => route('guide.category', $category->slug)],
             ['title' => $place->title, 'url' => null]
         ];
         
-        return view('front.guide.place', compact(
-            'category', 
-            'place', 
-            'relatedPlaces', 
-            'pageTitle', 
-            'pageDescription', 
-            'breadcrumbs'
-        ));
+        return view('front.guide.place', [
+            'category' => $category,
+            'guidePlace' => $place,
+            'relatedPlaces' => $relatedPlaces,
+            'pageTitle' => $pageTitle,
+            'pageDescription' => $pageDescription,
+            'breadcrumbs' => $breadcrumbs
+        ]);
     }
 
     /**
@@ -115,29 +115,50 @@ class GuideController extends Controller
      */
     public function search(Request $request)
     {
+        // Arama terimi yoksa ana sayfaya yönlendir
+        if (!$request->filled('q')) {
+            return redirect()->route('guide.index');
+        }
+        
         $request->validate([
             'q' => 'required|string|min:2|max:100'
         ]);
         
         $query = $request->q;
+        $type = $request->get('type'); // Filtre türü
         
-        $places = GuidePlace::active()
+        // Yerler arama
+        $placesQuery = GuidePlace::active()
             ->with(['category', 'images'])
             ->where(function($q) use ($query) {
                 $q->where('title', 'like', "%{$query}%")
                   ->orWhere('content', 'like', "%{$query}%")
                   ->orWhere('address', 'like', "%{$query}%");
             })
-            ->ordered()
-            ->paginate(12);
+            ->ordered();
         
-        $categories = GuideCategory::active()
+        // Kategoriler arama
+        $categoriesQuery = GuideCategory::active()
+            ->withCount('activePlaces')
             ->where(function($q) use ($query) {
                 $q->where('name', 'like', "%{$query}%")
                   ->orWhere('description', 'like', "%{$query}%");
             })
-            ->ordered()
-            ->get();
+            ->ordered();
+        
+        // Filtre türüne göre sonuçları al
+        if ($type === 'places') {
+            $places = $placesQuery->get();
+            $categories = collect();
+        } elseif ($type === 'categories') {
+            $places = collect();
+            $categories = $categoriesQuery->get();
+        } else {
+            $places = $placesQuery->get();
+            $categories = $categoriesQuery->get();
+        }
+        
+        $totalResults = $places->count() + $categories->count();
         
         // SEO bilgileri
         $pageTitle = "'{$query}' için arama sonuçları";
@@ -147,6 +168,7 @@ class GuideController extends Controller
             'places', 
             'categories', 
             'query', 
+            'totalResults',
             'pageTitle', 
             'pageDescription'
         ));

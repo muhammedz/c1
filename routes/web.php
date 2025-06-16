@@ -736,6 +736,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     Route::post('guide-categories/update-order', [App\Http\Controllers\Admin\GuideCategoryController::class, 'updateOrder'])->name('guide-categories.update-order');
     
     Route::resource('guide-places', App\Http\Controllers\Admin\GuidePlaceController::class);
+    Route::get('guide-places-all-info', [App\Http\Controllers\Admin\GuidePlaceController::class, 'allInfo'])->name('guide-places.all-info');
     Route::post('guide-places/{guidePlace}/toggle-status', [App\Http\Controllers\Admin\GuidePlaceController::class, 'toggleStatus'])->name('guide-places.toggle-status');
     Route::post('guide-places/{place}/images', [App\Http\Controllers\Admin\GuidePlaceController::class, 'uploadImages'])->name('guide-places.upload-images');
     Route::delete('guide-place-images/{image}', [App\Http\Controllers\Admin\GuidePlaceController::class, 'deleteImage'])->name('guide-place-images.destroy');

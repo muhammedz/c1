@@ -13,9 +13,14 @@
     <div class="card mb-4">
         <div class="card-header d-flex justify-content-between align-items-center">
             <div><i class="fas fa-map-pin me-1"></i> Rehber Yerleri Listesi</div>
-            <a href="{{ route('admin.guide-places.create') }}" class="btn btn-primary btn-sm">
-                <i class="fas fa-plus"></i> Yeni Yer Ekle
-            </a>
+            <div>
+                <a href="{{ route('admin.guide-places.all-info') }}" class="btn btn-info btn-sm me-2">
+                    <i class="fas fa-table"></i> Tüm Bilgiler
+                </a>
+                <a href="{{ route('admin.guide-places.create') }}" class="btn btn-primary btn-sm">
+                    <i class="fas fa-plus"></i> Yeni Yer Ekle
+                </a>
+            </div>
         </div>
         <div class="card-body">
             @if(session('success'))
