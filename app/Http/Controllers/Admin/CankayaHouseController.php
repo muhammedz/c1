@@ -40,6 +40,18 @@ class CankayaHouseController extends Controller
     }
 
     /**
+     * Display all cankaya houses information in a table format
+     */
+    public function allInfo()
+    {
+        $cankayaHouses = CankayaHouse::active()
+            ->ordered()
+            ->get();
+        
+        return view('admin.cankaya-houses.all-info', compact('cankayaHouses'));
+    }
+
+    /**
      * Show the form for creating a new resource.
      */
     public function create()

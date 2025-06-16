@@ -27,10 +27,16 @@
                             <i class="fas fa-home mr-2"></i>
                             Çankaya Evleri Yönetimi
                         </h3>
-                        <a href="{{ route('admin.cankaya-houses.create') }}" class="btn btn-primary">
-                            <i class="fas fa-plus mr-1"></i>
-                            Yeni Çankaya Evi Ekle
-                        </a>
+                        <div>
+                            <a href="{{ route('admin.cankaya-houses.all-info') }}" class="btn btn-info mr-2">
+                                <i class="fas fa-table mr-1"></i>
+                                Tüm Bilgiler
+                            </a>
+                            <a href="{{ route('admin.cankaya-houses.create') }}" class="btn btn-primary">
+                                <i class="fas fa-plus mr-1"></i>
+                                Yeni Çankaya Evi Ekle
+                            </a>
+                        </div>
                     </div>
                 </div>
 

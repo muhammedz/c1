@@ -399,6 +399,7 @@ Route::middleware(['auth', 'role:admin'])->name('admin.')->prefix('admin')->grou
 
     // Çankaya Evleri Yönetimi
     Route::resource('cankaya-houses', App\Http\Controllers\Admin\CankayaHouseController::class)->names('cankaya-houses');
+    Route::get('cankaya-houses-all-info', [App\Http\Controllers\Admin\CankayaHouseController::class, 'allInfo'])->name('cankaya-houses.all-info');
     Route::post('cankaya-houses/{cankayaHouse}/toggle-status', [App\Http\Controllers\Admin\CankayaHouseController::class, 'toggleStatus'])->name('cankaya-houses.toggle-status');
     Route::delete('cankaya-houses/{cankayaHouse}/remove-image', [App\Http\Controllers\Admin\CankayaHouseController::class, 'removeImage'])->name('cankaya-houses.remove-image');
     
