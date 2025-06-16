@@ -20,7 +20,11 @@ document.addEventListener('DOMContentLoaded', function() {
 /**
  * Mobil menü açma/kapama işlevselliği
  */
+// KAPALI - header.blade.php'te aktif
 function initMobileMenu() {
+    // Bu fonksiyon şu anda pasif - header.blade.php'te aktif olan versiyon kullanılıyor
+    return;
+    /*
     const mobileMenuButton = document.getElementById('mobileMenuButton');
     const mobileMenu = document.getElementById('mobileMenu');
     
@@ -29,6 +33,8 @@ function initMobileMenu() {
             mobileMenu.classList.toggle('hidden');
         });
     }
+    */
+}
     
     // Ana menü toggle
     const mobileMenuToggles = document.querySelectorAll('.mobile-menu-toggle');

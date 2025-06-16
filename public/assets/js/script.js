@@ -496,7 +496,8 @@ const servicesSwiper = new Swiper('.servicesSwiper', {
         }
     }
 });
-// Mobil menü toggle
+// Mobil menü toggle - KAPALI (header.blade.php'te aktif)
+/*
 document.addEventListener('DOMContentLoaded', function() {
     const mobileMenuButton = document.getElementById('mobileMenuButton');
     const mobileMenu = document.getElementById('mobileMenu');
@@ -507,6 +508,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+*/
 
 // Mobil dropdown menüler
 const mobileDropdowns = document.querySelectorAll('.mobile-dropdown');

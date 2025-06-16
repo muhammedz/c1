@@ -40,6 +40,9 @@ function initDesktopMenus() {
  * Mobil menü için toggle işlemlerini başlatır
  */
 function initMobileMenu() {
+    // Bu fonksiyon şu anda pasif - header.blade.php'te aktif olan versiyon kullanılıyor
+    return;
+    /*
     // Ana mobil menü toggle butonu
     const mobileMenuButton = document.getElementById('mobileMenuButton');
     const mobileMenu = document.getElementById('mobileMenu');
@@ -49,6 +52,7 @@ function initMobileMenu() {
             mobileMenu.classList.toggle('hidden');
         });
     }
+    */
     
     // Mobil menü grup toggle
     const menuToggles = document.querySelectorAll('.mobile-menu-toggle');

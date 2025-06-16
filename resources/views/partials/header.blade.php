@@ -220,90 +220,45 @@
     </div>
 
     <!-- Mobil Menü (Küçük ekranlarda görünür) -->
-    <div class="md:hidden hidden w-full z-50 absolute bg-white shadow-lg rounded-b-lg" id="mobileMenu">
+    <div class="md:hidden mobile-menu-hidden w-full absolute bg-white shadow-lg rounded-b-lg" id="mobileMenu" style="z-index: 9999; top: 100%;">
         <!-- Mobil Menü İçeriği -->
-        <div class="px-4 py-2">
+        <div class="mobile-menu-content">
             @if(isset($mainMenuItems) && $mainMenuItems->count() > 0)
                 @foreach($mainMenuItems as $menu)
-                    @if($menu->type == 1)
-                        <!-- Küçük menü için direkt link göster -->
-                        <div class="group border-b border-gray-200">
-                            <a href="{{ $menu->url ?? '#' }}" class="py-3 px-2 block text-gray-800 font-medium">
-                                {{ $menu->name }}
-                            </a>
-                        </div>
-                    @else
-                        <!-- Büyük menü için dropdown göster -->
-                        <div class="group border-b border-gray-200">
-                            <a href="#" class="py-3 px-2 block text-gray-800 font-medium flex justify-between items-center mobile-dropdown-toggle">
-                                {{ $menu->name }}
-                                <i class="fas fa-chevron-down text-sm"></i>
-                            </a>
-                            <div class="quick-menu-dropdown bg-gray-50 rounded-md p-2 hidden">
-                                @if($menu->type == 3)
-                                <!-- Modern Mobil Buton Menü -->
-                                <div class="grid grid-cols-1 gap-2 p-2">
-                                    @php
-                                        $menuItems = app(\App\Services\HeaderService::class)->getMenuItems($menu->id);
-                                        $iconMapping = [
-                                            'Adalet' => 'gavel',
-                                            'Çevre, Tarım ve Hayvancılık' => 'agriculture',
-                                            'Devlet ve Mevzuat' => 'account_balance',
-                                            'Eğitim' => 'school',
-                                            'Genel Bilgiler' => 'menu_book',
-                                            'Güvenlik' => 'security',
-                                            'İş ve Kariyer' => 'business',
-                                            'Kişisel Bilgiler' => 'badge',
-                                            'Sağlık' => 'favorite',
-                                            'Sosyal Güvenlik ve Sigorta' => 'umbrella',
-                                            'Şikayet ve Bilgi Edinme' => 'contact_support',
-                                            'Telekomünikasyon' => 'settings_phone',
-                                            'Trafik ve Ulaşım' => 'directions_car',
-                                            'Vergi, Harç ve Cezalar' => 'payments'
-                                        ];
-                                    @endphp
-                                    
-                                    @foreach($menuItems as $index => $item)
-                                        <a href="{{ $item->url ?? '#' }}" class="mobile-category-button bg-gradient-to-r from-gray-50 to-gray-100 border-gray-200 flex items-center p-2.5 rounded-lg border-2 shadow-sm active:scale-95 transition-all duration-200">
-                                            <div class="w-8 h-8 flex items-center justify-center rounded-full mr-3 bg-white/80 flex-shrink-0">
-                                                <i class="{{ $item->icon ?? 'fas fa-file-alt' }} text-[#007b32] text-base"></i>
-                                            </div>
-                                            <div class="flex-1 min-w-0">
-                                                <span class="font-medium text-[#00352b] text-sm leading-tight block">{{ $item->title }}</span>
-                                            </div>
-                                            <i class="fas fa-chevron-right text-[#007b32] text-base ml-2"></i>
-                                        </a>
-                                    @endforeach
-                                </div>
-                                @else
-                                <!-- Mobil dropdown içeriği -->
-                                @php
-                                    $menuItems = app(\App\Services\HeaderService::class)->getMenuItems($menu->id);
-                                @endphp
-                                
-                                @foreach($menuItems as $item)
-                                    <div class="border-t border-gray-100 py-2 px-4">
-                                        <p class="text-gray-700 font-medium">{{ $item->title }}</p>
-                                    </div>
-                                @endforeach
-                                @endif
-                            </div>
-                        </div>
-                    @endif
+                    <!-- Sadece ana menü linkleri göster -->
+                    <a href="{{ $menu->url ?? '#' }}" class="mobile-menu-item">
+                        <i class="fas fa-circle text-[#007b32] text-xs mr-3"></i>
+                        <span>{{ $menu->name }}</span>
+                        <i class="fas fa-chevron-right text-gray-400 text-sm ml-auto"></i>
+                    </a>
                 @endforeach
             @else
-                <!-- Kurumsal -->
-                <div class="group border-b border-gray-200">
-                    <a href="#" class="py-3 px-2 block text-gray-800 font-medium flex justify-between items-center">
-                        Kurumsal
-                        <span class="material-icons text-sm">expand_more</span>
-                    </a>
-                    <div class="quick-menu-dropdown hidden">
-                        <!-- Mobil dropdown içeriği -->
-                    </div>
-                </div>
-                
-                <!-- Diğer mobil menü öğeleri -->
+                <!-- Varsayılan menü öğeleri -->
+                <a href="{{ route('front.home') }}" class="mobile-menu-item">
+                    <i class="fas fa-home text-[#007b32] text-sm mr-3"></i>
+                    <span>Ana Sayfa</span>
+                    <i class="fas fa-chevron-right text-gray-400 text-sm ml-auto"></i>
+                </a>
+                <a href="#" class="mobile-menu-item">
+                    <i class="fas fa-building text-[#007b32] text-sm mr-3"></i>
+                    <span>Kurumsal</span>
+                    <i class="fas fa-chevron-right text-gray-400 text-sm ml-auto"></i>
+                </a>
+                <a href="#" class="mobile-menu-item">
+                    <i class="fas fa-cogs text-[#007b32] text-sm mr-3"></i>
+                    <span>Hizmetler</span>
+                    <i class="fas fa-chevron-right text-gray-400 text-sm ml-auto"></i>
+                </a>
+                <a href="#" class="mobile-menu-item">
+                    <i class="fas fa-newspaper text-[#007b32] text-sm mr-3"></i>
+                    <span>Haberler</span>
+                    <i class="fas fa-chevron-right text-gray-400 text-sm ml-auto"></i>
+                </a>
+                <a href="#" class="mobile-menu-item">
+                    <i class="fas fa-phone text-[#007b32] text-sm mr-3"></i>
+                    <span>İletişim</span>
+                    <i class="fas fa-chevron-right text-gray-400 text-sm ml-auto"></i>
+                </a>
             @endif
         </div>
     </div>
@@ -398,24 +353,91 @@
             height: 80px;
         }
 
+        /* Mobil menü için özel class'lar */
+        .mobile-menu-hidden {
+            display: none !important;
+        }
+        
+        .mobile-menu-visible {
+            display: block !important;
+            animation: slideDown 0.3s ease-out;
+        }
+        
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Mobil menü içerik stili */
+        .mobile-menu-content {
+            padding: 0;
+            background: linear-gradient(135deg, #ffffff 0%, #f8fffe 100%);
+            border-top: 3px solid #007b32;
+        }
+        
+        .mobile-menu-item {
+            display: flex;
+            align-items: center;
+            padding: 16px 20px;
+            color: #1f2937;
+            text-decoration: none;
+            border-bottom: 1px solid #e5e7eb;
+            transition: all 0.2s ease;
+            font-weight: 500;
+            font-size: 16px;
+        }
+        
+        .mobile-menu-item:hover {
+            background: linear-gradient(90deg, #f0fdf9 0%, #ecfdf5 100%);
+            color: #00352b;
+            transform: translateX(5px);
+            border-left: 4px solid #007b32;
+            padding-left: 16px;
+        }
+        
+        .mobile-menu-item:active {
+            background: #e6fffa;
+            transform: scale(0.98);
+        }
+        
+        .mobile-menu-item:last-child {
+            border-bottom: none;
+            border-bottom-left-radius: 8px;
+            border-bottom-right-radius: 8px;
+        }
+
         @media (max-width: 768px) {
             .header-section, .head {
-                height: 90px !important; /* Daha geniş header */
+                height: 90px !important;
             }
             
             .flex.items-center.justify-between {
-                height: 90px !important; /* Daha geniş header */
+                height: 90px !important;
             }
             
-            /* Mobil dropdown animasyonu */
-            .quick-menu-dropdown {
-                max-height: 0;
-                overflow: hidden;
-                transition: max-height 0.3s ease;
+            /* Mobil menü container */
+            #mobileMenu {
+                display: none !important;
+                position: absolute !important;
+                top: 100% !important;
+                left: 0 !important;
+                right: 0 !important;
+                z-index: 9999 !important;
+                background: white !important;
+                box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
+                border-bottom-left-radius: 8px !important;
+                border-bottom-right-radius: 8px !important;
+                overflow: hidden !important;
             }
             
-            .quick-menu-dropdown.open {
-                max-height: 1000px; /* Yeterince büyük bir değer */
+            #mobileMenu.mobile-menu-visible {
+                display: block !important;
             }
             
             /* Mobil Atatürk simgesi */
@@ -428,9 +450,40 @@
                 height: 70px; /* Biraz daha büyük */
             }
             
-            /* Mobil menü butonu ve Atatürk arasındaki boşluk */
+            /* Mobil menü butonu tasarımı */
             #mobileMenuButton {
                 margin-right: 5px;
+                background: linear-gradient(135deg, #f3f4f6, #ffffff) !important;
+                border: 2px solid #e5e7eb !important;
+                border-radius: 8px !important;
+                width: 44px !important;
+                height: 44px !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                transition: all 0.2s ease !important;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+            }
+            
+            #mobileMenuButton:hover {
+                background: linear-gradient(135deg, #007b32, #00652a) !important;
+                border-color: #007b32 !important;
+                transform: translateY(-1px) !important;
+                box-shadow: 0 4px 8px rgba(0, 123, 50, 0.2) !important;
+            }
+            
+            #mobileMenuButton:hover i {
+                color: white !important;
+            }
+            
+            #mobileMenuButton:active {
+                transform: translateY(0) scale(0.95) !important;
+            }
+            
+            #mobileMenuButton i {
+                font-size: 18px !important;
+                color: #374151 !important;
+                transition: color 0.2s ease !important;
             }
         }
     </style>
@@ -489,31 +542,53 @@
             });
         });
         
-        // Mobil menü toggle
+        // Mobil menü toggle - YENİ ÇÖZÜM
         const mobileMenuButton = document.getElementById('mobileMenuButton');
         const mobileMenu = document.getElementById('mobileMenu');
         
+        function closeMobileMenu() {
+            if (mobileMenu) {
+                mobileMenu.classList.remove('mobile-menu-visible');
+                mobileMenu.classList.add('mobile-menu-hidden');
+            }
+        }
+        
         if (mobileMenuButton && mobileMenu) {
-            mobileMenuButton.addEventListener('click', function() {
-                mobileMenu.classList.toggle('hidden');
+            // Varolan event listener'ları temizle
+            mobileMenuButton.replaceWith(mobileMenuButton.cloneNode(true));
+            const newMobileMenuButton = document.getElementById('mobileMenuButton');
+            
+            newMobileMenuButton.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                if (mobileMenu.classList.contains('mobile-menu-visible')) {
+                    closeMobileMenu();
+                } else {
+                    mobileMenu.classList.remove('mobile-menu-hidden');
+                    mobileMenu.classList.add('mobile-menu-visible');
+                }
             });
             
-            // Mobil dropdown toggle
-            const mobileDropdownToggles = document.querySelectorAll('.mobile-dropdown-toggle');
+            // Başka yere tıklanınca menüyü kapat
+            document.addEventListener('click', function(e) {
+                if (!mobileMenu.contains(e.target) && !newMobileMenuButton.contains(e.target)) {
+                    closeMobileMenu();
+                }
+            });
             
-            mobileDropdownToggles.forEach(toggle => {
-                toggle.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const dropdown = this.nextElementSibling;
-                    dropdown.classList.toggle('hidden');
-                    
-                    // İkon değiştirme
-                    const icon = this.querySelector('.material-icons');
-                    if (dropdown.classList.contains('hidden')) {
-                        icon.textContent = 'expand_more';
-                    } else {
-                        icon.textContent = 'expand_less';
-                    }
+            // ESC tuşu ile menüyü kapat
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    closeMobileMenu();
+                }
+            });
+            
+            // Mobil menü linklerine tıklanınca menüyü kapat
+            const mobileMenuLinks = mobileMenu.querySelectorAll('a[href]:not([href="#"])');
+            mobileMenuLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    closeMobileMenu();
                 });
             });
         }
