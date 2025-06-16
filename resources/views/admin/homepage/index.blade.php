@@ -22,7 +22,7 @@
                             </a>
                         </div>
                         <div class="col-md-4">
-                            <a href="{{ route('admin.profile') }}" class="btn btn-secondary btn-lg btn-block mb-3">
+                            <a href="{{ route('admin.homepage.profile-info') }}" class="btn btn-secondary btn-lg btn-block mb-3">
                                 <i class="fas fa-user mr-2"></i> Profil Bilgileri
                             </a>
                         </div>
