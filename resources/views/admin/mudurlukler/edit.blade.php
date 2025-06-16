@@ -434,13 +434,13 @@
                     <div class="col-md-6">
                         <div class="form-group mb-3">
                             <label for="new_document_name">Belge Adı <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" id="new_document_name" name="name" required>
+                            <input type="text" class="form-control" id="new_document_name" name="name">
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="form-group mb-3">
                             <label for="new_document_file">PDF Dosyası <span class="text-danger">*</span></label>
-                            <input type="file" class="form-control" id="new_document_file" name="file" required accept=".pdf">
+                            <input type="file" class="form-control" id="new_document_file" name="file" accept=".pdf">
                         </div>
                     </div>
                 </div>
@@ -718,6 +718,22 @@
         // Belge yükleme formu (ana formdan bağımsız)
         $('#document-upload-form').on('submit', function(e) {
             e.preventDefault();
+            
+            // Form validation
+            var name = $('#new_document_name').val().trim();
+            var file = $('#new_document_file')[0].files[0];
+            
+            if (!name) {
+                alert('Lütfen belge adını girin.');
+                $('#new_document_name').focus();
+                return;
+            }
+            
+            if (!file) {
+                alert('Lütfen bir PDF dosyası seçin.');
+                $('#new_document_file').focus();
+                return;
+            }
             
             var formData = new FormData(this);
             var submitBtn = $(this).find('button[type="submit"]');
