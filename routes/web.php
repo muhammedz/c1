@@ -136,8 +136,6 @@ Route::prefix('arsivler')->name('archives.')->group(function () {
 
 Auth::routes();
 
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
-
 // Arama Rotası - Yeni spesifik isimle - şimdilik devre dışı
 // Route::get('/search-page', [App\Http\Controllers\SearchController::class, 'index'])->name('search');
 
