@@ -274,10 +274,6 @@
                         İlgili Hizmetler
                     </a>
                     @endif
-                    <a href="#ilgili-mudurlukler" class="flex items-center px-4 py-2 rounded-lg text-gray-600 hover:bg-[#00352b]/10 hover:text-[#00352b] font-medium transition-colors">
-                        <i class="material-icons mr-3 text-lg">business</i>
-                        İlgili Müdürlükler
-                    </a>
                 </nav>
             </div>
         </div>
@@ -363,6 +359,35 @@
                         </div>
                     </div>
                 @endif
+
+                <!-- Diğer Belgeler -->
+                @php
+                    $digerBelgeler = $mudurluk->files->where('type', 'document')->where('is_active', true);
+                @endphp
+                @if($digerBelgeler->count() > 0)
+                    <div class="mt-6">
+                        <h3 class="font-semibold text-lg text-gray-800 mb-4">Diğer Belgeler</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                            @foreach($digerBelgeler as $file)
+                            <div class="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-all">
+                                <div class="p-5 flex flex-col h-full">
+                                    <div class="flex items-center mb-3">
+                                        <span class="material-icons text-[#00352b] mr-2">description</span>
+                                        <h3 class="font-semibold text-gray-800">{{ $file->title }}</h3>
+                                    </div>
+                                    <p class="text-sm text-gray-600 mb-4">{{ $file->file_name }} • {{ number_format($file->file_size / 1024, 1) }} KB</p>
+                                    <div class="mt-auto flex items-center">
+                                        <a href="{{ route('mudurlukler.download-file', [$mudurluk->slug, $file]) }}" class="inline-flex items-center text-[#00352b] hover:text-[#20846c] transition-colors">
+                                            <span class="material-icons mr-1 text-sm">file_download</span>
+                                            <span class="text-sm font-medium">İndir</span>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            @endforeach
+                        </div>
+                    </div>
+                @endif
             </section>
             @endif
             
@@ -399,48 +424,7 @@
             </section>
             @endif
             
-            <!-- İlgili Müdürlükler -->
-            <section id="ilgili-mudurlukler" class="service-content-section">
-                <h2>İlgili Müdürlükler</h2>
-                @php
-                    $relatedMudurlukler = \App\Models\Mudurluk::where('is_active', true)
-                        ->where('id', '!=', $mudurluk->id)
-                        ->orderBy('order_column')
-                        ->limit(6)
-                        ->get();
-                @endphp
-                
-                @if($relatedMudurlukler->count() > 0)
-                    <p class="mb-5">Belediyemizin diğer müdürlüklerini keşfedin ve hizmet alanları hakkında bilgi edinin:</p>
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        @foreach($relatedMudurlukler as $related)
-                        <div class="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-all">
-                            <div class="p-5 flex flex-col h-full">
-                                <div class="flex items-center mb-3">
-                                    <span class="material-icons text-[#00352b] mr-2">business</span>
-                                    <h3 class="font-semibold text-gray-800">{{ $related->name }}</h3>
-                                </div>
-                                @if($related->summary)
-                                <p class="text-sm text-gray-600 mb-4">{{ Str::limit($related->summary, 120) }}</p>
-                                @endif
-                                <div class="mt-auto flex items-center justify-between">
-                                    <div class="text-xs text-gray-500">
-                                        {{ $related->files->where('is_active', true)->count() }} dosya
-                                    </div>
-                                    <a href="{{ route('mudurlukler.show', $related->slug) }}" class="inline-flex items-center text-[#00352b] hover:text-[#20846c] transition-colors">
-                                        <span class="text-sm font-medium">Detaylar</span>
-                                        <span class="material-icons ml-1 text-sm">arrow_forward</span>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                        @endforeach
-                    </div>
-                @else
-                    <p class="mb-4">Şu anda görüntülenecek ilgili müdürlük bulunmamaktadır.</p>
-                @endif
-            </section>
+
         </div>
     </div>
 </div>
