@@ -197,6 +197,13 @@ Route::middleware(['auth', 'role:admin'])->name('admin.')->prefix('admin')->grou
     Route::patch('/mudurlukler/toggle-file/{file}', [App\Http\Controllers\Admin\MudurlukController::class, 'toggleFileStatus'])->name('mudurlukler.toggle-file');
     Route::post('/mudurlukler/reorder-files', [App\Http\Controllers\Admin\MudurlukController::class, 'reorderFiles'])->name('mudurlukler.reorder-files');
     
+    // Müdürlük Belgeleri Yönetimi
+    Route::post('/mudurlukler/{mudurluk}/documents', [App\Http\Controllers\Admin\MudurlukController::class, 'uploadDocument'])->name('mudurlukler.upload-document');
+    Route::post('/mudurlukler/{mudurluk}/documents/bulk', [App\Http\Controllers\Admin\MudurlukController::class, 'bulkUploadDocuments'])->name('mudurlukler.bulk-upload-documents');
+    Route::put('/mudurlukler/{mudurluk}/documents/{document}', [App\Http\Controllers\Admin\MudurlukController::class, 'updateDocument'])->name('mudurlukler.update-document');
+    Route::delete('/mudurlukler/{mudurluk}/documents/{document}', [App\Http\Controllers\Admin\MudurlukController::class, 'destroyDocument'])->name('mudurlukler.destroy-document');
+    Route::post('/mudurlukler/{mudurluk}/documents/{document}/toggle-status', [App\Http\Controllers\Admin\MudurlukController::class, 'toggleDocumentStatus'])->name('mudurlukler.toggle-document-status');
+    
     // Sayfa Ayarları
     Route::get('pages/settings', [PageSettingController::class, 'edit'])->name('pages.settings.edit');
     Route::put('pages/settings', [PageSettingController::class, 'update'])->name('pages.settings.update');

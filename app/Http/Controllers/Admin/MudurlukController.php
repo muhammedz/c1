@@ -222,6 +222,230 @@ class MudurlukController extends Controller
     }
 
     /**
+     * Upload document (AJAX)
+     */
+    public function uploadDocument(Request $request, Mudurluk $mudurluk)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'file' => 'required|file|max:51200', // 50MB max
+        ]);
+
+        try {
+            $file = $request->file('file');
+            
+            // Dosya bilgilerini al
+            $originalFileName = $file->getClientOriginalName();
+            $fileSize = $file->getSize();
+            
+            // Dosya adını temizle ve benzersiz yap
+            $originalName = pathinfo($originalFileName, PATHINFO_FILENAME);
+            $extension = $file->getClientOriginalExtension();
+            $fileName = \Str::slug($originalName) . '_' . time() . '.' . $extension;
+            
+            // Dosyayı kaydet
+            $filePath = $file->storeAs('mudurlukler', $fileName, 'public');
+            
+            // En yüksek sıra numarasını bul
+            $maxOrderColumn = $mudurluk->files()->max('order_column') ?? 0;
+            
+            // Veritabanına kaydet
+            $document = $mudurluk->files()->create([
+                'title' => $request->name,
+                'file_name' => $originalFileName,
+                'file_path' => $filePath,
+                'file_size' => $fileSize,
+                'type' => 'document', // Dinamik belgeler için genel tip
+                'order_column' => $maxOrderColumn + 1,
+                'is_active' => true,
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Belge başarıyla yüklendi.',
+                'document' => [
+                    'id' => $document->id,
+                    'title' => $document->title,
+                    'file_name' => $document->file_name,
+                    'file_size' => number_format($document->file_size / 1024, 2) . ' KB',
+                    'is_active' => $document->is_active,
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Belge yükleme hatası: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Belge yüklenirken bir hata oluştu: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Bulk upload documents (AJAX)
+     */
+    public function bulkUploadDocuments(Request $request, Mudurluk $mudurluk)
+    {
+        $request->validate([
+            'files' => 'required|array|min:1',
+            'files.*' => 'required|file|max:51200', // 50MB max per file
+            'names' => 'required|array',
+            'names.*' => 'required|string|max:255',
+        ]);
+
+        try {
+            $files = $request->file('files');
+            $names = $request->input('names');
+            $uploadedDocuments = [];
+            $errors = [];
+
+            // En yüksek sıra numarasını bul
+            $maxOrderColumn = $mudurluk->files()->max('order_column') ?? 0;
+
+            foreach ($files as $index => $file) {
+                try {
+                    // Dosya bilgilerini al
+                    $originalFileName = $file->getClientOriginalName();
+                    $fileSize = $file->getSize();
+                    
+                    // Dosya adını temizle ve benzersiz yap
+                    $originalName = pathinfo($originalFileName, PATHINFO_FILENAME);
+                    $extension = $file->getClientOriginalExtension();
+                    $fileName = \Str::slug($originalName) . '_' . time() . '_' . $index . '.' . $extension;
+                    
+                    // Dosyayı kaydet
+                    $filePath = $file->storeAs('mudurlukler', $fileName, 'public');
+                    
+                    // Belge adını belirle
+                    $documentName = isset($names[$index]) && !empty($names[$index]) 
+                        ? $names[$index] 
+                        : pathinfo($originalFileName, PATHINFO_FILENAME);
+                    
+                    // Veritabanına kaydet
+                    $document = $mudurluk->files()->create([
+                        'title' => $documentName,
+                        'file_name' => $originalFileName,
+                        'file_path' => $filePath,
+                        'file_size' => $fileSize,
+                        'type' => 'document',
+                        'order_column' => $maxOrderColumn + count($files) - $index,
+                        'is_active' => true,
+                    ]);
+
+                    $uploadedDocuments[] = [
+                        'id' => $document->id,
+                        'title' => $document->title,
+                        'file_name' => $document->file_name,
+                        'file_size' => number_format($document->file_size / 1024, 2) . ' KB',
+                    ];
+
+                } catch (\Exception $e) {
+                    $errors[] = $originalFileName . ': ' . $e->getMessage();
+                }
+            }
+
+            return response()->json([
+                'success' => count($uploadedDocuments) > 0,
+                'message' => count($uploadedDocuments) . ' belge başarıyla yüklendi.',
+                'uploaded_documents' => $uploadedDocuments,
+                'errors' => $errors,
+                'total_uploaded' => count($uploadedDocuments),
+                'total_errors' => count($errors)
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Toplu belge yükleme hatası: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Belgeler yüklenirken bir hata oluştu: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Update document (AJAX)
+     */
+    public function updateDocument(Request $request, Mudurluk $mudurluk, MudurlukFile $document)
+    {
+        $request->validate([
+            'title' => 'required|string|max:255',
+        ]);
+
+        try {
+            $document->update([
+                'title' => $request->title
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Belge başarıyla güncellendi.',
+                'document' => [
+                    'id' => $document->id,
+                    'title' => $document->title,
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Belge güncelleme hatası: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Belge güncellenirken bir hata oluştu: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Delete document (AJAX)
+     */
+    public function destroyDocument(Mudurluk $mudurluk, MudurlukFile $document)
+    {
+        try {
+            // Dosyayı sil
+            Storage::disk('public')->delete($document->file_path);
+            
+            // Kaydı sil
+            $document->delete();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Belge başarıyla silindi.'
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Belge silme hatası: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Belge silinirken bir hata oluştu: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Toggle document status (AJAX)
+     */
+    public function toggleDocumentStatus(Mudurluk $mudurluk, MudurlukFile $document)
+    {
+        try {
+            $document->update([
+                'is_active' => !$document->is_active
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Belge durumu başarıyla değiştirildi.',
+                'is_active' => $document->is_active
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Belge durum değiştirme hatası: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Belge durumu değiştirilirken bir hata oluştu: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
      * AJAX - Dosya silme
      */
     public function removeFile(Request $request, MudurlukFile $file)

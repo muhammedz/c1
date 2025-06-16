@@ -285,99 +285,178 @@
                     </div>
                 </div>
 
-                <!-- PDF Dosya Yönetimi -->
-                <div class="card">
-                    <div class="card-header">
-                        <h5><i class="fas fa-file-pdf"></i> PDF Dosyaları</h5>
+                <!-- PDF Belgeleri -->
+                <div class="card mb-4">
+                    <div class="card-header d-flex align-items-center justify-content-between">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-file-pdf me-2 text-danger"></i>
+                            <h5 class="mb-0">Belgeler</h5>
+                            <span class="badge bg-secondary ms-2">{{ $mudurluk->files->count() }}</span>
+                        </div>
+                        <div>
+                            <button type="button" class="btn btn-sm btn-primary" id="add-new-document">
+                                <i class="fas fa-plus"></i> Yeni Belge Ekle
+                            </button>
+                        </div>
                     </div>
                     <div class="card-body">
-                        <!-- Hizmet Standartları -->
-                        <div class="file-type-section">
-                            <div class="file-type-header">
-                                <i class="fas fa-clipboard-list"></i> Hizmet Standartları
-                            </div>
-                            
-                            <!-- Mevcut Dosyalar -->
-                            @foreach($mudurluk->files->where('type', 'hizmet_standartlari') as $file)
-                                <div class="existing-file" data-file-id="{{ $file->id }}">
-                                    <div class="file-info">
-                                        <i class="fas fa-file-pdf"></i>
-                                        <div class="file-details">
-                                            <h6>{{ $file->title }}</h6>
-                                            <small>{{ $file->file_name }} ({{ number_format($file->file_size / 1024, 2) }} KB)</small>
+                        <p class="text-muted mb-3">Bu müdürlüğe ait belgeleri yükleyebilirsiniz. Desteklenen format: PDF (Maksimum 10MB/dosya)</p>
+                        
+                        <!-- Mevcut Belgeler -->
+                        @if($mudurluk->files->count() > 0)
+                            <div class="mb-4">
+                                <h6 class="mb-3">
+                                    <i class="fas fa-list me-1"></i> Mevcut Belgeler
+                                </h6>
+                                @foreach($mudurluk->files as $file)
+                                    <div class="existing-file border rounded p-3 mb-3" data-file-id="{{ $file->id }}">
+                                        <div class="d-flex align-items-center justify-content-between">
+                                            <div class="file-info d-flex align-items-center">
+                                                <i class="fas fa-file-pdf text-danger me-3" style="font-size: 1.5em;"></i>
+                                                <div class="file-details">
+                                                    <h6 class="mb-1">{{ $file->title }}</h6>
+                                                    <small class="text-muted">{{ $file->file_name }} ({{ number_format($file->file_size / 1024, 2) }} KB)</small>
+                                                    <div class="mt-1">
+                                                        <span class="badge bg-{{ $file->is_active ? 'success' : 'secondary' }}">
+                                                            {{ $file->is_active ? 'Aktif' : 'Pasif' }}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="file-actions d-flex gap-2">
+                                                <a href="{{ route('mudurlukler.download-file', [$mudurluk->slug, $file]) }}" 
+                                                   class="btn btn-sm btn-primary" target="_blank" title="İndir">
+                                                    <i class="fas fa-download"></i>
+                                                </a>
+                                                <button type="button" class="btn btn-sm btn-info edit-document" 
+                                                        data-id="{{ $file->id }}" data-name="{{ $file->title }}" 
+                                                        title="Düzenle">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button type="button" class="btn btn-sm btn-warning toggle-file-status" 
+                                                        data-file-id="{{ $file->id }}" 
+                                                        title="{{ $file->is_active ? 'Pasifleştir' : 'Aktifleştir' }}">
+                                                    <i class="fas fa-{{ $file->is_active ? 'eye-slash' : 'eye' }}"></i>
+                                                </button>
+                                                <button type="button" class="btn btn-sm btn-danger remove-file" 
+                                                        data-file-id="{{ $file->id }}" title="Sil">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
-                                    <div class="file-actions">
-                                        <a href="{{ route('mudurlukler.download-file', [$mudurluk->slug, $file]) }}" 
-                                           class="btn btn-sm btn-primary" target="_blank">
-                                            <i class="fas fa-download"></i>
-                                        </a>
-                                        <button type="button" class="btn btn-sm btn-warning toggle-file-status" 
-                                                data-file-id="{{ $file->id }}" 
-                                                title="{{ $file->is_active ? 'Pasifleştir' : 'Aktifleştir' }}">
-                                            <i class="fas fa-{{ $file->is_active ? 'eye-slash' : 'eye' }}"></i>
-                                        </button>
-                                        <button type="button" class="btn btn-sm btn-danger remove-file" 
-                                                data-file-id="{{ $file->id }}">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            @endforeach
-                            
-                            <!-- Yeni Dosya Ekleme -->
-                            <div id="hizmet-standartlari-container">
-                                <!-- Dinamik dosya alanları buraya eklenecek -->
+                                @endforeach
                             </div>
-                            <button type="button" class="add-file-btn" onclick="addFileField('hizmet_standartlari')">
-                                <i class="fas fa-plus"></i> Hizmet Standardı Ekle
+                        @else
+                            <div class="text-center py-4">
+                                <i class="fas fa-file-pdf fa-3x text-muted mb-3"></i>
+                                <p class="text-muted">Henüz belge eklenmemiş.</p>
+                            </div>
+                        @endif
+
+                        <!-- Toplu Belge Yükleme -->
+                        <div class="mb-4">
+                            <h6 class="mb-3">
+                                <i class="fas fa-upload me-1"></i> Toplu Belge Yükleme
+                            </h6>
+                            
+                            <div class="form-group">
+                                <label for="bulk_document_files">Belgeler</label>
+                                <input type="file" class="form-control-file" id="bulk_document_files" name="files[]" multiple accept=".pdf">
+                                <small class="form-text text-muted">
+                                    Birden fazla PDF dosyası seçebilirsiniz. (Maksimum 10MB/dosya)
+                                </small>
+                            </div>
+                            
+                            <div id="selected-files-preview" class="mb-3" style="display: none;">
+                                <h6>Seçilen Dosyalar:</h6>
+                                <div id="files-list"></div>
+                            </div>
+                        </div>
+
+                        <!-- Tek Belge Yükleme -->
+                        <div class="text-center mb-3">
+                            <button type="button" class="btn btn-outline-primary btn-sm" id="toggle-single-upload">
+                                <i class="fas fa-plus"></i> Tek Belge Ekle
                             </button>
                         </div>
 
-                        <!-- Yönetim Şemaları -->
-                        <div class="file-type-section">
-                            <div class="file-type-header">
-                                <i class="fas fa-sitemap"></i> Yönetim Şemaları
-                            </div>
-                            
-                            <!-- Mevcut Dosyalar -->
-                            @foreach($mudurluk->files->where('type', 'yonetim_semalari') as $file)
-                                <div class="existing-file" data-file-id="{{ $file->id }}">
-                                    <div class="file-info">
-                                        <i class="fas fa-file-pdf"></i>
-                                        <div class="file-details">
-                                            <h6>{{ $file->title }}</h6>
-                                            <small>{{ $file->file_name }} ({{ number_format($file->file_size / 1024, 2) }} KB)</small>
-                                        </div>
-                                    </div>
-                                    <div class="file-actions">
-                                        <a href="{{ route('mudurlukler.download-file', [$mudurluk->slug, $file]) }}" 
-                                           class="btn btn-sm btn-primary" target="_blank">
-                                            <i class="fas fa-download"></i>
-                                        </a>
-                                        <button type="button" class="btn btn-sm btn-warning toggle-file-status" 
-                                                data-file-id="{{ $file->id }}" 
-                                                title="{{ $file->is_active ? 'Pasifleştir' : 'Aktifleştir' }}">
-                                            <i class="fas fa-{{ $file->is_active ? 'eye-slash' : 'eye' }}"></i>
-                                        </button>
-                                        <button type="button" class="btn btn-sm btn-danger remove-file" 
-                                                data-file-id="{{ $file->id }}">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </div>
+                        <div id="single-upload-form" style="display: none;">
+                            <div class="border rounded p-3 bg-light">
+                                <h6 class="mb-3">
+                                    <i class="fas fa-file me-1"></i> Tek Belge Yükleme
+                                </h6>
+                                
+                                <div class="form-group mb-3">
+                                    <label for="document_name">Belge Adı <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="document_name" placeholder="Belge adını girin">
                                 </div>
-                            @endforeach
-                            
-                            <!-- Yeni Dosya Ekleme -->
-                            <div id="yonetim-semalari-container">
-                                <!-- Dinamik dosya alanları buraya eklenecek -->
+                                
+                                <div class="form-group mb-3">
+                                    <label for="document_file">PDF Dosyası <span class="text-danger">*</span></label>
+                                    <input type="file" class="form-control-file" id="document_file" accept=".pdf">
+                                </div>
+                                
+                                <div class="d-flex gap-2">
+                                    <button type="button" class="btn btn-primary btn-sm" id="add-single-document">
+                                        <i class="fas fa-plus"></i> Belgeyi Ekle
+                                    </button>
+                                    <button type="button" class="btn btn-secondary btn-sm" id="cancel-document-form">
+                                        <i class="fas fa-times"></i> İptal
+                                    </button>
+                                </div>
                             </div>
-                            <button type="button" class="add-file-btn" onclick="addFileField('yonetim_semalari')">
-                                <i class="fas fa-plus"></i> Yönetim Şeması Ekle
-                            </button>
+                        </div>
+
+                        <!-- Eklenen Belgeler Listesi -->
+                        <div id="documents-list" style="display: none;">
+                            <hr>
+                            <h6 class="mb-3">
+                                <i class="fas fa-list me-1"></i> Eklenen Belgeler
+                            </h6>
+                            <div id="documents-container"></div>
                         </div>
                     </div>
                 </div>
+
+<!-- Belge Yükleme Formu (Ana formdan bağımsız) -->
+<div id="document-upload-form-container" style="display: none;">
+    <div class="card mt-4">
+        <div class="card-header">
+            <h5 class="mb-0">
+                <i class="fas fa-upload me-1"></i> Yeni Belge Yükle
+            </h5>
+        </div>
+        <div class="card-body">
+            <form id="document-upload-form" enctype="multipart/form-data">
+                @csrf
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group mb-3">
+                            <label for="new_document_name">Belge Adı <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="new_document_name" name="name" required>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group mb-3">
+                            <label for="new_document_file">PDF Dosyası <span class="text-danger">*</span></label>
+                            <input type="file" class="form-control" id="new_document_file" name="file" required accept=".pdf">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-upload"></i> Belge Yükle
+                    </button>
+                    <button type="button" class="btn btn-secondary" id="cancel-new-document-form">
+                        <i class="fas fa-times"></i> İptal
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
             </div>
 
             <!-- Sağ Kolon -->
@@ -613,6 +692,233 @@
                 }
             });
         });
+
+        // ===== BELGE YÖNETİMİ BAŞLANGIÇ =====
+        
+        // Yeni belge ekleme formunu göster/gizle
+        $('#add-new-document').on('click', function() {
+            $('#document-upload-form-container').toggle();
+            if ($('#document-upload-form-container').is(':visible')) {
+                $(this).html('<i class="fas fa-minus"></i> İptal');
+                // Sayfayı forma kaydır
+                $('html, body').animate({
+                    scrollTop: $('#document-upload-form-container').offset().top - 100
+                }, 500);
+            } else {
+                $(this).html('<i class="fas fa-plus"></i> Yeni Belge Ekle');
+            }
+        });
+
+        $('#cancel-new-document-form').on('click', function() {
+            $('#document-upload-form-container').hide();
+            $('#add-new-document').html('<i class="fas fa-plus"></i> Yeni Belge Ekle');
+            $('#document-upload-form')[0].reset();
+        });
+
+        // Belge yükleme formu (ana formdan bağımsız)
+        $('#document-upload-form').on('submit', function(e) {
+            e.preventDefault();
+            
+            var formData = new FormData(this);
+            var submitBtn = $(this).find('button[type="submit"]');
+            var originalText = submitBtn.html();
+            
+            submitBtn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Yükleniyor...');
+            
+            // Müdürlük belge yükleme route'unu kullanacağız
+            var uploadUrl = '{{ route("admin.mudurlukler.upload-document", $mudurluk) }}';
+            
+            $.ajax({
+                url: uploadUrl,
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    if (response.success) {
+                        // Formu temizle
+                        $('#document-upload-form')[0].reset();
+                        $('#document-upload-form-container').hide();
+                        $('#add-new-document').html('<i class="fas fa-plus"></i> Yeni Belge Ekle');
+                        
+                        // Başarı mesajı
+                        alert('Belge başarıyla yüklendi!');
+                        
+                        // Sayfayı yenile
+                        location.reload();
+                    }
+                },
+                error: function(xhr) {
+                    var errors = xhr.responseJSON.errors;
+                    if (errors) {
+                        var errorMsg = '';
+                        $.each(errors, function(key, value) {
+                            errorMsg += value[0] + '\n';
+                        });
+                        alert('Hata: ' + errorMsg);
+                    } else {
+                        alert('Bir hata oluştu.');
+                    }
+                },
+                complete: function() {
+                    submitBtn.prop('disabled', false).html(originalText);
+                }
+            });
+        });
+
+        // Tek belge yükleme formunu göster/gizle
+        $('#toggle-single-upload').on('click', function() {
+            $('#single-upload-form').toggle();
+            var icon = $(this).find('i');
+            if ($('#single-upload-form').is(':visible')) {
+                icon.removeClass('fa-plus').addClass('fa-minus');
+                $(this).html('<i class="fas fa-minus"></i> Tek Belge Formunu Gizle');
+            } else {
+                icon.removeClass('fa-minus').addClass('fa-plus');
+                $(this).html('<i class="fas fa-plus"></i> Tek Belge Ekle');
+            }
+        });
+
+        // Dosya seçimi önizlemesi
+        $('#bulk_document_files').on('change', function() {
+            var files = this.files;
+            var filesList = $('#files-list');
+            var preview = $('#selected-files-preview');
+            
+            filesList.empty();
+            
+            if (files.length > 0) {
+                preview.show();
+                
+                for (var i = 0; i < files.length; i++) {
+                    var file = files[i];
+                    var fileSize = (file.size / 1024 / 1024).toFixed(2) + ' MB';
+                    var fileName = file.name;
+                    
+                    var fileItem = $(`
+                        <div class="border rounded p-2 mb-2 d-flex align-items-center">
+                            <i class="fas fa-file-pdf text-danger me-2"></i>
+                            <div class="flex-grow-1">
+                                <div class="fw-bold">${fileName}</div>
+                                <small class="text-muted">${fileSize}</small>
+                            </div>
+                            <div class="ms-2">
+                                <input type="text" class="form-control form-control-sm file-name-input" 
+                                       placeholder="Belge adı (opsiyonel)" data-index="${i}">
+                            </div>
+                        </div>
+                    `);
+                    
+                    filesList.append(fileItem);
+                }
+            } else {
+                preview.hide();
+            }
+        });
+
+        // Tek belge ekleme
+        $('#add-single-document').on('click', function() {
+            var name = $('#document_name').val();
+            var file = $('#document_file')[0].files[0];
+            
+            if (!name || !file) {
+                alert('Lütfen belge adı ve dosya seçin.');
+                return;
+            }
+            
+            // Geçici belge listesine ekle
+            addDocumentToList({
+                name: name,
+                file: file,
+                isTemp: true
+            });
+            
+            // Formu temizle
+            $('#document_name').val('');
+            $('#document_file').val('');
+            $('#single-upload-form').hide();
+            $('#toggle-single-upload').html('<i class="fas fa-plus"></i> Tek Belge Ekle');
+        });
+
+        // Form iptal butonu
+        $('#cancel-document-form').on('click', function() {
+            $('#single-upload-form').hide();
+            $('#toggle-single-upload').html('<i class="fas fa-plus"></i> Tek Belge Ekle');
+            $('#document_name').val('');
+            $('#document_file').val('');
+        });
+
+        // Belge düzenleme
+        $(document).on('click', '.edit-document', function() {
+            var documentId = $(this).data('id');
+            var documentName = $(this).data('name');
+            
+            var newName = prompt('Belge adını düzenleyin:', documentName);
+            if (newName && newName !== documentName) {
+                $.ajax({
+                    url: '{{ route("admin.mudurlukler.update-document", [$mudurluk, "__DOCUMENT_ID__"]) }}'.replace('__DOCUMENT_ID__', documentId),
+                    type: 'PUT',
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                        name: newName
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            alert('Belge başarıyla güncellendi!');
+                            location.reload();
+                        }
+                    },
+                    error: function() {
+                        alert('Belge güncellenirken bir hata oluştu.');
+                    }
+                });
+            }
+        });
+
+        // Dosya silme (dinamik eklenen dosyalar için)
+        $(document).on('click', '.remove-document', function() {
+            $(this).closest('.document-item').remove();
+            if ($('#documents-container').children().length === 0) {
+                $('#documents-list').hide();
+            }
+        });
+
+        // Form gönderilmeden önce dosya verilerini hazırla
+        $('#mudurluk-form').on('submit', function(e) {
+            // TinyMCE içeriğini kaydet
+            tinymce.triggerSave();
+            
+            // Belge dosyalarını form verilerine ekle
+            const bulkFiles = $('#bulk_document_files')[0].files;
+            if (bulkFiles.length > 0) {
+                // Dosya adlarını topla
+                const fileNames = [];
+                $('.file-name-input').each(function(index) {
+                    const customName = $(this).val();
+                    if (customName) {
+                        fileNames.push(customName);
+                    } else {
+                        // Dosya adından uzantıyı çıkar
+                        const fileName = bulkFiles[index] ? bulkFiles[index].name : '';
+                        const nameWithoutExt = fileName.substring(0, fileName.lastIndexOf('.')) || fileName;
+                        fileNames.push(nameWithoutExt);
+                    }
+                });
+                
+                // Hidden input'ları ekle
+                for (let i = 0; i < fileNames.length; i++) {
+                    $('<input>').attr({
+                        type: 'hidden',
+                        name: 'names[' + i + ']',
+                        value: fileNames[i]
+                    }).appendTo(this);
+                }
+            }
+            
+            return true;
+        });
+
+        // ===== BELGE YÖNETİMİ BİTİŞ =====
     });
 
     function initTinyMCE() {
@@ -671,46 +977,27 @@
         }
     }
 
-    function addFileField(type) {
-        const container = document.getElementById(type.replace('_', '-') + '-container');
-        if (!container) {
-            console.error('Container bulunamadı:', type.replace('_', '-') + '-container');
-            return;
-        }
+    // Belge listesine ekleme fonksiyonu
+    function addDocumentToList(document) {
+        var fileSize = (document.file.size / 1024 / 1024).toFixed(2) + ' MB';
         
-        const index = fileCounters[type];
-        
-        const fileDiv = document.createElement('div');
-        fileDiv.className = 'file-upload-section';
-        fileDiv.innerHTML = `
-            <div class="row">
-                <div class="col-md-6">
-                    <label class="form-label">Dosya Başlığı</label>
-                    <input type="text" class="form-control" name="${type}_titles[]" placeholder="Dosya başlığı...">
-                </div>
-                <div class="col-md-5">
-                    <label class="form-label">PDF Dosyası</label>
-                    <input type="file" class="form-control" name="${type}_files[]" accept=".pdf">
-                </div>
-                <div class="col-md-1 d-flex align-items-end">
-                    <button type="button" class="btn btn-danger" onclick="removeFileField(this)">
+        var documentItem = $(`
+            <div class="border rounded p-3 mb-2 document-item" data-temp="true">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-file-pdf text-danger me-2"></i>
+                    <div class="flex-grow-1">
+                        <h6 class="mb-1">${document.name}</h6>
+                        <small class="text-muted">${document.file.name} (${fileSize})</small>
+                    </div>
+                    <button type="button" class="btn btn-sm btn-outline-danger remove-document">
                         <i class="fas fa-trash"></i>
                     </button>
                 </div>
             </div>
-        `;
+        `);
         
-        container.appendChild(fileDiv);
-        fileCounters[type]++;
+        $('#documents-container').append(documentItem);
+        $('#documents-list').show();
     }
-
-    function removeFileField(button) {
-        button.closest('.file-upload-section').remove();
-    }
-
-    // Form gönderilmeden önce TinyMCE içeriğini kaydet
-    $('#mudurluk-form').on('submit', function() {
-        tinymce.triggerSave();
-    });
 </script>
 @stop 
