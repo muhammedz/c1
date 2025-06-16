@@ -136,7 +136,7 @@
 <section class="py-20 bg-gray-50">
     <div class="container max-w-6xl mx-auto px-4">
         @if($places->count() > 0)
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8">
                 @foreach($places as $place)
                     <a href="{{ route('guide.place', [$category->slug, $place->slug]) }}" 
                        class="group block bg-white rounded-3xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-xl hover:-translate-y-2 transition-all duration-300">
@@ -156,32 +156,32 @@
                         @endif
                         
                         <!-- İçerik -->
-                        <div class="p-6">
-                            <h3 class="text-xl font-bold text-gray-900 mb-3 group-hover:text-[#004d2e] transition-colors duration-300">{{ $place->title }}</h3>
+                        <div class="p-4 md:p-6">
+                            <h3 class="text-lg md:text-xl font-bold text-gray-900 mb-2 md:mb-3 group-hover:text-[#004d2e] transition-colors duration-300 leading-tight">{{ $place->title }}</h3>
                             
                             @if($place->excerpt)
-                                <p class="text-gray-600 mb-4 line-clamp-2 leading-relaxed">{{ $place->excerpt }}</p>
+                                <p class="text-sm md:text-base text-gray-600 mb-3 md:mb-4 line-clamp-2 leading-relaxed">{{ $place->excerpt }}</p>
                             @endif
                             
                             <!-- İletişim Bilgileri -->
-                            <div class="space-y-3 mb-6">
+                            <div class="space-y-2 md:space-y-3 mb-4 md:mb-6">
                                 @if($place->address)
-                                    <div class="flex items-start text-sm text-gray-600">
-                                        <span class="material-icons text-[#004d2e] mr-3 mt-0.5 text-base">location_on</span>
-                                        <span class="flex-1 leading-relaxed">{{ Str::limit($place->address, 60) }}</span>
+                                    <div class="flex items-start text-xs md:text-sm text-gray-600">
+                                        <span class="material-icons text-[#004d2e] mr-2 md:mr-3 mt-0.5 text-sm md:text-base">location_on</span>
+                                        <span class="flex-1 leading-relaxed">{{ Str::limit($place->address, 45) }}</span>
                                     </div>
                                 @endif
                                 
                                 @if($place->phone)
-                                    <div class="flex items-center text-sm text-gray-600">
-                                        <span class="material-icons text-[#004d2e] mr-3 text-base">phone</span>
+                                    <div class="flex items-center text-xs md:text-sm text-gray-600">
+                                        <span class="material-icons text-[#004d2e] mr-2 md:mr-3 text-sm md:text-base">phone</span>
                                         <span>{{ $place->phone }}</span>
                                     </div>
                                 @endif
                                 
                                 @if($place->working_hours)
-                                    <div class="flex items-center text-sm text-gray-600">
-                                        <span class="material-icons text-[#004d2e] mr-3 text-base">schedule</span>
+                                    <div class="flex items-center text-xs md:text-sm text-gray-600">
+                                        <span class="material-icons text-[#004d2e] mr-2 md:mr-3 text-sm md:text-base">schedule</span>
                                         <span>{{ $place->working_hours }}</span>
                                     </div>
                                 @endif
@@ -189,11 +189,11 @@
                             
                             <!-- Aksiyon Butonları -->
                             <div class="flex items-center justify-between">
-                                <span class="text-sm font-medium text-[#004d2e] group-hover:text-[#006b3f] transition-colors duration-300">
+                                <span class="text-xs md:text-sm font-medium text-[#004d2e] group-hover:text-[#006b3f] transition-colors duration-300">
                                     Detayları Gör
                                 </span>
-                                <div class="w-8 h-8 bg-[#004d2e]/10 group-hover:bg-[#004d2e] rounded-full flex items-center justify-center transition-all duration-300 group-hover:translate-x-1">
-                                    <span class="material-icons text-sm text-[#004d2e] group-hover:text-white transition-colors duration-300">arrow_forward</span>
+                                <div class="w-6 h-6 md:w-8 md:h-8 bg-[#004d2e]/10 group-hover:bg-[#004d2e] rounded-full flex items-center justify-center transition-all duration-300 group-hover:translate-x-1">
+                                    <span class="material-icons text-xs md:text-sm text-[#004d2e] group-hover:text-white transition-colors duration-300">arrow_forward</span>
                                 </div>
                             </div>
                         </div>

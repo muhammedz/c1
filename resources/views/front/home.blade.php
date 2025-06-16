@@ -43,10 +43,15 @@
             grid: {
                 rows: 2,
             },
-            spaceBetween: 10,
+            spaceBetween: 4,
             navigation: {
                 nextEl: '.news-next-btn',
                 prevEl: '.news-prev-btn',
+            },
+            breakpoints: {
+                768: {
+                    spaceBetween: 10,
+                }
             },
         });
 
