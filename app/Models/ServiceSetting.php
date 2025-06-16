@@ -48,9 +48,9 @@ class ServiceSetting extends Model
             // Tablo yoksa varsayılan ayarları bir model yerine dizi olarak döndür
             return (object)[
                 'hero_badge_text' => 'Hizmetlerimiz',
-                'hero_title' => 'Size Özel Profesyonel Hizmetler',
-                'hero_title_highlight' => 'Profesyonel',
-                'hero_description' => 'İhtiyacınıza uygun kaliteli hizmetlerimizi keşfedin ve size nasıl yardımcı olabileceğimizi öğrenin.',
+                'hero_title' => 'Tüm Belediyecilik hizmetleri',
+                'hero_title_highlight' => 'Belediyecilik',
+                'hero_description' => 'İhtiyaç duyduğunuz hizmetlerimizi keşfedin ve size nasıl yardımcı olabileceğimizi öğrenin.',
                 'search_title' => 'Hangi hizmeti arıyorsunuz?',
                 'search_placeholder' => 'Anahtar kelime yazın...',
                 'search_button_text' => 'Ara',
@@ -69,9 +69,9 @@ class ServiceSetting extends Model
             // Varsayılan değerlerle yeni bir ayar kaydı oluştur
             $settings = self::create([
                 'hero_badge_text' => 'Hizmetlerimiz',
-                'hero_title' => 'Size Özel Profesyonel Hizmetler',
-                'hero_title_highlight' => 'Profesyonel',
-                'hero_description' => 'İhtiyacınıza uygun kaliteli hizmetlerimizi keşfedin ve size nasıl yardımcı olabileceğimizi öğrenin.',
+                'hero_title' => 'Tüm Belediyecilik hizmetleri',
+                'hero_title_highlight' => 'Belediyecilik',
+                'hero_description' => 'İhtiyaç duyduğunuz hizmetlerimizi keşfedin ve size nasıl yardımcı olabileceğimizi öğrenin.',
                 'search_title' => 'Hangi hizmeti arıyorsunuz?',
                 'search_placeholder' => 'Anahtar kelime yazın...',
                 'search_button_text' => 'Ara',
