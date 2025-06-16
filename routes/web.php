@@ -49,6 +49,7 @@ use App\Http\Controllers\Admin\FooterMenuController;
 use App\Http\Controllers\Admin\FooterMenuLinkController;
 use App\Http\Controllers\Admin\NotFoundController;
 use App\Http\Controllers\Admin\RedirectController;
+use App\Http\Controllers\PharmacyController;
 
 /*
 |--------------------------------------------------------------------------
@@ -140,6 +141,9 @@ Route::prefix('rehber')->name('guide.')->group(function () {
     Route::get('/{category:slug}', [App\Http\Controllers\Front\GuideController::class, 'category'])->name('category');
     Route::get('/{category:slug}/{place:slug}', [App\Http\Controllers\Front\GuideController::class, 'place'])->name('place');
 });
+
+// Nöbetçi Eczaneler Sayfası
+Route::get('/nobetci-eczaneler', [PharmacyController::class, 'index'])->name('pharmacy.index');
 
 Auth::routes();
 

@@ -15,11 +15,15 @@
             border-radius: 24px;
             box-shadow: 0 2px 20px rgba(0,0,0,0.05);
             transition: all 0.3s ease;
+            text-decoration: none !important;
+            color: inherit !important;
         }
         
         .featured-service-card:hover {
             box-shadow: 0 2px 20px rgba(0,0,0,0.1);
             transform: translateY(-5px);
+            text-decoration: none !important;
+            color: inherit !important;
         }
         
         .featured-service-icon {
@@ -104,16 +108,21 @@
         @forelse($featuredServices as $service)
         <!-- Hizmet {{ $loop->iteration }} -->
         <div class="service-item">
-            <div class="featured-service-card">
-                <div class="featured-service-icon">
-                    {!! $service->icon_html !!}
-                </div>
-                @if($service->url)
-                    <a href="{{ $service->url }}" class="featured-service-title">{{ $service->title }}</a>
-                @else
+            @if($service->url)
+                <a href="{{ $service->url }}" class="featured-service-card" style="text-decoration: none; color: inherit; cursor: pointer;">
+                    <div class="featured-service-icon">
+                        {!! $service->icon_html !!}
+                    </div>
                     <h3 class="featured-service-title">{{ $service->title }}</h3>
-                @endif
-            </div>
+                </a>
+            @else
+                <div class="featured-service-card">
+                    <div class="featured-service-icon">
+                        {!! $service->icon_html !!}
+                    </div>
+                    <h3 class="featured-service-title">{{ $service->title }}</h3>
+                </div>
+            @endif
         </div>
         @empty
         <!-- Örnek Hizmetler (Veri yoksa gösterilir) -->
