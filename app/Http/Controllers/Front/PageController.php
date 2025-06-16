@@ -65,10 +65,8 @@ class PageController extends Controller
             ->where('is_active', true)
             ->firstOrFail();
         
-        $query = Page::published()
-            ->whereHas('categories', function($q) use ($category) {
-                $q->where('category_id', $category->id);
-            });
+        // Tüm sayfaları getir (kategori filtresi kaldırıldı)
+        $query = Page::published();
         
         // Arama sorgusu varsa filtrele
         if (request()->has('search') && request('search')) {
@@ -79,7 +77,8 @@ class PageController extends Controller
             });
         }
             
-        $pages = $query->orderBy('published_at', 'desc')->paginate(12);
+        // Sıralamayı eski tarihten yeniye çevir (asc) - sayfalama kaldırıldı
+        $pages = $query->orderBy('published_at', 'asc')->get();
             
         return view('front.pages.category', compact('category', 'pages'));
     }
