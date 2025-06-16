@@ -131,6 +131,16 @@ Route::prefix('arsivler')->name('archives.')->group(function () {
     Route::get('/{slug}', [App\Http\Controllers\Front\ArchiveController::class, 'show'])->name('show');
 });
 
+// Ön Yüz Rehber Rotaları
+Route::prefix('rehber')->name('guide.')->group(function () {
+    Route::get('/', [App\Http\Controllers\Front\GuideController::class, 'index'])->name('index');
+    Route::get('/arama', [App\Http\Controllers\Front\GuideController::class, 'search'])->name('search');
+    Route::get('/konum', [App\Http\Controllers\Front\GuideController::class, 'getPlacesByLocation'])->name('location');
+    Route::get('/istatistikler', [App\Http\Controllers\Front\GuideController::class, 'getCategoryStats'])->name('stats');
+    Route::get('/{category:slug}', [App\Http\Controllers\Front\GuideController::class, 'category'])->name('category');
+    Route::get('/{category:slug}/{place:slug}', [App\Http\Controllers\Front\GuideController::class, 'place'])->name('place');
+});
+
 Auth::routes();
 
 // Arama Rotası - Yeni spesifik isimle - şimdilik devre dışı
@@ -719,6 +729,18 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     Route::post('/settings/seo', [App\Http\Controllers\Admin\SettingsController::class, 'updateSeo'])->name('settings.seo.update');
     Route::post('/settings/favicon', [App\Http\Controllers\Admin\SettingsController::class, 'updateFavicon'])->name('settings.favicon.update');
     Route::get('/settings/favicon/delete', [App\Http\Controllers\Admin\SettingsController::class, 'deleteFavicon'])->name('settings.favicon.delete');
+    
+    // Rehber Yönetimi Routes
+    Route::resource('guide-categories', App\Http\Controllers\Admin\GuideCategoryController::class);
+    Route::post('guide-categories/{guideCategory}/toggle-status', [App\Http\Controllers\Admin\GuideCategoryController::class, 'toggleStatus'])->name('guide-categories.toggle-status');
+    Route::post('guide-categories/update-order', [App\Http\Controllers\Admin\GuideCategoryController::class, 'updateOrder'])->name('guide-categories.update-order');
+    
+    Route::resource('guide-places', App\Http\Controllers\Admin\GuidePlaceController::class);
+    Route::post('guide-places/{guidePlace}/toggle-status', [App\Http\Controllers\Admin\GuidePlaceController::class, 'toggleStatus'])->name('guide-places.toggle-status');
+    Route::post('guide-places/{place}/images', [App\Http\Controllers\Admin\GuidePlaceController::class, 'uploadImages'])->name('guide-places.upload-images');
+    Route::delete('guide-place-images/{image}', [App\Http\Controllers\Admin\GuidePlaceController::class, 'deleteImage'])->name('guide-place-images.destroy');
+    Route::post('guide-places/{place}/featured-image', [App\Http\Controllers\Admin\GuidePlaceController::class, 'setFeaturedImage'])->name('guide-places.set-featured-image');
+    Route::post('guide-places/{place}/image-order', [App\Http\Controllers\Admin\GuidePlaceController::class, 'updateImageOrder'])->name('guide-places.update-image-order');
 });
 
 // Duplicate services route'u kaldırıldı - admin içindeki yeterli

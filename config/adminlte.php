@@ -594,6 +594,25 @@ return [
                 ],
             ],
         ],
+        // Rehber Modülü
+        [
+            'text'    => 'Rehber',
+            'icon'    => 'fas fa-map-marker-alt',
+            'submenu' => [
+                [
+                    'text' => 'Kategoriler',
+                    'url'  => 'admin/guide-categories',
+                    'icon' => 'fas fa-folder',
+                    'active' => ['admin/guide-categories', 'admin/guide-categories/*']
+                ],
+                [
+                    'text' => 'Yerler',
+                    'url'  => 'admin/guide-places',
+                    'icon' => 'fas fa-map-pin',
+                    'active' => ['admin/guide-places', 'admin/guide-places/*']
+                ],
+            ],
+        ],
         // Müdürlükler Modülü
         [
             'text'    => 'Müdürlükler',

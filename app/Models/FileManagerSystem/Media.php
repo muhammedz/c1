@@ -186,6 +186,14 @@ class Media extends Model
     }
     
     /**
+     * Dosyanın türüne göre ikon sınıfını döndürür (metod olarak)
+     */
+    public function getIconClass()
+    {
+        return $this->getIconClassAttribute();
+    }
+    
+    /**
      * Dosyanın resim olup olmadığını kontrol eder
      */
     public function isImage()
