@@ -415,6 +415,7 @@ Route::middleware(['auth', 'role:admin'])->name('admin.')->prefix('admin')->grou
         
         // Menu Items routes
         Route::post('/items/store', [App\Http\Controllers\Admin\MenuSystemController::class, 'storeItem'])->name('items.store');
+        Route::get('/items/{item}/edit', [App\Http\Controllers\Admin\MenuSystemController::class, 'editItem'])->name('items.edit');
         Route::put('/items/{item}', [App\Http\Controllers\Admin\MenuSystemController::class, 'updateItem'])->name('items.update');
         Route::delete('/items/{item}', [App\Http\Controllers\Admin\MenuSystemController::class, 'destroyItem'])->name('items.destroy');
         Route::post('/items/order', [App\Http\Controllers\Admin\MenuSystemController::class, 'updateItemOrder'])->name('items.order');

@@ -333,6 +333,30 @@ class MenuSystemController extends Controller
     }
 
     /**
+     * Menü öğesi düzenleme formunu gösterir.
+     */
+    public function editItem($id)
+    {
+        try {
+            $menuItem = MenuSystemItem::with('menu')->findOrFail($id);
+            
+            // Menü öğesinin ait olduğu menüyü al
+            $menu = $menuItem->menu;
+            
+            // Aynı menüdeki diğer öğeleri parent seçimi için al
+            $parentItems = MenuSystemItem::where('menu_id', $menu->id)
+                ->where('id', '!=', $id)
+                ->where('parent_id', 0)
+                ->orderBy('order')
+                ->get();
+            
+            return view('admin.menusystem.items.edit', compact('menuItem', 'menu', 'parentItems'));
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Menü öğesi bulunamadı: ' . $e->getMessage());
+        }
+    }
+
+    /**
      * Menü öğesini günceller.
      */
     public function updateItem(Request $request, $id)
