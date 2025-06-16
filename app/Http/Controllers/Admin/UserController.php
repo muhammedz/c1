@@ -57,7 +57,9 @@ class UserController extends Controller
         
         // Rolleri atama
         if ($request->has('roles')) {
-            $user->syncRoles($request->roles);
+            // Rol ID'lerini rol isimlerine çevir
+            $roleNames = Role::whereIn('id', $request->roles)->pluck('name')->toArray();
+            $user->syncRoles($roleNames);
         }
         
         return redirect()->route('admin.users.index')
@@ -125,7 +127,9 @@ class UserController extends Controller
         
         // Rolleri güncelleme
         if ($request->has('roles')) {
-            $user->syncRoles($request->roles);
+            // Rol ID'lerini rol isimlerine çevir
+            $roleNames = Role::whereIn('id', $request->roles)->pluck('name')->toArray();
+            $user->syncRoles($roleNames);
         } else {
             $user->syncRoles([]);
         }
