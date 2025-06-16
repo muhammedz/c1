@@ -299,25 +299,7 @@
                 </a>
             </div>
             
-            <!-- İlgili Sayfalar -->
-            @if(isset($relatedPages) && $relatedPages->count() > 0)
-                <div>
-                    <h3 class="text-xl font-bold text-[#00352b] mb-4">İlgili İçerikler</h3>
-                    <div class="space-y-4">
-                        @foreach($relatedPages->take(3) as $relatedPage)
-                            <div class="group">
-                                <a href="{{ route('pages.show', $relatedPage->slug) }}" class="block p-3 rounded-lg border border-transparent hover:border-[#00352b]/20 hover:bg-gray-50 transition-all">
-                                    <h4 class="font-medium text-gray-800 mb-2 line-clamp-2 group-hover:text-[#00352b] transition-all">{{ $relatedPage->title }}</h4>
-                                    <div class="text-xs text-gray-500 flex items-center">
-                                        <i class="far fa-calendar-alt mr-1.5"></i>
-                                        {{ $relatedPage->published_at ? $relatedPage->published_at->format('d.m.Y') : $relatedPage->created_at->format('d.m.Y') }}
-                                    </div>
-                                </a>
-                            </div>
-                        @endforeach
-                    </div>
-                </div>
-            @endif
+
         </div>
     </div>
     

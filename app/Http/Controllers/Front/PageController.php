@@ -44,15 +44,6 @@ class PageController extends Controller
         // Görüntülenme sayısını artır
         $page->incrementViews();
         
-        // İlişkili sayfaları getir
-        $relatedPages = Page::published()
-            ->whereHas('categories', function($query) use ($page) {
-                $query->whereIn('category_id', $page->categories->pluck('id'));
-            })
-            ->where('id', '!=', $page->id)
-            ->limit(4)
-            ->get();
-        
         // Tüm aktif kategorileri getir
         $categories = PageCategory::where('is_active', true)
             ->withCount(['pages' => function($query) {
@@ -62,7 +53,7 @@ class PageController extends Controller
             ->orderBy('name')
             ->get();
             
-        return view('front.pages.show', compact('page', 'relatedPages', 'categories'));
+        return view('front.pages.show', compact('page', 'categories'));
     }
     
     /**
