@@ -61,10 +61,7 @@ use App\Http\Controllers\Admin\RedirectController;
 |
 */
 
-Route::get('/basittest', function() {
-    return 'Bu basit test sayfası çalışıyor!';
-});
-
+// Arama route'u - SearchService kullanarak
 Route::get('/arama', function() {
     $query = request()->input('q');
     
@@ -142,12 +139,7 @@ Auth::routes();
 // Arama Test Rotası - şimdilik devre dışı
 // Route::get('/arama-test', [App\Http\Controllers\SearchPageController::class, 'index'])->name('search.test');
 
-// Test rotası - SEO ayarlarını kontrol etmek için
-Route::get('/test-seo', function() {
-    return view('layouts.front', [
-        'content' => '<div class="container mx-auto py-8"><h1 class="text-3xl font-bold">SEO Test Sayfası</h1><p>Bu sayfa SEO ayarlarını test etmek için oluşturulmuştur.</p></div>'
-    ]);
-})->name('test.seo');
+
 
 // Admin Panel Route Tanımlamaları
 Route::middleware(['auth', 'role:admin'])->name('admin.')->prefix('admin')->group(function () {
