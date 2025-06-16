@@ -1,5 +1,5 @@
 <!-- #### Quick Menu Section -->
-<div id="quick-menu-section" class="quick-menu-section w-full rounded-md bg-gradient-radial text-white mt-[-10px] md:mt-[-10px] relative" style="z-index: 50;">
+<div id="quick-menu-section" class="quick-menu-section w-full rounded-md bg-gradient-radial text-white mt-[-10px] md:mt-[-15px] relative" style="z-index: 50;">
     <!-- Desktop Menu -->
     <div class="hidden md:flex ">
         @if(isset($quickMenuCategories) && $quickMenuCategories->count() > 0)
@@ -435,6 +435,7 @@
             margin-top: 0 !important;
             margin-bottom: 1rem;
             border-radius: 0 !important;
+            position: relative !important;
         }
         
         /* Mobilde container padding'i sıfırla */
@@ -443,35 +444,43 @@
             padding-right: 0 !important;
         }
         
+        /* Mobil dropdown konumlandırması */
         #quick-menu-section .quick-menu-dropdown {
             position: static !important;
-            bottom: auto !important;
             width: 100% !important;
-            box-shadow: none !important;
+            background: white !important;
+            z-index: 1 !important;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1) !important;
             margin: 0 !important;
             transform: none !important;
             border-radius: 0 !important;
-            border: none !important;
-            border-left: 2px solid #007d32 !important;
+            border-left: 3px solid #007d32 !important;
+            border-right: 1px solid rgba(0, 0, 0, 0.1) !important;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1) !important;
             display: none !important;
             opacity: 1 !important;
-            background: white !important;
-            z-index: 10 !important;
+            max-height: none !important;
+            overflow-y: visible !important;
         }
 
         #quick-menu-section .group.active .quick-menu-dropdown {
             display: block !important;
             visibility: visible !important;
             height: auto !important;
-            max-height: 500px !important;
-            overflow: visible !important;
         }
 
         #quick-menu-section .quick-menu-dropdown a {
             color: black !important;
-            padding: 8px 12px !important;
-            font-size: 0.8rem !important;
+            padding: 12px 16px !important;
+            font-size: 0.875rem !important;
             white-space: normal !important;
+            line-height: 1.4 !important;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05) !important;
+            transition: all 0.2s ease !important;
+        }
+        
+        #quick-menu-section .quick-menu-dropdown a:last-child {
+            border-bottom: none !important;
         }
 
         #quick-menu-section .quick-menu-dropdown a:hover {

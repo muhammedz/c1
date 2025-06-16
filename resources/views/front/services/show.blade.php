@@ -119,25 +119,7 @@
 
     @media (max-width: 768px) {
         #sidebar {
-            display: none;
-        }
-        
-        #sidebar.active {
-            display: block;
-            position: fixed;
-            top: 15px;
-            left: 15px;
-            right: 15px;
-            width: auto;
-            z-index: 100;
-        }
-        
-        #sidebar.scrolledDown .sticky-container {
-            position: relative;
-            top: 0;
-            left: 0 !important; /* Mobilde varsayılan pozisyon, JS'in eklediği style'ı ezmek için !important kullanıldı */
-            width: 100% !important; /* Tam genişlik */
-            transform: none; /* Transform değerini kaldırdık */
+            display: none !important;
         }
     }
 </style>
@@ -484,6 +466,11 @@
 @section('after_scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // Mobilde sidebar gizli olduğu için JavaScript'i çalıştırma
+        if (window.innerWidth <= 768) {
+            return;
+        }
+        
         // Basit smooth scroll davranışı için
         const menuLinks = document.querySelectorAll('#sidebar nav a');
         const sidebarElement = document.getElementById('sidebar');
@@ -523,6 +510,10 @@
         
         // Pencere boyutu değiştiğinde offset'i yeniden hesapla
         window.addEventListener('resize', function() {
+            // Mobilde sidebar gizli olduğu için çalıştırma
+            if (window.innerWidth <= 768) {
+                return;
+            }
             updateSidebarMetrics();
         });
         
@@ -545,6 +536,11 @@
         
         // Sidebar'ın sayfa kaydırıldıkça davranışı
         window.addEventListener('scroll', function() {
+            // Mobilde sidebar gizli olduğu için çalıştırma
+            if (window.innerWidth <= 768) {
+                return;
+            }
+            
             const currentScrollY = window.scrollY;
             const windowHeight = window.innerHeight;
             const stickyContainer = sidebarElement.querySelector('.sticky-container');
@@ -624,16 +620,7 @@
                 }
             }
             
-            // Mobil görünümde sidebar davranışı
-            if (window.innerWidth <= 768) {
-                if (currentScrollY > 200) {
-                    // Aşağı kaydırıldıysa sidebar'ı göster
-                    sidebarElement.classList.add('active');
-                } else {
-                    // Sayfanın üst kısmındaysa sidebar'ı gizle
-                    sidebarElement.classList.remove('active');
-                }
-            }
+
         });
     });
 </script>
