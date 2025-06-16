@@ -162,4 +162,26 @@ class NotFoundController extends Controller
 
         return response()->json($data);
     }
+
+    /**
+     * Tüm 404 kayıtlarını temizle
+     */
+    public function clearAll()
+    {
+        $totalCount = NotFoundLog::count();
+        
+        if ($totalCount === 0) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Temizlenecek 404 log kaydı bulunamadı.'
+            ]);
+        }
+
+        NotFoundLog::truncate();
+
+        return response()->json([
+            'success' => true,
+            'message' => $totalCount . ' adet 404 log kaydı başarıyla temizlendi.'
+        ]);
+    }
 }

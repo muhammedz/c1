@@ -6,6 +6,9 @@
     <div class="d-flex justify-content-between align-items-center">
         <h1>404 Takip Yönetimi</h1>
         <div>
+            <button type="button" class="btn btn-danger mr-2" id="clear-all-btn">
+                <i class="fas fa-eraser"></i> Tümünü Temizle
+            </button>
             <button type="button" class="btn btn-success" data-toggle="modal" data-target="#bulkActionsModal">
                 <i class="fas fa-tasks"></i> Toplu İşlemler
             </button>
@@ -224,7 +227,7 @@
                 
                 <!-- Pagination -->
                 <div class="card-footer">
-                    {{ $logs->links() }}
+                    {{ $logs->links('custom.pagination-simple') }}
                 </div>
             @else
                 <div class="text-center py-4">
@@ -382,6 +385,28 @@ $(document).ready(function() {
             .fail(function() {
                 toastr.error('Bir hata oluştu!');
             });
+        }
+    });
+
+    // Clear all logs
+    $('#clear-all-btn').click(function() {
+        if (confirm('TÜM 404 log kayıtları silinsin mi? Bu işlem geri alınamaz ve tüm veriler kaybolacaktır!')) {
+            if (confirm('Emin misiniz? Bu işlem tüm 404 log verilerini kalıcı olarak silecektir!')) {
+                $.post('{{ route('admin.404-logs.clear-all') }}', {
+                    _token: '{{ csrf_token() }}'
+                })
+                .done(function(response) {
+                    if (response.success) {
+                        toastr.success(response.message);
+                        location.reload();
+                    } else {
+                        toastr.warning(response.message);
+                    }
+                })
+                .fail(function() {
+                    toastr.error('Bir hata oluştu!');
+                });
+            }
         }
     });
 });

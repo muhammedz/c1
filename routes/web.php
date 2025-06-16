@@ -492,6 +492,7 @@ Route::middleware(['auth', 'role:admin'])->name('admin.')->prefix('admin')->grou
         Route::post('/{notFoundLog}/resolve', [App\Http\Controllers\Admin\NotFoundController::class, 'resolve'])->name('resolve');
         Route::post('/bulk-resolve', [App\Http\Controllers\Admin\NotFoundController::class, 'bulkResolve'])->name('bulk-resolve');
         Route::post('/bulk-delete', [App\Http\Controllers\Admin\NotFoundController::class, 'bulkDelete'])->name('bulk-delete');
+        Route::post('/clear-all', [App\Http\Controllers\Admin\NotFoundController::class, 'clearAll'])->name('clear-all');
         Route::delete('/{notFoundLog}', [App\Http\Controllers\Admin\NotFoundController::class, 'destroy'])->name('destroy');
         Route::get('/{notFoundLog}/create-redirect', [App\Http\Controllers\Admin\NotFoundController::class, 'createRedirect'])->name('create-redirect');
         Route::get('/dashboard-widget', [App\Http\Controllers\Admin\NotFoundController::class, 'dashboardWidget'])->name('dashboard-widget');
