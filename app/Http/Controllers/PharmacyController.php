@@ -64,7 +64,7 @@ class PharmacyController extends Controller
                     }
                 }
 
-                // Rate limit aşıldıysa ve cache'de veri varsa, cached veriyi göster
+                // Rate limit aşıldıysa ve cache'de veri varsa, cached veriyi göster (uyarısız)
                 if ($isRateLimited && ($cachedData || $globalCachedData)) {
                     if ($cachedData) {
                         $pharmacies = $cachedData['data'] ?? [];
@@ -77,7 +77,7 @@ class PharmacyController extends Controller
                         $pharmacies = array_values($pharmacies); // Re-index array
                     }
                     $isFromCache = true;
-                    $error = "Çok sık istekte bulunuyorsunuz. {$timeLeft} saniye sonra yeni arama yapabilirsiniz. Şu anda önbelleğe alınmış veriler gösteriliyor.";
+                    // Hiç uyarı verme, sadece cached verileri göster
                 } 
                 // Rate limit aşıldıysa ama cache'de veri yoksa hata göster
                 elseif ($isRateLimited && !$cachedData && !$globalCachedData) {
@@ -163,7 +163,7 @@ class PharmacyController extends Controller
                         $pharmacies = array_values($pharmacies);
                     }
                     $isFromCache = true;
-                    $error = "Sistemde geçici bir sorun oluştu. Önbelleğe alınmış veriler gösteriliyor. Hata: " . $e->getMessage();
+                    // Hata durumunda da uyarı verme, sadece cached verileri göster
                 } else {
                     $error = $e->getMessage();
                 }
