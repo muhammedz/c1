@@ -330,6 +330,8 @@ Route::middleware(['auth', 'role:admin'])->name('admin.')->prefix('admin')->grou
     Route::delete('hizmet-konulari/{serviceTopic}', [App\Http\Controllers\Admin\ServiceTopicController::class, 'destroy'])->name('service-topics.destroy');
     Route::post('/hizmet-konulari/update-order', [App\Http\Controllers\Admin\ServiceTopicController::class, 'updateOrder'])->name('service-topics.update-order');
     
+
+    
     // Sayfa Kategorileri Yönetimi
     Route::resource('page-categories', App\Http\Controllers\Admin\PageCategoryController::class)->names('page-categories');
     Route::post('/page-categories/update-order', [App\Http\Controllers\Admin\PageCategoryController::class, 'updateOrder'])->name('page-categories.update-order');
