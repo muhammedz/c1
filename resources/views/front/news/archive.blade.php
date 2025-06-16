@@ -1,6 +1,6 @@
 @extends('layouts.front')
 
-@section('title', $archive_date->format('F Y') . ' Arşivi - ' . config('app.name'))
+@section('title', $archive_date->format('F Y') . ' Arşivi')
 
 @section('meta_description', $archive_date->format('F Y') . ' ayına ait tüm haberler ve gelişmeler.')
 

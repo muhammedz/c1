@@ -1,6 +1,6 @@
 @extends('layouts.front')
 
-@section('title', 'Sayfalar - ' . config('app.name'))
+@section('title', 'Sayfalar')
 
 @section('meta_description', 'Tüm sayfaları keşfedin. En güncel içerikler, makaleler ve daha fazlası burada.')
 

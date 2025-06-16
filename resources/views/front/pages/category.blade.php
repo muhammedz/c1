@@ -1,6 +1,6 @@
 @extends('layouts.front')
 
-@section('title', $category->name . ' - ' . config('app.name'))
+@section('title', $category->name)
 @section('meta_description', $category->description ?? 'Bu kategorideki tüm içerikleri keşfedin. ' . $category->name . ' kategorisindeki sayfalar, makaleler ve daha fazlası.')
 
 @include('helpers.functions')

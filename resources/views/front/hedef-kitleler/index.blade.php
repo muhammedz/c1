@@ -1,6 +1,6 @@
 @extends('layouts.front')
 
-@section('title', 'Hedef Kitleler - ' . config('app.name'))
+@section('title', 'Hedef Kitleler')
 
 @section('meta_description', 'Tüm hedef kitleleri keşfedin. Size özel içerikler ve daha fazlası burada.')
 

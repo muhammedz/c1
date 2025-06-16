@@ -1,6 +1,6 @@
 @extends('layouts.front')
 
-@section('title', $category->name . ' Haberleri - ' . config('app.name'))
+@section('title', $category->name . ' Haberleri')
 
 @section('meta_description', $category->description ?? $category->name . ' kategorisindeki en güncel haberler ve gelişmeler.')
 

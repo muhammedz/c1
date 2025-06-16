@@ -148,8 +148,10 @@
                                      class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
                             </div>
                         @else
-                            <div class="aspect-video bg-gray-50 flex items-center justify-center">
-                                <span class="material-icons text-gray-300 text-4xl">business</span>
+                            <div class="aspect-video overflow-hidden">
+                                <img src="{{ asset('images/cankaya-default.jpeg') }}" 
+                                     alt="{{ $place->title }}"
+                                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
                             </div>
                         @endif
                         

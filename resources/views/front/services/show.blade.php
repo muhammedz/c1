@@ -212,55 +212,55 @@
             <div class="sticky-container bg-white rounded-lg border-t-4 border-[#00352b]">
                 <h3 class="text-2xl font-bold mb-4 text-[#00352b] pb-4 border-b border-gray-200">İçindekiler</h3>
                 <nav class="flex flex-col space-y-2">
-                    @if(isset($service->features['is_purpose_visible']) && $service->features['is_purpose_visible'])
+                    @if(isset($service->features['is_purpose_visible']) && $service->features['is_purpose_visible'] && isset($service->features['service_purpose']) && !empty($service->features['service_purpose']))
                     <a href="#hizmetin-amaci" class="flex items-center px-4 py-2 rounded-lg text-gray-600 hover:bg-[#00352b]/10 hover:text-[#00352b] font-medium transition-colors">
                         <i class="material-icons mr-3 text-lg">lightbulb</i>
                         Hizmetin Amacı
                     </a>
                     @endif
-                    @if(isset($service->features['is_who_can_apply_visible']) && $service->features['is_who_can_apply_visible'])
+                    @if(isset($service->features['is_who_can_apply_visible']) && $service->features['is_who_can_apply_visible'] && isset($service->features['who_can_apply']) && !empty($service->features['who_can_apply']))
                     <a href="#kimler-basvurabilir" class="flex items-center px-4 py-2 rounded-lg text-gray-600 hover:bg-[#00352b]/10 hover:text-[#00352b] font-medium transition-colors">
                         <i class="material-icons mr-3 text-lg">people</i>
                         Kimler Başvurabilir
                     </a>
                     @endif
-                    @if(isset($service->features['is_requirements_visible']) && $service->features['is_requirements_visible'])
+                    @if(isset($service->features['is_requirements_visible']) && $service->features['is_requirements_visible'] && isset($service->features['requirements']) && !empty($service->features['requirements']))
                     <a href="#basvuru-sartlari" class="flex items-center px-4 py-2 rounded-lg text-gray-600 hover:bg-[#00352b]/10 hover:text-[#00352b] font-medium transition-colors">
                         <i class="material-icons mr-3 text-lg">assignment</i>
                         Başvuru Şartları
                     </a>
                     @endif
-                    @if(isset($service->features['is_application_process_visible']) && $service->features['is_application_process_visible'])
+                    @if(isset($service->features['is_application_process_visible']) && $service->features['is_application_process_visible'] && isset($service->features['application_process']) && !empty($service->features['application_process']))
                     <a href="#basvuru-sureci" class="flex items-center px-4 py-2 rounded-lg text-gray-600 hover:bg-[#00352b]/10 hover:text-[#00352b] font-medium transition-colors">
                         <i class="material-icons mr-3 text-lg">timeline</i>
                         Başvuru Süreci
                     </a>
                     @endif
-                    @if(isset($service->features['is_standard_forms_visible']) && $service->features['is_standard_forms_visible'])
+                    @if(isset($service->features['is_standard_forms_visible']) && $service->features['is_standard_forms_visible'] && (isset($service->features['standard_forms']) && !empty($service->features['standard_forms']) || isset($service->features['documents']) && is_array($service->features['documents']) && !empty($service->features['documents'])))
                     <a href="#standart-formlar" class="flex items-center px-4 py-2 rounded-lg text-gray-600 hover:bg-[#00352b]/10 hover:text-[#00352b] font-medium transition-colors">
                         <i class="material-icons mr-3 text-lg">description</i>
                         Standart Formlar
                     </a>
                     @endif
-                    @if(isset($service->features['is_processing_times_visible']) && $service->features['is_processing_times_visible'])
+                    @if(isset($service->features['is_processing_times_visible']) && $service->features['is_processing_times_visible'] && isset($service->features['processing_times']) && is_array($service->features['processing_times']) && !empty($service->features['processing_times']))
                     <a href="#islem-suresi" class="flex items-center px-4 py-2 rounded-lg text-gray-600 hover:bg-[#00352b]/10 hover:text-[#00352b] font-medium transition-colors">
                         <i class="material-icons mr-3 text-lg">schedule</i>
                         İşlem Süresi
                     </a>
                     @endif
-                    @if(isset($service->features['is_fees_visible']) && $service->features['is_fees_visible'])
+                    @if(isset($service->features['is_fees_visible']) && $service->features['is_fees_visible'] && isset($service->features['fees']) && is_array($service->features['fees']) && !empty($service->features['fees']))
                     <a href="#ucretler" class="flex items-center px-4 py-2 rounded-lg text-gray-600 hover:bg-[#00352b]/10 hover:text-[#00352b] font-medium transition-colors">
                         <i class="material-icons mr-3 text-lg">payment</i>
                         Ücretler
                     </a>
                     @endif
-                    @if(isset($service->features['is_payment_options_visible']) && $service->features['is_payment_options_visible'])
+                    @if(isset($service->features['is_payment_options_visible']) && $service->features['is_payment_options_visible'] && isset($service->features['payment_options']) && is_array($service->features['payment_options']) && !empty($service->features['payment_options']))
                     <a href="#odeme-secenekleri" class="flex items-center px-4 py-2 rounded-lg text-gray-600 hover:bg-[#00352b]/10 hover:text-[#00352b] font-medium transition-colors">
                         <i class="material-icons mr-3 text-lg">payment</i>
                         Ödeme Seçenekleri
                     </a>
                     @endif
-                    @if(!isset($service->features['is_additional_info_visible']) || $service->features['is_additional_info_visible'])
+                    @if((!isset($service->features['is_additional_info_visible']) || $service->features['is_additional_info_visible']) && isset($service->features['additional_info']) && !empty($service->features['additional_info']))
                     <a href="#diger-bilgiler" class="flex items-center px-4 py-2 rounded-lg text-gray-600 hover:bg-[#00352b]/10 hover:text-[#00352b] font-medium transition-colors">
                         <i class="material-icons mr-3 text-lg">info</i>
                         Diğer Bilgiler
@@ -279,201 +279,167 @@
         <!-- Sağ İçerik Alanı -->
         <div class="service-content-area">
             <!-- Hizmetin Amacı -->
-            @if(isset($service->features['is_purpose_visible']) && $service->features['is_purpose_visible'])
+            @if(isset($service->features['is_purpose_visible']) && $service->features['is_purpose_visible'] && isset($service->features['service_purpose']) && !empty($service->features['service_purpose']))
             <section id="hizmetin-amaci" class="service-content-section">
                 <h2>Hizmetin Amacı</h2>
-                @if(isset($service->features['service_purpose']) && !empty($service->features['service_purpose']))
-                    {!! $service->features['service_purpose'] !!}
-                @else
-                    <p class="mb-4">Buraya içerik ekleyin veya görünümünü gizli yapın.</p>
-                @endif
+                {!! $service->features['service_purpose'] !!}
             </section>
             @endif
             
             <!-- Kimler Başvurabilir -->
-            @if(isset($service->features['is_who_can_apply_visible']) && $service->features['is_who_can_apply_visible'])
+            @if(isset($service->features['is_who_can_apply_visible']) && $service->features['is_who_can_apply_visible'] && isset($service->features['who_can_apply']) && !empty($service->features['who_can_apply']))
             <section id="kimler-basvurabilir" class="service-content-section">
                 <h2>Kimler Başvurabilir</h2>
-                @if(isset($service->features['who_can_apply']) && !empty($service->features['who_can_apply']))
-                    {!! $service->features['who_can_apply'] !!}
-                @else
-                    <p class="mb-4">Buraya içerik ekleyin veya görünümünü gizli yapın.</p>
-                @endif
+                {!! $service->features['who_can_apply'] !!}
             </section>
             @endif
             
             <!-- Başvuru Şartları -->
-            @if(isset($service->features['is_requirements_visible']) && $service->features['is_requirements_visible'])
+            @if(isset($service->features['is_requirements_visible']) && $service->features['is_requirements_visible'] && isset($service->features['requirements']) && !empty($service->features['requirements']))
             <section id="basvuru-sartlari" class="service-content-section">
                 <h2>Başvuru Şartları</h2>
-                @if(isset($service->features['requirements']) && !empty($service->features['requirements']))
-                    {!! $service->features['requirements'] !!}
-                @else
-                    <p class="mb-4">Buraya içerik ekleyin veya görünümünü gizli yapın.</p>
-                @endif
+                {!! $service->features['requirements'] !!}
             </section>
             @endif
             
             <!-- Başvuru Süreci -->
-            @if(isset($service->features['is_application_process_visible']) && $service->features['is_application_process_visible'])
+            @if(isset($service->features['is_application_process_visible']) && $service->features['is_application_process_visible'] && isset($service->features['application_process']) && !empty($service->features['application_process']))
             <section id="basvuru-sureci" class="service-content-section">
                 <h2>Başvuru Süreci</h2>
-                @if(isset($service->features['application_process']) && !empty($service->features['application_process']))
-                    {!! $service->features['application_process'] !!}
-                @else
-                    <p class="mb-4">Buraya içerik ekleyin veya görünümünü gizli yapın.</p>
-                @endif
+                {!! $service->features['application_process'] !!}
             </section>
             @endif
             
             <!-- İşlem Süresi -->
-            @if(isset($service->features['is_processing_times_visible']) && $service->features['is_processing_times_visible'])
+            @if(isset($service->features['is_processing_times_visible']) && $service->features['is_processing_times_visible'] && isset($service->features['processing_times']) && is_array($service->features['processing_times']) && !empty($service->features['processing_times']))
             <section id="islem-suresi" class="service-content-section">
                 <h2>İşlem Süresi</h2>
-                @if(isset($service->features['processing_times']) && is_array($service->features['processing_times']) && !empty($service->features['processing_times']))
-                    <p class="mb-5">{{ $service->title }} hizmetimizin işlem süreleri aşağıda detaylandırılmıştır:</p>
-                    
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full bg-white border border-gray-200 rounded-lg">
-                            <thead>
-                                <tr>
-                                    <th class="px-6 py-3 bg-[#00352b]/5 text-left text-xs font-semibold text-gray-700 uppercase border-b">İşlem Adı</th>
-                                    <th class="px-6 py-3 bg-[#00352b]/5 text-left text-xs font-semibold text-gray-700 uppercase border-b">Süre</th>
-                                    <th class="px-6 py-3 bg-[#00352b]/5 text-left text-xs font-semibold text-gray-700 uppercase border-b">Açıklama</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach($service->features['processing_times'] as $item)
-                                <tr class="hover:bg-gray-50">
-                                    <td class="px-6 py-4 border-b text-sm">{{ $item['title'] ?? '' }}</td>
-                                    <td class="px-6 py-4 border-b text-sm">{{ $item['time'] ?? '' }}</td>
-                                    <td class="px-6 py-4 border-b text-sm">{{ $item['description'] ?? '' }}</td>
-                                </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                @else
-                    <p class="mb-4">Buraya içerik ekleyin veya görünümünü gizli yapın.</p>
-                @endif
+                <p class="mb-5">{{ $service->title }} hizmetimizin işlem süreleri aşağıda detaylandırılmıştır:</p>
+                
+                <div class="overflow-x-auto">
+                    <table class="min-w-full bg-white border border-gray-200 rounded-lg">
+                        <thead>
+                            <tr>
+                                <th class="px-6 py-3 bg-[#00352b]/5 text-left text-xs font-semibold text-gray-700 uppercase border-b">İşlem Adı</th>
+                                <th class="px-6 py-3 bg-[#00352b]/5 text-left text-xs font-semibold text-gray-700 uppercase border-b">Süre</th>
+                                <th class="px-6 py-3 bg-[#00352b]/5 text-left text-xs font-semibold text-gray-700 uppercase border-b">Açıklama</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($service->features['processing_times'] as $item)
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-4 border-b text-sm">{{ $item['title'] ?? '' }}</td>
+                                <td class="px-6 py-4 border-b text-sm">{{ $item['time'] ?? '' }}</td>
+                                <td class="px-6 py-4 border-b text-sm">{{ $item['description'] ?? '' }}</td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
             </section>
             @endif
             
             <!-- Ücretler -->
-            @if(isset($service->features['is_fees_visible']) && $service->features['is_fees_visible'])
+            @if(isset($service->features['is_fees_visible']) && $service->features['is_fees_visible'] && isset($service->features['fees']) && is_array($service->features['fees']) && !empty($service->features['fees']))
             <section id="ucretler" class="service-content-section">
                 <h2>Ücretler</h2>
-                @if(isset($service->features['fees']) && is_array($service->features['fees']) && !empty($service->features['fees']))
-                    <p class="mb-5">{{ $service->title }} hizmetimiz için ücret tarifesi aşağıda belirtilmiştir:</p>
-                    
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full bg-white border border-gray-200 rounded-lg">
-                            <thead>
-                                <tr>
-                                    <th class="px-6 py-4 bg-[#00352b]/5 text-left text-sm font-semibold text-gray-700 border-b">Hizmet Paketi</th>
-                                    <th class="px-6 py-4 bg-[#00352b]/5 text-left text-sm font-semibold text-gray-700 border-b">Açıklama</th>
-                                    <th class="px-6 py-4 bg-[#00352b]/5 text-left text-sm font-semibold text-gray-700 border-b">Fiyat</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach($service->features['fees'] as $fee)
-                                <tr class="hover:bg-gray-50 transition-colors">
-                                    <td class="px-6 py-4 border-b text-sm font-medium text-gray-800">{{ $fee['package'] ?? '' }}</td>
-                                    <td class="px-6 py-4 border-b text-sm text-gray-700">{{ $fee['description'] ?? '' }}</td>
-                                    <td class="px-6 py-4 border-b text-sm">
-                                        <span class="inline-block bg-blue-50 text-blue-700 px-3 py-1 rounded-full font-medium">{{ $fee['price'] ?? '' }}</span>
-                                    </td>
-                                </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                @else
-                    <p class="mb-4">Buraya içerik ekleyin veya görünümünü gizli yapın.</p>
-                @endif
+                <p class="mb-5">{{ $service->title }} hizmetimiz için ücret tarifesi aşağıda belirtilmiştir:</p>
+                
+                <div class="overflow-x-auto">
+                    <table class="min-w-full bg-white border border-gray-200 rounded-lg">
+                        <thead>
+                            <tr>
+                                <th class="px-6 py-4 bg-[#00352b]/5 text-left text-sm font-semibold text-gray-700 border-b">Hizmet Paketi</th>
+                                <th class="px-6 py-4 bg-[#00352b]/5 text-left text-sm font-semibold text-gray-700 border-b">Açıklama</th>
+                                <th class="px-6 py-4 bg-[#00352b]/5 text-left text-sm font-semibold text-gray-700 border-b">Fiyat</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($service->features['fees'] as $fee)
+                            <tr class="hover:bg-gray-50 transition-colors">
+                                <td class="px-6 py-4 border-b text-sm font-medium text-gray-800">{{ $fee['package'] ?? '' }}</td>
+                                <td class="px-6 py-4 border-b text-sm text-gray-700">{{ $fee['description'] ?? '' }}</td>
+                                <td class="px-6 py-4 border-b text-sm">
+                                    <span class="inline-block bg-blue-50 text-blue-700 px-3 py-1 rounded-full font-medium">{{ $fee['price'] ?? '' }}</span>
+                                </td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
             </section>
             @endif
             
             <!-- Ödeme Seçenekleri -->
-            @if(isset($service->features['is_payment_options_visible']) && $service->features['is_payment_options_visible'])
+            @if(isset($service->features['is_payment_options_visible']) && $service->features['is_payment_options_visible'] && isset($service->features['payment_options']) && is_array($service->features['payment_options']) && !empty($service->features['payment_options']))
             <section id="odeme-secenekleri" class="service-content-section">
                 <h2>Ödeme Seçenekleri</h2>
-                @if(isset($service->features['payment_options']) && is_array($service->features['payment_options']) && !empty($service->features['payment_options']))
-                    <p class="mb-5">{{ $service->title }} hizmetimiz için ödeme seçenekleri aşağıda belirtilmiştir:</p>
-                    
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full bg-white border border-gray-200 rounded-lg">
-                            <thead>
-                                <tr>
-                                    <th class="px-6 py-4 bg-[#00352b]/5 text-left text-sm font-semibold text-gray-700 border-b">Ödeme Yöntemi</th>
-                                    <th class="px-6 py-4 bg-[#00352b]/5 text-left text-sm font-semibold text-gray-700 border-b">Vade</th>
-                                    <th class="px-6 py-4 bg-[#00352b]/5 text-left text-sm font-semibold text-gray-700 border-b">Açıklama</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach($service->features['payment_options'] as $option)
-                                <tr class="hover:bg-gray-50 transition-colors">
-                                    <td class="px-6 py-4 border-b text-sm font-medium text-gray-800">{{ $option['method'] ?? '' }}</td>
-                                    <td class="px-6 py-4 border-b text-sm text-gray-700">{{ $option['term'] ?? '' }}</td>
-                                    <td class="px-6 py-4 border-b text-sm text-gray-700">{{ $option['description'] ?? '' }}</td>
-                                </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                @else
-                    <p class="mb-4">Buraya içerik ekleyin veya görünümünü gizli yapın.</p>
-                @endif
+                <p class="mb-5">{{ $service->title }} hizmetimiz için ödeme seçenekleri aşağıda belirtilmiştir:</p>
+                
+                <div class="overflow-x-auto">
+                    <table class="min-w-full bg-white border border-gray-200 rounded-lg">
+                        <thead>
+                            <tr>
+                                <th class="px-6 py-4 bg-[#00352b]/5 text-left text-sm font-semibold text-gray-700 border-b">Ödeme Yöntemi</th>
+                                <th class="px-6 py-4 bg-[#00352b]/5 text-left text-sm font-semibold text-gray-700 border-b">Vade</th>
+                                <th class="px-6 py-4 bg-[#00352b]/5 text-left text-sm font-semibold text-gray-700 border-b">Açıklama</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($service->features['payment_options'] as $option)
+                            <tr class="hover:bg-gray-50 transition-colors">
+                                <td class="px-6 py-4 border-b text-sm font-medium text-gray-800">{{ $option['method'] ?? '' }}</td>
+                                <td class="px-6 py-4 border-b text-sm text-gray-700">{{ $option['term'] ?? '' }}</td>
+                                <td class="px-6 py-4 border-b text-sm text-gray-700">{{ $option['description'] ?? '' }}</td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
             </section>
             @endif
             
             <!-- Diğer Bilgiler -->
-            @if(!isset($service->features['is_additional_info_visible']) || $service->features['is_additional_info_visible'])
+            @if((!isset($service->features['is_additional_info_visible']) || $service->features['is_additional_info_visible']) && isset($service->features['additional_info']) && !empty($service->features['additional_info']))
             <section id="diger-bilgiler" class="service-content-section">
                 <h2>Diğer Bilgiler</h2>
-                @if(isset($service->features['additional_info']) && !empty($service->features['additional_info']))
-                    {!! $service->features['additional_info'] !!}
-                @else
-                    <p class="mb-4">Buraya içerik ekleyin veya görünümünü gizli yapın.</p>
-                @endif
+                {!! $service->features['additional_info'] !!}
             </section>
             @endif
             
             <!-- Standart Formlar -->
-            @if(!isset($service->features['is_standard_forms_visible']) || $service->features['is_standard_forms_visible'])
+            @if((!isset($service->features['is_standard_forms_visible']) || $service->features['is_standard_forms_visible']) && (isset($service->features['standard_forms']) && !empty($service->features['standard_forms']) || isset($service->features['documents']) && is_array($service->features['documents']) && !empty($service->features['documents'])))
             <section id="standart-formlar" class="service-content-section">
                 <h2>Standart Formlar</h2>
                 @if(isset($service->features['standard_forms']) && !empty($service->features['standard_forms']))
                     {!! $service->features['standard_forms'] !!}
-                    
-                    @if(isset($service->features['documents']) && is_array($service->features['documents']) && !empty($service->features['documents']))
-                    <div class="mt-6">
-                        <h3 class="font-semibold text-lg text-gray-800 mb-4">İndirilebilir Dosyalar</h3>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                            @foreach($service->features['documents'] as $document)
-                            <div class="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-all">
-                                <div class="p-5 flex flex-col h-full">
-                                    <div class="flex items-center mb-3">
-                                        <span class="material-icons text-[#00352b] mr-2">description</span>
-                                        <h3 class="font-semibold text-gray-800">{{ $document['name'] }}</h3>
-                                    </div>
-                                    @if(isset($document['description']) && !empty($document['description']))
-                                    <p class="text-sm text-gray-600 mb-4">{{ $document['description'] }}</p>
-                                    @endif
-                                    <div class="mt-auto flex items-center">
-                                        <a href="{{ $document['file'] }}" target="_blank" class="inline-flex items-center text-[#00352b] hover:text-[#20846c] transition-colors">
-                                            <span class="material-icons mr-1 text-sm">file_download</span>
-                                            <span class="text-sm font-medium">İndir</span>
-                                        </a>
-                                    </div>
+                @endif
+                
+                @if(isset($service->features['documents']) && is_array($service->features['documents']) && !empty($service->features['documents']))
+                <div class="mt-6">
+                    <h3 class="font-semibold text-lg text-gray-800 mb-4">İndirilebilir Dosyalar</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        @foreach($service->features['documents'] as $document)
+                        <div class="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-all">
+                            <div class="p-5 flex flex-col h-full">
+                                <div class="flex items-center mb-3">
+                                    <span class="material-icons text-[#00352b] mr-2">description</span>
+                                    <h3 class="font-semibold text-gray-800">{{ $document['name'] }}</h3>
+                                </div>
+                                @if(isset($document['description']) && !empty($document['description']))
+                                <p class="text-sm text-gray-600 mb-4">{{ $document['description'] }}</p>
+                                @endif
+                                <div class="mt-auto flex items-center">
+                                    <a href="{{ $document['file'] }}" target="_blank" class="inline-flex items-center text-[#00352b] hover:text-[#20846c] transition-colors">
+                                        <span class="material-icons mr-1 text-sm">file_download</span>
+                                        <span class="text-sm font-medium">İndir</span>
+                                    </a>
                                 </div>
                             </div>
-                            @endforeach
                         </div>
+                        @endforeach
                     </div>
-                    @endif
-                @else
-                    <p class="mb-4">Buraya içerik ekleyin veya görünümünü gizli yapın.</p>
+                </div>
                 @endif
             </section>
             @endif

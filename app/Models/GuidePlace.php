@@ -129,6 +129,6 @@ class GuidePlace extends Model
             return asset('storage/' . $firstImage->image_path);
         }
         
-        return asset('images/no-image.jpg'); // Default image
+        return asset('images/cankaya-default.jpeg'); // Çankaya Belediyesi default resmi
     }
 }
