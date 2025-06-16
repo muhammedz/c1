@@ -73,10 +73,10 @@ class ServiceTopic extends Model
         return $query->orderBy('order', 'asc');
     }
     
-    // URL için
+    // URL için - ID kullanacak şekilde değiştirildi
     public function getRouteKeyName()
     {
-        return 'slug';
+        return 'id';
     }
     
     // SEO title
