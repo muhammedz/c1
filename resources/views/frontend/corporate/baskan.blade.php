@@ -187,7 +187,7 @@
             
             <div class="p-6">
                 <div class="prose prose-lg max-w-none prose-headings:text-gray-800 prose-p:text-gray-700 prose-a:text-[#00352b] prose-a:no-underline hover:prose-a:text-[#20846c] hover:prose-a:underline prose-img:rounded-lg">
-                    {!! $mayor->biography ? nl2br(e($mayor->biography)) : '<p>Biyografi bilgisi henüz eklenmemiş.</p>' !!}
+                    {!! $mayor->biography ? nl2br(html_entity_decode($mayor->biography, ENT_QUOTES, 'UTF-8')) : '<p>Biyografi bilgisi henüz eklenmemiş.</p>' !!}
                 </div>
             </div>
         </div>

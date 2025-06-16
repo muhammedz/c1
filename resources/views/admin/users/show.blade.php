@@ -77,7 +77,7 @@
                             <div class="card-body">
                                 <strong><i class="fas fa-book mr-1"></i> Biyografi</strong>
                                 <p class="text-muted">
-                                    {!! $user->bio ? nl2br(e($user->bio)) : '<em>Biyografi bilgisi girilmemiş.</em>' !!}
+                                    {!! $user->bio ? nl2br(html_entity_decode($user->bio, ENT_QUOTES, 'UTF-8')) : '<em>Biyografi bilgisi girilmemiş.</em>' !!}
                                 </p>
                                 <hr>
                                 
