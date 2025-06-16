@@ -191,18 +191,7 @@ Route::middleware(['auth', 'role:admin'])->name('admin.')->prefix('admin')->grou
     Route::resource('tenders', App\Http\Controllers\Admin\TenderController::class);
     Route::post('tenders/{id}/toggle-status', [App\Http\Controllers\Admin\TenderController::class, 'toggleStatus'])->name('tenders.toggle-status');
     
-    // Müdürlükler Yönetimi
-    Route::resource('mudurlukler', App\Http\Controllers\Admin\MudurlukController::class)->parameters(['mudurlukler' => 'mudurluk']);
-    Route::delete('/mudurlukler/remove-file/{file}', [App\Http\Controllers\Admin\MudurlukController::class, 'removeFile'])->name('mudurlukler.remove-file');
-    Route::patch('/mudurlukler/toggle-file/{file}', [App\Http\Controllers\Admin\MudurlukController::class, 'toggleFileStatus'])->name('mudurlukler.toggle-file');
-    Route::post('/mudurlukler/reorder-files', [App\Http\Controllers\Admin\MudurlukController::class, 'reorderFiles'])->name('mudurlukler.reorder-files');
-    
-    // Müdürlük Belgeleri Yönetimi
-    Route::post('/mudurlukler/{mudurluk}/documents', [App\Http\Controllers\Admin\MudurlukController::class, 'uploadDocument'])->name('mudurlukler.upload-document');
-    Route::post('/mudurlukler/{mudurluk}/documents/bulk', [App\Http\Controllers\Admin\MudurlukController::class, 'bulkUploadDocuments'])->name('mudurlukler.bulk-upload-documents');
-    Route::put('/mudurlukler/{mudurluk}/documents/{document}', [App\Http\Controllers\Admin\MudurlukController::class, 'updateDocument'])->name('mudurlukler.update-document');
-    Route::delete('/mudurlukler/{mudurluk}/documents/{document}', [App\Http\Controllers\Admin\MudurlukController::class, 'destroyDocument'])->name('mudurlukler.destroy-document');
-    Route::post('/mudurlukler/{mudurluk}/documents/{document}/toggle-status', [App\Http\Controllers\Admin\MudurlukController::class, 'toggleDocumentStatus'])->name('mudurlukler.toggle-document-status');
+
     
     // Sayfa Ayarları
     Route::get('pages/settings', [PageSettingController::class, 'edit'])->name('pages.settings.edit');
@@ -754,6 +743,19 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     Route::delete('guide-place-images/{image}', [App\Http\Controllers\Admin\GuidePlaceController::class, 'deleteImage'])->name('guide-place-images.destroy');
     Route::post('guide-places/{place}/featured-image', [App\Http\Controllers\Admin\GuidePlaceController::class, 'setFeaturedImage'])->name('guide-places.set-featured-image');
     Route::post('guide-places/{place}/image-order', [App\Http\Controllers\Admin\GuidePlaceController::class, 'updateImageOrder'])->name('guide-places.update-image-order');
+    
+    // Müdürlükler Yönetimi
+    Route::resource('mudurlukler', App\Http\Controllers\Admin\MudurlukController::class)->parameters(['mudurlukler' => 'mudurluk']);
+    Route::delete('/mudurlukler/remove-file/{file}', [App\Http\Controllers\Admin\MudurlukController::class, 'removeFile'])->name('mudurlukler.remove-file');
+    Route::patch('/mudurlukler/toggle-file/{file}', [App\Http\Controllers\Admin\MudurlukController::class, 'toggleFileStatus'])->name('mudurlukler.toggle-file');
+    Route::post('/mudurlukler/reorder-files', [App\Http\Controllers\Admin\MudurlukController::class, 'reorderFiles'])->name('mudurlukler.reorder-files');
+    
+    // Müdürlük Belgeleri Yönetimi
+    Route::post('/mudurlukler/{mudurluk}/documents', [App\Http\Controllers\Admin\MudurlukController::class, 'uploadDocument'])->name('mudurlukler.upload-document');
+    Route::post('/mudurlukler/{mudurluk}/documents/bulk', [App\Http\Controllers\Admin\MudurlukController::class, 'bulkUploadDocuments'])->name('mudurlukler.bulk-upload-documents');
+    Route::put('/mudurlukler/{mudurluk}/documents/{document}', [App\Http\Controllers\Admin\MudurlukController::class, 'updateDocument'])->name('mudurlukler.update-document');
+    Route::delete('/mudurlukler/{mudurluk}/documents/{document}', [App\Http\Controllers\Admin\MudurlukController::class, 'destroyDocument'])->name('mudurlukler.destroy-document');
+    Route::post('/mudurlukler/{mudurluk}/documents/{document}/toggle-status', [App\Http\Controllers\Admin\MudurlukController::class, 'toggleDocumentStatus'])->name('mudurlukler.toggle-document-status');
 });
 
 // Duplicate services route'u kaldırıldı - admin içindeki yeterli

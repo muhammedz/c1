@@ -227,7 +227,7 @@ class MudurlukController extends Controller
     public function uploadDocument(Request $request, Mudurluk $mudurluk)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
+            'document_name' => 'required|string|max:255',
             'file' => 'required|file|max:51200', // 50MB max
         ]);
 
@@ -251,7 +251,7 @@ class MudurlukController extends Controller
             
             // Veritabanına kaydet
             $document = $mudurluk->files()->create([
-                'title' => $request->name,
+                'title' => $request->document_name,
                 'file_name' => $originalFileName,
                 'file_path' => $filePath,
                 'file_size' => $fileSize,
@@ -286,6 +286,8 @@ class MudurlukController extends Controller
      */
     public function bulkUploadDocuments(Request $request, Mudurluk $mudurluk)
     {
+
+
         $request->validate([
             'files' => 'required|array|min:1',
             'files.*' => 'required|file|max:51200', // 50MB max per file
@@ -304,6 +306,8 @@ class MudurlukController extends Controller
 
             foreach ($files as $index => $file) {
                 try {
+
+                    
                     // Dosya bilgilerini al
                     $originalFileName = $file->getClientOriginalName();
                     $fileSize = $file->getSize();
@@ -344,14 +348,18 @@ class MudurlukController extends Controller
                 }
             }
 
-            return response()->json([
+            $responseData = [
                 'success' => count($uploadedDocuments) > 0,
                 'message' => count($uploadedDocuments) . ' belge başarıyla yüklendi.',
                 'uploaded_documents' => $uploadedDocuments,
                 'errors' => $errors,
                 'total_uploaded' => count($uploadedDocuments),
                 'total_errors' => count($errors)
-            ]);
+            ];
+            
+
+            
+            return response()->json($responseData);
 
         } catch (\Exception $e) {
             Log::error('Toplu belge yükleme hatası: ' . $e->getMessage());

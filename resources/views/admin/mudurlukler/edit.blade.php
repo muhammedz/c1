@@ -356,65 +356,46 @@
 
                         <!-- Toplu Belge Yükleme -->
                         <div class="mb-4">
-                            <h6 class="mb-3">
-                                <i class="fas fa-upload me-1"></i> Toplu Belge Yükleme
-                            </h6>
-                            
-                            <div class="form-group">
-                                <label for="bulk_document_files">Belgeler</label>
-                                <input type="file" class="form-control-file" id="bulk_document_files" name="files[]" multiple accept=".pdf">
-                                <small class="form-text text-muted">
-                                    Birden fazla PDF dosyası seçebilirsiniz. (Maksimum 10MB/dosya)
-                                </small>
-                            </div>
-                            
-                            <div id="selected-files-preview" class="mb-3" style="display: none;">
-                                <h6>Seçilen Dosyalar:</h6>
-                                <div id="files-list"></div>
-                            </div>
-                        </div>
-
-                        <!-- Tek Belge Yükleme -->
-                        <div class="text-center mb-3">
-                            <button type="button" class="btn btn-outline-primary btn-sm" id="toggle-single-upload">
-                                <i class="fas fa-plus"></i> Tek Belge Ekle
-                            </button>
-                        </div>
-
-                        <div id="single-upload-form" style="display: none;">
-                            <div class="border rounded p-3 bg-light">
-                                <h6 class="mb-3">
-                                    <i class="fas fa-file me-1"></i> Tek Belge Yükleme
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h6 class="mb-0">
+                                    <i class="fas fa-upload me-1"></i> Toplu Belge Yükleme
                                 </h6>
-                                
-                                <div class="form-group mb-3">
-                                    <label for="document_name">Belge Adı <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" id="document_name" placeholder="Belge adını girin">
-                                </div>
-                                
-                                <div class="form-group mb-3">
-                                    <label for="document_file">PDF Dosyası <span class="text-danger">*</span></label>
-                                    <input type="file" class="form-control-file" id="document_file" accept=".pdf">
-                                </div>
-                                
-                                <div class="d-flex gap-2">
-                                    <button type="button" class="btn btn-primary btn-sm" id="add-single-document">
-                                        <i class="fas fa-plus"></i> Belgeyi Ekle
-                                    </button>
-                                    <button type="button" class="btn btn-secondary btn-sm" id="cancel-document-form">
-                                        <i class="fas fa-times"></i> İptal
-                                    </button>
+                                <button type="button" class="btn btn-outline-success btn-sm" id="toggle-bulk-upload">
+                                    <i class="fas fa-plus"></i> Toplu Yükleme
+                                </button>
+                            </div>
+                            
+                            <div id="bulk-upload-form" style="display: none;">
+                                <div class="border rounded p-3 bg-light">
+                                    <div class="form-group mb-3">
+                                        <label for="bulk_document_files">PDF Dosyaları</label>
+                                        <input type="file" class="form-control" id="bulk_document_files" multiple accept=".pdf">
+                                        <small class="form-text text-muted">
+                                            Birden fazla PDF dosyası seçebilirsiniz. (Maksimum 10MB/dosya)
+                                        </small>
+                                    </div>
+                                    
+                                    <div id="selected-files-preview" class="mb-3" style="display: none;">
+                                        <h6>Seçilen Dosyalar:</h6>
+                                        <div id="files-list"></div>
+                                    </div>
+                                    
+                                    <div class="d-flex gap-2">
+                                        <button type="button" class="btn btn-success" id="upload-bulk-documents">
+                                            <i class="fas fa-upload"></i> Tüm Dosyaları Yükle
+                                        </button>
+                                        <button type="button" class="btn btn-secondary" id="cancel-bulk-upload">
+                                            <i class="fas fa-times"></i> İptal
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Eklenen Belgeler Listesi -->
-                        <div id="documents-list" style="display: none;">
-                            <hr>
-                            <h6 class="mb-3">
-                                <i class="fas fa-list me-1"></i> Eklenen Belgeler
-                            </h6>
-                            <div id="documents-container"></div>
+                        <!-- Belge Yükleme Bilgisi -->
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            <strong>Belge yüklemek için:</strong> Tek dosya için "Yeni Belge Ekle", birden fazla dosya için "Toplu Yükleme" butonunu kullanın. Belgeler AJAX ile anında yüklenir.
                         </div>
                     </div>
                 </div>
@@ -434,7 +415,7 @@
                     <div class="col-md-6">
                         <div class="form-group mb-3">
                             <label for="new_document_name">Belge Adı <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" id="new_document_name" name="name">
+                            <input type="text" class="form-control" id="new_document_name" name="document_name">
                         </div>
                     </div>
                     <div class="col-md-6">
@@ -697,15 +678,18 @@
         
         // Yeni belge ekleme formunu göster/gizle
         $('#add-new-document').on('click', function() {
-            $('#document-upload-form-container').toggle();
             if ($('#document-upload-form-container').is(':visible')) {
-                $(this).html('<i class="fas fa-minus"></i> İptal');
+                $('#document-upload-form-container').hide();
+                $(this).html('<i class="fas fa-plus"></i> Yeni Belge Ekle');
+            } else {
+                $('#document-upload-form-container').show();
+                $(this).html('<i class="fas fa-minus"></i> Belge Yüklemeyi Gizle');
+                $('#new_document_name').focus();
+                
                 // Sayfayı forma kaydır
                 $('html, body').animate({
                     scrollTop: $('#document-upload-form-container').offset().top - 100
                 }, 500);
-            } else {
-                $(this).html('<i class="fas fa-plus"></i> Yeni Belge Ekle');
             }
         });
 
@@ -715,15 +699,161 @@
             $('#document-upload-form')[0].reset();
         });
 
+        // Toplu belge yükleme formunu göster/gizle
+        $('#toggle-bulk-upload').on('click', function() {
+            if ($('#bulk-upload-form').is(':visible')) {
+                $('#bulk-upload-form').hide();
+                $(this).html('<i class="fas fa-plus"></i> Toplu Yükleme');
+            } else {
+                $('#bulk-upload-form').show();
+                $(this).html('<i class="fas fa-minus"></i> Toplu Yüklemeyi Gizle');
+                $('#bulk_document_files').focus();
+            }
+        });
+
+        $('#cancel-bulk-upload').on('click', function() {
+            $('#bulk-upload-form').hide();
+            $('#toggle-bulk-upload').html('<i class="fas fa-plus"></i> Toplu Yükleme');
+            $('#bulk_document_files').val('');
+            $('#selected-files-preview').hide();
+            $('#files-list').empty();
+        });
+
+        // Dosya seçimi önizlemesi
+        $('#bulk_document_files').on('change', function() {
+            var files = this.files;
+            var filesList = $('#files-list');
+            var preview = $('#selected-files-preview');
+            
+            filesList.empty();
+            
+            if (files.length > 0) {
+                preview.show();
+                
+                for (var i = 0; i < files.length; i++) {
+                    var file = files[i];
+                    var fileSize = (file.size / 1024 / 1024).toFixed(2) + ' MB';
+                    var fileName = file.name;
+                    var nameWithoutExt = fileName.substring(0, fileName.lastIndexOf('.')) || fileName;
+                    
+                    var fileItem = $(`
+                        <div class="border rounded p-2 mb-2 d-flex align-items-center">
+                            <i class="fas fa-file-pdf text-danger me-2"></i>
+                            <div class="flex-grow-1">
+                                <div class="fw-bold">${fileName}</div>
+                                <small class="text-muted">${fileSize}</small>
+                            </div>
+                            <div class="ms-2">
+                                <input type="text" class="form-control form-control-sm file-name-input" 
+                                       placeholder="Belge adı (opsiyonel)" value="${nameWithoutExt}" data-index="${i}">
+                            </div>
+                        </div>
+                    `);
+                    
+                    filesList.append(fileItem);
+                }
+            } else {
+                preview.hide();
+            }
+        });
+
+        // Toplu belge yükleme
+        $('#upload-bulk-documents').on('click', function() {
+            var files = $('#bulk_document_files')[0].files;
+            
+            if (files.length === 0) {
+                alert('Lütfen en az bir dosya seçin.');
+                return;
+            }
+            
+            var formData = new FormData();
+            var fileNames = [];
+            
+            // Dosyaları FormData'ya ekle
+            for (var i = 0; i < files.length; i++) {
+                formData.append('files[]', files[i]);
+                
+                // Dosya adını belirle
+                var customName = $('.file-name-input[data-index="' + i + '"]').val();
+                if (customName && customName.trim() !== '') {
+                    fileNames.push(customName.trim());
+                } else {
+                    // Dosya adından uzantıyı çıkar
+                    var fileName = files[i].name;
+                    var nameWithoutExt = fileName.substring(0, fileName.lastIndexOf('.')) || fileName;
+                    fileNames.push(nameWithoutExt);
+                }
+            }
+            
+            // Dosya adlarını FormData'ya ekle
+            for (var j = 0; j < fileNames.length; j++) {
+                formData.append('names[]', fileNames[j]);
+            }
+            
+            formData.append('_token', '{{ csrf_token() }}');
+            
+
+            
+            var submitBtn = $(this);
+            var originalText = submitBtn.html();
+            
+            submitBtn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Yükleniyor...');
+            
+            $.ajax({
+                                 url: '{{ route("admin.mudurlukler.bulk-upload-documents", $mudurluk) }}',
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    if (response.success) {
+                        alert(response.message + '\nYüklenen belgeler: ' + (response.uploaded_documents ? response.uploaded_documents.length : 0));
+                        
+                        // Formu temizle ve gizle
+                        $('#bulk_document_files').val('');
+                        $('#selected-files-preview').hide();
+                        $('#files-list').empty();
+                        $('#bulk-upload-form').hide();
+                        $('#toggle-bulk-upload').html('<i class="fas fa-plus"></i> Toplu Yükleme');
+                        
+                        // Sayfayı yenile
+                        location.reload();
+                    } else {
+                        var errorDetails = '';
+                        if (response.errors && response.errors.length > 0) {
+                            errorDetails = '\n\nHata detayları:\n' + response.errors.join('\n');
+                        }
+                        alert('Hata: ' + response.message + errorDetails);
+                    }
+                },
+                error: function(xhr) {
+                    
+                    var errors = xhr.responseJSON ? xhr.responseJSON.errors : null;
+                    if (errors) {
+                        var errorMsg = '';
+                        $.each(errors, function(key, value) {
+                            errorMsg += key + ': ' + value[0] + '\n';
+                        });
+                        alert('Validation Hataları:\n' + errorMsg);
+                    } else {
+                        alert('Bir hata oluştu. Status: ' + xhr.status + '\nDetay: ' + (xhr.responseJSON ? xhr.responseJSON.message : xhr.responseText));
+                    }
+                },
+                complete: function() {
+                    submitBtn.prop('disabled', false).html(originalText);
+                }
+            });
+        });
+
         // Belge yükleme formu (ana formdan bağımsız)
         $('#document-upload-form').on('submit', function(e) {
             e.preventDefault();
             
             // Form validation
-            var name = $('#new_document_name').val().trim();
+            var documentName = $('#new_document_name').val().trim();
             var file = $('#new_document_file')[0].files[0];
             
-            if (!name) {
+            if (!documentName) {
                 alert('Lütfen belge adını girin.');
                 $('#new_document_name').focus();
                 return;
@@ -782,87 +912,7 @@
             });
         });
 
-        // Tek belge yükleme formunu göster/gizle
-        $('#toggle-single-upload').on('click', function() {
-            $('#single-upload-form').toggle();
-            var icon = $(this).find('i');
-            if ($('#single-upload-form').is(':visible')) {
-                icon.removeClass('fa-plus').addClass('fa-minus');
-                $(this).html('<i class="fas fa-minus"></i> Tek Belge Formunu Gizle');
-            } else {
-                icon.removeClass('fa-minus').addClass('fa-plus');
-                $(this).html('<i class="fas fa-plus"></i> Tek Belge Ekle');
-            }
-        });
 
-        // Dosya seçimi önizlemesi
-        $('#bulk_document_files').on('change', function() {
-            var files = this.files;
-            var filesList = $('#files-list');
-            var preview = $('#selected-files-preview');
-            
-            filesList.empty();
-            
-            if (files.length > 0) {
-                preview.show();
-                
-                for (var i = 0; i < files.length; i++) {
-                    var file = files[i];
-                    var fileSize = (file.size / 1024 / 1024).toFixed(2) + ' MB';
-                    var fileName = file.name;
-                    
-                    var fileItem = $(`
-                        <div class="border rounded p-2 mb-2 d-flex align-items-center">
-                            <i class="fas fa-file-pdf text-danger me-2"></i>
-                            <div class="flex-grow-1">
-                                <div class="fw-bold">${fileName}</div>
-                                <small class="text-muted">${fileSize}</small>
-                            </div>
-                            <div class="ms-2">
-                                <input type="text" class="form-control form-control-sm file-name-input" 
-                                       placeholder="Belge adı (opsiyonel)" data-index="${i}">
-                            </div>
-                        </div>
-                    `);
-                    
-                    filesList.append(fileItem);
-                }
-            } else {
-                preview.hide();
-            }
-        });
-
-        // Tek belge ekleme
-        $('#add-single-document').on('click', function() {
-            var name = $('#document_name').val();
-            var file = $('#document_file')[0].files[0];
-            
-            if (!name || !file) {
-                alert('Lütfen belge adı ve dosya seçin.');
-                return;
-            }
-            
-            // Geçici belge listesine ekle
-            addDocumentToList({
-                name: name,
-                file: file,
-                isTemp: true
-            });
-            
-            // Formu temizle
-            $('#document_name').val('');
-            $('#document_file').val('');
-            $('#single-upload-form').hide();
-            $('#toggle-single-upload').html('<i class="fas fa-plus"></i> Tek Belge Ekle');
-        });
-
-        // Form iptal butonu
-        $('#cancel-document-form').on('click', function() {
-            $('#single-upload-form').hide();
-            $('#toggle-single-upload').html('<i class="fas fa-plus"></i> Tek Belge Ekle');
-            $('#document_name').val('');
-            $('#document_file').val('');
-        });
 
         // Belge düzenleme
         $(document).on('click', '.edit-document', function() {
@@ -899,37 +949,10 @@
             }
         });
 
-        // Form gönderilmeden önce dosya verilerini hazırla
+        // Form gönderilmeden önce TinyMCE içeriğini kaydet
         $('#mudurluk-form').on('submit', function(e) {
             // TinyMCE içeriğini kaydet
             tinymce.triggerSave();
-            
-            // Belge dosyalarını form verilerine ekle
-            const bulkFiles = $('#bulk_document_files')[0].files;
-            if (bulkFiles.length > 0) {
-                // Dosya adlarını topla
-                const fileNames = [];
-                $('.file-name-input').each(function(index) {
-                    const customName = $(this).val();
-                    if (customName) {
-                        fileNames.push(customName);
-                    } else {
-                        // Dosya adından uzantıyı çıkar
-                        const fileName = bulkFiles[index] ? bulkFiles[index].name : '';
-                        const nameWithoutExt = fileName.substring(0, fileName.lastIndexOf('.')) || fileName;
-                        fileNames.push(nameWithoutExt);
-                    }
-                });
-                
-                // Hidden input'ları ekle
-                for (let i = 0; i < fileNames.length; i++) {
-                    $('<input>').attr({
-                        type: 'hidden',
-                        name: 'names[' + i + ']',
-                        value: fileNames[i]
-                    }).appendTo(this);
-                }
-            }
             
             return true;
         });
