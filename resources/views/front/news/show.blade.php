@@ -467,7 +467,7 @@
     <div class="pattern-overlay"></div>
     <div class="news-detail-container">
         <nav class="breadcrumb">
-            <a href="{{ route('home') }}" class="breadcrumb-link">Ana Sayfa</a>
+                                    <a href="{{ route('front.home') }}" class="breadcrumb-link">Ana Sayfa</a>
             <span class="breadcrumb-separator">/</span>
             <a href="{{ route('news.index') }}" class="breadcrumb-link">Haberler</a>
             @if($news->category)

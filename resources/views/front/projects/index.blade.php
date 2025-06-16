@@ -274,7 +274,7 @@
     <div class="decorative-shape-2"></div>
     <div class="projects-container">
         <nav class="breadcrumb">
-            <a href="{{ route('home') }}" class="breadcrumb-link">Ana Sayfa</a>
+                                    <a href="{{ route('front.home') }}" class="breadcrumb-link">Ana Sayfa</a>
             <span class="breadcrumb-separator">/</span>
             <span class="breadcrumb-item">Projeler</span>
         </nav>

@@ -81,7 +81,7 @@
 <div class="bg-white border-b border-gray-200">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
         <nav class="flex items-center space-x-2 text-sm">
-            <a href="{{ route('home') }}" class="text-gray-500 hover:text-gray-700">Anasayfa</a>
+                            <a href="{{ route('front.home') }}" class="text-gray-500 hover:text-gray-700">Anasayfa</a>
             <span class="material-icons text-gray-400 text-sm">chevron_right</span>
             <a href="{{ route('services.index') }}" class="text-gray-500 hover:text-gray-700">Hizmetler</a>
             <span class="material-icons text-gray-400 text-sm">chevron_right</span>
