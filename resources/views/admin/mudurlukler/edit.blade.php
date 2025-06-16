@@ -926,7 +926,7 @@
                     type: 'PUT',
                     data: {
                         _token: '{{ csrf_token() }}',
-                        name: newName
+                        title: newName
                     },
                     success: function(response) {
                         if (response.success) {
