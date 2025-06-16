@@ -5,9 +5,14 @@
 @section('content_header')
     <div class="d-flex justify-content-between">
         <h1>Hizmetler</h1>
-        <a href="{{ route('admin.services.create') }}" class="btn btn-primary">
-            <i class="fas fa-plus"></i> Yeni Hizmet Ekle
-        </a>
+        <div>
+            <a href="{{ route('admin.services.services-settings') }}" class="btn btn-info mr-2">
+                <i class="fas fa-cog"></i> Sayfa Ayarları
+            </a>
+            <a href="{{ route('admin.services.create') }}" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Yeni Hizmet Ekle
+            </a>
+        </div>
     </div>
 @stop
 
@@ -38,6 +43,7 @@
                                 <th style="width: 250px;">Başlık</th>
                                 <th style="width: 180px;">Kategoriler</th>
                                 <th style="width: 150px;">Birim</th>
+                                <th style="width: 100px;">Durum</th>
                                 <th style="width: 200px;">Hizmet Konuları</th>
                                 <th style="width: 180px;">Hedef Kitleler</th>
                                 <th style="width: 200px;">İlgili Haber Kategorileri</th>
@@ -46,7 +52,7 @@
                         </thead>
                         <tbody>
                             @forelse($services as $service)
-                            <tr>
+                            <tr class="{{ $service->status === 'draft' ? 'table-danger-light' : '' }}">
                                 <td class="text-center">
                                     <span class="badge badge-light">{{ $service->id }}</span>
                                 </td>
@@ -74,6 +80,15 @@
                                     @else
                                         <span class="text-muted small">Birim yok</span>
                                     @endif
+                                </td>
+                                <td>
+                                    <button type="button" class="btn btn-sm p-0 border-0 bg-transparent" onclick="toggleStatus({{ $service->id }})">
+                                        @if($service->status === 'published')
+                                            <span class="badge badge-success">Aktif</span>
+                                        @else
+                                            <span class="badge badge-danger">Pasif</span>
+                                        @endif
+                                    </button>
                                 </td>
                                 <td>
                                     <div class="badge-container">
@@ -147,7 +162,7 @@
                             </tr>
                             @empty
                             <tr>
-                                <td colspan="8" class="text-center">Henüz hizmet bulunmamaktadır.</td>
+                                <td colspan="9" class="text-center">Henüz hizmet bulunmamaktadır.</td>
                             </tr>
                             @endforelse
                         </tbody>
@@ -229,6 +244,15 @@
         font-style: italic;
     }
     
+    /* Pasif hizmetler için hafif kırmızı arka plan */
+    .table-danger-light {
+        background-color: #f8d7da !important;
+    }
+    
+    .table-danger-light:hover {
+        background-color: #f5c6cb !important;
+    }
+    
     /* Responsive düzenlemeler */
     @media (max-width: 1200px) {
         .table th, .table td {
@@ -249,6 +273,28 @@
     $(function() {
         // Flash mesajı için otomatik kapanma
         $('.alert').delay(3000).fadeOut(500);
-          });
-  </script>
+    });
+    
+    function toggleStatus(serviceId) {
+        $.ajax({
+            url: '/admin/services/' + serviceId + '/toggle-status',
+            type: 'POST',
+            data: {
+                _token: '{{ csrf_token() }}'
+            },
+            success: function(response) {
+                if (response.success) {
+                    // Sayfayı yenile
+                    location.reload();
+                } else {
+                    alert('Durum değiştirilirken bir hata oluştu: ' + (response.message || 'Bilinmeyen hata'));
+                }
+            },
+            error: function(xhr) {
+                alert('Durum değiştirilirken bir hata oluştu. Lütfen tekrar deneyin.');
+                console.error('AJAX Error:', xhr);
+            }
+        });
+    }
+</script>
 @stop 

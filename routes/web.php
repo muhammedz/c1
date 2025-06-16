@@ -299,6 +299,10 @@ Route::middleware(['auth', 'role:admin'])->name('admin.')->prefix('admin')->grou
         Route::post('/{service}/toggle-archive', [ServiceController::class, 'toggleArchive'])->name('toggle-archive');
         Route::post('/{service}/toggle-status', [ServiceController::class, 'toggleStatus'])->name('toggle-status');
         Route::post('/upload-gallery-image', [ServiceController::class, 'uploadGalleryImage'])->name('upload-gallery-image');
+        
+        // Hizmet Ayarları
+        Route::get('/services-settings', [ServiceController::class, 'settings'])->name('services-settings');
+        Route::post('/services-settings', [ServiceController::class, 'updateSettings'])->name('services-settings.update');
 
         // Birimler route'ları
         Route::get('/units', [ServicesUnitController::class, 'index'])->name('units.index');

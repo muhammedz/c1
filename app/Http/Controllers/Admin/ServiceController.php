@@ -16,6 +16,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use App\Models\ServicesUnit;
+use App\Models\ServiceSetting;
 
 class ServiceController extends Controller
 {
@@ -468,6 +469,38 @@ class ServiceController extends Controller
         }
         
         return $url;
+    }
+
+    /**
+     * Hizmet sayfası ayarlarını göster
+     */
+    public function settings()
+    {
+        $settings = ServiceSetting::firstOrCreate();
+        return view('admin.services.settings', compact('settings'));
+    }
+
+    /**
+     * Hizmet sayfası ayarlarını güncelle
+     */
+    public function updateSettings(Request $request)
+    {
+        $request->validate([
+            'hero_title' => 'nullable|string|max:255',
+            'hero_title_highlight' => 'nullable|string|max:255',
+            'hero_subtitle' => 'nullable|string|max:500',
+            'hero_description' => 'nullable|string|max:1000',
+            'hero_image' => 'nullable|string|max:500',
+            'meta_title' => 'nullable|string|max:255',
+            'meta_description' => 'nullable|string|max:500',
+            'meta_keywords' => 'nullable|string|max:500',
+        ]);
+
+        $settings = ServiceSetting::firstOrCreate();
+        $settings->update($request->all());
+
+        return redirect()->route('admin.services.services-settings')
+            ->with('success', 'Hizmet sayfası ayarları başarıyla güncellendi.');
     }
 
     /**

@@ -405,7 +405,7 @@
                                         <div class="card-body p-2 text-center">
                                             <div class="d-flex align-items-center justify-content-center">
                                                 <i class="fas fa-check-circle status-icon me-2" style="font-size: 1.2rem; color: {{ old('status', $service->status) == 'published' ? '#3490dc' : '#6c757d' }}; transition: all 0.3s ease;"></i>
-                                                <span class="status-title" style="font-weight: {{ old('status', $service->status) == 'published' ? '700' : '500' }}; font-size: 0.9rem; color: {{ old('status', $service->status) == 'published' ? '#3490dc' : '#212529' }};">Yayında</span>
+                                                <span class="status-title" style="font-weight: {{ old('status', $service->status) == 'published' ? '700' : '500' }}; font-size: 0.9rem; color: {{ old('status', $service->status) == 'published' ? '#3490dc' : '#212529' }};">Aktif</span>
                                             </div>
                                         </div>
                                     </div>
@@ -421,8 +421,8 @@
                                         
                                         <div class="card-body p-2 text-center">
                                             <div class="d-flex align-items-center justify-content-center">
-                                                <i class="fas fa-edit status-icon me-2" style="font-size: 1.2rem; color: {{ old('status', $service->status) == 'draft' ? '#3490dc' : '#6c757d' }}; transition: all 0.3s ease;"></i>
-                                                <span class="status-title" style="font-weight: {{ old('status', $service->status) == 'draft' ? '700' : '500' }}; font-size: 0.9rem; color: {{ old('status', $service->status) == 'draft' ? '#3490dc' : '#212529' }};">Taslak</span>
+                                                <i class="fas fa-times-circle status-icon me-2" style="font-size: 1.2rem; color: {{ old('status', $service->status) == 'draft' ? '#3490dc' : '#6c757d' }}; transition: all 0.3s ease;"></i>
+                                                <span class="status-title" style="font-weight: {{ old('status', $service->status) == 'draft' ? '700' : '500' }}; font-size: 0.9rem; color: {{ old('status', $service->status) == 'draft' ? '#3490dc' : '#212529' }};">Pasif</span>
                                             </div>
                                         </div>
                                     </div>

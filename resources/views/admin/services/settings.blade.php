@@ -1,84 +1,119 @@
 @extends('adminlte::page')
 
-@section('title', 'Hizmetler Ayarları')
+@section('title', 'Hizmet Sayfası Ayarları')
 
 @section('content_header')
-    <h1>Hizmetler Ayarları</h1>
+    <h1>Hizmet Sayfası Ayarları</h1>
 @stop
 
 @section('content')
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-md-12">
-            <div class="card card-primary">
-                <div class="card-header">
-                    <h3 class="card-title">Hizmetler Genel Ayarları</h3>
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Hizmetler Sayfası Genel Ayarları</h3>
+            </div>
+            
+            <form action="{{ route('admin.services.services-settings.update') }}" method="POST">
+                @csrf
+                <div class="card-body">
+                    
+                    <!-- Hero Bölümü -->
+                    <div class="form-group">
+                        <label for="hero_title">Ana Başlık</label>
+                        <input type="text" class="form-control @error('hero_title') is-invalid @enderror" 
+                               id="hero_title" name="hero_title" 
+                               value="{{ old('hero_title', $settings->hero_title) }}">
+                        @error('hero_title')
+                            <span class="invalid-feedback">{{ $message }}</span>
+                        @enderror
+                    </div>
+
+                    <div class="form-group">
+                        <label for="hero_title_highlight">Vurgulanan Kelime</label>
+                        <input type="text" class="form-control @error('hero_title_highlight') is-invalid @enderror" 
+                               id="hero_title_highlight" name="hero_title_highlight" 
+                               value="{{ old('hero_title_highlight', $settings->hero_title_highlight) }}">
+                        @error('hero_title_highlight')
+                            <span class="invalid-feedback">{{ $message }}</span>
+                        @enderror
+                    </div>
+
+                    <div class="form-group">
+                        <label for="hero_subtitle">Alt Başlık</label>
+                        <input type="text" class="form-control @error('hero_subtitle') is-invalid @enderror" 
+                               id="hero_subtitle" name="hero_subtitle" 
+                               value="{{ old('hero_subtitle', $settings->hero_subtitle) }}">
+                        @error('hero_subtitle')
+                            <span class="invalid-feedback">{{ $message }}</span>
+                        @enderror
+                    </div>
+
+                    <div class="form-group">
+                        <label for="hero_description">Açıklama</label>
+                        <textarea class="form-control @error('hero_description') is-invalid @enderror" 
+                                  id="hero_description" name="hero_description" rows="3">{{ old('hero_description', $settings->hero_description) }}</textarea>
+                        @error('hero_description')
+                            <span class="invalid-feedback">{{ $message }}</span>
+                        @enderror
+                    </div>
+
+                    <div class="form-group">
+                        <label for="hero_image">Hero Görseli URL</label>
+                        <input type="text" class="form-control @error('hero_image') is-invalid @enderror" 
+                               id="hero_image" name="hero_image" 
+                               value="{{ old('hero_image', $settings->hero_image) }}">
+                        @error('hero_image')
+                            <span class="invalid-feedback">{{ $message }}</span>
+                        @enderror
+                    </div>
+
+                    <hr>
+
+                    <!-- SEO Bölümü -->
+                    <h5>SEO Ayarları</h5>
+                    
+                    <div class="form-group">
+                        <label for="meta_title">Meta Başlık</label>
+                        <input type="text" class="form-control @error('meta_title') is-invalid @enderror" 
+                               id="meta_title" name="meta_title" 
+                               value="{{ old('meta_title', $settings->meta_title) }}">
+                        @error('meta_title')
+                            <span class="invalid-feedback">{{ $message }}</span>
+                        @enderror
+                    </div>
+
+                    <div class="form-group">
+                        <label for="meta_description">Meta Açıklama</label>
+                        <textarea class="form-control @error('meta_description') is-invalid @enderror" 
+                                  id="meta_description" name="meta_description" rows="3">{{ old('meta_description', $settings->meta_description) }}</textarea>
+                        @error('meta_description')
+                            <span class="invalid-feedback">{{ $message }}</span>
+                        @enderror
+                    </div>
+
+                    <div class="form-group">
+                        <label for="meta_keywords">Meta Anahtar Kelimeler</label>
+                        <input type="text" class="form-control @error('meta_keywords') is-invalid @enderror" 
+                               id="meta_keywords" name="meta_keywords" 
+                               value="{{ old('meta_keywords', $settings->meta_keywords) }}"
+                               placeholder="Virgülle ayırarak yazın">
+                        @error('meta_keywords')
+                            <span class="invalid-feedback">{{ $message }}</span>
+                        @enderror
+                    </div>
+
                 </div>
                 
-                <form method="POST" action="{{ route('admin.services.settings.update') }}" enctype="multipart/form-data">
-                    @csrf
-                    @method('PUT')
-                    
-                    <div class="card-body">
-                        @if(session('success'))
-                            <div class="alert alert-success">
-                                {{ session('success') }}
-                            </div>
-                        @endif
-                        
-                        <div class="form-group">
-                            <label for="per_page">Sayfa Başına Gösterilecek Hizmet Sayısı</label>
-                            <input type="number" class="form-control" id="per_page" name="per_page" value="{{ old('per_page', 10) }}" min="1" max="50">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="default_sort">Varsayılan Sıralama</label>
-                            <select class="form-control" id="default_sort" name="default_sort">
-                                <option value="created_at_desc">Oluşturma Tarihi (Yeni-Eski)</option>
-                                <option value="created_at_asc">Oluşturma Tarihi (Eski-Yeni)</option>
-                                <option value="title_asc">Başlık (A-Z)</option>
-                                <option value="title_desc">Başlık (Z-A)</option>
-                            </select>
-                        </div>
-                        
-                        <div class="form-group">
-                            <div class="custom-control custom-switch">
-                                <input type="checkbox" class="custom-control-input" id="show_featured" name="show_featured" value="1" checked>
-                                <label class="custom-control-label" for="show_featured">Öne Çıkan Hizmetleri Göster</label>
-                            </div>
-                        </div>
-                        
-                        <hr>
-                        
-                        <h4>SEO Ayarları</h4>
-                        
-                        <div class="form-group">
-                            <label for="meta_title">Meta Başlık</label>
-                            <input type="text" class="form-control" id="meta_title" name="meta_title" value="{{ old('meta_title', 'Hizmetlerimiz') }}">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="meta_description">Meta Açıklama</label>
-                            <textarea class="form-control" id="meta_description" name="meta_description" rows="3">{{ old('meta_description', 'Kurumumuz tarafından sunulan tüm hizmetler.') }}</textarea>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="banner_image">Banner Görseli</label>
-                            <div class="input-group">
-                                <div class="custom-file">
-                                    <input type="file" class="custom-file-input" id="banner_image" name="banner_image">
-                                    <label class="custom-file-label" for="banner_image">Dosya Seç</label>
-                                </div>
-                            </div>
-                            <small class="form-text text-muted">Önerilen boyut: 1920x400 piksel.</small>
-                        </div>
-                    </div>
-                    
-                    <div class="card-footer">
-                        <button type="submit" class="btn btn-primary">Ayarları Kaydet</button>
-                    </div>
-                </form>
-            </div>
+                <div class="card-footer">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Kaydet
+                    </button>
+                    <a href="{{ route('admin.services.index') }}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Geri Dön
+                    </a>
+                </div>
+            </form>
         </div>
     </div>
 </div>
@@ -86,18 +121,17 @@
 
 @section('css')
 <style>
-    /* Custom CSS */
+    .card-header h3 {
+        margin: 0;
+    }
 </style>
 @stop
 
 @section('js')
 <script>
-    $(document).ready(function() {
-        // Custom JS
-        $('.custom-file-input').on('change', function() {
-            var fileName = $(this).val().split('\\').pop();
-            $(this).siblings('.custom-file-label').addClass('selected').html(fileName);
-        });
+    // Form submit edildiğinde loading göster
+    $('form').on('submit', function() {
+        $(this).find('button[type="submit"]').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Kaydediliyor...');
     });
 </script>
 @stop 

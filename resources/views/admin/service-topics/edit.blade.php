@@ -164,7 +164,7 @@
                                                 <td>{{ $service->title }}</td>
                                                 <td class="text-center">
                                                     <span class="badge bg-{{ $service->status === 'published' ? 'success' : 'warning' }}">
-                                                        {{ $service->status === 'published' ? 'Yayında' : 'Taslak' }}
+                                                        {{ $service->status === 'published' ? 'Aktif' : 'Pasif' }}
                                                     </span>
                                                 </td>
                                                 <td class="text-center">

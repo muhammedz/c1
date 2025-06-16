@@ -221,12 +221,12 @@
                                             @php
                                                 $statusClass = [
                                                     'published' => 'success',
-                                                    'draft' => 'warning',
+                                                    'draft' => 'danger',
                                                 ][$service->status] ?? 'secondary';
                                                 
                                                 $statusText = [
-                                                    'published' => 'Yayında',
-                                                    'draft' => 'Taslak',
+                                                    'published' => 'Aktif',
+                                                    'draft' => 'Pasif',
                                                 ][$service->status] ?? $service->status;
                                             @endphp
                                             

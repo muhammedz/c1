@@ -574,24 +574,24 @@
                                         <div class="card-body p-2 text-center">
                                             <div class="d-flex align-items-center justify-content-center">
                                                 <i class="fas fa-check-circle status-icon me-2" style="font-size: 1.2rem; color: {{ old('status', 'published') == 'published' ? '#3490dc' : '#6c757d' }}; transition: all 0.3s ease;"></i>
-                                                <span class="status-title" style="font-weight: {{ old('status', 'published') == 'published' ? '700' : '500' }}; font-size: 0.9rem; color: {{ old('status', 'published') == 'published' ? '#3490dc' : '#212529' }};">Yayında</span>
+                                                <span class="status-title" style="font-weight: {{ old('status', 'published') == 'published' ? '700' : '500' }}; font-size: 0.9rem; color: {{ old('status', 'published') == 'published' ? '#3490dc' : '#212529' }};">Aktif</span>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                                 
                                 <div class="status-card compact flex-grow-1" data-status="draft" style="max-width: 50%; margin: 0 auto;">
-                                    <div class="card h-100 status-option {{ old('status') == 'draft' ? 'border-primary active' : 'border' }}" style="cursor: pointer; transition: all 0.3s ease; border-width: 3px !important; border-radius: 12px !important; overflow: hidden; position: relative; box-shadow: {{ old('status') == 'draft' ? '0 0 10px rgba(52,144,220,0.5)' : 'none' }}; background-color: {{ old('status') == 'draft' ? '#e6f2ff' : 'white' }};">
+                                    <div class="card h-100 status-option {{ old('status', 'published') == 'draft' ? 'border-primary active' : 'border' }}" style="cursor: pointer; transition: all 0.3s ease; border-width: 3px !important; border-radius: 12px !important; overflow: hidden; position: relative; box-shadow: {{ old('status', 'published') == 'draft' ? '0 0 10px rgba(52,144,220,0.5)' : 'none' }}; background-color: {{ old('status', 'published') == 'draft' ? '#e6f2ff' : 'white' }};">
                                         
-                                        @if(old('status') == 'draft')
+                                        @if(old('status', 'published') == 'draft')
                                         <div style="position: absolute; top: 0; left: 0; width: 8px; height: 100%; background-color: #3490dc;"></div>
                                         <div style="position: absolute; top: 5px; right: 6px; font-size: 14px; color: #3490dc; font-weight: bold;">✓</div>
                                         @endif
                                         
                                         <div class="card-body p-2 text-center">
                                             <div class="d-flex align-items-center justify-content-center">
-                                                <i class="fas fa-edit status-icon me-2" style="font-size: 1.2rem; color: {{ old('status') == 'draft' ? '#3490dc' : '#6c757d' }}; transition: all 0.3s ease;"></i>
-                                                <span class="status-title" style="font-weight: {{ old('status') == 'draft' ? '700' : '500' }}; font-size: 0.9rem; color: {{ old('status') == 'draft' ? '#3490dc' : '#212529' }};">Taslak</span>
+                                                <i class="fas fa-times-circle status-icon me-2" style="font-size: 1.2rem; color: {{ old('status', 'published') == 'draft' ? '#3490dc' : '#6c757d' }}; transition: all 0.3s ease;"></i>
+                                                <span class="status-title" style="font-weight: {{ old('status', 'published') == 'draft' ? '700' : '500' }}; font-size: 0.9rem; color: {{ old('status', 'published') == 'draft' ? '#3490dc' : '#212529' }};">Pasif</span>
                                             </div>
                                         </div>
                                     </div>

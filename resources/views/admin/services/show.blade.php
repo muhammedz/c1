@@ -31,9 +31,9 @@
                             <small>
                                 <i class="fas fa-link mr-1"></i>{{ $service->slug }} 
                                 @if($service->status == 'published')
-                                    <span class="badge badge-success ml-2"><i class="fas fa-eye mr-1"></i>Yayında</span>
+                                    <span class="badge badge-success ml-2"><i class="fas fa-eye mr-1"></i>Aktif</span>
                                 @else
-                                    <span class="badge badge-secondary ml-2"><i class="fas fa-eye-slash mr-1"></i>Taslak</span>
+                                    <span class="badge badge-secondary ml-2"><i class="fas fa-eye-slash mr-1"></i>Pasif</span>
                                 @endif
 
                                 @if($service->is_featured)

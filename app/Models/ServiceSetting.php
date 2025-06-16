@@ -19,12 +19,17 @@ class ServiceSetting extends Model
         'hero_badge_text',
         'hero_title',
         'hero_title_highlight',
+        'hero_subtitle',
         'hero_description',
+        'hero_image',
         'search_title',
         'search_placeholder',
         'search_button_text',
         'popular_searches_title',
         'popular_searches',
+        'meta_title',
+        'meta_description',
+        'meta_keywords',
     ];
     
     /**
