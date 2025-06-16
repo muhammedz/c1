@@ -4,7 +4,7 @@
     <div class="relative z-0">
         @include('front.sections.slider')
     </div>
-    <div class="w-full relative z-50 md:-mt-11 -mt-0">
+    <div class="w-full relative z-50 md:-mt-16 -mt-0">
         <div class="container max-w-[1235px] mx-auto md:px-4 px-0">
             <div class="flex items-center justify-center">
                 @include('front.sections.quickmenu')
