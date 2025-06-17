@@ -48,33 +48,6 @@ class PharmacyController extends Controller
         // Form gönderilmişse veya ilk yüklemede eczaneleri getir
         if ($request->has('search') || !$request->hasAny(['plateCode', 'date', 'district', 'search'])) {
             
-            // Her zaman bağlantı testlerini yap
-            $debugInfo[] = "Bağlantı testleri başlatılıyor...";
-            
-            // İnternet bağlantısını test et
-            try {
-                $testResponse = Http::timeout(5)->get('https://www.google.com');
-                $debugInfo[] = "✅ İnternet bağlantısı: OK";
-            } catch (Exception $e) {
-                $debugInfo[] = "❌ İnternet bağlantısı: HATA - " . $e->getMessage();
-            }
-            
-            // Türkiye.gov.tr'ye bağlantıyı test et
-            try {
-                $testGovResponse = Http::timeout(10)->get('https://www.turkiye.gov.tr');
-                $debugInfo[] = "✅ Türkiye.gov.tr bağlantısı: OK - Status: " . $testGovResponse->status();
-            } catch (Exception $e) {
-                $debugInfo[] = "❌ Türkiye.gov.tr bağlantısı: HATA - " . $e->getMessage();
-            }
-            
-            // Eczane sayfasına bağlantıyı test et
-            try {
-                $testPharmacyResponse = Http::timeout(10)->get('https://www.turkiye.gov.tr/saglik-titck-nobetci-eczane-sorgulama');
-                $debugInfo[] = "✅ Eczane sayfası bağlantısı: OK - Status: " . $testPharmacyResponse->status();
-            } catch (Exception $e) {
-                $debugInfo[] = "❌ Eczane sayfası bağlantısı: HATA - " . $e->getMessage();
-            }
-            
             try {
                 // Önce cache'de veri var mı kontrol et
                 $cacheKey = "pharmacy_data_{$plateCode}_{$date}_{$district}";
@@ -99,7 +72,6 @@ class PharmacyController extends Controller
                 if ($cachedData && is_array($cachedData) && isset($cachedData['data'])) {
                     $pharmacies = $cachedData['data'];
                     $isFromCache = true;
-                    $debugInfo[] = "Cache'den veri alındı - " . count($pharmacies) . " eczane";
                     $debugInfo[] = "Cache tarihi: " . ($cachedData['meta']['cached_at'] ?? 'bilinmiyor');
                 } elseif ($globalCachedData && is_array($globalCachedData) && isset($globalCachedData['data'])) {
                     // Global cache'den filtrele
@@ -109,36 +81,25 @@ class PharmacyController extends Controller
                     });
                     $pharmacies = array_values($pharmacies);
                     $isFromCache = true;
-                    $debugInfo[] = "Global cache'den filtrelendi - Toplam: " . count($allPharmacies) . ", Filtreli: " . count($pharmacies);
-                    $debugInfo[] = "Global cache tarihi: " . ($globalCachedData['meta']['cached_at'] ?? 'bilinmiyor');
+                    $debugInfo[] = "Cache tarihi: " . ($globalCachedData['meta']['cached_at'] ?? 'bilinmiyor');
                 } else {
                     // Cache'de veri yok, API'den çek
                     if ($isRateLimited) {
                         $error = "Çok sık istek gönderdiniz. Lütfen {$timeLeft} saniye sonra tekrar deneyin.";
-                        $debugInfo[] = "Rate limit aşıldı";
                     } else {
                         // Rate limit kaydet
                         Cache::put($rateLimitKey, time(), 4);
-                        
-                        // API'den veri çek
-                        $debugInfo[] = "API'den veri çekiliyor";
-                        
                         // Token al
                         $token = $this->fetchToken();
                         if (!$token) {
-                            $debugInfo[] = "Token alma başarısız!";
                             throw new Exception('Token alınamadı');
                         }
                         
-                        $debugInfo[] = "Token alındı: " . substr($token, 0, 10) . "...";
-                        
                         // Form gönder
                         $this->submitSearchForm($token, $plateCode, $date);
-                        $debugInfo[] = "Form gönderildi";
                         
                         // Tüm eczaneleri getir
                         $allPharmacies = $this->fetchAllPharmacies();
-                        $debugInfo[] = "Toplam " . count($allPharmacies) . " eczane bulundu";
                         
                         if (count($allPharmacies) > 0) {
                             // Global cache'e tüm eczaneleri kaydet
@@ -159,7 +120,7 @@ class PharmacyController extends Controller
                             });
                             $pharmacies = array_values($pharmacies);
                             
-                            $debugInfo[] = $district . " ilçesi için " . count($pharmacies) . " eczane filtrelendi";
+
                             
                             // Spesifik sonucu da cache'le
                             $result = [
@@ -174,7 +135,6 @@ class PharmacyController extends Controller
                             ];
                             Cache::put($cacheKey, $result, 1800); // 30 dakika
                         } else {
-                            $debugInfo[] = "API'den hiç eczane bulunamadı";
                             // Boş sonucu da cache'le (kısa süre)
                             $emptyResult = [
                                 'data' => [],
@@ -194,19 +154,16 @@ class PharmacyController extends Controller
 
                 // Eğer hala sonuç yoksa ve cache'de de yoksa, geçmiş günlerin cache'ine bak
                 if (count($pharmacies) === 0 && !$isRateLimited) {
-                    $debugInfo[] = "Alternatif cache aranıyor";
                     $fallbackPharmacies = $this->getFallbackPharmacies($plateCode, $district);
                     if (count($fallbackPharmacies) > 0) {
                         $pharmacies = $fallbackPharmacies;
                         $isFromCache = true;
-                        $debugInfo[] = "Alternatif cache'den " . count($pharmacies) . " eczane bulundu";
                         $error = "Güncel veri alınamadı. Geçmiş tarihli veriler gösteriliyor.";
                     }
                 }
 
             } catch (Exception $e) {
                 $error = 'Eczane verileri alınırken bir hata oluştu: ' . $e->getMessage();
-                $debugInfo[] = "Hata: " . $e->getMessage();
                 
                 // Hata durumunda da fallback cache'e bak
                 $fallbackPharmacies = $this->getFallbackPharmacies($plateCode, $district);
@@ -214,7 +171,6 @@ class PharmacyController extends Controller
                     $pharmacies = $fallbackPharmacies;
                     $isFromCache = true;
                     $error = "Güncel veri alınamadı. Geçmiş tarihli veriler gösteriliyor.";
-                    $debugInfo[] = "Hata sonrası fallback'den " . count($pharmacies) . " eczane bulundu";
                 }
                 
                 // Hata logla
@@ -228,11 +184,7 @@ class PharmacyController extends Controller
             }
         }
 
-        // Debug bilgilerini her zaman göster (geçici olarak)
-        $debugInfo[] = "Sonuç: " . count($pharmacies) . " eczane";
-        $debugInfo[] = "Cache'den: " . ($isFromCache ? 'Evet' : 'Hayır');
-        $debugInfo[] = "Ortam: " . config('app.env');
-        $debugInfo[] = "Debug Modu: " . (config('app.debug') ? 'Açık' : 'Kapalı');
+        // Sadece cache tarihi debug bilgisi kalacak
 
         return view('front.pharmacy.index', compact(
             'pharmacies', 
