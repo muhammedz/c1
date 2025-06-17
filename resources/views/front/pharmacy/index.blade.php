@@ -184,26 +184,18 @@
 </div>
 
 <div class="pharmacy-container">
-    <!-- Debug Bilgileri (Sadece development ortamında) -->
-    @if(config('app.debug') && isset($debugInfo) && count($debugInfo) > 0)
-        <div class="alert alert-info" style="background-color: #f0f8ff; border-color: #b3d9ff;">
-            <i class="fas fa-bug"></i>
-            <strong>Debug Bilgileri:</strong>
-            <ul style="margin: 0.5rem 0 0 1rem; padding: 0;">
-                @foreach($debugInfo as $info)
-                    <li style="margin: 0.2rem 0;">{{ $info }}</li>
-                @endforeach
-            </ul>
-        </div>
+    <!-- Debug Bilgileri Console'a yazdır -->
+    @if(isset($debugInfo) && count($debugInfo) > 0)
+        <script>
+            console.group('🔍 Nöbetçi Eczane Debug Bilgileri');
+            @foreach($debugInfo as $info)
+                console.log('{{ addslashes($info) }}');
+            @endforeach
+            console.groupEnd();
+        </script>
     @endif
 
-    <!-- Cache Bilgisi -->
-    @if(isset($isFromCache) && $isFromCache)
-        <div class="alert alert-info" style="background-color: #e8f5e8; border-color: #c3e6c3;">
-            <i class="fas fa-clock"></i>
-            Veriler önbellekten getirildi. Güncel veriler için sayfayı yenileyin.
-        </div>
-    @endif
+
 
     <!-- Hata Mesajları -->
     @if($error)
@@ -219,9 +211,6 @@
             <i class="fas fa-info-circle"></i>
             <strong>{{ count($pharmacies) }}</strong> adet nöbetçi eczane bulundu.
             <small>({{ $date }} tarihinde Ankara {{ $district }} ilçesi için)</small>
-            @if(isset($isFromCache) && $isFromCache)
-                <br><small class="text-muted"><i class="fas fa-info-circle"></i> Bu veriler önbellekten alınmıştır.</small>
-            @endif
         </div>
         
         <div class="pharmacy-grid">

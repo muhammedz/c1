@@ -47,6 +47,34 @@ class PharmacyController extends Controller
 
         // Form gönderilmişse veya ilk yüklemede eczaneleri getir
         if ($request->has('search') || !$request->hasAny(['plateCode', 'date', 'district', 'search'])) {
+            
+            // Her zaman bağlantı testlerini yap
+            $debugInfo[] = "Bağlantı testleri başlatılıyor...";
+            
+            // İnternet bağlantısını test et
+            try {
+                $testResponse = Http::timeout(5)->get('https://www.google.com');
+                $debugInfo[] = "✅ İnternet bağlantısı: OK";
+            } catch (Exception $e) {
+                $debugInfo[] = "❌ İnternet bağlantısı: HATA - " . $e->getMessage();
+            }
+            
+            // Türkiye.gov.tr'ye bağlantıyı test et
+            try {
+                $testGovResponse = Http::timeout(10)->get('https://www.turkiye.gov.tr');
+                $debugInfo[] = "✅ Türkiye.gov.tr bağlantısı: OK - Status: " . $testGovResponse->status();
+            } catch (Exception $e) {
+                $debugInfo[] = "❌ Türkiye.gov.tr bağlantısı: HATA - " . $e->getMessage();
+            }
+            
+            // Eczane sayfasına bağlantıyı test et
+            try {
+                $testPharmacyResponse = Http::timeout(10)->get('https://www.turkiye.gov.tr/saglik-titck-nobetci-eczane-sorgulama');
+                $debugInfo[] = "✅ Eczane sayfası bağlantısı: OK - Status: " . $testPharmacyResponse->status();
+            } catch (Exception $e) {
+                $debugInfo[] = "❌ Eczane sayfası bağlantısı: HATA - " . $e->getMessage();
+            }
+            
             try {
                 // Önce cache'de veri var mı kontrol et
                 $cacheKey = "pharmacy_data_{$plateCode}_{$date}_{$district}";
@@ -96,10 +124,11 @@ class PharmacyController extends Controller
                         // Token al
                         $token = $this->fetchToken();
                         if (!$token) {
+                            $debugInfo[] = "Token alma başarısız!";
                             throw new Exception('Token alınamadı');
                         }
                         
-                        $debugInfo[] = "Token alındı";
+                        $debugInfo[] = "Token alındı: " . substr($token, 0, 10) . "...";
                         
                         // Form gönder
                         $this->submitSearchForm($token, $plateCode, $date);
@@ -120,7 +149,7 @@ class PharmacyController extends Controller
                                     'cached_at' => now()->format('d/m/Y H:i:s')
                                 ]
                             ];
-                            Cache::put($globalCacheKey, $globalResult, 3600); // 1 saat
+                            Cache::put($globalCacheKey, $globalResult, 1800); // 30 dakika
                             
                             // İstenen ilçeye göre filtrele
                             $pharmacies = array_filter($allPharmacies, function($pharmacy) use ($district) {
@@ -141,7 +170,7 @@ class PharmacyController extends Controller
                                     'cached_at' => now()->format('d/m/Y H:i:s')
                                 ]
                             ];
-                            Cache::put($cacheKey, $result, 3600);
+                            Cache::put($cacheKey, $result, 1800); // 30 dakika
                         } else {
                             $debugInfo[] = "API'den hiç eczane bulunamadı";
                             // Boş sonucu da cache'le (kısa süre)
@@ -156,7 +185,7 @@ class PharmacyController extends Controller
                                     'reason' => 'no_data_from_api'
                                 ]
                             ];
-                            Cache::put($cacheKey, $emptyResult, 300); // 5 dakika
+                            Cache::put($cacheKey, $emptyResult, 1800); // 30 dakika
                         }
                     }
                 }
@@ -197,11 +226,11 @@ class PharmacyController extends Controller
             }
         }
 
-        // Debug bilgilerini sadece development ortamında göster
-        if (config('app.debug')) {
-            $debugInfo[] = "Sonuç: " . count($pharmacies) . " eczane";
-            $debugInfo[] = "Cache'den: " . ($isFromCache ? 'Evet' : 'Hayır');
-        }
+        // Debug bilgilerini her zaman göster (geçici olarak)
+        $debugInfo[] = "Sonuç: " . count($pharmacies) . " eczane";
+        $debugInfo[] = "Cache'den: " . ($isFromCache ? 'Evet' : 'Hayır');
+        $debugInfo[] = "Ortam: " . config('app.env');
+        $debugInfo[] = "Debug Modu: " . (config('app.debug') ? 'Açık' : 'Kapalı');
 
         return view('front.pharmacy.index', compact(
             'pharmacies', 
@@ -270,13 +299,24 @@ class PharmacyController extends Controller
                 ->get($this->baseUrl);
 
             if ($response->failed()) {
-                throw new Exception('Token alınırken hata oluştu');
+                Log::error('Token fetch failed', [
+                    'status' => $response->status(),
+                    'body' => substr($response->body(), 0, 500)
+                ]);
+                throw new Exception('Token alınırken hata oluştu - Status: ' . $response->status());
             }
 
             preg_match('/<input type="hidden" name="token" value="([^"]+)"/', $response->body(), $matches);
+            
+            if (!isset($matches[1])) {
+                Log::error('Token not found in response', [
+                    'body_preview' => substr($response->body(), 0, 1000)
+                ]);
+            }
 
             return $matches[1] ?? null;
         } catch (Exception $e) {
+            Log::error('Token fetch exception', ['error' => $e->getMessage()]);
             throw new Exception('Token alınırken hata: ' . $e->getMessage());
         }
     }
@@ -330,6 +370,11 @@ class PharmacyController extends Controller
                 ->get($this->baseUrl . '?nobetci=Eczaneler');
 
             if ($response->failed() || empty($response->body())) {
+                Log::error('Pharmacy data fetch failed', [
+                    'status' => $response->status(),
+                    'body_empty' => empty($response->body()),
+                    'body_preview' => substr($response->body(), 0, 500)
+                ]);
                 return [];
             }
 
