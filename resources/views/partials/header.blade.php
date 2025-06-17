@@ -229,13 +229,13 @@
         <!-- Menu Container -->
         <div id="sideMenuContainer" class="fixed top-0 left-0 h-full w-96 bg-white shadow-2xl transform -translate-x-full transition-transform duration-300 ease-out" style="z-index: 999999 !important; position: fixed !important; font-family: 'TT Norms Pro', sans-serif; -webkit-font-feature-settings: 'liga' 1; font-feature-settings: 'liga' 1; text-rendering: optimizeLegibility; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;">
             <!-- Header -->
-                          <div class="flex items-center justify-between px-4 py-3 bg-[#004d2e] text-white">
-                <button id="sideMenuBack" class="text-white text-xl hidden">
-                    <i class="fas fa-chevron-left"></i>
+                          <div class="flex items-center justify-between px-4 bg-[#004d2e] text-white" style="padding-top: 12px !important; padding-bottom: 12px !important; min-height: 48px !important; height: 48px !important;">
+                <button id="sideMenuBack" class="text-white text-lg hidden" style="padding: 4px 6px !important;">
+                    <i class="fas fa-chevron-left" style="font-size: 16px !important;"></i>
                 </button>
-                <h3 id="sideMenuTitle" class="font-medium text-base tracking-wide"></h3>
-                <button id="sideMenuClose" class="text-white text-xl">
-                    <i class="fas fa-times"></i>
+                <h3 id="sideMenuTitle" class="font-medium text-base tracking-wide" style="font-size: 15px !important; line-height: 1.4 !important;"></h3>
+                <button id="sideMenuClose" class="text-white text-lg" style="padding: 4px 6px !important;">
+                    <i class="fas fa-times" style="font-size: 16px !important;"></i>
                 </button>
             </div>
             
@@ -305,7 +305,7 @@
         /* Yeşil çizgi */
         .w-full.h-1.bg-\[\#007b32\] {
             position: relative;
-            z-index: 50;
+            z-index: 10;
         }
         
         /* Yatay buton hover efekti */
@@ -372,24 +372,26 @@
         }
         
         .side-menu-header {
-            display: flex;
-            align-items: center;
-            padding: 20px;
-            background: linear-gradient(135deg, #004d2e, #003d24);
-            color: white;
-            min-height: 75px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+            display: flex !important;
+            align-items: center !important;
+            padding: 12px 16px !important;
+            background: linear-gradient(135deg, #004d2e, #003d24) !important;
+            color: white !important;
+            min-height: 48px !important;
+            height: 48px !important;
+            max-height: 48px !important;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
         }
         
         .side-menu-back-btn {
             background: none;
             border: none;
             color: white;
-            font-size: 18px;
-            padding: 6px 8px;
-            margin-right: 12px;
+            font-size: 14px;
+            padding: 2px 4px;
+            margin-right: 6px;
             cursor: pointer;
-            border-radius: 6px;
+            border-radius: 3px;
             transition: all 0.2s ease;
         }
         
@@ -399,10 +401,10 @@
         
         .side-menu-title {
             flex: 1;
-            font-size: 18px;
-            font-weight: 600;
+            font-size: 12px;
+            font-weight: 500;
             margin: 0;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.2px;
             font-family: 'TT Norms Pro', sans-serif;
         }
         
@@ -410,10 +412,10 @@
             background: none;
             border: none;
             color: white;
-            font-size: 20px;
-            padding: 6px 8px;
+            font-size: 14px;
+            padding: 2px 4px;
             cursor: pointer;
-            border-radius: 6px;
+            border-radius: 3px;
             transition: all 0.2s ease;
         }
         
@@ -781,6 +783,14 @@
                         quickMenu.style.visibility = 'hidden';
                         quickMenu.style.zIndex = '1';
                     }
+                    
+                    // Yeşil çizgiyi gizle
+                    const greenLine = document.querySelector('.w-full.h-1.bg-\\[\\#007b32\\]');
+                    if (greenLine) {
+                        greenLine.style.display = 'none';
+                        greenLine.style.visibility = 'hidden';
+                        greenLine.style.zIndex = '1';
+                    }
                 } catch (error) {
                     // Sessizce hata yönetimi
                 }
@@ -797,6 +807,14 @@
                         quickMenu.style.display = '';
                         quickMenu.style.visibility = '';
                         quickMenu.style.zIndex = '10';
+                    }
+                    
+                    // Yeşil çizgiyi geri göster
+                    const greenLine = document.querySelector('.w-full.h-1.bg-\\[\\#007b32\\]');
+                    if (greenLine) {
+                        greenLine.style.display = '';
+                        greenLine.style.visibility = '';
+                        greenLine.style.zIndex = '10';
                     }
                     
                     // Menüyü ana seviyeye sıfırla
