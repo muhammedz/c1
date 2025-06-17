@@ -50,6 +50,7 @@ use App\Http\Controllers\Admin\FooterMenuLinkController;
 use App\Http\Controllers\Admin\NotFoundController;
 use App\Http\Controllers\Admin\RedirectController;
 use App\Http\Controllers\PharmacyController;
+use Illuminate\Support\Facades\Cache;
 
 /*
 |--------------------------------------------------------------------------
@@ -144,6 +145,12 @@ Route::prefix('rehber')->name('guide.')->group(function () {
 
 // Nöbetçi Eczaneler Sayfası
 Route::get('/nobetci-eczaneler', [PharmacyController::class, 'index'])->name('pharmacy.index');
+
+// Geçici cache temizleme route'u
+Route::get('/nobetci-eczaneler/cache-temizle-gizli', function() {
+    Cache::flush(); // Tüm cache'i temizle
+    return "Cache temizlendi! Artık /nobetci-eczaneler sayfasına gidebilirsin.";
+});
 
 // Side Menu API - Mobil menü için
 Route::get('/api/menu-items/{menuId}', [App\Http\Controllers\Admin\MenuSystemController::class, 'getMenuItemsForSideMenu'])->name('api.menu-items');

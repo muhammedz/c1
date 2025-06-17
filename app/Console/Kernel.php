@@ -12,7 +12,11 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
-        // $schedule->command('inspire')->hourly();
+        // Nöbetçi eczane cache'ini her 30 dakikada bir temizle
+        $schedule->command('pharmacy:clear-cache')
+                 ->everyThirtyMinutes()
+                 ->withoutOverlapping()
+                 ->runInBackground();
     }
 
     /**

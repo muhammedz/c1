@@ -99,7 +99,8 @@ class PharmacyController extends Controller
                 if ($cachedData && is_array($cachedData) && isset($cachedData['data'])) {
                     $pharmacies = $cachedData['data'];
                     $isFromCache = true;
-                    $debugInfo[] = "Cache'den veri alındı";
+                    $debugInfo[] = "Cache'den veri alındı - " . count($pharmacies) . " eczane";
+                    $debugInfo[] = "Cache tarihi: " . ($cachedData['meta']['cached_at'] ?? 'bilinmiyor');
                 } elseif ($globalCachedData && is_array($globalCachedData) && isset($globalCachedData['data'])) {
                     // Global cache'den filtrele
                     $allPharmacies = $globalCachedData['data'];
@@ -108,7 +109,8 @@ class PharmacyController extends Controller
                     });
                     $pharmacies = array_values($pharmacies);
                     $isFromCache = true;
-                    $debugInfo[] = "Global cache'den filtrelendi";
+                    $debugInfo[] = "Global cache'den filtrelendi - Toplam: " . count($allPharmacies) . ", Filtreli: " . count($pharmacies);
+                    $debugInfo[] = "Global cache tarihi: " . ($globalCachedData['meta']['cached_at'] ?? 'bilinmiyor');
                 } else {
                     // Cache'de veri yok, API'den çek
                     if ($isRateLimited) {
