@@ -191,20 +191,21 @@
         <!-- Copyright -->
         <div class="border-t border-white/20 mt-8 pt-6">
             <div class="flex flex-col md:flex-row justify-between items-center">
-                <p class="text-white/80 text-sm mb-2 md:mb-0">
-                    @if($footerSettings && $footerSettings->copyright_left)
+                @if($footerSettings && $footerSettings->copyright_left)
+                    <p class="text-white/80 text-sm mb-2 md:mb-0">
                         {{ $footerSettings->copyright_left }}
-                    @else
+                    </p>
+                @else
+                    <p class="text-white/80 text-sm mb-2 md:mb-0">
                         © {{ date('Y') }} Çankaya Belediyesi. Tüm hakları saklıdır.
-                    @endif
-                </p>
-                <p class="text-white/80 text-sm">
-                    @if($footerSettings && $footerSettings->copyright_right)
+                    </p>
+                @endif
+                
+                @if($footerSettings && $footerSettings->copyright_right)
+                    <p class="text-white/80 text-sm">
                         {{ $footerSettings->copyright_right }}
-                    @else
-                        Web Tasarım: EPOXSOFT
-                    @endif
-                </p>
+                    </p>
+                @endif
             </div>
         </div>
     </div>
