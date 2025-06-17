@@ -75,6 +75,25 @@
                             </small>
                         </div>
                         
+                        <!-- Link Açılma Türü -->
+                        <div class="form-group">
+                            <label for="target">Link Açılma Türü</label>
+                            <select class="form-control @error('target') is-invalid @enderror" id="target" name="target">
+                                <option value="_self" {{ old('target', $item->target) == '_self' ? 'selected' : '' }}>
+                                    Aynı sekmede aç
+                                </option>
+                                <option value="_blank" {{ old('target', $item->target) == '_blank' ? 'selected' : '' }}>
+                                    Yeni sekmede aç
+                                </option>
+                            </select>
+                            @error('target')
+                                <span class="invalid-feedback">{{ $message }}</span>
+                            @enderror
+                            <small class="form-text text-muted">
+                                Linkin nasıl açılacağını belirleyin
+                            </small>
+                        </div>
+                        
                         <!-- Sıralama -->
                         <div class="form-group">
                             <label for="order">Sıralama</label>

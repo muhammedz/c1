@@ -18,6 +18,7 @@ class QuickMenuItem extends Model
         'category_id',
         'title',
         'url',
+        'target',
         'icon',
         'order',
         'is_active'

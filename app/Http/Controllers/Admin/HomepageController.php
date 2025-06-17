@@ -444,6 +444,7 @@ class HomepageController extends Controller
         $request->validate([
             'title' => 'required|string|max:255',
             'url' => 'required|string|max:255',
+            'target' => 'required|in:_self,_blank',
             'icon' => 'nullable|string|max:50',
             'order' => 'nullable|integer|min:0',
             'is_active' => 'nullable|boolean',
@@ -492,6 +493,7 @@ class HomepageController extends Controller
         $request->validate([
             'title' => 'required|string|max:255',
             'url' => 'required|string|max:255',
+            'target' => 'required|in:_self,_blank',
             'icon' => 'nullable|string|max:50',
             'order' => 'nullable|integer|min:0',
             'is_active' => 'nullable|boolean',

@@ -77,6 +77,7 @@
                             <th style="width: 50px">İkon</th>
                             <th>Başlık</th>
                             <th>URL</th>
+                            <th style="width: 100px">Açılma Türü</th>
                             <th style="width: 80px">Durum</th>
                             <th style="width: 120px">İşlemler</th>
                         </tr>
@@ -100,9 +101,20 @@
                                 </td>
                                 <td>{{ $item->title }}</td>
                                 <td>
-                                    <a href="{{ $item->url }}" target="_blank" class="text-truncate d-inline-block" style="max-width: 200px;" title="{{ $item->url }}">
+                                    <a href="{{ $item->url }}" target="{{ $item->target ?? '_self' }}" class="text-truncate d-inline-block" style="max-width: 200px;" title="{{ $item->url }}">
                                         {{ $item->url }}
                                     </a>
+                                </td>
+                                <td>
+                                    @if(($item->target ?? '_self') == '_blank')
+                                        <span class="badge badge-info">
+                                            <i class="fas fa-external-link-alt"></i> Yeni Sekme
+                                        </span>
+                                    @else
+                                        <span class="badge badge-secondary">
+                                            <i class="fas fa-link"></i> Aynı Sekme
+                                        </span>
+                                    @endif
                                 </td>
                                 <td>
                                     <div class="custom-control custom-switch">
@@ -126,7 +138,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="7" class="text-center">Bu kategoriye ait menü öğesi bulunmamaktadır.</td>
+                                <td colspan="8" class="text-center">Bu kategoriye ait menü öğesi bulunmamaktadır.</td>
                             </tr>
                         @endforelse
                     </tbody>

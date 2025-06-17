@@ -31,7 +31,7 @@
                     <div class="quick-menu-dropdown" style="position: absolute; left: 0; bottom: 100%; width: 100%; background: white; z-index: 100; display: none;">
                         <div class="py-1">
                             @foreach($category->activeItems as $item)
-                            <a href="{{ $item->url }}" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                            <a href="{{ $item->url }}" target="{{ $item->target ?? '_self' }}" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                                 @if(Str::startsWith($item->icon, 'fas ') || Str::startsWith($item->icon, 'far ') || Str::startsWith($item->icon, 'fab '))
                                     <i class="{{ $item->icon }} mr-2 text-gray-400"></i>
                                 @else
@@ -193,7 +193,7 @@
                         <div class="quick-menu-dropdown bg-white">
                             <div class="py-2">
                                 @foreach($category->activeItems as $item)
-                                <a href="{{ $item->url }}" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                <a href="{{ $item->url }}" target="{{ $item->target ?? '_self' }}" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                                     @if(Str::startsWith($item->icon, 'fas ') || Str::startsWith($item->icon, 'far ') || Str::startsWith($item->icon, 'fab '))
                                         <i class="{{ $item->icon }} mr-2 text-gray-400"></i>
                                     @else
