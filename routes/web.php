@@ -145,6 +145,9 @@ Route::prefix('rehber')->name('guide.')->group(function () {
 // Nöbetçi Eczaneler Sayfası
 Route::get('/nobetci-eczaneler', [PharmacyController::class, 'index'])->name('pharmacy.index');
 
+// Side Menu API - Mobil menü için
+Route::get('/api/menu-items/{menuId}', [App\Http\Controllers\Admin\MenuSystemController::class, 'getMenuItemsForSideMenu'])->name('api.menu-items');
+
 Auth::routes();
 
 // Arama Rotası - Yeni spesifik isimle - şimdilik devre dışı

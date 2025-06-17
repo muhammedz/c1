@@ -527,6 +527,7 @@ p {
     visibility: hidden;
     transform: translateY(10px);
     transition: all 0.3s ease;
+    transition-delay: 600ms;
     z-index: 59;
     border-bottom: 2px solid #004d2e;
 }
@@ -535,6 +536,7 @@ p {
     opacity: 1;
     visibility: visible;
     transform: translateY(0);
+    transition-delay: 0ms;
 }
 
 .quick-menu-dropdown a {
@@ -569,12 +571,14 @@ p {
     overflow: hidden;
     transform: translateY(20px);
     transition: all 0.3s ease;
+    transition-delay: 600ms;
 }
 
 .group:hover .quick-menu-dropdown {
     opacity: 1;
     visibility: visible;
     transform: translateY(0);
+    transition-delay: 0ms;
 }
 
 /* Quick Menu Bar Styles */

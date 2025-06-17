@@ -1,5 +1,5 @@
 <!-- #### Quick Menu Section -->
-<div id="quick-menu-section" class="quick-menu-section w-full rounded-md bg-gradient-radial text-white mt-[-10px] md:mt-[-15px] relative" style="z-index: 50;">
+<div id="quick-menu-section" class="quick-menu-section w-full rounded-md bg-gradient-radial text-white mt-[-10px] md:mt-[-15px] relative" style="z-index: 10 !important;">
     <!-- Desktop Menu -->
     <div class="hidden md:flex ">
         @if(isset($quickMenuCategories) && $quickMenuCategories->count() > 0)
@@ -371,6 +371,11 @@
         display: block !important;
         transform: translateY(0) !important;
         opacity: 1 !important;
+        transition-delay: 0ms !important;
+    }
+    
+    .hidden .group .quick-menu-dropdown {
+        transition-delay: 600ms !important;
     }
     
     .quick-menu-dropdown .py-2 {

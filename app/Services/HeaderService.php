@@ -37,19 +37,23 @@ class HeaderService
     }
 
     /**
-     * Menü alt başlıklarını getirir
+     * Menü alt başlıklarını getirir (3 seviyeli)
      */
     public function getMenuItems($menuId)
     {
         return Cache::remember('menu_items_' . $menuId, 60, function () use ($menuId) {
-            // İlgili menünün aktif alt öğelerini al
+            // İlgili menünün aktif alt öğelerini al (3 seviyeli)
             return MenuSystemItem::active()
                 ->where('menu_id', $menuId)
                 ->whereNull('parent_id')
                 ->orderBy('order')
                 ->with(['children' => function ($query) {
                     $query->where('status', true)
-                          ->orderBy('order');
+                          ->orderBy('order')
+                          ->with(['children' => function ($subQuery) {
+                              $subQuery->where('status', true)
+                                       ->orderBy('order');
+                          }]);
                 }])
                 ->get();
         });

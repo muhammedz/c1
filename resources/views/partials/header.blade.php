@@ -220,46 +220,29 @@
     </div>
 
     <!-- Mobil Menü (Küçük ekranlarda görünür) -->
-    <div class="md:hidden mobile-menu-hidden w-full absolute bg-white shadow-lg rounded-b-lg" id="mobileMenu" style="z-index: 9999; top: 100%;">
-        <!-- Mobil Menü İçeriği -->
-        <div class="mobile-menu-content">
-            @if(isset($mainMenuItems) && $mainMenuItems->count() > 0)
-                @foreach($mainMenuItems as $menu)
-                    <!-- Sadece ana menü linkleri göster -->
-                    <a href="{{ $menu->url ?? '#' }}" class="mobile-menu-item">
-                        <i class="fas fa-circle text-[#007b32] text-xs mr-3"></i>
-                        <span>{{ $menu->name }}</span>
-                        <i class="fas fa-chevron-right text-gray-400 text-sm ml-auto"></i>
-                    </a>
-                @endforeach
-            @else
-                <!-- Varsayılan menü öğeleri -->
-                <a href="{{ route('front.home') }}" class="mobile-menu-item">
-                    <i class="fas fa-home text-[#007b32] text-sm mr-3"></i>
-                    <span>Ana Sayfa</span>
-                    <i class="fas fa-chevron-right text-gray-400 text-sm ml-auto"></i>
-                </a>
-                <a href="#" class="mobile-menu-item">
-                    <i class="fas fa-building text-[#007b32] text-sm mr-3"></i>
-                    <span>Kurumsal</span>
-                    <i class="fas fa-chevron-right text-gray-400 text-sm ml-auto"></i>
-                </a>
-                <a href="#" class="mobile-menu-item">
-                    <i class="fas fa-cogs text-[#007b32] text-sm mr-3"></i>
-                    <span>Hizmetler</span>
-                    <i class="fas fa-chevron-right text-gray-400 text-sm ml-auto"></i>
-                </a>
-                <a href="#" class="mobile-menu-item">
-                    <i class="fas fa-newspaper text-[#007b32] text-sm mr-3"></i>
-                    <span>Haberler</span>
-                    <i class="fas fa-chevron-right text-gray-400 text-sm ml-auto"></i>
-                </a>
-                <a href="#" class="mobile-menu-item">
-                    <i class="fas fa-phone text-[#007b32] text-sm mr-3"></i>
-                    <span>İletişim</span>
-                    <i class="fas fa-chevron-right text-gray-400 text-sm ml-auto"></i>
-                </a>
-            @endif
+    <!-- Modern Side Menu Overlay -->
+    <!-- Basit Side Menu -->
+    <div id="sideMenuOverlay" class="fixed inset-0 lg:hidden" style="z-index: 999999 !important; position: fixed !important;">
+        <!-- Backdrop -->
+        <div class="fixed inset-0 bg-black bg-opacity-70 transition-opacity duration-200" id="sideMenuBackdrop" style="z-index: 999998;"></div>
+        
+        <!-- Menu Container -->
+        <div id="sideMenuContainer" class="fixed top-0 left-0 h-full w-96 bg-white shadow-2xl transform -translate-x-full transition-transform duration-300 ease-out" style="z-index: 999999 !important; position: fixed !important; font-family: 'TT Norms Pro', sans-serif; -webkit-font-feature-settings: 'liga' 1; font-feature-settings: 'liga' 1; text-rendering: optimizeLegibility; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;">
+            <!-- Header -->
+                          <div class="flex items-center justify-between px-4 py-3 bg-[#004d2e] text-white">
+                <button id="sideMenuBack" class="text-white text-xl hidden">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <h3 id="sideMenuTitle" class="font-medium text-base tracking-wide"></h3>
+                <button id="sideMenuClose" class="text-white text-xl">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <!-- Content -->
+            <div id="sideMenuContent" class="h-full overflow-y-auto bg-white">
+                <!-- Dinamik içerik buraya gelecek -->
+            </div>
         </div>
     </div>
 
@@ -353,63 +336,168 @@
             height: 80px;
         }
 
-        /* Mobil menü için özel class'lar */
-        .mobile-menu-hidden {
-            display: none !important;
+        /* Side Menu Stilleri */
+        .side-menu-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 99999;
+            visibility: hidden;
+            opacity: 0;
+            transition: all 0.3s ease;
         }
         
-        .mobile-menu-visible {
-            display: block !important;
-            animation: slideDown 0.3s ease-out;
+        .side-menu-overlay.active {
+            visibility: visible;
+            opacity: 1;
         }
         
-        @keyframes slideDown {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .side-menu-container {
+            width: 85%;
+            max-width: 350px;
+            height: 100vh;
+            background: white;
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
         }
         
-        /* Mobil menü içerik stili */
-        .mobile-menu-content {
+        .side-menu-overlay.active .side-menu-container {
+            transform: translateX(0);
+        }
+        
+        .side-menu-header {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            background: linear-gradient(135deg, #004d2e, #003d24);
+            color: white;
+            min-height: 75px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        }
+        
+        .side-menu-back-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 18px;
+            padding: 6px 8px;
+            margin-right: 12px;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+        
+        .side-menu-back-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .side-menu-title {
+            flex: 1;
+            font-size: 18px;
+            font-weight: 600;
+            margin: 0;
+            letter-spacing: 0.5px;
+            font-family: 'TT Norms Pro', sans-serif;
+        }
+        
+        .side-menu-close-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 20px;
+            padding: 6px 8px;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+        
+        .side-menu-close-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .side-menu-content {
+            flex: 1;
+            overflow-y: auto;
             padding: 0;
-            background: linear-gradient(135deg, #ffffff 0%, #f8fffe 100%);
-            border-top: 3px solid #007b32;
+            background: white;
         }
         
-        .mobile-menu-item {
+        .side-menu-item {
             display: flex;
             align-items: center;
             padding: 16px 20px;
-            color: #1f2937;
+            color: #374151;
             text-decoration: none;
             border-bottom: 1px solid #e5e7eb;
             transition: all 0.2s ease;
             font-weight: 500;
             font-size: 16px;
+            cursor: pointer;
+            background: white;
+            min-height: 60px;
+            font-family: 'TT Norms Pro', sans-serif;
         }
         
-        .mobile-menu-item:hover {
-            background: linear-gradient(90deg, #f0fdf9 0%, #ecfdf5 100%);
-            color: #00352b;
-            transform: translateX(5px);
-            border-left: 4px solid #007b32;
-            padding-left: 16px;
+        .side-menu-item:hover {
+            background: linear-gradient(90deg, #f8fafc 0%, #f1f5f9 100%);
+            color: #004d2e;
+            transform: translateX(4px);
+            box-shadow: 0 2px 4px rgba(0, 77, 46, 0.1);
         }
         
-        .mobile-menu-item:active {
-            background: #e6fffa;
+        .side-menu-item:active {
+            background: #f3f4f6;
             transform: scale(0.98);
         }
         
-        .mobile-menu-item:last-child {
-            border-bottom: none;
-            border-bottom-left-radius: 8px;
-            border-bottom-right-radius: 8px;
+        .side-menu-item-icon {
+            width: 20px;
+            height: 20px;
+            margin-right: 12px;
+            color: #004d2e;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .side-menu-item-text {
+            flex: 1;
+        }
+        
+        .side-menu-item-arrow {
+            margin-left: auto;
+            color: #6b7280;
+            font-size: 14px;
+        }
+        
+        .side-menu-item.has-children .side-menu-item-arrow {
+            transform: rotate(0deg);
+            transition: transform 0.2s ease;
+        }
+        
+        /* Side menu animasyonları */
+        @keyframes slideInLeft {
+            from {
+                transform: translateX(-100%);
+            }
+            to {
+                transform: translateX(0);
+            }
+        }
+        
+        @keyframes slideOutLeft {
+            from {
+                transform: translateX(0);
+            }
+            to {
+                transform: translateX(-100%);
+            }
         }
 
         @media (max-width: 768px) {
@@ -421,23 +509,47 @@
                 height: 90px !important;
             }
             
-            /* Mobil menü container */
-            #mobileMenu {
-                display: none !important;
-                position: absolute !important;
-                top: 100% !important;
-                left: 0 !important;
-                right: 0 !important;
-                z-index: 9999 !important;
-                background: white !important;
-                box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
-                border-bottom-left-radius: 8px !important;
-                border-bottom-right-radius: 8px !important;
-                overflow: hidden !important;
+            /* Side menu mobil görünüm - Sadece gerekli CSS */
+            #sideMenuOverlay {
+                display: none;
+                z-index: 999999 !important;
             }
             
-            #mobileMenu.mobile-menu-visible {
-                display: block !important;
+            #sideMenuOverlay.active {
+                display: block;
+                z-index: 999999 !important;
+            }
+            
+            #sideMenuOverlay.active #sideMenuBackdrop {
+                opacity: 1;
+                z-index: 999998 !important;
+            }
+            
+            #sideMenuOverlay.active #sideMenuContainer {
+                transform: translateX(0);
+                z-index: 999999 !important;
+            }
+            
+            /* Quick menu z-index'ini düşür */
+            #quick-menu-section {
+                z-index: 10 !important;
+            }
+            
+            .quick-menu-dropdown {
+                z-index: 11 !important;
+            }
+            
+            .quick-menu-section {
+                z-index: 10 !important;
+            }
+            
+            /* Mobil menü her zaman en üstte */
+            #sideMenuOverlay,
+            #sideMenuOverlay.active,
+            #sideMenuContainer,
+            #sideMenuBackdrop {
+                z-index: 999999 !important;
+                position: fixed !important;
             }
             
             /* Mobil Atatürk simgesi */
@@ -466,10 +578,10 @@
             }
             
             #mobileMenuButton:hover {
-                background: linear-gradient(135deg, #007b32, #00652a) !important;
-                border-color: #007b32 !important;
+                background: linear-gradient(135deg, #004d2e, #003d24) !important;
+                border-color: #004d2e !important;
                 transform: translateY(-1px) !important;
-                box-shadow: 0 4px 8px rgba(0, 123, 50, 0.2) !important;
+                box-shadow: 0 4px 8px rgba(0, 77, 46, 0.2) !important;
             }
             
             #mobileMenuButton:hover i {
@@ -542,56 +654,466 @@
             });
         });
         
-        // Mobil menü toggle - YENİ ÇÖZÜM
-        const mobileMenuButton = document.getElementById('mobileMenuButton');
-        const mobileMenu = document.getElementById('mobileMenu');
-        
-        function closeMobileMenu() {
-            if (mobileMenu) {
-                mobileMenu.classList.remove('mobile-menu-visible');
-                mobileMenu.classList.add('mobile-menu-hidden');
-            }
-        }
-        
-        if (mobileMenuButton && mobileMenu) {
-            // Varolan event listener'ları temizle
-            mobileMenuButton.replaceWith(mobileMenuButton.cloneNode(true));
-            const newMobileMenuButton = document.getElementById('mobileMenuButton');
-            
-            newMobileMenuButton.addEventListener('click', function(e) {
-                e.preventDefault();
-                e.stopPropagation();
+        // Basit Side Menu Sistemi
+        class SimpleSideMenu {
+            constructor() {
+                this.overlay = document.getElementById('sideMenuOverlay');
+                this.backdrop = document.getElementById('sideMenuBackdrop');
+                this.container = document.getElementById('sideMenuContainer');
+                this.backBtn = document.getElementById('sideMenuBack');
+                this.closeBtn = document.getElementById('sideMenuClose');
+                this.title = document.getElementById('sideMenuTitle');
+                this.content = document.getElementById('sideMenuContent');
+                this.mobileMenuButton = document.getElementById('mobileMenuButton');
                 
-                if (mobileMenu.classList.contains('mobile-menu-visible')) {
-                    closeMobileMenu();
-                } else {
-                    mobileMenu.classList.remove('mobile-menu-hidden');
-                    mobileMenu.classList.add('mobile-menu-visible');
-                }
-            });
+                this.currentLevel = 0;
+                this.menuHistory = [];
+                
+                this.init();
+            }
             
-            // Başka yere tıklanınca menüyü kapat
-            document.addEventListener('click', function(e) {
-                if (!mobileMenu.contains(e.target) && !newMobileMenuButton.contains(e.target)) {
-                    closeMobileMenu();
+            init() {
+                // Event listeners
+                if (this.mobileMenuButton) {
+                    this.mobileMenuButton.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        this.open();
+                    });
                 }
-            });
-            
-            // ESC tuşu ile menüyü kapat
-            document.addEventListener('keydown', function(e) {
-                if (e.key === 'Escape') {
-                    closeMobileMenu();
+                
+                if (this.closeBtn) {
+                    this.closeBtn.addEventListener('click', () => this.close());
                 }
-            });
-            
-            // Mobil menü linklerine tıklanınca menüyü kapat
-            const mobileMenuLinks = mobileMenu.querySelectorAll('a[href]:not([href="#"])');
-            mobileMenuLinks.forEach(link => {
-                link.addEventListener('click', function() {
-                    closeMobileMenu();
+                
+                if (this.backBtn) {
+                    this.backBtn.addEventListener('click', () => this.goBack());
+                }
+                
+                if (this.backdrop) {
+                    this.backdrop.addEventListener('click', () => this.close());
+                }
+                
+                // ESC tuşu
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape' && this.overlay.classList.contains('active')) {
+                        this.close();
+                    }
                 });
-            });
+                
+                // İlk menüyü render et
+                this.renderMainMenu();
+            }
+            
+            getMenuData() {
+                // PHP'den gelen menü verilerini al
+                const menuData = {
+                    mainMenu: [
+                        {
+                            id: 'home',
+                            name: 'Ana Sayfa',
+                            icon: 'fas fa-home',
+                            url: '{{ route("front.home") }}',
+                            hasChildren: false
+                        }
+                        @if(isset($mainMenuItems) && $mainMenuItems->count() > 0)
+                            @foreach($mainMenuItems as $menu)
+                                ,{
+                                    id: '{{ $menu->id }}',
+                                    name: '{{ $menu->name }}',
+                                    icon: 'fas fa-{{ $menu->type == 1 ? "link" : "folder" }}',
+                                    url: '{{ $menu->url ?? "#" }}',
+                                    hasChildren: {{ $menu->type != 1 ? 'true' : 'false' }},
+                                    type: {{ $menu->type }}
+                                }
+                            @endforeach
+                        @else
+                            ,{
+                                id: 'kurumsal',
+                                name: 'Kurumsal',
+                                icon: 'fas fa-building',
+                                url: '#',
+                                hasChildren: true,
+                                type: 2
+                            },
+                            {
+                                id: 'hizmetler',
+                                name: 'Hizmetler',
+                                icon: 'fas fa-cogs',
+                                url: '#',
+                                hasChildren: true,
+                                type: 2
+                            },
+                            {
+                                id: 'haberler',
+                                name: 'Haberler',
+                                icon: 'fas fa-newspaper',
+                                url: '/haberler',
+                                hasChildren: false,
+                                type: 1
+                            },
+                            {
+                                id: 'iletisim',
+                                name: 'İletişim',
+                                icon: 'fas fa-phone',
+                                url: '/iletisim',
+                                hasChildren: false,
+                                type: 1
+                            }
+                        @endif
+                    ]
+                };
+                return menuData;
+            }
+            
+            open() {
+                try {
+                    if (!this.overlay) {
+                        return;
+                    }
+                    
+                    this.overlay.classList.add('active');
+                    document.body.classList.add('overflow-hidden');
+                    
+                    // Quick menu'yu gizle
+                    const quickMenu = document.getElementById('quick-menu-section');
+                    if (quickMenu) {
+                        quickMenu.style.display = 'none';
+                        quickMenu.style.visibility = 'hidden';
+                        quickMenu.style.zIndex = '1';
+                    }
+                } catch (error) {
+                    // Sessizce hata yönetimi
+                }
+            }
+            
+            close() {
+                try {
+                    this.overlay.classList.remove('active');
+                    document.body.classList.remove('overflow-hidden');
+                    
+                    // Quick menu'yu geri göster
+                    const quickMenu = document.getElementById('quick-menu-section');
+                    if (quickMenu) {
+                        quickMenu.style.display = '';
+                        quickMenu.style.visibility = '';
+                        quickMenu.style.zIndex = '10';
+                    }
+                    
+                    // Menüyü ana seviyeye sıfırla
+                    setTimeout(() => {
+                        this.resetToMainMenu();
+                    }, 300);
+                } catch (error) {
+                    // Sessizce hata yönetimi
+                }
+            }
+            
+            goBack() {
+                if (this.menuHistory.length > 0) {
+                    const previousMenu = this.menuHistory.pop();
+                    this.currentLevel--;
+                    
+                    this.title.textContent = previousMenu.title;
+                    this.content.innerHTML = previousMenu.content;
+                    this.attachMenuItemEvents();
+                    
+                    if (this.currentLevel === 0) {
+                        this.backBtn.classList.add('hidden');
+                    }
+                }
+            }
+            
+            resetToMainMenu() {
+                this.currentLevel = 0;
+                this.menuHistory = [];
+                this.title.textContent = '';
+                this.backBtn.classList.add('hidden');
+                this.renderMainMenu();
+            }
+            
+            renderMainMenu() {
+                // Ana menüde başlık gösterme
+                this.title.textContent = '';
+                
+                const mainMenuItems = [
+                    @if(isset($mainMenuItems) && count($mainMenuItems) > 0)
+                        @foreach($mainMenuItems as $index => $menu)
+                        @if($index > 0),@endif{
+                            id: '{{ $menu->id }}',
+                            name: {!! json_encode($menu->name) !!},
+                            url: '{{ $menu->url ?? "#" }}',
+                            hasChildren: {{ $menu->type == 2 || $menu->type == 3 ? 'true' : 'false' }},
+                            type: {{ $menu->type }},
+                            menuName: {!! json_encode($menu->name) !!} // Alt menü başlığı için
+                        }
+                        @endforeach
+                    @endif
+                ];
+                
+                this.content.innerHTML = this.createMenuList(mainMenuItems);
+                this.attachMenuItemEvents();
+            }
+            
+            createMenuList(items) {
+                return `
+                    <div>
+                        ${items.map(item => this.createMenuItem(item)).join('')}
+                    </div>
+                `;
+            }
+            
+            createMenuItem(item, level = 1) {
+                const hasChildren = item.hasChildren;
+                const arrow = hasChildren ? '<i class="fas fa-chevron-right text-gray-400 text-base"></i>' : '';
+                
+                const menuElement = document.createElement('div');
+                menuElement.className = 'menu-item flex items-center px-5 py-4 border-b border-gray-200 cursor-pointer hover:bg-gray-50 active:bg-gray-100 transition-all duration-200';
+                menuElement.setAttribute('data-menu-id', item.id);
+                menuElement.setAttribute('data-url', item.url || '#');
+                menuElement.setAttribute('data-has-children', hasChildren);
+                menuElement.setAttribute('data-type', item.type || 1);
+                menuElement.style.fontFamily = "'TT Norms Pro', sans-serif";
+                
+                const contentDiv = document.createElement('div');
+                contentDiv.className = 'flex items-center flex-1';
+                
+                const textSpan = document.createElement('span');
+                textSpan.className = 'text-gray-800 font-medium text-base tracking-wide';
+                textSpan.textContent = item.name; // textContent Türkçe karakterleri düzgün handle eder
+                
+                contentDiv.appendChild(textSpan);
+                menuElement.appendChild(contentDiv);
+                
+                if (hasChildren) {
+                    const arrowElement = document.createElement('i');
+                    arrowElement.className = 'fas fa-chevron-right text-gray-400 text-base';
+                    menuElement.appendChild(arrowElement);
+                }
+                
+                return menuElement.outerHTML;
+            }
+            
+                        attachMenuItemEvents() {
+                const menuItems = this.content.querySelectorAll('.menu-item');
+                
+                menuItems.forEach(item => {
+                    item.addEventListener('click', (e) => {
+                e.preventDefault();
+                        
+                        // Visual feedback
+                        item.style.backgroundColor = '#f9fafb';
+                        setTimeout(() => item.style.backgroundColor = '', 200);
+                        
+                        const hasChildren = item.getAttribute('data-has-children') === 'true';
+                        const menuId = item.getAttribute('data-menu-id');
+                        const url = item.getAttribute('data-url');
+                        const type = parseInt(item.getAttribute('data-type')) || 1;
+                        const menuName = item.querySelector('span').textContent; // Menü adını al
+                        
+                        if (hasChildren) {
+                            this.navigateToSubmenu(menuId, type, menuName);
+                        } else if (url && url !== '#') {
+                            this.close();
+                            window.location.href = url;
+                        }
+                    });
+                });
+            }
+            
+            findItemInApiData(itemId, items) {
+                for (let item of items) {
+                    if (item.id == itemId) {
+                        return item;
+                    }
+                    if (item.children) {
+                        const found = this.findItemInApiData(itemId, item.children);
+                        if (found) return found;
+                    }
+                }
+                return null;
+            }
+            
+            getCurrentMenuId() {
+                // Şu anki menü ID'sini bul
+                if (this.currentApiData) {
+                    // API'den gelen data varsa, menü ID'sini bul
+                    return this.currentMenuId || 'kurumsal';
+                }
+                return 'kurumsal'; // Varsayılan
+            }
+            
+            navigateToLevel(items, title, menuType = 2) {
+                // Şu anki menüyü history'e kaydet
+                this.menuHistory.push({
+                    title: this.title.textContent,
+                    content: this.content.innerHTML
+                });
+                
+                this.currentLevel++;
+                this.backBtn.classList.remove('hidden');
+                
+                // Menüyü render et
+                this.renderSubmenu(items, title, menuType);
+            }
+            
+            async navigateToSubmenu(menuId, menuType = 2, menuName = '') {
+                // Şu anki menüyü history'e kaydet
+                this.menuHistory.push({
+                    title: this.title.textContent,
+                    content: this.content.innerHTML
+                });
+                
+                this.currentLevel++;
+                this.backBtn.classList.remove('hidden');
+                
+                // Loading göster
+                this.content.innerHTML = '<div class="flex items-center justify-center py-8"><div class="text-white">Yükleniyor...</div></div>';
+                
+                // Mevcut menü ID'lerini kontrol et
+                const validMenuSystemIds = [5, 6, 7, 8, 9]; // MenuSystem ID'leri
+                const validMenuItemIds = [25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 40, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 79, 80, 82, 83, 85, 117, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 156, 157, 158, 159, 160, 161, 162, 163, 164, 165, 166, 167, 168, 169, 170, 174, 176, 177, 178, 179, 180, 182, 183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, 197, 198]; // MenuSystemItem ID'leri
+                
+                const menuIdInt = parseInt(menuId);
+                if (!validMenuSystemIds.includes(menuIdInt) && !validMenuItemIds.includes(menuIdInt)) {
+                    // Fallback veriler kullan
+                    const submenuData = this.getSubmenuData(menuId);
+                    const submenuTitle = this.getSubmenuTitle(menuId);
+                    this.renderSubmenu(submenuData, submenuTitle, menuType);
+                    return;
+                }
+                
+                try {
+                    // API'den alt menü verilerini çek
+                    const response = await fetch(`/api/menu-items/${menuId}`);
+                    
+                    if (response.ok) {
+                        const data = await response.json();
+                        if (data.success && data.items) {
+                            this.renderSubmenu(data.items, menuName || 'Alt Menü', data.menuType || menuType);
+                            return;
+                        }
+                    }
+                } catch (error) {
+                    // Sessizce hata yönetimi
+                }
+                
+                // Fallback veriler kullan
+                const submenuData = this.getSubmenuData(menuId);
+                const submenuTitle = menuName || this.getSubmenuTitle(menuId);
+                this.renderSubmenu(submenuData, submenuTitle, menuType);
+            }
+            
+            getSubmenuTitle(menuId) {
+                const titles = {
+                    '5': 'Kurumsal',
+                    '6': 'Hizmetler', 
+                    '7': 'Duyurular',
+                    '8': 'Ne Nerede?',
+                    '9': 'İletişim',
+                    'baskan': 'Başkan',
+                    'kurumsal': 'Kurumsal',
+                    'atasehir': 'Ataşehir',
+                    'hizmetler': 'Hizmetler',
+                    'guncel': 'Güncel',
+                    'iletisim': 'İletişim'
+                };
+                return titles[menuId] || 'Alt Menü';
+            }
+            
+            getSubmenuData(menuId) {
+                const submenuData = {
+                    // ID bazlı veriler (gerçek veritabanı ID'leri)
+                    '5': [ // Kurumsal
+                        { id: 'meclis-kararlari', name: 'Meclis Kararları', hasChildren: false },
+                        { id: 'encumen-uyeleri', name: 'Encümen Üyeleri', hasChildren: false },
+                        { id: 'belediye-meclis-uyeleri', name: 'Belediye Meclis Üyeleri', hasChildren: false },
+                        { id: 'organizasyon-semasi', name: 'Organizasyon Şeması', hasChildren: false }
+                    ],
+                    '6': [ // Hizmetler
+                        { id: 'sosyal-hizmetler', name: 'Sosyal Hizmetler', hasChildren: false },
+                        { id: 'teknik-hizmetler', name: 'Teknik Hizmetler', hasChildren: false },
+                        { id: 'kultur-sanat', name: 'Kültür ve Sanat', hasChildren: false },
+                        { id: 'cevre-hizmetleri', name: 'Çevre Hizmetleri', hasChildren: false }
+                    ],
+                    '7': [ // Duyurular (Type 3 - Button Grid'den Liste'ye)
+                        { id: 'tum-etkinlikler', name: 'Tüm Etkinlikler', hasChildren: false, url: '#' },
+                        { id: 'askidaki-planlar', name: 'Askıdaki Planlar', hasChildren: false, url: '#' },
+                        { id: 'ihaleler', name: 'İhaleler', hasChildren: false, url: '#' },
+                        { id: 'yururlukteki-stratejik-plan', name: 'Yürürlükteki Stratejik Plan', hasChildren: false, url: '#' },
+                        { id: 'karanfil-dergisi', name: 'Karanfil Dergisi', hasChildren: false, url: '#' },
+                        { id: 'kadin-bulteni', name: 'Kadın Bülteni', hasChildren: false, url: '#' },
+                        { id: 'meclis-gundemi', name: 'Meclis Gündemi', hasChildren: false, url: '#' },
+                        { id: 'meclis-kararlari', name: 'Meclis Kararları', hasChildren: false, url: '#' }
+                    ],
+                    '8': [ // Ne Nerede?
+                        { id: 'hizmet-noktalari', name: 'Hizmet Noktaları', hasChildren: false },
+                        { id: 'parklar', name: 'Parklar', hasChildren: false },
+                        { id: 'sosyal-tesisler', name: 'Sosyal Tesisler', hasChildren: false }
+                    ],
+                    '9': [ // İletişim
+                        { id: 'iletisim-bilgileri', name: 'İletişim Bilgileri', hasChildren: false },
+                        { id: 'bize-ulasin', name: 'Bize Ulaşın', hasChildren: false },
+                        { id: 'sosyal-medya', name: 'Sosyal Medya', hasChildren: false }
+                    ],
+                    
+                    // String bazlı fallback veriler (eski sistem uyumluluğu için)
+                    'kurumsal': [
+                        { id: 'meclis-kararlari', name: 'Meclis Kararları', hasChildren: false },
+                        { id: 'encumen-uyeleri', name: 'Encümen Üyeleri', hasChildren: false },
+                        { id: 'belediye-meclis-uyeleri', name: 'Belediye Meclis Üyeleri', hasChildren: false }
+                    ],
+                    'hizmetler': [
+                        { id: 'sosyal-hizmetler', name: 'Sosyal Hizmetler', hasChildren: false },
+                        { id: 'teknik-hizmetler', name: 'Teknik Hizmetler', hasChildren: false },
+                        { id: 'kultur-sanat', name: 'Kültür ve Sanat', hasChildren: false }
+                    ]
+                };
+                
+                return submenuData[menuId] || [];
+            }
+            
+            renderSubmenu(items, title, menuType = 2) {
+                this.title.textContent = title;
+                
+                // Mobilde tüm menüler aynı liste formatında görünsün
+                // Type 3 (button grid) menüler de normal liste olarak render edilsin
+                this.content.innerHTML = this.createMenuList(items.map(item => ({
+                    ...item,
+                    description: item.hasChildren ? `${item.children?.length || 0} alt öğe` : null
+                })));
+                
+                this.attachMenuItemEvents();
+            }
+            
+            createButtonGrid(items) {
+                return `
+                    <div class="p-4">
+                        <div class="grid grid-cols-2 gap-3">
+                            ${items.map(item => this.createButtonMenuItem(item)).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+            
+            createButtonMenuItem(item) {
+                return `
+                    <div class="menu-item group bg-white rounded-xl p-4 border border-gray-200 hover:border-green-300 hover:shadow-lg transition-all duration-200 cursor-pointer text-center" 
+                         data-menu-id="${item.id}" 
+                         data-url="${item.url}" 
+                         data-has-children="${item.hasChildren || false}">
+                        <div class="w-12 h-12 mx-auto mb-3 rounded-full bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center group-hover:scale-110 transition-transform duration-200">
+                            <i class="${item.icon} text-white text-xl"></i>
+                        </div>
+                        <div class="font-medium text-gray-800 text-sm leading-tight">${item.name}</div>
+                    </div>
+                `;
+            }
+            
+
         }
+        
+        // Basit Side Menu'yu başlat
+        const sideMenu = new SimpleSideMenu();
     });
 </script>
 

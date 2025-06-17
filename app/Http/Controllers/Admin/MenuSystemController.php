@@ -558,4 +558,178 @@ class MenuSystemController extends Controller
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
     }
+
+    /**
+     * Side menu için menü öğelerini getirir (Mobil API)
+     */
+    public function getMenuItemsForSideMenu($menuId)
+    {
+        try {
+            // Önce MenuSystem olarak dene
+            $menu = MenuSystem::find($menuId);
+            $menuItems = [];
+            $menuName = '';
+            $menuType = 2;
+            
+            if ($menu) {
+                // MenuSystem bulundu - HeaderService kullan
+                $menuItems = app(\App\Services\HeaderService::class)->getMenuItems($menuId);
+                $menuName = $menu->name;
+                $menuType = $menu->type;
+            } else {
+                // MenuSystemItem olarak dene
+                $menuItem = \App\Models\MenuSystemItem::find($menuId);
+                if ($menuItem) {
+                    // MenuSystemItem'ın alt öğelerini al
+                    $menuItems = \App\Models\MenuSystemItem::where('parent_id', $menuId)
+                        ->where('status', true)
+                        ->orderBy('order')
+                        ->get();
+                    $menuName = $menuItem->title;
+                    $menuType = 2;
+                } else {
+                    throw new \Exception("Menü bulunamadı: ID $menuId");
+                }
+            }
+            
+            $formattedItems = [];
+            
+            foreach ($menuItems as $item) {
+                $hasChildren = false;
+                
+                // Alt öğe kontrolü
+                if (isset($item->children)) {
+                    $hasChildren = $item->children && $item->children->count() > 0;
+                } else {
+                    // MenuSystemItem için alt öğe kontrolü
+                    $childrenCount = \App\Models\MenuSystemItem::where('parent_id', $item->id)
+                        ->where('status', true)
+                        ->count();
+                    $hasChildren = $childrenCount > 0;
+                }
+                
+                $formattedItem = [
+                    'id' => $item->id,
+                    'name' => $item->title ?? $item->name,
+                    'icon' => $this->getIconForItem($item->title ?? $item->name),
+                    'url' => $item->url ?? '#',
+                    'hasChildren' => $hasChildren,
+                    'level' => 2
+                ];
+                
+                // 3. seviye alt öğeler varsa ekle
+                if ($hasChildren) {
+                    if (isset($item->children)) {
+                        // HeaderService'ten gelen veriler
+                        $formattedItem['children'] = $item->children->map(function($child) {
+                            $childHasChildren = $child->children && $child->children->count() > 0;
+                            
+                            return [
+                                'id' => $child->id,
+                                'name' => $child->title ?? $child->name,
+                                'icon' => $this->getIconForItem($child->title ?? $child->name),
+                                'url' => $child->url ?? '#',
+                                'hasChildren' => $childHasChildren,
+                                'level' => 3
+                            ];
+                        })->toArray();
+                    } else {
+                        // Doğrudan veritabanından alt öğeleri al
+                        $children = \App\Models\MenuSystemItem::where('parent_id', $item->id)
+                            ->where('status', true)
+                            ->orderBy('order')
+                            ->get();
+                        
+                        $formattedItem['children'] = $children->map(function($child) {
+                            $childHasChildren = \App\Models\MenuSystemItem::where('parent_id', $child->id)
+                                ->where('status', true)
+                                ->count() > 0;
+                            
+                            return [
+                                'id' => $child->id,
+                                'name' => $child->title,
+                                'icon' => $this->getIconForItem($child->title),
+                                'url' => $child->url ?? '#',
+                                'hasChildren' => $childHasChildren,
+                                'level' => 3
+                            ];
+                        })->toArray();
+                    }
+                }
+                
+                $formattedItems[] = $formattedItem;
+            }
+            
+            return response()->json([
+                'success' => true,
+                'title' => $menuName,
+                'items' => $formattedItems,
+                'menuType' => $menuType
+            ]);
+            
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+    
+    /**
+     * Menü öğesi adına göre uygun ikon döndürür
+     */
+    private function getIconForItem($itemName)
+    {
+        $iconMapping = [
+            // Kurumsal
+            'Belediye Makamları' => 'fas fa-users',
+            'Başkan' => 'fas fa-user-tie',
+            'Başkan Yardımcıları' => 'fas fa-user-friends',
+            'Meclis Üyeleri' => 'fas fa-users-cog',
+            'Encümen Üyeleri' => 'fas fa-user-check',
+            'Organizasyon Şeması' => 'fas fa-sitemap',
+            
+            'Kurumsal Politikalar' => 'fas fa-clipboard-list',
+            'Hizmet Standartları' => 'fas fa-star',
+            'Bilgi Güvenliği' => 'fas fa-shield-alt',
+            'Uluslararası İş Birlikleri' => 'fas fa-globe',
+            'Engelsiz İş Yerleri' => 'fas fa-wheelchair',
+            'Sıfır Atık' => 'fas fa-recycle',
+            'İklim Değişikliği' => 'fas fa-thermometer-half',
+            'Misyon ve Vizyon' => 'fas fa-bullseye',
+            
+            'Belediye İştirakleri' => 'fas fa-handshake',
+            'Kimlik' => 'fas fa-id-card',
+            'Tarihçe' => 'fas fa-history',
+            'Antik Tarih' => 'fas fa-landmark',
+            'Kültürel Yaşam' => 'fas fa-theater-masks',
+            'Doğal Yapı' => 'fas fa-mountain',
+            'Ekonomik Yaşam' => 'fas fa-chart-line',
+            
+            // Hizmetler
+            'İş Yerleri' => 'fas fa-store',
+            'Kültür' => 'fas fa-palette',
+            'Sağlık' => 'fas fa-heartbeat',
+            'İmar' => 'fas fa-building',
+            'Sosyal Yardım' => 'fas fa-hands-helping',
+            'Çevre' => 'fas fa-leaf',
+            'Veterinerlik' => 'fas fa-paw',
+            'Temizlik' => 'fas fa-broom',
+            'Park' => 'fas fa-tree',
+            'Fen İşleri' => 'fas fa-tools',
+            
+            // Duyurular
+            'Belediye Duyuruları' => 'fas fa-bullhorn',
+            'Etkinlikler' => 'fas fa-calendar-alt',
+            'Askıdaki Planlar' => 'fas fa-map',
+            'Meclis Kararları' => 'fas fa-gavel',
+            'İhaleler' => 'fas fa-handshake',
+            'Planlar ve Projeler' => 'fas fa-drafting-compass',
+            
+            // Varsayılan
+            'default' => 'fas fa-circle'
+        ];
+        
+        return $iconMapping[$itemName] ?? $iconMapping['default'];
+    }
 }
