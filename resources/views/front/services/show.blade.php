@@ -155,10 +155,12 @@
                 <p class="text-white/80 text-lg mb-5">{{ $service->summary ?? 'Belediyemiz tarafından sunulan bu hizmet ile ilgili tüm detayları bu sayfada bulabilirsiniz.' }}</p>
                 
                 <div class="flex flex-wrap gap-4">
-                    <a href="#basvuru-sureci" class="inline-flex items-center px-5 py-2.5 bg-[#e6a23c] text-white rounded-md hover:bg-[#e6a23c]/90 transition-colors font-medium shadow-lg shadow-[#e6a23c]/20">
-                        <span class="material-icons mr-2 text-sm">edit_document</span>
-                        Başvuru Yap
-                    </a>
+                    @if(!empty($service->cta_text) && !empty($service->cta_url))
+                        <a href="{{ $service->cta_url }}" class="inline-flex items-center px-5 py-2.5 bg-[#e6a23c] text-white rounded-md hover:bg-[#e6a23c]/90 transition-colors font-medium shadow-lg shadow-[#e6a23c]/20" @if(str_starts_with($service->cta_url, 'http')) target="_blank" @endif>
+                            <span class="material-icons mr-2 text-sm">edit_document</span>
+                            {{ $service->cta_text }}
+                        </a>
+                    @endif
                     @if(isset($service->features['is_standard_forms_visible']) && $service->features['is_standard_forms_visible'])
                     <a href="#standart-formlar" class="inline-flex items-center px-5 py-2.5 bg-white/10 text-white border border-white/20 rounded-md hover:bg-white/20 transition-colors shadow-lg shadow-black/5">
                         <span class="material-icons mr-2 text-sm">download</span>

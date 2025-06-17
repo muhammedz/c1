@@ -247,26 +247,43 @@
             <!-- CTA Ayarları -->
             <div class="card mb-4">
                 <div class="card-header">
-                    <h5 class="mb-0">Çağrı Butonu Ayarları</h5>
+                    <h5 class="mb-0"><i class="fas fa-mouse-pointer mr-2"></i>Başvuru Butonu Ayarları</h5>
                 </div>
                 <div class="card-body">
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle mr-2"></i>
+                        <strong>Bilgi:</strong> Bu alanların her ikisi de doldurulursa hizmet detay sayfasında başvuru butonu görünür. Boş bırakılırsa buton gösterilmez.
+                    </div>
+                    
                     <div class="mb-4">
                         <label for="cta_text" class="form-label">Buton Metni</label>
-                        <input type="text" class="form-control @error('cta_text') is-invalid @enderror" id="cta_text" name="cta_text" value="{{ old('cta_text', $service->cta_text) }}" placeholder="Örn: Hemen Başvur, Fiyat Teklifi Al">
+                        <input type="text" class="form-control @error('cta_text') is-invalid @enderror" id="cta_text" name="cta_text" value="{{ old('cta_text', $service->cta_text) }}" placeholder="Örn: Hemen Başvur, Online Başvuru Yap, Randevu Al">
                         @error('cta_text')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
-                        <small class="text-muted">Detay sayfasında gösterilecek çağrı butonunun metni.</small>
+                        <small class="text-muted">Hizmet detay sayfasında gösterilecek butonun metni.</small>
                     </div>
                             
                     <div class="mb-4">
-                        <label for="cta_url" class="form-label">Buton URL</label>
-                        <input type="text" class="form-control @error('cta_url') is-invalid @enderror" id="cta_url" name="cta_url" value="{{ old('cta_url', $service->cta_url) }}" placeholder="Örn: /iletisim, https://example.com/form">
+                        <label for="cta_url" class="form-label">Buton Linki</label>
+                        <input type="text" class="form-control @error('cta_url') is-invalid @enderror" id="cta_url" name="cta_url" value="{{ old('cta_url', $service->cta_url) }}" placeholder="Örn: /iletisim, https://basvuru.example.com, tel:+905551234567">
                         @error('cta_url')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
-                        <small class="text-muted">Butona tıklandığında gidilecek sayfanın URL'i. Boş bırakılırsa iletişim sayfasına yönlendirir.</small>
+                        <small class="text-muted">Butona tıklandığında gidilecek sayfa, form veya telefon numarası. Dış linkler için "https://" ile başlayın.</small>
                     </div>
+                    
+                    @if(!empty($service->cta_text) || !empty($service->cta_url))
+                    <div class="alert alert-success">
+                        <i class="fas fa-check-circle mr-2"></i>
+                        <strong>Önizleme:</strong> 
+                        @if(!empty($service->cta_text) && !empty($service->cta_url))
+                            Buton aktif - "{{ $service->cta_text }}" metni ile "{{ $service->cta_url }}" adresine yönlendirecek.
+                        @else
+                            Eksik bilgi var - hem metin hem de link doldurulmalı.
+                        @endif
+                    </div>
+                    @endif
                 </div>
             </div>
                                 
