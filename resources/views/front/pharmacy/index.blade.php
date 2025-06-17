@@ -184,6 +184,27 @@
 </div>
 
 <div class="pharmacy-container">
+    <!-- Debug Bilgileri (Sadece development ortamında) -->
+    @if(config('app.debug') && isset($debugInfo) && count($debugInfo) > 0)
+        <div class="alert alert-info" style="background-color: #f0f8ff; border-color: #b3d9ff;">
+            <i class="fas fa-bug"></i>
+            <strong>Debug Bilgileri:</strong>
+            <ul style="margin: 0.5rem 0 0 1rem; padding: 0;">
+                @foreach($debugInfo as $info)
+                    <li style="margin: 0.2rem 0;">{{ $info }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
+    <!-- Cache Bilgisi -->
+    @if(isset($isFromCache) && $isFromCache)
+        <div class="alert alert-info" style="background-color: #e8f5e8; border-color: #c3e6c3;">
+            <i class="fas fa-clock"></i>
+            Veriler önbellekten getirildi. Güncel veriler için sayfayı yenileyin.
+        </div>
+    @endif
+
     <!-- Hata Mesajları -->
     @if($error)
         <div class="alert alert-danger">
@@ -198,6 +219,9 @@
             <i class="fas fa-info-circle"></i>
             <strong>{{ count($pharmacies) }}</strong> adet nöbetçi eczane bulundu.
             <small>({{ $date }} tarihinde Ankara {{ $district }} ilçesi için)</small>
+            @if(isset($isFromCache) && $isFromCache)
+                <br><small class="text-muted"><i class="fas fa-info-circle"></i> Bu veriler önbellekten alınmıştır.</small>
+            @endif
         </div>
         
         <div class="pharmacy-grid">
@@ -240,6 +264,18 @@
             </div>
             <h3>Sonuç Bulunamadı</h3>
             <p>{{ $date }} tarihinde Ankara {{ $district }} ilçesinde nöbetçi eczane bulunamadı.</p>
+            <div style="margin-top: 1.5rem; padding: 1rem; background-color: #f8f9fa; border-radius: 8px; text-align: left;">
+                <h4 style="color: var(--primary-color); margin-bottom: 0.5rem;">Olası Nedenler:</h4>
+                <ul style="margin: 0; padding-left: 1.5rem; color: #6b7280;">
+                    <li>Seçilen tarihte {{ $district }} ilçesinde nöbetçi eczane bulunmuyor olabilir</li>
+                    <li>Resmi tatil günlerinde nöbetçi eczane dağılımı farklı olabilir</li>
+                    <li>Veri kaynağından geçici olarak bilgi alınamıyor olabilir</li>
+                </ul>
+                <p style="margin-top: 1rem; margin-bottom: 0; color: #6b7280; font-size: 0.9rem;">
+                    <i class="fas fa-lightbulb" style="color: #e6a23c;"></i>
+                    <strong>Öneri:</strong> Farklı bir tarih seçerek tekrar deneyebilir veya diğer ilçelere bakabilirsiniz.
+                </p>
+            </div>
         </div>
     @endif
 </div>

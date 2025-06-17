@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Exception;
 use DOMDocument;
 use DOMXPath;
@@ -20,10 +21,11 @@ class PharmacyController extends Controller
         $this->baseUrl = 'https://www.turkiye.gov.tr/saglik-titck-nobetci-eczane-sorgulama';
         $this->headers = [
             'Accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
-            'Accept-Language' => 'en-US,en;q=0.9',
+            'Accept-Language' => 'tr-TR,tr;q=0.9,en;q=0.8',
             'Cache-Control' => 'max-age=0',
             'Connection' => 'keep-alive',
             'User-Agent' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36',
+            'Referer' => 'https://www.turkiye.gov.tr/',
         ];
         $this->cookieString = 'language=tr_TR.UTF-8; w3p=1943251136.20480.0000; _uid=1740222152-6371b0c0-9419-485e-abf4-f1a4d9de5c3b; ridbb=WyI4MjE2YjU0YWRkN2YxOTkwNDU2NmZjMzgzZTIzZGRmZGQ1MTVmYmIxZTIiXQ%3D%3D; TURKIYESESSIONID=ppvh79th8g07afbs5f9geuvefd; TS01c2accc=015c1cbb6d1a639504e1b29b05b98286d479274aaf94c82d859307282d1c86808d72742a98623567bf8f57c330e2ce30a706ea5e64; _lastptts=1740223200';
     }
@@ -41,13 +43,14 @@ class PharmacyController extends Controller
         $error = null;
         $loading = false;
         $isFromCache = false;
+        $debugInfo = [];
 
         // Form gönderilmişse veya ilk yüklemede eczaneleri getir
         if ($request->has('search') || !$request->hasAny(['plateCode', 'date', 'district', 'search'])) {
             try {
                 // Önce cache'de veri var mı kontrol et
                 $cacheKey = "pharmacy_data_{$plateCode}_{$date}_{$district}";
-                $globalCacheKey = "pharmacy_global_{$plateCode}_{$date}"; // Tüm ilçeler için global cache
+                $globalCacheKey = "pharmacy_global_{$plateCode}_{$date}"; 
                 
                 $cachedData = Cache::get($cacheKey);
                 $globalCachedData = Cache::get($globalCacheKey);
@@ -64,113 +67,190 @@ class PharmacyController extends Controller
                     }
                 }
 
-                // Rate limit aşıldıysa ve cache'de veri varsa, cached veriyi göster (uyarısız)
-                if ($isRateLimited && ($cachedData || $globalCachedData)) {
-                    if ($cachedData) {
-                        $pharmacies = $cachedData['data'] ?? [];
-                    } elseif ($globalCachedData) {
-                        // Global cache'den ilgili ilçenin verilerini filtrele
-                        $allPharmacies = $globalCachedData['data'] ?? [];
-                        $pharmacies = array_filter($allPharmacies, function($pharmacy) use ($district) {
-                            return mb_strtoupper($pharmacy['district'], 'UTF-8') === mb_strtoupper($district, 'UTF-8');
-                        });
-                        $pharmacies = array_values($pharmacies); // Re-index array
-                    }
+                // Önce cache'den dene
+                if ($cachedData && is_array($cachedData) && isset($cachedData['data'])) {
+                    $pharmacies = $cachedData['data'];
                     $isFromCache = true;
-                    // Hiç uyarı verme, sadece cached verileri göster
-                } 
-                // Rate limit aşıldıysa ama cache'de veri yoksa hata göster
-                elseif ($isRateLimited && !$cachedData && !$globalCachedData) {
-                    $error = "Rate limit aşıldı. Lütfen yeni istek için {$timeLeft} saniye bekleyin.";
-                    return view('front.pharmacy.index', compact('pharmacies', 'error', 'plateCode', 'date', 'district', 'isFromCache'));
-                }
-                // Rate limit aşılmadıysa normal akış
-                else {
-                    Cache::put($rateLimitKey, time(), 4);
-
-                    // Parametreleri doğrula
-                    if (!$plateCode || !is_numeric($plateCode)) {
-                        $error = 'Geçersiz il/plaka kodu!';
-                    } elseif (!preg_match('/^\d{2}\/\d{2}\/\d{4}$/', $date)) {
-                        $error = 'Geçersiz tarih formatı (örnek: 22/02/2025)';
+                    $debugInfo[] = "Cache'den veri alındı";
+                } elseif ($globalCachedData && is_array($globalCachedData) && isset($globalCachedData['data'])) {
+                    // Global cache'den filtrele
+                    $allPharmacies = $globalCachedData['data'];
+                    $pharmacies = array_filter($allPharmacies, function($pharmacy) use ($district) {
+                        return $this->normalizeDistrict($pharmacy['district']) === $this->normalizeDistrict($district);
+                    });
+                    $pharmacies = array_values($pharmacies);
+                    $isFromCache = true;
+                    $debugInfo[] = "Global cache'den filtrelendi";
+                } else {
+                    // Cache'de veri yok, API'den çek
+                    if ($isRateLimited) {
+                        $error = "Çok sık istek gönderdiniz. Lütfen {$timeLeft} saniye sonra tekrar deneyin.";
+                        $debugInfo[] = "Rate limit aşıldı";
                     } else {
-                        // Cache'de güncel veri varsa kullan
-                        if ($cachedData) {
-                            $pharmacies = $cachedData['data'] ?? [];
-                            $isFromCache = true;
+                        // Rate limit kaydet
+                        Cache::put($rateLimitKey, time(), 4);
+                        
+                        // API'den veri çek
+                        $debugInfo[] = "API'den veri çekiliyor";
+                        
+                        // Token al
+                        $token = $this->fetchToken();
+                        if (!$token) {
+                            throw new Exception('Token alınamadı');
+                        }
+                        
+                        $debugInfo[] = "Token alındı";
+                        
+                        // Form gönder
+                        $this->submitSearchForm($token, $plateCode, $date);
+                        $debugInfo[] = "Form gönderildi";
+                        
+                        // Tüm eczaneleri getir
+                        $allPharmacies = $this->fetchAllPharmacies();
+                        $debugInfo[] = "Toplam " . count($allPharmacies) . " eczane bulundu";
+                        
+                        if (count($allPharmacies) > 0) {
+                            // Global cache'e tüm eczaneleri kaydet
+                            $globalResult = [
+                                'data' => $allPharmacies,
+                                'meta' => [
+                                    'date' => $date,
+                                    'plate_code' => $plateCode,
+                                    'total_pharmacies' => count($allPharmacies),
+                                    'cached_at' => now()->format('d/m/Y H:i:s')
+                                ]
+                            ];
+                            Cache::put($globalCacheKey, $globalResult, 3600); // 1 saat
+                            
+                            // İstenen ilçeye göre filtrele
+                            $pharmacies = array_filter($allPharmacies, function($pharmacy) use ($district) {
+                                return $this->normalizeDistrict($pharmacy['district']) === $this->normalizeDistrict($district);
+                            });
+                            $pharmacies = array_values($pharmacies);
+                            
+                            $debugInfo[] = $district . " ilçesi için " . count($pharmacies) . " eczane filtrelendi";
+                            
+                            // Spesifik sonucu da cache'le
+                            $result = [
+                                'data' => $pharmacies,
+                                'meta' => [
+                                    'date' => $date,
+                                    'plate_code' => $plateCode,
+                                    'district' => $district,
+                                    'total_pharmacies' => count($pharmacies),
+                                    'cached_at' => now()->format('d/m/Y H:i:s')
+                                ]
+                            ];
+                            Cache::put($cacheKey, $result, 3600);
                         } else {
-                            // Token al
-                            $token = $this->fetchToken();
-                            if (!$token) {
-                                $error = 'Doğrulama tokeni alınamadı!';
-                            } else {
-                                // Form gönder
-                                $this->submitSearchForm($token, $plateCode, $date);
-                                
-                                // Tüm eczaneleri getir (ilçe filtrelemesi olmadan)
-                                $allPharmacies = $this->fetchAllPharmacies();
-                                
-                                // Global cache'e tüm eczaneleri kaydet
-                                $globalResult = [
-                                    'data' => $allPharmacies,
-                                    'meta' => [
-                                        'date' => $date,
-                                        'plate_code' => $plateCode,
-                                        'total_pharmacies' => count($allPharmacies),
-                                        'cached_at' => now()->format('d/m/Y H:i:s')
-                                    ]
-                                ];
-                                Cache::put($globalCacheKey, $globalResult, 3600); // 1 saat
-                                
-                                // İstenen ilçeye göre filtrele
-                                $pharmacies = array_filter($allPharmacies, function($pharmacy) use ($district) {
-                                    return mb_strtoupper($pharmacy['district'], 'UTF-8') === mb_strtoupper($district, 'UTF-8');
-                                });
-                                $pharmacies = array_values($pharmacies);
-                                
-                                // Spesifik sonucu da cache'le (1 saat)
-                                $result = [
-                                    'data' => $pharmacies,
-                                    'meta' => [
-                                        'date' => $date,
-                                        'plate_code' => $plateCode,
-                                        'district' => $district,
-                                        'total_pharmacies' => count($pharmacies),
-                                        'cached_at' => now()->format('d/m/Y H:i:s')
-                                    ]
-                                ];
-                                Cache::put($cacheKey, $result, 3600); // 1 saat
-                            }
+                            $debugInfo[] = "API'den hiç eczane bulunamadı";
+                            // Boş sonucu da cache'le (kısa süre)
+                            $emptyResult = [
+                                'data' => [],
+                                'meta' => [
+                                    'date' => $date,
+                                    'plate_code' => $plateCode,
+                                    'district' => $district,
+                                    'total_pharmacies' => 0,
+                                    'cached_at' => now()->format('d/m/Y H:i:s'),
+                                    'reason' => 'no_data_from_api'
+                                ]
+                            ];
+                            Cache::put($cacheKey, $emptyResult, 300); // 5 dakika
                         }
                     }
                 }
-            } catch (Exception $e) {
-                // Hata durumunda da cached veri varsa göster
-                $cacheKey = "pharmacy_data_{$plateCode}_{$date}_{$district}";
-                $globalCacheKey = "pharmacy_global_{$plateCode}_{$date}";
-                
-                $cachedData = Cache::get($cacheKey);
-                $globalCachedData = Cache::get($globalCacheKey);
-                
-                if ($cachedData || $globalCachedData) {
-                    if ($cachedData) {
-                        $pharmacies = $cachedData['data'] ?? [];
-                    } elseif ($globalCachedData) {
-                        $allPharmacies = $globalCachedData['data'] ?? [];
-                        $pharmacies = array_filter($allPharmacies, function($pharmacy) use ($district) {
-                            return mb_strtoupper($pharmacy['district'], 'UTF-8') === mb_strtoupper($district, 'UTF-8');
-                        });
-                        $pharmacies = array_values($pharmacies);
+
+                // Eğer hala sonuç yoksa ve cache'de de yoksa, geçmiş günlerin cache'ine bak
+                if (count($pharmacies) === 0 && !$isRateLimited) {
+                    $debugInfo[] = "Alternatif cache aranıyor";
+                    $fallbackPharmacies = $this->getFallbackPharmacies($plateCode, $district);
+                    if (count($fallbackPharmacies) > 0) {
+                        $pharmacies = $fallbackPharmacies;
+                        $isFromCache = true;
+                        $debugInfo[] = "Alternatif cache'den " . count($pharmacies) . " eczane bulundu";
+                        $error = "Güncel veri alınamadı. Geçmiş tarihli veriler gösteriliyor.";
                     }
-                    $isFromCache = true;
-                    // Hata durumunda da uyarı verme, sadece cached verileri göster
-                } else {
-                    $error = $e->getMessage();
                 }
+
+            } catch (Exception $e) {
+                $error = 'Eczane verileri alınırken bir hata oluştu: ' . $e->getMessage();
+                $debugInfo[] = "Hata: " . $e->getMessage();
+                
+                // Hata durumunda da fallback cache'e bak
+                $fallbackPharmacies = $this->getFallbackPharmacies($plateCode, $district);
+                if (count($fallbackPharmacies) > 0) {
+                    $pharmacies = $fallbackPharmacies;
+                    $isFromCache = true;
+                    $error = "Güncel veri alınamadı. Geçmiş tarihli veriler gösteriliyor.";
+                    $debugInfo[] = "Hata sonrası fallback'den " . count($pharmacies) . " eczane bulundu";
+                }
+                
+                // Hata logla
+                Log::error('Pharmacy API Error', [
+                    'error' => $e->getMessage(),
+                    'date' => $date,
+                    'district' => $district,
+                    'plate_code' => $plateCode,
+                    'debug_info' => $debugInfo
+                ]);
             }
         }
 
-        return view('front.pharmacy.index', compact('pharmacies', 'error', 'plateCode', 'date', 'district', 'isFromCache'));
+        // Debug bilgilerini sadece development ortamında göster
+        if (config('app.debug')) {
+            $debugInfo[] = "Sonuç: " . count($pharmacies) . " eczane";
+            $debugInfo[] = "Cache'den: " . ($isFromCache ? 'Evet' : 'Hayır');
+        }
+
+        return view('front.pharmacy.index', compact(
+            'pharmacies', 
+            'error', 
+            'loading', 
+            'isFromCache', 
+            'plateCode', 
+            'date', 
+            'district',
+            'debugInfo'
+        ));
+    }
+
+    /**
+     * İlçe adını normalize et
+     */
+    private function normalizeDistrict(string $district): string
+    {
+        return mb_strtoupper(trim($district), 'UTF-8');
+    }
+
+    /**
+     * Geçmiş cache verilerinden eczane bul
+     */
+    private function getFallbackPharmacies(string $plateCode, string $district): array
+    {
+        // Son 7 günün cache'ine bak
+        for ($i = 1; $i <= 7; $i++) {
+            $fallbackDate = date('d/m/Y', strtotime("-{$i} days"));
+            $fallbackCacheKey = "pharmacy_data_{$plateCode}_{$fallbackDate}_{$district}";
+            $fallbackGlobalKey = "pharmacy_global_{$plateCode}_{$fallbackDate}";
+            
+            $fallbackData = Cache::get($fallbackCacheKey);
+            if ($fallbackData && is_array($fallbackData) && isset($fallbackData['data']) && count($fallbackData['data']) > 0) {
+                return $fallbackData['data'];
+            }
+            
+            $fallbackGlobalData = Cache::get($fallbackGlobalKey);
+            if ($fallbackGlobalData && is_array($fallbackGlobalData) && isset($fallbackGlobalData['data'])) {
+                $filtered = array_filter($fallbackGlobalData['data'], function($pharmacy) use ($district) {
+                    return $this->normalizeDistrict($pharmacy['district']) === $this->normalizeDistrict($district);
+                });
+                if (count($filtered) > 0) {
+                    return array_values($filtered);
+                }
+            }
+        }
+        
+        return [];
     }
 
     /**
