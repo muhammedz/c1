@@ -88,6 +88,8 @@
             },
         });
 
+
+
         // Mobil Menü Toggle İşlevi - quickmenu.blade.php dosyasında tanımlandı
     </script>
 @endsection
