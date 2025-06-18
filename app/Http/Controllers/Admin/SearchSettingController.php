@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\SearchSetting;
 use App\Models\SearchQuickLink;
 use App\Models\SearchPopularQuery;
+use App\Models\SearchLog;
 use Illuminate\Http\Request;
 
 class SearchSettingController extends Controller
@@ -19,7 +20,19 @@ class SearchSettingController extends Controller
         $quickLinks = SearchQuickLink::orderBy('order')->get();
         $popularQueries = SearchPopularQuery::orderBy('order')->get();
         
-        return view('admin.search_settings.index', compact('settings', 'quickLinks', 'popularQueries'));
+        // Arama istatistikleri
+        $searchStats = SearchLog::getSearchStats();
+        $recentSearches = SearchLog::getRecentSearches(20);
+        $popularSearches = SearchLog::getPopularSearches(10);
+        
+        return view('admin.search_settings.index', compact(
+            'settings', 
+            'quickLinks', 
+            'popularQueries',
+            'searchStats',
+            'recentSearches',
+            'popularSearches'
+        ));
     }
     
     /**

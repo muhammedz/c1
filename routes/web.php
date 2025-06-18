@@ -71,6 +71,11 @@ Route::get('/arama', function() {
     $searchService = new \App\Services\SearchService();
     $results = $searchService->search($query ?? '');
     
+    // Arama yapıldıysa loglama
+    if (!empty($query)) {
+        \App\Models\SearchLog::logSearch($query, $results['total'] ?? 0);
+    }
+    
     return view('search.index', [
         'query' => $query,
         'results' => $results

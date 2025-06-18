@@ -60,20 +60,7 @@
         border-bottom: 1px solid #e5e7eb;
     }
     
-    @media (max-width: 768px) {
-        .service-grid-layout {
-            grid-template-columns: 1fr;
-            gap: 1rem;
-        }
-        
-        .service-content-area {
-            grid-column: 1;
-        }
-        
-        .service-grid-layout::before {
-            display: none;
-        }
-    }
+
 
     /* İçindekiler stillerini sol tarafta sticky olacak şekilde düzenle */
     #sidebar {
@@ -119,25 +106,20 @@
 
     @media (max-width: 768px) {
         #sidebar {
+            display: none !important;
+        }
+        
+        .service-grid-layout {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+        
+        .service-content-area {
+            grid-column: 1;
+        }
+        
+        .service-grid-layout::before {
             display: none;
-        }
-        
-        #sidebar.active {
-            display: block;
-            position: fixed;
-            top: 15px;
-            left: 15px;
-            right: 15px;
-            width: auto;
-            z-index: 100;
-        }
-        
-        #sidebar.scrolledDown .sticky-container {
-            position: relative;
-            top: 0;
-            left: 0 !important;
-            width: 100% !important;
-            transform: none;
         }
     }
 
@@ -573,16 +555,7 @@
                 }
             }
             
-            // Mobil görünümde sidebar davranışı
-            if (window.innerWidth <= 768) {
-                if (currentScrollY > 200) {
-                    // Aşağı kaydırıldıysa sidebar'ı göster
-                    sidebarElement.classList.add('active');
-                } else {
-                    // Sayfanın üst kısmındaysa sidebar'ı gizle
-                    sidebarElement.classList.remove('active');
-                }
-            }
+
         });
 
         // View count increment (silent)

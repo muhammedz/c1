@@ -358,11 +358,13 @@ class PharmacyController extends Controller
                 if ($cols->length > 0) {
                     $district = trim($cols->item(1)->textContent);
                     
+                    $rawPhone = trim(preg_replace('/\s+/', ' ', str_replace("Ara", "", $cols->item(2)->textContent)));
+                    
                     $pharmacies[] = [
                         'name' => trim($cols->item(0)->textContent) . ' ECZANESİ',
                         'district' => $district,
-                        'phone' => trim(preg_replace('/\s+/', ' ', str_replace("Ara", "", $cols->item(2)->textContent))),
-                        'address' => trim($cols->item(3)->textContent)
+                        'phone' => $this->formatPhoneNumber($rawPhone),
+                        'address' => $this->formatAddress(trim($cols->item(3)->textContent))
                     ];
                 }
             }
@@ -420,11 +422,13 @@ class PharmacyController extends Controller
                     $district = trim($cols->item(1)->textContent);
 
                     if (mb_strtoupper($district, 'UTF-8') === mb_strtoupper($targetDistrict, 'UTF-8')) {
+                        $rawPhone = trim(preg_replace('/\s+/', ' ', str_replace("Ara", "", $cols->item(2)->textContent)));
+                        
                         $pharmacies[] = [
                             'name' => trim($cols->item(0)->textContent) . ' ECZANESİ',
                             'district' => $district,
-                            'phone' => trim(preg_replace('/\s+/', ' ', str_replace("Ara", "", $cols->item(2)->textContent))),
-                            'address' => trim($cols->item(3)->textContent)
+                            'phone' => $this->formatPhoneNumber($rawPhone),
+                            'address' => $this->formatAddress(trim($cols->item(3)->textContent))
                         ];
                     }
                 }
@@ -434,6 +438,61 @@ class PharmacyController extends Controller
         } catch (Exception $e) {
             throw new Exception('Eczane verileri alınırken hata: ' . $e->getMessage());
         }
+    }
+
+    /**
+     * Telefon numarasını formatla
+     */
+    private function formatPhoneNumber(string $phone): string
+    {
+        // Tüm özel karakterleri ve boşlukları temizle
+        $cleanPhone = preg_replace('/[^0-9]/', '', $phone);
+        
+        // Eğer telefon numarası boşsa, orijinalini döndür
+        if (empty($cleanPhone)) {
+            return $phone;
+        }
+        
+        // Türkiye telefon numarası formatı (10 haneli)
+        if (strlen($cleanPhone) === 10) {
+            // 0312 481 8583 formatında döndür
+            return substr($cleanPhone, 0, 4) . ' ' . substr($cleanPhone, 4, 3) . ' ' . substr($cleanPhone, 7, 4);
+        }
+        
+        // 11 haneli ise (başında 0 varsa)
+        if (strlen($cleanPhone) === 11 && $cleanPhone[0] === '0') {
+            // 0312 481 8583 formatında döndür
+            return substr($cleanPhone, 0, 4) . ' ' . substr($cleanPhone, 4, 3) . ' ' . substr($cleanPhone, 7, 4);
+        }
+        
+        // Diğer durumlarda orijinal telefonu döndür
+        return $phone;
+    }
+
+    /**
+     * Adres formatını düzenle - sadece baş harfleri büyük yap
+     */
+    private function formatAddress(string $address): string
+    {
+        // Boş adres kontrolü
+        if (empty(trim($address))) {
+            return $address;
+        }
+        
+        // Adresi küçük harfe çevir
+        $formattedAddress = mb_strtolower($address, 'UTF-8');
+        
+        // Her kelimenin baş harfini büyük yap
+        $formattedAddress = mb_convert_case($formattedAddress, MB_CASE_TITLE, 'UTF-8');
+        
+        // Türkçe karakterler için özel düzenleme
+        $formattedAddress = str_replace(
+            ['İ', 'I'],
+            ['İ', 'I'],
+            $formattedAddress
+        );
+        
+        return $formattedAddress;
     }
 
     /**

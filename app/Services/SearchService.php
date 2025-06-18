@@ -4,6 +4,10 @@ namespace App\Services;
 
 use App\Models\Service;
 use App\Models\News;
+use App\Models\Project;
+use App\Models\GuidePlace;
+use App\Models\CankayaHouse;
+use App\Models\Mudurluk;
 use Illuminate\Support\Collection;
 
 class SearchService
@@ -20,6 +24,10 @@ class SearchService
             return [
                 'services' => collect(),
                 'news' => collect(),
+                'projects' => collect(),
+                'guides' => collect(),
+                'cankaya_houses' => collect(),
+                'mudurlukler' => collect(),
                 'total' => 0
             ];
         }
@@ -30,11 +38,22 @@ class SearchService
         // Farklı arama stratejileri uygula
         $services = $this->searchServices($normalizedQuery, $query);
         $news = $this->searchNews($normalizedQuery, $query);
+        $projects = $this->searchProjects($normalizedQuery, $query);
+        $guides = $this->searchGuides($normalizedQuery, $query);
+        $cankayaHouses = $this->searchCankayaHouses($normalizedQuery, $query);
+        $mudurlukler = $this->searchMudurlukler($normalizedQuery, $query);
+        
+        $totalCount = $services->count() + $news->count() + $projects->count() + 
+                     $guides->count() + $cankayaHouses->count() + $mudurlukler->count();
         
         return [
             'services' => $services,
             'news' => $news,
-            'total' => $services->count() + $news->count()
+            'projects' => $projects,
+            'guides' => $guides,
+            'cankaya_houses' => $cankayaHouses,
+            'mudurlukler' => $mudurlukler,
+            'total' => $totalCount
         ];
     }
     
@@ -85,7 +104,7 @@ class SearchService
         $additionalResults = $likeResults->whereNotIn('id', $existingIds);
         $results = $results->merge($additionalResults);
         
-        // 3. Kelime kelime arama
+        // 3. Kelime kelime arama (sadece başlık)
         $words = explode(' ', $normalizedQuery);
         if (count($words) > 1) {
             foreach ($words as $word) {
@@ -145,7 +164,7 @@ class SearchService
         $additionalResults = $likeResults->whereNotIn('id', $existingIds);
         $results = $results->merge($additionalResults);
         
-        // 3. Kelime kelime arama
+        // 3. Kelime kelime arama (sadece başlık)
         $words = explode(' ', $normalizedQuery);
         if (count($words) > 1) {
             foreach ($words as $word) {
@@ -292,5 +311,169 @@ class SearchService
         }
         
         return array_unique($variations);
+    }
+    
+    /**
+     * Projelerde arama yap
+     * 
+     * @param string $normalizedQuery
+     * @param string $originalQuery
+     * @return Collection
+     */
+    private function searchProjects(string $normalizedQuery, string $originalQuery): Collection
+    {
+        $results = collect();
+        
+        // Aktif projelerde LIKE ile arama (sadece başlık)
+        $likeResults = Project::where('is_active', true)
+            ->where(function($q) use ($originalQuery, $normalizedQuery) {
+                $q->where('title', 'LIKE', "%{$originalQuery}%")
+                  ->orWhere('title', 'LIKE', "%{$normalizedQuery}%");
+            })
+            ->with('category')
+            ->get();
+        
+        $results = $results->merge($likeResults);
+        
+        // Kelime kelime arama (sadece başlık)
+        $words = explode(' ', $normalizedQuery);
+        if (count($words) > 1) {
+            foreach ($words as $word) {
+                if (strlen($word) > 2) {
+                    $wordResults = Project::where('is_active', true)
+                        ->where('title', 'LIKE', "%{$word}%")
+                        ->with('category')
+                        ->get();
+                    
+                    $existingIds = $results->pluck('id')->toArray();
+                    $additionalResults = $wordResults->whereNotIn('id', $existingIds);
+                    $results = $results->merge($additionalResults);
+                }
+            }
+        }
+        
+        return $results;
+    }
+    
+    /**
+     * Rehber yerlerinde arama yap
+     * 
+     * @param string $normalizedQuery
+     * @param string $originalQuery
+     * @return Collection
+     */
+    private function searchGuides(string $normalizedQuery, string $originalQuery): Collection
+    {
+        $results = collect();
+        
+        // Aktif rehber yerlerinde LIKE ile arama (sadece başlık)
+        $likeResults = GuidePlace::where('is_active', true)
+            ->where(function($q) use ($originalQuery, $normalizedQuery) {
+                $q->where('title', 'LIKE', "%{$originalQuery}%")
+                  ->orWhere('title', 'LIKE', "%{$normalizedQuery}%");
+            })
+            ->with('category')
+            ->get();
+        
+        $results = $results->merge($likeResults);
+        
+        // Kelime kelime arama (sadece başlık)
+        $words = explode(' ', $normalizedQuery);
+        if (count($words) > 1) {
+            foreach ($words as $word) {
+                if (strlen($word) > 2) {
+                    $wordResults = GuidePlace::where('is_active', true)
+                        ->where('title', 'LIKE', "%{$word}%")
+                        ->with('category')
+                        ->get();
+                    
+                    $existingIds = $results->pluck('id')->toArray();
+                    $additionalResults = $wordResults->whereNotIn('id', $existingIds);
+                    $results = $results->merge($additionalResults);
+                }
+            }
+        }
+        
+        return $results;
+    }
+    
+    /**
+     * Çankaya Evlerinde arama yap
+     * 
+     * @param string $normalizedQuery
+     * @param string $originalQuery
+     * @return Collection
+     */
+    private function searchCankayaHouses(string $normalizedQuery, string $originalQuery): Collection
+    {
+        $results = collect();
+        
+        // Aktif Çankaya Evlerinde LIKE ile arama (sadece isim)
+        $likeResults = CankayaHouse::where('status', 'active')
+            ->where(function($q) use ($originalQuery, $normalizedQuery) {
+                $q->where('name', 'LIKE', "%{$originalQuery}%")
+                  ->orWhere('name', 'LIKE', "%{$normalizedQuery}%");
+            })
+            ->get();
+        
+        $results = $results->merge($likeResults);
+        
+        // Kelime kelime arama (sadece isim)
+        $words = explode(' ', $normalizedQuery);
+        if (count($words) > 1) {
+            foreach ($words as $word) {
+                if (strlen($word) > 2) {
+                    $wordResults = CankayaHouse::where('status', 'active')
+                        ->where('name', 'LIKE', "%{$word}%")
+                        ->get();
+                    
+                    $existingIds = $results->pluck('id')->toArray();
+                    $additionalResults = $wordResults->whereNotIn('id', $existingIds);
+                    $results = $results->merge($additionalResults);
+                }
+            }
+        }
+        
+        return $results;
+    }
+    
+    /**
+     * Müdürlüklerde arama yap
+     * 
+     * @param string $normalizedQuery
+     * @param string $originalQuery
+     * @return Collection
+     */
+    private function searchMudurlukler(string $normalizedQuery, string $originalQuery): Collection
+    {
+        $results = collect();
+        
+        // Aktif müdürlüklerde LIKE ile arama (sadece isim)
+        $likeResults = Mudurluk::where('is_active', true)
+            ->where(function($q) use ($originalQuery, $normalizedQuery) {
+                $q->where('name', 'LIKE', "%{$originalQuery}%")
+                  ->orWhere('name', 'LIKE', "%{$normalizedQuery}%");
+            })
+            ->get();
+        
+        $results = $results->merge($likeResults);
+        
+        // Kelime kelime arama (sadece isim)
+        $words = explode(' ', $normalizedQuery);
+        if (count($words) > 1) {
+            foreach ($words as $word) {
+                if (strlen($word) > 2) {
+                    $wordResults = Mudurluk::where('is_active', true)
+                        ->where('name', 'LIKE', "%{$word}%")
+                        ->get();
+                    
+                    $existingIds = $results->pluck('id')->toArray();
+                    $additionalResults = $wordResults->whereNotIn('id', $existingIds);
+                    $results = $results->merge($additionalResults);
+                }
+            }
+        }
+        
+        return $results;
     }
 } 

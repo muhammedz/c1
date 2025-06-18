@@ -48,26 +48,25 @@
     
     .pharmacy-card {
         background: white;
-        border-radius: 12px;
+        border-radius: 8px;
         padding: 1.5rem;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-        border-top: 4px solid var(--primary-color);
-        transition: all 0.3s ease;
-    }
-    
-    .pharmacy-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+        border: 1px solid #e2e8f0;
+        border-left: 4px solid var(--primary-color);
     }
     
     .pharmacy-name {
-        font-size: 1.25rem;
-        font-weight: 700;
+        font-size: 1.2rem;
+        font-weight: 600;
         color: var(--primary-color);
         margin-bottom: 1rem;
         display: flex;
         align-items: center;
         gap: 0.5rem;
+    }
+    
+    .pharmacy-name i {
+        font-size: 1.1rem;
+        color: var(--secondary-color);
     }
     
     .pharmacy-info {
@@ -80,49 +79,61 @@
         display: flex;
         align-items: flex-start;
         gap: 0.75rem;
-        font-size: 0.95rem;
+        font-size: 0.9rem;
+        margin-bottom: 0.75rem;
+    }
+    
+    .info-item:last-child {
+        margin-bottom: 0;
     }
     
     .info-icon {
         color: var(--secondary-color);
-        font-size: 1.1rem;
+        font-size: 1rem;
         margin-top: 0.1rem;
         flex-shrink: 0;
     }
     
     .info-text {
-        color: #374151;
+        color: #4a5568;
         line-height: 1.5;
     }
     
     .phone-link {
         color: var(--primary-color);
         text-decoration: none;
-        font-weight: 600;
-        transition: color 0.3s ease;
+        font-weight: 500;
     }
     
     .phone-link:hover {
         color: var(--secondary-color);
+        text-decoration: underline;
     }
     
     .address-link {
-        color: #374151;
+        color: #4a5568;
         text-decoration: none;
-        transition: all 0.3s ease;
-        display: inline-block;
-        position: relative;
     }
     
     .address-link:hover {
         color: var(--primary-color);
-        text-decoration: none;
-        transform: translateX(2px);
+        text-decoration: underline;
     }
     
-    .address-link:hover .fas.fa-external-link-alt {
-        opacity: 1;
+    .address-link .fas.fa-external-link-alt {
+        opacity: 0.6;
+        margin-left: 0.3rem;
+        font-size: 0.75rem;
+    }
+    
+    .map-view-link {
         color: var(--secondary-color);
+        text-decoration: none;
+    }
+    
+    .map-view-link:hover {
+        color: var(--primary-color);
+        text-decoration: underline;
     }
     
     .no-results {
@@ -241,11 +252,6 @@
                     </div>
                     
                     <div class="pharmacy-info">
-                        <div class="info-item">
-                            <i class="fas fa-map-marker-alt info-icon"></i>
-                            <span class="info-text">{{ $pharmacy['district'] }}</span>
-                        </div>
-                        
                         @if($pharmacy['phone'])
                             <div class="info-item">
                                 <i class="fas fa-phone info-icon"></i>
@@ -262,8 +268,18 @@
                                    target="_blank" 
                                    class="info-text address-link"
                                    title="Google Haritalar'da görüntüle">
-                                    {{ $pharmacy['address'] }}
+                                    {{ $pharmacy['address'] }}, {{ $pharmacy['district'] }}
                                     <i class="fas fa-external-link-alt" style="font-size: 0.8rem; margin-left: 0.5rem; opacity: 0.7;"></i>
+                                </a>
+                            </div>
+                            
+                            <div class="info-item">
+                                <i class="fas fa-map-marked-alt info-icon"></i>
+                                <a href="https://www.google.com/maps/search/{{ urlencode($pharmacy['address'] . ', ' . $pharmacy['district'] . ', Ankara') }}" 
+                                   target="_blank" 
+                                   class="info-text map-view-link"
+                                   title="Haritada Görüntüle">
+                                    Haritada Görüntüle
                                 </a>
                             </div>
                         @endif
