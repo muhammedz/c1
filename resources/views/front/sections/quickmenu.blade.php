@@ -13,7 +13,7 @@
             
             @foreach($displayCategories as $index => $category)
                 @if($category->activeItems->count() > 0)
-                <div class="group relative {{ $widthClass }} {{ $index < $categoryCount - 1 ? 'border-r border-white/20' : '' }}">
+                <div class="group relative {{ $widthClass }} {{ $index < $categoryCount - 1 ? 'border-r border-white/20' : '' }}" style="padding: 0 5px;">
                     <a href="#" class="group flex items-center h-full px-6 py-4 space-x-3 transition-colors duration-300">
                         <span class="material-icons text-2xl">
                             @if(Str::startsWith($category->icon, 'fas ') || Str::startsWith($category->icon, 'far ') || Str::startsWith($category->icon, 'fab '))
@@ -47,7 +47,7 @@
             @endforeach
         @else
         <!-- Online Hizmetler -->
-        <div class="group relative w-[300px] border-r border-white/20">
+        <div class="group relative w-[300px] border-r border-white/20" style="padding: 0 5px;">
             <a href="#" class=" group flex items-center h-full px-6 py-4 space-x-3 transition-colors duration-300">
                 <span class="material-icons text-2xl">language</span>
                 <div class="flex flex-col">
@@ -86,7 +86,7 @@
             </div>
         </div>
         <!-- Sosyal Hizmetler -->
-        <div class="group relative w-[300px] border-r border-white/20">
+        <div class="group relative w-[300px] border-r border-white/20" style="padding: 0 5px;">
             <a href="#" class=" group flex items-center h-full px-6 py-4 space-x-3 transition-colors duration-300">
                 <span class="material-icons text-2xl">people</span>
                 <div class="flex flex-col">
@@ -113,7 +113,7 @@
             </div>
         </div>
         <!-- E-Belediye -->
-        <div class="group relative w-[300px] border-r border-white/20">
+        <div class="group relative w-[300px] border-r border-white/20" style="padding: 0 5px;">
             <a href="#" class="group flex items-center h-full px-6 py-4 space-x-3 transition-colors duration-300">
                 <span class="material-icons text-2xl">computer</span>
                 <div class="flex flex-col">
@@ -140,7 +140,7 @@
             </div>
         </div>
         <!-- Belediye Rehberi -->
-        <div class="group relative w-[300px]">
+        <div class="group relative w-[300px]" style="padding: 0 5px;">
             <a href="#" class=" group flex items-center h-full px-6 py-4 space-x-3 transition-colors duration-300">
                 <span class="material-icons text-2xl">menu_book</span>
                 <div class="flex flex-col">
@@ -346,16 +346,16 @@
     /* Desktop dropdown styles */
     .hidden .quick-menu-dropdown {
         position: absolute !important;
-        left: 0 !important;
+        left: 4px !important;
         bottom: 100% !important;
         top: auto !important;
-        width: 100% !important;
+        width: calc(100% - 8px) !important;
         background: rgba(255, 255, 255, 0.98) !important;
         z-index: 100 !important;
         box-shadow: 0 -4px 12px -3px rgba(0, 0, 0, 0.08) !important;
         display: none !important;
         border-radius: 12px 12px 0 0 !important;
-        overflow: hidden !important;
+        overflow: visible !important;
         transform-origin: bottom center !important;
         transform: translateY(-5px) !important;
         transition: transform 0.2s ease-out, opacity 0.2s ease-out !important;
@@ -367,7 +367,19 @@
         backdrop-filter: blur(5px) !important;
     }
     
-    .hidden .group:hover .quick-menu-dropdown {
+    /* Hover alanını genişletmek için invisible padding */
+    .hidden .quick-menu-dropdown::before {
+        content: '' !important;
+        position: absolute !important;
+        top: -10px !important;
+        left: -10px !important;
+        right: -10px !important;
+        bottom: -10px !important;
+        z-index: -1 !important;
+    }
+    
+    .hidden .group:hover .quick-menu-dropdown,
+    .hidden .group .quick-menu-dropdown:hover {
         display: block !important;
         transform: translateY(0) !important;
         opacity: 1 !important;
@@ -375,7 +387,12 @@
     }
     
     .hidden .group .quick-menu-dropdown {
-        transition-delay: 600ms !important;
+        transition-delay: 800ms !important;
+    }
+    
+    /* Dropdown'a hover edildiğinde gecikmesiz görünür kal */
+    .hidden .group .quick-menu-dropdown:hover {
+        transition-delay: 0ms !important;
     }
     
     .quick-menu-dropdown .py-2 {

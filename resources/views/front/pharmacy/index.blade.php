@@ -106,6 +106,25 @@
         color: var(--secondary-color);
     }
     
+    .address-link {
+        color: #374151;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        display: inline-block;
+        position: relative;
+    }
+    
+    .address-link:hover {
+        color: var(--primary-color);
+        text-decoration: none;
+        transform: translateX(2px);
+    }
+    
+    .address-link:hover .fas.fa-external-link-alt {
+        opacity: 1;
+        color: var(--secondary-color);
+    }
+    
     .no-results {
         text-align: center;
         padding: 3rem 2rem;
@@ -239,7 +258,13 @@
                         @if($pharmacy['address'])
                             <div class="info-item">
                                 <i class="fas fa-home info-icon"></i>
-                                <span class="info-text">{{ $pharmacy['address'] }}</span>
+                                <a href="https://www.google.com/maps/search/{{ urlencode($pharmacy['address'] . ', ' . $pharmacy['district'] . ', Ankara') }}" 
+                                   target="_blank" 
+                                   class="info-text address-link"
+                                   title="Google Haritalar'da görüntüle">
+                                    {{ $pharmacy['address'] }}
+                                    <i class="fas fa-external-link-alt" style="font-size: 0.8rem; margin-left: 0.5rem; opacity: 0.7;"></i>
+                                </a>
                             </div>
                         @endif
                     </div>

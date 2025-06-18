@@ -518,8 +518,8 @@ p {
 .quick-menu-dropdown {
     position: absolute;
     top: 100%;
-    left: 0;
-    width: 200px;
+    left: 4px;
+    width: calc(100% - 8px);
     background-color: white;
     border-radius: 0 0 8px 8px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
@@ -527,16 +527,48 @@ p {
     visibility: hidden;
     transform: translateY(10px);
     transition: all 0.3s ease;
-    transition-delay: 600ms;
+    transition-delay: 800ms;
     z-index: 59;
     border-bottom: 2px solid #004d2e;
 }
 
-.group:hover .quick-menu-dropdown {
+.group:hover .quick-menu-dropdown,
+.quick-menu-dropdown:hover {
     opacity: 1;
     visibility: visible;
     transform: translateY(0);
     transition-delay: 0ms;
+}
+
+/* Dropdown'a hover edildiğinde gecikmesiz görünür kal */
+.quick-menu-dropdown:hover {
+    transition-delay: 0ms !important;
+}
+
+/* Hover alanını genişletmek için invisible padding */
+.quick-menu-dropdown::before {
+    content: '';
+    position: absolute;
+    top: -10px;
+    left: -10px;
+    right: -10px;
+    bottom: -10px;
+    z-index: -1;
+}
+
+/* Ana menü grubu için hover alanı genişletme */
+.quick-menu-section .group {
+    position: relative;
+}
+
+.quick-menu-section .group::after {
+    content: '';
+    position: absolute;
+    top: -5px;
+    left: -5px;
+    right: -5px;
+    bottom: -5px;
+    z-index: -1;
 }
 
 .quick-menu-dropdown a {
@@ -571,10 +603,11 @@ p {
     overflow: hidden;
     transform: translateY(20px);
     transition: all 0.3s ease;
-    transition-delay: 600ms;
+    transition-delay: 800ms;
 }
 
-.group:hover .quick-menu-dropdown {
+.group:hover .quick-menu-dropdown,
+.quick-menu-dropdown:hover {
     opacity: 1;
     visibility: visible;
     transform: translateY(0);
