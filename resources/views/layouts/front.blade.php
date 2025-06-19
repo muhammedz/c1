@@ -45,6 +45,9 @@
     <!-- Ana CSS -->
     <link href="{{ asset('assets/css/styles.css') }}" rel="stylesheet">
     
+    <!-- Preloader CSS -->
+    <link href="{{ asset('css/preloader.css') }}" rel="stylesheet">
+    
     <!-- Swiper CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
     
@@ -67,6 +70,13 @@
 </head>
 
 <body class="bg-slate-100 overflow-x-hidden">
+    <!-- Preloader -->
+    <div id="preloader">
+        <div class="preloader-content">
+            <div class="preloader-spinner"></div>
+        </div>
+    </div>
+
     <!-- Header Alanı -->
     @include('partials.header')
     
@@ -86,6 +96,9 @@
     
     <!-- JavaScript Dosyaları -->
     @yield('before_scripts')
+    
+    <!-- Preloader JS -->
+    <script src="{{ asset('js/preloader.js') }}"></script>
     
     <!-- Ana JS -->
     <script src="{{ asset('assets/js/script.js') }}"></script>
