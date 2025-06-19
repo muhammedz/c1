@@ -72,6 +72,7 @@ class StoreNewsRequest extends FormRequest
             'meta_description' => 'nullable|string',
             'gallery' => 'nullable|array',
             'gallery.*' => 'string',
+            'filemanagersystem_gallery' => 'nullable|json',
             'is_headline' => 'nullable|boolean',
             'is_featured' => 'nullable|boolean',
             'tags' => 'nullable|string',

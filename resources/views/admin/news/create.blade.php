@@ -765,6 +765,86 @@
                                 </div>
                             </div>
                         </div>
+                        
+                        <!-- Fotoğraf Galerisi -->
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-images me-2"></i>
+                                    Fotoğraf Galerisi
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <small class="text-muted">
+                                        <i class="fas fa-info-circle me-1"></i>
+                                        Habere ait fotoğraf galerisini oluşturmak için birden fazla resim yükleyebilirsiniz. 
+                                        Resimler otomatik olarak dosya yönetim sistemine kaydedilecektir.
+                                    </small>
+                                </div>
+                                
+                                <!-- Toplu Resim Yükleme Alanı -->
+                                <div class="gallery-upload-area" id="gallery-upload-area">
+                                    <div class="upload-dropzone" id="gallery-dropzone">
+                                        <div class="dropzone-content text-center">
+                                            <i class="fas fa-cloud-upload-alt fa-3x text-muted mb-3"></i>
+                                            <h5>Resimleri Buraya Sürükleyin</h5>
+                                            <p class="text-muted">veya tıklayarak seçin</p>
+                                            <button type="button" class="btn btn-primary" id="select-gallery-files">
+                                                <i class="fas fa-images me-1"></i>
+                                                Resim Seç
+                                            </button>
+                                            <input type="file" id="gallery-file-input" multiple accept="image/*" style="display: none;">
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Yükleme Progress Bar -->
+                                <div class="upload-progress mt-3" id="gallery-upload-progress" style="display: none;">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <small class="text-muted">Yükleniyor...</small>
+                                        <small class="text-muted" id="upload-status">0/0</small>
+                                    </div>
+                                    <div class="progress">
+                                        <div class="progress-bar progress-bar-striped progress-bar-animated" 
+                                             role="progressbar" 
+                                             style="width: 0%" 
+                                             id="gallery-progress-bar"></div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Galeri Önizleme -->
+                                <div class="gallery-preview mt-4" id="gallery-preview" style="display: none;">
+                                    <h6 class="mb-3">
+                                        <i class="fas fa-eye me-1"></i>
+                                        Galeri Önizleme
+                                        <span class="badge bg-primary ms-2" id="gallery-count">0</span>
+                                    </h6>
+                                    
+                                    <div class="gallery-grid" id="gallery-grid">
+                                        <!-- Galeri resimleri buraya dinamik olarak eklenecek -->
+                                    </div>
+                                    
+                                    <div class="gallery-actions mt-3">
+                                        <button type="button" class="btn btn-outline-secondary btn-sm" id="clear-gallery">
+                                            <i class="fas fa-trash me-1"></i>
+                                            Tümünü Temizle
+                                        </button>
+                                        <button type="button" class="btn btn-outline-primary btn-sm" id="add-more-images">
+                                            <i class="fas fa-plus me-1"></i>
+                                            Daha Fazla Ekle
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <!-- Hidden Input for Gallery Data -->
+                                <input type="hidden" name="filemanagersystem_gallery" id="filemanagersystem_gallery" value="{{ old('filemanagersystem_gallery', '[]') }}">
+                                
+                                @error('filemanagersystem_gallery')
+                                    <div class="invalid-feedback d-block">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
                     </div>
                     
             <div class="col-lg-4">
@@ -1634,8 +1714,473 @@
     }
 
     // ===== BELGE YÖNETİMİ BİTİŞ =====
+    
+    // ===== GALERİ YÖNETİMİ BAŞLANGIÇ =====
+    
+    let galleryImages = [];
+    
+    // Dosya seçimi
+    $('#select-gallery-files, #add-more-images').on('click', function() {
+        $('#gallery-file-input').click();
+    });
+    
+    // Drag & Drop olayları
+    $('#gallery-dropzone').on('dragover', function(e) {
+        e.preventDefault();
+        $(this).addClass('dragover');
+    });
+    
+    $('#gallery-dropzone').on('dragleave', function(e) {
+        e.preventDefault();
+        $(this).removeClass('dragover');
+    });
+    
+    $('#gallery-dropzone').on('drop', function(e) {
+        e.preventDefault();
+        $(this).removeClass('dragover');
+        
+        const files = e.originalEvent.dataTransfer.files;
+        handleGalleryFiles(files);
+    });
+    
+    // Dosya input değişimi
+    $('#gallery-file-input').on('change', function() {
+        const files = this.files;
+        handleGalleryFiles(files);
+    });
+    
+    // Dosyaları işleme fonksiyonu
+    function handleGalleryFiles(files) {
+        const validFiles = [];
+        
+        // Dosya türü kontrolü
+        for (let i = 0; i < files.length; i++) {
+            const file = files[i];
+            if (file.type.startsWith('image/')) {
+                validFiles.push(file);
+            } else {
+                alert(file.name + ' dosyası resim formatında değil. Lütfen sadece resim dosyası seçin.');
+            }
+        }
+        
+        if (validFiles.length > 0) {
+            uploadGalleryImages(validFiles);
+        }
+    }
+    
+    // Galeri resimlerini yükleme
+    function uploadGalleryImages(files) {
+        console.log('Galeri yükleme başlıyor, dosya sayısı:', files.length);
+        
+        const formData = new FormData();
+        
+        // Dosyaları FormData'ya ekle
+        for (let i = 0; i < files.length; i++) {
+            formData.append('files[]', files[i]);
+            console.log('Dosya eklendi:', files[i].name, 'Boyut:', files[i].size);
+        }
+        
+        // CSRF token ekle
+        formData.append('_token', $('meta[name="csrf-token"]').attr('content'));
+        formData.append('folder_id', ''); // Boş bırak, otomatik klasörleme yapılacak
+        formData.append('is_public', '1');
+        
+        // Progress bar göster ve sıfırla
+        $('#gallery-upload-progress').show();
+        $('#gallery-progress-bar').css('width', '0%');
+        $('#upload-status').text('0/' + files.length);
+        
+        // Upload butonunu devre dışı bırak
+        $('#select-gallery-files').prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-1"></i>Yükleniyor...');
+        
+        $.ajax({
+            url: '{{ route("admin.filemanagersystem.media.store") }}',
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            timeout: 300000, // 5 dakika timeout
+            xhr: function() {
+                const xhr = new window.XMLHttpRequest();
+                xhr.upload.addEventListener('progress', function(e) {
+                    if (e.lengthComputable) {
+                        const percentComplete = (e.loaded / e.total) * 100;
+                        console.log('Upload progress:', percentComplete + '%');
+                        $('#gallery-progress-bar').css('width', percentComplete + '%');
+                        $('#upload-status').text('Yükleniyor... ' + Math.round(percentComplete) + '%');
+                    }
+                });
+                return xhr;
+            },
+            beforeSend: function() {
+                console.log('AJAX isteği başlıyor...');
+            },
+            success: function(response) {
+                console.log('Galeri yükleme başarılı:', response);
+                
+                // Progress bar'ı %100 yap
+                $('#gallery-progress-bar').css('width', '100%');
+                $('#upload-status').text('Tamamlandı!');
+                
+                if (response.success && response.uploaded_files) {
+                    // Yüklenen dosyaları galeri listesine ekle
+                    response.uploaded_files.forEach(function(file) {
+                        addImageToGallery(file);
+                    });
+                    
+                    updateGalleryDisplay();
+                    
+                    // Başarı mesajı
+                    showGalleryMessage('success', response.uploaded_files.length + ' resim başarıyla yüklendi.');
+                    
+                    // 2 saniye sonra progress bar'ı gizle
+                    setTimeout(function() {
+                        $('#gallery-upload-progress').hide();
+                    }, 2000);
+                } else {
+                    $('#gallery-upload-progress').hide();
+                    showGalleryMessage('error', 'Resim yükleme sırasında bir hata oluştu.');
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('Galeri yükleme hatası:', error);
+                console.error('XHR Status:', status);
+                console.error('Response:', xhr.responseText);
+                
+                $('#gallery-upload-progress').hide();
+                
+                let errorMessage = 'Resim yükleme sırasında bir hata oluştu.';
+                if (xhr.responseJSON && xhr.responseJSON.message) {
+                    errorMessage = xhr.responseJSON.message;
+                } else if (xhr.status === 413) {
+                    errorMessage = 'Dosya boyutu çok büyük. Lütfen daha küçük dosyalar seçin.';
+                } else if (xhr.status === 422) {
+                    errorMessage = 'Dosya formatı desteklenmiyor. Lütfen sadece resim dosyası seçin.';
+                } else if (xhr.status === 500) {
+                    errorMessage = 'Sunucu hatası. Lütfen daha sonra tekrar deneyin.';
+                }
+                
+                showGalleryMessage('error', errorMessage);
+            },
+            complete: function() {
+                console.log('AJAX isteği tamamlandı.');
+                // Upload butonunu tekrar aktif et
+                $('#select-gallery-files').prop('disabled', false).html('<i class="fas fa-images me-1"></i>Resim Seç');
+            }
+        });
+    }
+    
+    // Resmi galeriye ekleme
+    function addImageToGallery(imageData) {
+        galleryImages.push({
+            id: imageData.id,
+            url: imageData.url,
+            name: imageData.name || imageData.original_name,
+            size: imageData.size,
+            order: galleryImages.length
+        });
+    }
+    
+    // Galeri görünümünü güncelleme
+    function updateGalleryDisplay() {
+        console.log('updateGalleryDisplay çağrıldı, galleryImages:', galleryImages);
+        
+        const galleryGrid = $('#gallery-grid');
+        console.log('Gallery grid elementi:', galleryGrid.length);
+        
+        galleryGrid.empty();
+        
+        if (galleryImages.length === 0) {
+            console.log('Galeri boş, gizleniyor');
+            $('#gallery-preview').hide();
+            return;
+        }
+        
+        console.log('Galeri gösteriliyor, resim sayısı:', galleryImages.length);
+        $('#gallery-preview').show();
+        $('#gallery-count').text(galleryImages.length);
+        
+        galleryImages.forEach(function(image, index) {
+            console.log(`Resim ${index} ekleniyor:`, image);
+            
+            const imageItem = $(`
+                <div class="gallery-item" data-index="${index}">
+                    <div class="gallery-image">
+                        <img src="${image.url}" alt="${image.name}" loading="lazy">
+                        <div class="gallery-overlay">
+                            <button type="button" class="btn btn-sm btn-danger remove-gallery-image" data-index="${index}">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                            <button type="button" class="btn btn-sm btn-primary move-up" data-index="${index}" ${index === 0 ? 'disabled' : ''}>
+                                <i class="fas fa-arrow-up"></i>
+                            </button>
+                            <button type="button" class="btn btn-sm btn-primary move-down" data-index="${index}" ${index === galleryImages.length - 1 ? 'disabled' : ''}>
+                                <i class="fas fa-arrow-down"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="gallery-info">
+                        <small class="text-muted">${image.name}</small>
+                    </div>
+                </div>
+            `);
+            
+            console.log('ImageItem DOM elementi:', imageItem);
+            galleryGrid.append(imageItem);
+            console.log('Grid\'e eklendi');
+        });
+        
+        // Hidden input'u güncelle
+        $('#filemanagersystem_gallery').val(JSON.stringify(galleryImages));
+    }
+    
+    // Galeri resmi silme
+    $(document).on('click', '.remove-gallery-image', function() {
+        const index = parseInt($(this).data('index'));
+        galleryImages.splice(index, 1);
+        
+        // Order değerlerini yeniden düzenle
+        galleryImages.forEach(function(image, newIndex) {
+            image.order = newIndex;
+        });
+        
+        updateGalleryDisplay();
+        showGalleryMessage('info', 'Resim galeriden kaldırıldı.');
+    });
+    
+    // Resim sıralama - yukarı
+    $(document).on('click', '.move-up', function() {
+        const index = parseInt($(this).data('index'));
+        if (index > 0) {
+            const temp = galleryImages[index];
+            galleryImages[index] = galleryImages[index - 1];
+            galleryImages[index - 1] = temp;
+            
+            updateGalleryDisplay();
+        }
+    });
+    
+    // Resim sıralama - aşağı
+    $(document).on('click', '.move-down', function() {
+        const index = parseInt($(this).data('index'));
+        if (index < galleryImages.length - 1) {
+            const temp = galleryImages[index];
+            galleryImages[index] = galleryImages[index + 1];
+            galleryImages[index + 1] = temp;
+            
+            updateGalleryDisplay();
+        }
+    });
+    
+    // Tüm galeriyi temizleme
+    $('#clear-gallery').on('click', function() {
+        if (confirm('Tüm galeri resimlerini kaldırmak istediğinizden emin misiniz?')) {
+            galleryImages = [];
+            updateGalleryDisplay();
+            showGalleryMessage('info', 'Galeri temizlendi.');
+        }
+    });
+    
+    // Galeri mesajları
+    function showGalleryMessage(type, message) {
+        console.log('Galeri mesajı gösteriliyor:', type, message);
+        
+        const alertClass = type === 'success' ? 'alert-success' : 
+                          type === 'error' ? 'alert-danger' : 'alert-info';
+        
+        const iconClass = type === 'success' ? 'fas fa-check-circle' : 
+                         type === 'error' ? 'fas fa-exclamation-triangle' : 'fas fa-info-circle';
+        
+        const messageDiv = $(`
+            <div class="alert ${alertClass} alert-dismissible fade show mt-2" role="alert">
+                <i class="${iconClass} me-2"></i>
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Kapat"></button>
+            </div>
+        `);
+        
+        // Önceki mesajları temizle
+        $('.alert').remove();
+        
+        // Galeri alanının üzerine ekle
+        $('#gallery-upload-area').after(messageDiv);
+        
+        // 8 saniye sonra otomatik kaldır (başarı mesajları için daha uzun süre)
+        const timeout = type === 'success' ? 8000 : 6000;
+        setTimeout(function() {
+            messageDiv.fadeOut(function() {
+                $(this).remove();
+            });
+        }, timeout);
+    }
+    
+    // Sayfa yüklendiğinde mevcut galeri verilerini yükle
+    const existingGallery = $('#filemanagersystem_gallery').val();
+    if (existingGallery && existingGallery !== '[]') {
+        try {
+            galleryImages = JSON.parse(existingGallery);
+            updateGalleryDisplay();
+        } catch (e) {
+            console.error('Mevcut galeri verileri parse edilemedi:', e);
+        }
+    }
+    
+    // ===== GALERİ YÖNETİMİ BİTİŞ =====
 });
 </script>
+
+<!-- Galeri CSS Stilleri -->
+<style>
+.gallery-upload-area {
+    margin-bottom: 1rem;
+}
+
+.upload-dropzone {
+    border: 2px dashed #dee2e6;
+    border-radius: 8px;
+    padding: 2rem;
+    text-align: center;
+    transition: all 0.3s ease;
+    background-color: #f8f9fa;
+}
+
+.upload-dropzone:hover,
+.upload-dropzone.dragover {
+    border-color: #007bff;
+    background-color: #e3f2fd;
+}
+
+.gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.gallery-item {
+    position: relative;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    overflow: hidden;
+    background: white;
+}
+
+.gallery-image {
+    position: relative;
+    aspect-ratio: 16/9;
+    overflow: hidden;
+}
+
+.gallery-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.gallery-item:hover .gallery-image img {
+    transform: scale(1.05);
+}
+
+.gallery-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.gallery-item:hover .gallery-overlay {
+    opacity: 1;
+}
+
+.gallery-overlay .btn {
+    border-radius: 50%;
+    width: 35px;
+    height: 35px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.gallery-info {
+    padding: 0.5rem;
+    text-align: center;
+}
+
+.gallery-info small {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Progress bar stilleri */
+.upload-progress {
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+    padding: 15px;
+    margin-top: 15px;
+}
+
+.upload-progress .progress {
+    height: 12px;
+    border-radius: 6px;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,.1);
+}
+
+.upload-progress .progress-bar {
+    background: linear-gradient(45deg, #007bff, #0056b3);
+    transition: width 0.3s ease;
+}
+
+/* Alert mesajları */
+.alert {
+    border-radius: 8px;
+    border: none;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.alert-success {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.alert-danger {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+.alert-info {
+    background-color: #d1ecf1;
+    color: #0c5460;
+}
+
+/* Responsive tasarım */
+@media (max-width: 768px) {
+    .gallery-grid {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 0.5rem;
+    }
+    
+    .upload-dropzone {
+        padding: 1.5rem 1rem;
+    }
+    
+    .gallery-overlay .btn {
+        width: 30px;
+        height: 30px;
+    }
+}
+</style>
 
 <!-- MediaPicker Modal -->
 <div class="modal fade" id="mediapickerModal" tabindex="-1" role="dialog" aria-labelledby="mediapickerModalLabel" aria-hidden="true">

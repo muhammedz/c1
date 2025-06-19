@@ -4,7 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Site Şifre Koruması</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+    // Tailwind CDN uyarısını bastır
+    const originalWarn = console.warn;
+    console.warn = function(...args) {
+        const message = args.join(' ');
+        if (message.includes('cdn.tailwindcss.com should not be used in production')) {
+            return; // Bu uyarıyı gösterme
+        }
+        originalWarn.apply(console, args);
+    };
+</script>
+<script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <style>
         body {

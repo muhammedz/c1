@@ -620,7 +620,6 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('Quick menu script loaded');
     
     // Desktop hover functionality - basit CSS hover kullanıyoruz, JavaScript'e gerek yok
     
@@ -630,13 +629,11 @@ document.addEventListener('DOMContentLoaded', function() {
         const mobileContainer = quickMenuSection.querySelector('.md\\:hidden');
         if (mobileContainer) {
             const mobileGroups = mobileContainer.querySelectorAll('.group');
-            console.log('Mobile groups found:', mobileGroups.length);
             
             mobileGroups.forEach((group, index) => {
                 const link = group.querySelector('a');
                 
                 if (link) {
-                    console.log(`Mobile Group ${index} found with link`);
                     
                     // Çakışmayı önlemek için event'i sadece bir kez ekle
                     if (!link.hasAttribute('data-quick-menu-handled')) {
@@ -645,7 +642,6 @@ document.addEventListener('DOMContentLoaded', function() {
                         link.addEventListener('click', function(e) {
                             e.preventDefault();
                             e.stopPropagation();
-                            console.log(`Quick menu clicked: ${index}`);
                             
                             // Diğer tüm açık olan menüleri kapat
                             mobileGroups.forEach(otherGroup => {
@@ -657,12 +653,11 @@ document.addEventListener('DOMContentLoaded', function() {
                             // Bu menüyü aç/kapat
                             const wasActive = group.classList.contains('active');
                             group.classList.toggle('active');
-                            console.log(`Quick menu ${index} toggled to:`, !wasActive);
                         });
                         
                         // Touch event de ekle
                         link.addEventListener('touchstart', function(e) {
-                            console.log(`Quick menu touched: ${index}`);
+                            // Touch event handling
                         });
                     }
                 }

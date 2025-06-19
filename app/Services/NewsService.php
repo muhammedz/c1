@@ -86,8 +86,17 @@ class NewsService
             }
             
             // Galeri ilişkilerini kur
-            if (!empty($data['filemanagersystem_gallery']) && is_array($data['filemanagersystem_gallery'])) {
-                $this->createGalleryMediaRelations($news, $data['filemanagersystem_gallery']);
+            if (!empty($data['filemanagersystem_gallery'])) {
+                $galleryData = $data['filemanagersystem_gallery'];
+                
+                // JSON string ise decode et
+                if (is_string($galleryData)) {
+                    $galleryData = json_decode($galleryData, true);
+                }
+                
+                if (is_array($galleryData) && !empty($galleryData)) {
+                    $this->createGalleryMediaRelations($news, $galleryData);
+                }
             }
             
             DB::commit();
@@ -205,8 +214,17 @@ class NewsService
             }
             
             // Galeri ilişkilerini güncelle
-            if (!empty($data['filemanagersystem_gallery']) && is_array($data['filemanagersystem_gallery'])) {
-                $this->updateGalleryMediaRelations($news, $data['filemanagersystem_gallery']);
+            if (!empty($data['filemanagersystem_gallery'])) {
+                $galleryData = $data['filemanagersystem_gallery'];
+                
+                // JSON string ise decode et
+                if (is_string($galleryData)) {
+                    $galleryData = json_decode($galleryData, true);
+                }
+                
+                if (is_array($galleryData) && !empty($galleryData)) {
+                    $this->updateGalleryMediaRelations($news, $galleryData);
+                }
             }
             
             DB::commit();

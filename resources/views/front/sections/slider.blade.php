@@ -204,7 +204,6 @@
                 },
                 on: {
                     init: function() {
-                        console.log("Slider başlatıldı!"); // Debug için konsola log eklendi
                         // İlk slide'ın içeriğini animasyonla göster
                         let activeSlide = document.querySelector('.swiper-slide-active');
                         if (activeSlide) {
@@ -218,7 +217,6 @@
                         }
                     },
                     slideChange: function() {
-                        console.log("Slide değişti!"); // Debug için konsola log eklendi
                         // Görüntülenen slide'ın içeriğini animasyonla göster
                         let slides = document.querySelectorAll('.swiper-slide');
                         slides.forEach(slide => {

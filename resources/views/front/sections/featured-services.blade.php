@@ -420,8 +420,6 @@
                 
                 prevBtn.style.opacity = currentIndex === 0 ? '0.5' : '1';
                 nextBtn.style.opacity = currentIndex >= maxIndex ? '0.5' : '1';
-                
-                console.log(`Slide: ${currentIndex + 1}/${maxIndex + 1}, Görünür: ${visibleSlides}, Toplam: ${totalSlides}`);
             }
             
             function nextSlide() {
@@ -480,9 +478,6 @@
             
             // İlk yükleme
             updateSlider();
-            
-            console.log('Featured Services Slider başlatıldı');
-            console.log(`Toplam slide: ${totalSlides}, Görünür: ${visibleSlides}, Max index: ${maxIndex}`);
         });
     </script>
 </section>

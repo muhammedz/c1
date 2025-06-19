@@ -670,8 +670,6 @@ input[name="project-category"] {
         
         // Korumayı yeniden uygula
         setTimeout(protectProjectsSection, 10);
-        
-        console.log('Kategori değiştirildi:', selectedCategory);
     }
     
     // Event listener'ları kurma fonksiyonu
@@ -724,13 +722,9 @@ input[name="project-category"] {
                     const slides = activePanel.querySelectorAll('.project-slide');
                     const currentSlide = activePanel.querySelector('.project-slide:not(.hidden)');
                     
-                    console.log('Prev button clicked, slides found:', slides.length);
-                    
                     if (currentSlide && slides.length > 1) {
                         const currentIndex = parseInt(currentSlide.dataset.slideIndex) || 0;
                         const newIndex = (currentIndex - 1 + slides.length) % slides.length;
-                        
-                        console.log('Current index:', currentIndex, 'New index:', newIndex);
                 
                 // Tüm slide'ları gizle
                         slides.forEach(function(slide, idx) {
@@ -767,13 +761,9 @@ input[name="project-category"] {
                     const slides = activePanel.querySelectorAll('.project-slide');
                     const currentSlide = activePanel.querySelector('.project-slide:not(.hidden)');
                     
-                    console.log('Next button clicked, slides found:', slides.length);
-                    
                     if (currentSlide && slides.length > 1) {
                         const currentIndex = parseInt(currentSlide.dataset.slideIndex) || 0;
                         const newIndex = (currentIndex + 1) % slides.length;
-                        
-                        console.log('Current index:', currentIndex, 'New index:', newIndex);
                 
                 // Tüm slide'ları gizle
                         slides.forEach(function(slide, idx) {
@@ -905,7 +895,6 @@ input[name="project-category"] {
         }
         
         isInitialized = true;
-        console.log('Projeler bölümü tamamen izole edildi ve korunmaya alındı');
         
         // İlk kategoriyi seç
         setTimeout(function() {

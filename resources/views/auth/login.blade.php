@@ -2,7 +2,18 @@
 
 @section('adminlte_css_pre')
     <link rel="stylesheet" href="{{ asset('vendor/icheck-bootstrap/icheck-bootstrap.min.css') }}">
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+    // Tailwind CDN uyarısını bastır
+    const originalWarn = console.warn;
+    console.warn = function(...args) {
+        const message = args.join(' ');
+        if (message.includes('cdn.tailwindcss.com should not be used in production')) {
+            return; // Bu uyarıyı gösterme
+        }
+        originalWarn.apply(console, args);
+    };
+</script>
+<script src="https://cdn.tailwindcss.com"></script>
     <style>
         .login-page {
             min-height: 100vh;

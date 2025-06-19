@@ -37,56 +37,89 @@
         // Hero Slider inicializasyonu slider.blade.php dosyasının içinde yapılıyor.
         // Çakışma olmaması için buradan kaldırıldı.
 
-        // News Thumbs Swiper önce başlatılmalı
-        var newsThumbsSwiper = new Swiper(".newsThumbsSwiper", {
-            slidesPerView: 2,
-            grid: {
-                rows: 2,
-            },
-            spaceBetween: 4,
-            navigation: {
-                nextEl: '.news-next-btn',
-                prevEl: '.news-prev-btn',
-            },
-            breakpoints: {
-                768: {
-                    spaceBetween: 10,
-                }
-            },
-        });
-
-        // Haber Slider Inicializasyonu
+        // Haber Slider Inicializasyonu - Sadece ana slider
         var newsMainSwiper = new Swiper(".newsMainSwiper", {
-            loop: true,
+            loop: false,
             autoplay: {
                 delay: 5000,
                 disableOnInteraction: false,
             },
-            thumbs: {
-                swiper: newsThumbsSwiper
+            effect: 'fade',
+            fadeEffect: {
+                crossFade: true
+            },
+            on: {
+                slideChange: function() {
+                    console.log('Main slide changed to index:', this.activeIndex);
+                    updateActiveCard(this.activeIndex);
+                }
             }
         });
 
-        // Etkinlikler Timeline Slider Inicializasyonu
-        var timelineSwiper = new Swiper(".timelineSwiper", {
-            slidesPerView: 1,
-            spaceBetween: 20,
-            navigation: {
-                nextEl: '.timeline-next',
-                prevEl: '.timeline-prev',
-            },
-            breakpoints: {
-                640: {
-                    slidesPerView: 1,
-                },
-                768: {
-                    slidesPerView: 2,
-                },
-                1024: {
-                    slidesPerView: 3,
-                },
-            },
+        // Aktif kart styling fonksiyonu
+        function updateActiveCard(activeIndex) {
+            const cards = document.querySelectorAll('.news-card');
+            cards.forEach((card, index) => {
+                const cardLink = card.querySelector('a') || card.querySelector('div');
+                const title = cardLink.querySelector('h3');
+                if (index === activeIndex) {
+                    cardLink.classList.remove('bg-white', 'hover:bg-gray-50');
+                    cardLink.classList.add('bg-[#004d2e]', 'hover:brightness-90');
+                    title.classList.remove('text-gray-800');
+                    title.classList.add('text-white');
+                    card.classList.add('active');
+                } else {
+                    cardLink.classList.remove('bg-[#004d2e]', 'hover:brightness-90');
+                    cardLink.classList.add('bg-white', 'hover:bg-gray-50');
+                    title.classList.remove('text-white');
+                    title.classList.add('text-gray-800');
+                    card.classList.remove('active');
+                }
+            });
+        }
+
+        // İlk yüklemede aktif kartı güncelle
+        updateActiveCard(0);
+
+        // Haber kartlarına tıklama olayı ekle
+        document.querySelectorAll('.news-card').forEach((card, index) => {
+            card.addEventListener('click', function(e) {
+                if (!e.target.closest('a')) { // Eğer link değilse
+                    e.preventDefault();
+                    newsMainSwiper.slideTo(index);
+                    updateActiveCard(index);
+                }
+            });
         });
+
+        // Navigation butonlarına event delegation ile event listener ekle
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('.news-next-btn')) {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('Next button clicked'); // Debug
+                if (newsMainSwiper) {
+                    const currentIndex = newsMainSwiper.activeIndex;
+                    const nextIndex = Math.min(currentIndex + 1, newsMainSwiper.slides.length - 1);
+                    newsMainSwiper.slideTo(nextIndex);
+                    updateActiveCard(nextIndex);
+                }
+            }
+            
+            if (e.target.closest('.news-prev-btn')) {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('Prev button clicked'); // Debug
+                if (newsMainSwiper) {
+                    const currentIndex = newsMainSwiper.activeIndex;
+                    const prevIndex = Math.max(currentIndex - 1, 0);
+                    newsMainSwiper.slideTo(prevIndex);
+                    updateActiveCard(prevIndex);
+                }
+            }
+        });
+
+        // Etkinlikler Timeline Slider Inicializasyonu script.js dosyasında yapılıyor
 
 
 

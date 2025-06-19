@@ -14,7 +14,7 @@
                 </div>
 
                 <!-- Desktop Menü -->
-                <div class="hidden md:flex items-center h-full space-x-1">
+                <div class="hidden lg:flex items-center h-full space-x-1">
                     @if(isset($mainMenuItems) && $mainMenuItems->count() > 0)
                         @foreach($mainMenuItems as $menu)
                             @if($menu->type == 1)
@@ -195,19 +195,19 @@
                 <!-- Arama İkonu, Slogan ve Atatürk Simgesi -->
                 <div class="flex items-center md:space-x-4 space-x-2">
                     <!-- Arama butonu - sadece desktop'ta görünür -->
-                    <button id="searchButton" class="hidden md:flex w-11 h-11 bg-[#007b32] rounded-full items-center justify-center text-white shadow-md hover:bg-[#00352b] hover:scale-105 transition-all">
+                    <button id="searchButton" class="hidden lg:flex w-11 h-11 bg-[#007b32] rounded-full items-center justify-center text-white shadow-md hover:bg-[#00352b] hover:scale-105 transition-all">
                         <i class="fas fa-search text-white text-xl"></i>
                     </button>
                     
                     <!-- Slogan - sadece desktop'ta görünür -->
-                    <div class="text-md text-[#00352b] font-bold hidden md:block">
+                    <div class="text-md text-[#00352b] font-bold hidden lg:block">
                         <img src="{{ asset('images/slogan.png') }}" alt="Çankaya Belediyesi Slogan" class="h-12">
                     </div>
                     
-                    <!-- Mobil Menü Butonu - sadece mobilde görünür -->
-                    <button class="md:hidden flex items-center justify-center bg-gray-100 rounded-md p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-200 focus:outline-none transition-all"
+                    <!-- Mobil + Tablet Menü Butonu - desktop hariç her yerde görünür -->
+                    <button class="lg:hidden"
                         id="mobileMenuButton">
-                        <i class="fas fa-bars"></i>
+                        <span style="font-size: 18px; line-height: 1; display: inline-block;">☰</span>
                     </button>
                     
                     <!-- Atatürk simgesi - her zaman görünür, mobilde menünün sağında -->
@@ -502,6 +502,124 @@
             }
         }
 
+        /* Overlay'i varsayılan olarak gizle - tüm boyutlarda */
+        #sideMenuOverlay {
+            display: none !important;
+            z-index: 999999 !important;
+        }
+        
+        /* Menü container'ı varsayılan olarak gizle */
+        #sideMenuContainer {
+            transform: translateX(-100%) !important;
+        }
+        
+        /* Overlay aktif durumu - tüm boyutlarda */
+        #sideMenuOverlay.active {
+            display: block !important;
+            z-index: 999999 !important;
+        }
+        
+        #sideMenuOverlay.active #sideMenuBackdrop {
+            opacity: 1;
+            z-index: 999998 !important;
+        }
+        
+        #sideMenuOverlay.active #sideMenuContainer {
+            transform: translateX(0) !important;
+            z-index: 999999 !important;
+        }
+        
+        /* Quick menu z-index'ini düşür */
+        #quick-menu-section {
+            z-index: 10 !important;
+        }
+        
+        .quick-menu-dropdown {
+            z-index: 11 !important;
+        }
+        
+        .quick-menu-section {
+            z-index: 10 !important;
+        }
+        
+        /* Mobil menü her zaman en üstte */
+        #sideMenuOverlay,
+        #sideMenuOverlay.active,
+        #sideMenuContainer,
+        #sideMenuBackdrop {
+            z-index: 999999 !important;
+            position: fixed !important;
+        }
+        
+        /* Mobil menü butonu tasarımı - SADECE MOBİL VE TABLET */
+        #mobileMenuButton {
+            margin-right: 5px !important;
+            background: linear-gradient(135deg, #f3f4f6, #ffffff) !important;
+            border: 2px solid #e5e7eb !important;
+            border-radius: 8px !important;
+            width: 44px !important;
+            height: 44px !important;
+            min-width: 44px !important;
+            min-height: 44px !important;
+            max-width: 44px !important;
+            max-height: 44px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            transition: all 0.2s ease !important;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+            position: relative !important;
+            padding: 0 !important;
+            outline: none !important;
+            cursor: pointer !important;
+        }
+
+        /* Desktop'ta mobil menü butonunu gizle */
+        @media (min-width: 1024px) {
+            #mobileMenuButton {
+                display: none !important;
+            }
+        }
+        
+        #mobileMenuButton:hover {
+            background: linear-gradient(135deg, #004d2e, #003d24) !important;
+            border-color: #004d2e !important;
+            transform: translateY(-1px) !important;
+            box-shadow: 0 4px 8px rgba(0, 77, 46, 0.2) !important;
+        }
+        
+        #mobileMenuButton:hover i,
+        #mobileMenuButton:hover span {
+            color: white !important;
+        }
+        
+        #mobileMenuButton:active {
+            transform: translateY(0) scale(0.95) !important;
+        }
+        
+        #mobileMenuButton:focus {
+            outline: none !important;
+        }
+        
+        #mobileMenuButton i,
+        #mobileMenuButton span {
+            font-size: 18px !important;
+            color: #374151 !important;
+            transition: color 0.2s ease !important;
+            display: inline-block !important;
+            text-align: center !important;
+            vertical-align: middle !important;
+            width: auto !important;
+            height: auto !important;
+            line-height: 1 !important;
+            font-weight: 900 !important;
+            font-style: normal !important;
+        }
+        
+        #mobileMenuButton i {
+            font-family: "Font Awesome 5 Free" !important;
+        }
+        
         @media (max-width: 768px) {
             .header-section, .head {
                 height: 90px !important;
@@ -509,49 +627,6 @@
             
             .flex.items-center.justify-between {
                 height: 90px !important;
-            }
-            
-            /* Side menu mobil görünüm - Sadece gerekli CSS */
-            #sideMenuOverlay {
-                display: none;
-                z-index: 999999 !important;
-            }
-            
-            #sideMenuOverlay.active {
-                display: block;
-                z-index: 999999 !important;
-            }
-            
-            #sideMenuOverlay.active #sideMenuBackdrop {
-                opacity: 1;
-                z-index: 999998 !important;
-            }
-            
-            #sideMenuOverlay.active #sideMenuContainer {
-                transform: translateX(0);
-                z-index: 999999 !important;
-            }
-            
-            /* Quick menu z-index'ini düşür */
-            #quick-menu-section {
-                z-index: 10 !important;
-            }
-            
-            .quick-menu-dropdown {
-                z-index: 11 !important;
-            }
-            
-            .quick-menu-section {
-                z-index: 10 !important;
-            }
-            
-            /* Mobil menü her zaman en üstte */
-            #sideMenuOverlay,
-            #sideMenuOverlay.active,
-            #sideMenuContainer,
-            #sideMenuBackdrop {
-                z-index: 999999 !important;
-                position: fixed !important;
             }
             
             /* Mobil Atatürk simgesi */
@@ -562,42 +637,6 @@
             
             .text-xl.font-bold.relative.flex.items-end.pb-1.z-10 img {
                 height: 70px; /* Biraz daha büyük */
-            }
-            
-            /* Mobil menü butonu tasarımı */
-            #mobileMenuButton {
-                margin-right: 5px;
-                background: linear-gradient(135deg, #f3f4f6, #ffffff) !important;
-                border: 2px solid #e5e7eb !important;
-                border-radius: 8px !important;
-                width: 44px !important;
-                height: 44px !important;
-                display: flex !important;
-                align-items: center !important;
-                justify-content: center !important;
-                transition: all 0.2s ease !important;
-                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
-            }
-            
-            #mobileMenuButton:hover {
-                background: linear-gradient(135deg, #004d2e, #003d24) !important;
-                border-color: #004d2e !important;
-                transform: translateY(-1px) !important;
-                box-shadow: 0 4px 8px rgba(0, 77, 46, 0.2) !important;
-            }
-            
-            #mobileMenuButton:hover i {
-                color: white !important;
-            }
-            
-            #mobileMenuButton:active {
-                transform: translateY(0) scale(0.95) !important;
-            }
-            
-            #mobileMenuButton i {
-                font-size: 18px !important;
-                color: #374151 !important;
-                transition: color 0.2s ease !important;
             }
         }
     </style>
@@ -773,7 +812,17 @@
                         return;
                     }
                     
+                    if (!this.container) {
+                        return;
+                    }
+                    
+                    // CSS !important kuralını ezmek için inline style kullan
+                    this.overlay.style.setProperty('display', 'block', 'important');
                     this.overlay.classList.add('active');
+                    
+                    // Container'ı da force et
+                    this.container.style.setProperty('transform', 'translateX(0)', 'important');
+                    
                     document.body.classList.add('overflow-hidden');
                     
                     // Quick menu'yu gizle
@@ -792,12 +841,14 @@
                         greenLine.style.zIndex = '1';
                     }
                 } catch (error) {
-                    // Sessizce hata yönetimi
+                    console.error('Menü açma hatası:', error);
                 }
             }
             
             close() {
                 try {
+                    // Overlay'i gizle
+                    this.overlay.style.setProperty('display', 'none', 'important');
                     this.overlay.classList.remove('active');
                     document.body.classList.remove('overflow-hidden');
                     

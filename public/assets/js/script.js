@@ -164,64 +164,7 @@ document.addEventListener('DOMContentLoaded', function () {
 // Mobile Menu Toggle - Bu kod quickmenu.blade.php'de handle ediliyor
 // Çakışmayı önlemek için kaldırıldı
 
-document.addEventListener('DOMContentLoaded', function () {
-    // Thumbs Swiper
-    const newsThumbsSwiper = new Swiper('.newsThumbsSwiper', {
-        slidesPerView: 2,
-        slidesPerColumn: 2,
-        grid: {
-            rows: 2,
-            fill: 'row'
-        },
-        spaceBetween: 24,
-        watchSlidesProgress: true,
-    });
-
-    // Main Swiper
-    const newsMainSwiper = new Swiper('.newsMainSwiper', {
-        effect: 'fade',
-        fadeEffect: {
-            crossFade: true
-        },
-        autoplay: {
-            delay: 5000,
-            disableOnInteraction: false,
-        },
-        thumbs: {
-            swiper: newsThumbsSwiper
-        },
-        navigation: {
-            nextEl: '.news-next-btn',
-            prevEl: '.news-prev-btn',
-        },
-    });
-
-    // Aktif karta özel stil
-    function updateActiveSlide() {
-        const slides = document.querySelectorAll('.newsThumbsSwiper .swiper-slide');
-        slides.forEach((slide, index) => {
-            const card = slide.querySelector('div');
-            const title = card.querySelector('h3');
-            if (index === newsMainSwiper.activeIndex) {
-                card.classList.remove('bg-white', 'hover:bg-gray-50');
-                card.classList.add('bg-[#004d2e]', 'hover:brightness-90', 'rounded-[32px]');
-                title.classList.remove('text-gray-800');
-                title.classList.add('text-white');
-            } else {
-                card.classList.remove('bg-[#004d2e]', 'hover:brightness-90');
-                card.classList.add('bg-white', 'hover:bg-gray-50', 'rounded-[32px]');
-                title.classList.remove('text-white');
-                title.classList.add('text-gray-800');
-            }
-        });
-    }
-
-    // İlk yüklemede aktif kartı güncelle
-    updateActiveSlide();
-
-    // Slide değiştiğinde aktif kartı güncelle
-    newsMainSwiper.on('slideChange', updateActiveSlide);
-});
+// News slider tanımları home.blade.php dosyasında yapılıyor - çakışmayı önlemek için kaldırıldı
 
 document.addEventListener('DOMContentLoaded', function () {
     const servicesSwiper = new Swiper('.servicesSwiper', {
@@ -307,80 +250,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 
-// News Slider
-const newsSwiper = new Swiper('.newsSwiper', {
-    loop: true,
-    autoplay: {
-        delay: 4000,
-        disableOnInteraction: false,
-    },
-    pagination: {
-        el: '.swiper-pagination',
-        clickable: true,
-    },
-    effect: 'fade',
-    fadeEffect: {
-        crossFade: true
-    },
-});
-
-// News Cards Interaction
-const newsCards = document.querySelectorAll('.news-card');
-
-function updateNewsCardStyles(activeCard) {
-    // Tüm kartların stilini sıfırla
-    newsCards.forEach(card => {
-        card.classList.remove('bg-[#004d2e]', 'text-white');
-        card.classList.add('bg-white');
-        const icon = card.querySelector('.material-icons');
-        if (icon) icon.classList.remove('text-white');
-        if (icon) icon.classList.add('text-green-600');
-    });
-
-    // Aktif kartın stilini güncelle
-    activeCard.classList.remove('bg-white');
-    activeCard.classList.add('bg-[#004d2e]', 'text-white');
-    const activeIcon = activeCard.querySelector('.material-icons');
-    if (activeIcon) {
-        activeIcon.classList.remove('text-green-600');
-        activeIcon.classList.add('text-white');
-    }
-}
-
-function findSlideIndexByNewsId(newsId) {
-    const slides = document.querySelectorAll('.newsSwiper .swiper-slide');
-    for (let i = 0; i < slides.length; i++) {
-        if (slides[i].dataset.newsId === newsId) {
-            return i;
-        }
-    }
-    return 0;
-}
-
-newsCards.forEach((card, index) => {
-    card.addEventListener('click', () => {
-        const newsId = card.dataset.newsId;
-        const slideIndex = findSlideIndexByNewsId(newsId);
-
-        // Slider'ı güncelle
-        newsSwiper.slideTo(slideIndex);
-
-        // Kartların stilini güncelle
-        updateNewsCardStyles(card);
-    });
-});
-
-// Slider değiştiğinde kartları güncelle
-newsSwiper.on('slideChange', () => {
-    const activeSlide = document.querySelector('.newsSwiper .swiper-slide-active');
-    if (activeSlide) {
-        const newsId = activeSlide.dataset.newsId;
-        const activeCard = document.querySelector(`.news-card[data-news-id="${newsId}"]`);
-        if (activeCard) {
-            updateNewsCardStyles(activeCard);
-        }
-    }
-});
+// News Slider ve Cards Interaction kodları home.blade.php dosyasında yapılıyor - çakışmayı önlemek için kaldırıldı
 
 // Proje kategorileri ve başlıkları
 const projectCategories = document.querySelectorAll('.project-category');
