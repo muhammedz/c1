@@ -15,7 +15,7 @@ class SettingsController extends Controller
      */
     public function index()
     {
-        $settings = Setting::whereIn('group', ['seo', 'general'])->get()->keyBy('key');
+        $settings = Setting::whereIn('group', ['seo', 'general', 'preloader'])->get()->keyBy('key');
         
         return view('admin.settings.index', compact('settings'));
     }
@@ -163,5 +163,37 @@ class SettingsController extends Controller
             return redirect()->back()
                 ->with('error', 'Favicon silinirken bir hata oluştu: ' . $e->getMessage());
         }
+    }
+
+    /**
+     * Preloader ayarlarını güncelle
+     */
+    public function updatePreloader(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'preloader_enabled' => 'nullable|boolean',
+        ]);
+
+        if ($validator->fails()) {
+            return redirect()->back()
+                ->withErrors($validator)
+                ->withInput();
+        }
+
+        // Preloader aktif/pasif ayarını güncelle veya oluştur
+        Setting::updateOrCreate(
+            ['key' => 'preloader_enabled', 'group' => 'preloader'],
+            [
+                'value' => $request->has('preloader_enabled') ? '1' : '0',
+                'display_name' => 'Preloader Aktif',
+                'type' => 'checkbox',
+                'description' => 'Sayfa yüklenirken preloader gösterilsin mi?',
+                'is_public' => true,
+                'order' => 1
+            ]
+        );
+
+        return redirect()->route('admin.settings.index')
+            ->with('success', 'Preloader ayarları başarıyla güncellendi.');
     }
 } 

@@ -190,6 +190,56 @@
         </div>
     </div>
 
+    <!-- Preloader Ayarları -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card card-warning">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-spinner"></i> Preloader Ayarları
+                    </h3>
+                </div>
+                <form action="{{ route('admin.settings.preloader.update') }}" method="POST">
+                    @csrf
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <div class="custom-control custom-switch">
+                                        <input type="checkbox" 
+                                               class="custom-control-input" 
+                                               id="preloader_enabled" 
+                                               name="preloader_enabled" 
+                                               value="1"
+                                               {{ (isset($settings['preloader_enabled']) && $settings['preloader_enabled']->value == '1') || !isset($settings['preloader_enabled']) ? 'checked' : '' }}>
+                                        <label class="custom-control-label" for="preloader_enabled">
+                                            <strong>Preloader'ı Aktif Et</strong>
+                                        </label>
+                                    </div>
+                                    <small class="form-text text-muted">
+                                        <i class="fas fa-info-circle"></i> 
+                                        Bu seçenek aktif olduğunda sayfa yüklenirken beyaz bir preloader ekranı gösterilir.
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="alert alert-info">
+                            <i class="fas fa-lightbulb"></i>
+                            <strong>Bilgi:</strong> Preloader sayfa yüklenme sürecini kullanıcılara göstermek için kullanılır. 
+                            Çok hızlı bir şekilde (0.05 saniye) gösterilir ve animasyon içermez.
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <button type="submit" class="btn btn-warning">
+                            <i class="fas fa-save"></i> Preloader Ayarlarını Kaydet
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <!-- Gelecekte eklenecek diğer ayar bölümleri için yer -->
     <div class="row">
         <div class="col-12">
@@ -223,6 +273,10 @@
     }
     .card-info .card-header {
         background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+    }
+    .card-warning .card-header {
+        background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);
+        color: #212529;
     }
     .form-control:focus {
         border-color: #28a745;

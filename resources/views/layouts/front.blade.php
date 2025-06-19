@@ -1,3 +1,7 @@
+@php
+    $preloaderEnabled = \App\Models\Setting::get('preloader_enabled', '1');
+@endphp
+
 <!DOCTYPE html>
 <html lang="tr" class="overflow-x-hidden">
 
@@ -45,8 +49,10 @@
     <!-- Ana CSS -->
     <link href="{{ asset('assets/css/styles.css') }}" rel="stylesheet">
     
-    <!-- Preloader CSS -->
-    <link href="{{ asset('css/preloader.css') }}" rel="stylesheet">
+    @if($preloaderEnabled == '1')
+        <!-- Preloader CSS -->
+        <link href="{{ asset('css/preloader.css') }}" rel="stylesheet">
+    @endif
     
     <!-- Swiper CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
@@ -70,9 +76,11 @@
 </head>
 
 <body class="bg-slate-100 overflow-x-hidden">
-    <!-- Preloader -->
-    <div id="preloader">
-    </div>
+    @if($preloaderEnabled == '1')
+        <!-- Preloader -->
+        <div id="preloader">
+        </div>
+    @endif
 
     <!-- Header Alanı -->
     @include('partials.header')
@@ -94,8 +102,10 @@
     <!-- JavaScript Dosyaları -->
     @yield('before_scripts')
     
-    <!-- Preloader JS -->
-    <script src="{{ asset('js/preloader.js') }}"></script>
+    @if($preloaderEnabled == '1')
+        <!-- Preloader JS -->
+        <script src="{{ asset('js/preloader.js') }}"></script>
+    @endif
     
     <!-- Ana JS -->
     <script src="{{ asset('assets/js/script.js') }}"></script>
