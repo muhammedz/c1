@@ -24,13 +24,9 @@ document.addEventListener('DOMContentLoaded', function() {
     function hidePreloader() {
         const preloader = document.getElementById('preloader');
         if (preloader) {
-            preloader.classList.add('fade-out');
-            
-            // Animasyon tamamlandıktan sonra elementi kaldır
-            setTimeout(function() {
-                preloader.remove();
-                document.body.classList.remove('preloader-active');
-            }, 500);
+            // Animasyon yok - direk kaldır
+            preloader.remove();
+            document.body.classList.remove('preloader-active');
         }
     }
     
