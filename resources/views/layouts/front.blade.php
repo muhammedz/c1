@@ -72,9 +72,6 @@
 <body class="bg-slate-100 overflow-x-hidden">
     <!-- Preloader -->
     <div id="preloader">
-        <div class="preloader-content">
-            <div class="preloader-spinner"></div>
-        </div>
     </div>
 
     <!-- Header Alanı -->
