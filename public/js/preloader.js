@@ -3,8 +3,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // Body'ye preloader-active class'ı ekle
     document.body.classList.add('preloader-active');
     
-    // Minimum gösterim süresi (1 saniye)
-    const minShowTime = 1000;
+    // Minimum gösterim süresi (0.5 saniye)
+    const minShowTime = 500;
     const startTime = Date.now();
     
     // Sayfa tamamen yüklendiğinde preloader'ı gizle
