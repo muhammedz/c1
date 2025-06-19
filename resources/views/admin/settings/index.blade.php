@@ -1,4 +1,4 @@
-@extends('admin.layouts.app')
+@extends('adminlte::page')
 
 @section('title', 'Ayarlar')
 
