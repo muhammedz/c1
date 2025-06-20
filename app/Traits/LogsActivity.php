@@ -24,6 +24,11 @@ trait LogsActivity
      */
     public function logCreated(Model $model): void
     {
+        // Bot kontrolü yap
+        if ($this->isBot()) {
+            return;
+        }
+
         $this->createActivityLog($model, 'created', null, $this->getModelAttributes($model));
     }
 
@@ -32,11 +37,26 @@ trait LogsActivity
      */
     public function logUpdated(Model $model): void
     {
+        // Bot kontrolü yap
+        if ($this->isBot()) {
+            return;
+        }
+
         $oldValues = $this->getModelAttributes($model->getOriginal());
         $newValues = $this->getModelAttributes($model->getAttributes());
         
         // Sadece değişen alanları logla
         $changes = $this->getChangedAttributes($oldValues, $newValues);
+        
+        // Eğer sadece sistem alanları değişmişse loglamayı atla
+        if ($this->isOnlySystemChanges($changes)) {
+            return;
+        }
+        
+        // Eğer sadece updated_at değişmişse loglamayı atla
+        if ($this->isOnlyTimestampChange($changes)) {
+            return;
+        }
         
         if (!empty($changes['old']) && !empty($changes['new'])) {
             $this->createActivityLog($model, 'updated', $changes['old'], $changes['new']);
@@ -254,13 +274,95 @@ trait LogsActivity
         ];
     }
 
-
-
     /**
      * Create custom activity log with description.
      */
     protected function createCustomLog(Model $model, string $action, string $description): void
     {
         $this->createActivityLog($model, $action, null, null, $description);
+    }
+
+    /**
+     * Check if the current request is from a bot.
+     */
+    protected function isBot(): bool
+    {
+        // Implement the logic to check if the current request is from a bot
+        // This is a placeholder and should be replaced with the actual implementation
+        return false;
+    }
+
+    /**
+     * Check if the change is only a timestamp change.
+     */
+    protected function isOnlyTimestampChange(array $changes): bool
+    {
+        $changedFields = array_keys($changes['old'] ?? []);
+        
+        // Eğer hiç değişiklik yoksa false döndür
+        if (empty($changedFields)) {
+            return false;
+        }
+        
+        // Sadece timestamp alanları
+        $timestampFields = ['updated_at', 'created_at'];
+        
+        // Sadece timestamp alanları değişmişse true döndür
+        $nonTimestampChanges = array_diff($changedFields, $timestampFields);
+        return empty($nonTimestampChanges);
+    }
+
+    /**
+     * Check if the change is only system changes.
+     */
+    protected function isOnlySystemChanges(array $changes): bool
+    {
+        // Sistem tarafından otomatik değişen alanlar - çok kapsamlı liste
+        $systemFields = [
+            // Görüntülenme sayaçları
+            'view_count', 'views', 'hit_count', 'click_count', 'visit_count',
+            
+            // Timestamp alanları
+            'updated_at', 'created_at', 'deleted_at', 'last_seen_at', 'last_login_at',
+            
+            // Boolean alanların 0/1 dönüşümü
+            'is_featured', 'is_headline', 'is_scheduled', 'is_active', 'is_published',
+            'is_draft', 'is_visible', 'is_public', 'is_private', 'is_enabled',
+            'is_disabled', 'status', 'active', 'enabled', 'published', 'featured',
+            
+            // Tarih format değişimleri
+            'published_at', 'start_date', 'end_date', 'event_date', 'created_date',
+            'updated_date', 'publish_date', 'expire_date', 'deadline',
+            
+            // JSON/Array alanları
+            'gallery', 'images', 'files', 'attachments', 'metadata', 'options',
+            'settings', 'config', 'data', 'extra', 'custom_fields',
+            'filemanagersystem_gallery', 'filemanagersystem_image', 'filemanagersystem_files',
+            'features', 'properties', 'attributes', 'tags_list', 'categories_list',
+            
+            // Scout search indexing
+            'search_index', 'search_data', 'indexed_at',
+            
+            // Cache alanları
+            'cache_key', 'cached_at', 'cache_expires_at',
+            
+            // Sistem durumları
+            'processing', 'processed_at', 'synced_at', 'imported_at', 'exported_at',
+            
+            // Otomatik hesaplanan alanlar
+            'slug_generated', 'auto_slug', 'calculated_field', 'computed_value',
+        ];
+        
+        // Değişen alanları kontrol et
+        $changedFields = array_keys($changes['old'] ?? []);
+        
+        // Eğer hiç değişiklik yoksa false döndür
+        if (empty($changedFields)) {
+            return false;
+        }
+        
+        // Sadece sistem alanları değişmişse true döndür
+        $nonSystemChanges = array_diff($changedFields, $systemFields);
+        return empty($nonSystemChanges);
     }
 } 

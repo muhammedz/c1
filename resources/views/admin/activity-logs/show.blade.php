@@ -114,14 +114,20 @@
                                                     @if(is_null($change['old']))
                                                         <span class="text-muted">-</span>
                                                     @else
-                                                        <span class="text-danger">{{ Str::limit($change['old'], 100) }}</span>
+                                                        @php
+                                                            $oldValue = is_array($change['old']) ? json_encode($change['old'], JSON_UNESCAPED_UNICODE) : (string)$change['old'];
+                                                        @endphp
+                                                        <span class="text-danger">{{ Str::limit($oldValue, 100) }}</span>
                                                     @endif
                                                 </td>
                                                 <td>
                                                     @if(is_null($change['new']))
                                                         <span class="text-muted">-</span>
                                                     @else
-                                                        <span class="text-success">{{ Str::limit($change['new'], 100) }}</span>
+                                                        @php
+                                                            $newValue = is_array($change['new']) ? json_encode($change['new'], JSON_UNESCAPED_UNICODE) : (string)$change['new'];
+                                                        @endphp
+                                                        <span class="text-success">{{ Str::limit($newValue, 100) }}</span>
                                                     @endif
                                                 </td>
                                             </tr>
