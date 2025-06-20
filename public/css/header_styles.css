@@ -59,8 +59,7 @@
     border-top: 3px solid #007b32;
     opacity: 0;
     visibility: hidden;
-    transform: translateY(-15px) scale(0.95);
-    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+    transition: opacity 0.3s ease, visibility 0.3s ease;
     pointer-events: none;
 }
 
@@ -71,9 +70,7 @@
 .group:hover .mega-menu {
     opacity: 1;
     visibility: visible;
-    transform: translateY(0) scale(1);
     pointer-events: auto;
-    transition-delay: 0.1s;
 }
 
 /* Mega menüye giriş yolunu daha tolere edecek alan oluşturma */

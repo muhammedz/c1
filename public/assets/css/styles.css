@@ -709,9 +709,7 @@ p {
     justify-content: center;
     flex-direction: column;
     align-items: center;
-    transform: translateY(-20px) scale(0.95);
-    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
-    transform-origin: top center;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
 }
 
 /* Normal hover durumu */
@@ -719,8 +717,6 @@ p {
     opacity: 1;
     visibility: visible;
     pointer-events: auto;
-    transform: translateY(0) scale(1);
-    transition-delay: 0.1s;
 }
 
 /* Scroll sırasında tüm mega menüleri gizle */
@@ -844,10 +840,7 @@ body.is-scrolling .group:hover .mega-menu {
     color: #006428;
 }
 
-/* Mega menü kutusu animasyonu için ek stiller */
-.mega-menu {
-    transform-origin: top center;
-}
+/* Mega menü sadece fade efekti */
 
 .mega-menu-link-icon {
     color: #007d32;
