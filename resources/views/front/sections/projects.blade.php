@@ -537,7 +537,6 @@ input[name="project-category"] {
         // changeCategory fonksiyonunu override et
         if (window.changeCategory) {
             window.changeCategory = function() {
-                console.log('Eski projeler sistemi devre dışı bırakıldı');
                 return false;
             };
         }

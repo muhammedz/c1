@@ -148,7 +148,7 @@
                                 @foreach($guideCategory->places as $place)
                                 <tr>
                                     <td>
-                                        <strong>{{ $place->name }}</strong>
+                                        <strong>{{ $place->title }}</strong>
                                         @if($place->images && $place->images->count() > 0)
                                             <i class="fas fa-image text-info ms-1" title="Görselli"></i>
                                         @endif
@@ -167,6 +167,13 @@
                                             <a href="{{ route('admin.guide-places.edit', $place) }}" class="btn btn-primary btn-sm" title="Düzenle">
                                                 <i class="fas fa-edit"></i>
                                             </a>
+                                            <form action="{{ route('admin.guide-places.destroy', $place) }}" method="POST" style="display: inline;" onsubmit="return confirm('Bu yeri silmek istediğinize emin misiniz?')">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-danger btn-sm" title="Sil">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </form>
                                         </div>
                                     </td>
                                 </tr>

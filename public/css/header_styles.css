@@ -60,7 +60,8 @@
     border-top: 3px solid #007b32;
     opacity: 0;
     visibility: hidden;
-    transition: opacity 0.3s ease, visibility 0.3s ease;
+    transform: translateY(-10px);
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 .group {
@@ -71,7 +72,8 @@
     display: block;
     opacity: 1;
     visibility: visible;
-    transition-delay: 0.1s;
+    transform: translateY(0);
+    transition-delay: 0.15s;
 }
 
 /* Mega menüye giriş yolunu daha tolere edecek alan oluşturma */
@@ -91,6 +93,12 @@
 }
 
 /* Mega Menü Kategori Stili */
+.mega-menu-category {
+    opacity: 0;
+    transform: translateY(10px);
+    animation: fadeInUp 0.5s ease-out forwards;
+}
+
 .mega-menu-category h3 {
     font-weight: bold;
     font-size: 16px;
@@ -100,19 +108,50 @@
     color: #333;
 }
 
+/* Mega menü kategorilerinin sırayla animasyonu */
+.group:hover .mega-menu-category:nth-child(1) { animation-delay: 0.05s; }
+.group:hover .mega-menu-category:nth-child(2) { animation-delay: 0.1s; }
+.group:hover .mega-menu-category:nth-child(3) { animation-delay: 0.15s; }
+.group:hover .mega-menu-category:nth-child(4) { animation-delay: 0.2s; }
+
+@keyframes fadeInUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
 /* Mega Menü Bağlantı Stili */
 .mega-menu-link {
     display: flex;
     align-items: center;
     padding: 6px 0;
     color: #4a5568;
-    transition: all 0.2s;
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     font-size: 14px;
+    opacity: 0;
+    transform: translateX(-5px);
+    animation: slideInLeft 0.4s ease-out forwards;
 }
 
 .mega-menu-link:hover {
     color: #007b32;
     transform: translateX(4px);
+}
+
+/* Mega menü açıldığında linklerin sırayla animasyonu */
+.group:hover .mega-menu-link:nth-child(1) { animation-delay: 0.1s; }
+.group:hover .mega-menu-link:nth-child(2) { animation-delay: 0.15s; }
+.group:hover .mega-menu-link:nth-child(3) { animation-delay: 0.2s; }
+.group:hover .mega-menu-link:nth-child(4) { animation-delay: 0.25s; }
+.group:hover .mega-menu-link:nth-child(5) { animation-delay: 0.3s; }
+.group:hover .mega-menu-link:nth-child(6) { animation-delay: 0.35s; }
+
+@keyframes slideInLeft {
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
 }
 
 .mega-menu-link-icon {

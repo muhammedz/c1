@@ -179,29 +179,38 @@
                     window.heroSwiperInstance.destroy(true, true);
                 }
                 
+                // Slide sayısını kontrol et
+                const slideCount = document.querySelectorAll('.heroSwiper .swiper-slide').length;
+                const swiperContainer = document.querySelector('.heroSwiper');
+                
+                // Tek slide durumunda CSS class ekle
+                if (slideCount <= 1) {
+                    swiperContainer.classList.add('single-slide');
+                }
+                
                 // Yeni swiper oluştur ve global değişkene kaydet
                 window.heroSwiperInstance = new Swiper('.heroSwiper', {
-                loop: true,
+                loop: slideCount > 1, // Sadece 1'den fazla slide varsa loop aktif
                 effect: 'fade', // Fade efekti kullanıyoruz
                 fadeEffect: {
                   crossFade: true // Geçişlerin daha pürüzsüz olması için
                 },
                 speed: 1500, // Geçiş hızı
-                autoplay: {
+                autoplay: slideCount > 1 ? {
                     delay: 6000, // 6 saniyede bir geçiş
                     disableOnInteraction: false, // Kullanıcı etkileşiminde bile autoplay devam etsin
-                },
+                } : false, // Tek slide varsa autoplay kapalı
                 lazy: {
                   loadPrevNext: true, // Önceki ve sonraki slider'ları da yükle
                 },
-                pagination: {
+                pagination: slideCount > 1 ? {
                     el: '.swiper-pagination',
                     clickable: true, // Tıklanabilir pagination noktaları
-                },
-                navigation: {
+                } : false, // Tek slide varsa pagination gizli
+                navigation: slideCount > 1 ? {
                     nextEl: '.swiper-button-next',
                     prevEl: '.swiper-button-prev',
-                },
+                } : false, // Tek slide varsa navigation gizli
                 on: {
                     init: function() {
                         // İlk slide'ın içeriğini animasyonla göster
@@ -328,6 +337,13 @@
             height: 20px;
             background: linear-gradient(to bottom, transparent, rgba(0,0,0,0.1));
             z-index: 5;
+        }
+        
+        /* Tek slide durumunda navigation ve pagination gizle */
+        .heroSwiper.single-slide .swiper-pagination,
+        .heroSwiper.single-slide .swiper-button-next,
+        .heroSwiper.single-slide .swiper-button-prev {
+            display: none !important;
         }
     </style>
 </section> 

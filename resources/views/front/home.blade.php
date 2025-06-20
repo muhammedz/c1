@@ -50,7 +50,6 @@
             },
             on: {
                 slideChange: function() {
-                    console.log('Main slide changed to index:', this.activeIndex);
                     updateActiveCard(this.activeIndex);
                 }
             }
@@ -97,7 +96,6 @@
             if (e.target.closest('.news-next-btn')) {
                 e.preventDefault();
                 e.stopPropagation();
-                console.log('Next button clicked'); // Debug
                 if (newsMainSwiper) {
                     const currentIndex = newsMainSwiper.activeIndex;
                     const nextIndex = Math.min(currentIndex + 1, newsMainSwiper.slides.length - 1);
@@ -109,7 +107,6 @@
             if (e.target.closest('.news-prev-btn')) {
                 e.preventDefault();
                 e.stopPropagation();
-                console.log('Prev button clicked'); // Debug
                 if (newsMainSwiper) {
                     const currentIndex = newsMainSwiper.activeIndex;
                     const prevIndex = Math.max(currentIndex - 1, 0);

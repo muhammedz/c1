@@ -20,6 +20,17 @@ document.addEventListener('DOMContentLoaded', function () {
             // Mega menü container genişliğini ayarla
             group.addEventListener('mouseenter', () => {
                 adjustMegaMenuWidth(megaMenu);
+                // Animasyon sıfırlama
+                resetMegaMenuAnimations(megaMenu);
+            });
+            
+            // Mega menü kapanırken animasyonu sıfırla
+            group.addEventListener('mouseleave', () => {
+                setTimeout(() => {
+                    if (!group.matches(':hover')) {
+                        resetMegaMenuAnimations(megaMenu);
+                    }
+                }, 100);
             });
         }
     });
@@ -42,6 +53,27 @@ document.addEventListener('DOMContentLoaded', function () {
             content.style.margin = '0 auto';
             content.style.width = '100%';
         }
+    }
+    
+    // Mega menü animasyonlarını sıfırlama fonksiyonu
+    function resetMegaMenuAnimations(megaMenu) {
+        if (!megaMenu) return;
+        
+        // Kategorilerin animasyonlarını sıfırla
+        const categories = megaMenu.querySelectorAll('.mega-menu-category');
+        categories.forEach(category => {
+            category.style.animation = 'none';
+            category.offsetHeight; // Reflow zorla
+            category.style.animation = null;
+        });
+        
+        // Linklerin animasyonlarını sıfırla
+        const links = megaMenu.querySelectorAll('.mega-menu-link');
+        links.forEach(link => {
+            link.style.animation = 'none';
+            link.offsetHeight; // Reflow zorla
+            link.style.animation = null;
+        });
     }
     
     // Sayfa boyutu değiştiğinde mega menü genişliklerini yeniden ayarla
@@ -166,206 +198,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
 // News slider tanımları home.blade.php dosyasında yapılıyor - çakışmayı önlemek için kaldırıldı
 
-document.addEventListener('DOMContentLoaded', function () {
-    const servicesSwiper = new Swiper('.servicesSwiper', {
-        slidesPerView: 1,
-        spaceBetween: 24,
-        autoplay: {
-            delay: 3000,
-            disableOnInteraction: false,
-        },
-        breakpoints: {
-            640: {
-                slidesPerView: 2,
-            },
-            768: {
-                slidesPerView: 3,
-            },
-            1024: {
-                slidesPerView: 4,
-            },
-            1280: {
-                slidesPerView: 5,
-            }
-        }
-    });
-});
+// servicesSwiper kaldırıldı - featured-services.blade.php dosyasında kendi JavaScript sistemi kullanılıyor
 
-document.addEventListener('DOMContentLoaded', function () {
-    // Tüm slider'ları başlat
-    const swipers = {};
-    document.querySelectorAll('.projectSwiper').forEach(function (element) {
-        const category = element.dataset.category;
-        swipers[category] = new Swiper(element, {
-            slidesPerView: 1,
-            spaceBetween: 24,
-            navigation: {
-                nextEl: '.swiper-next',
-                prevEl: '.swiper-prev',
-            },
-            breakpoints: {
-                640: {
-                    slidesPerView: 1,
-                },
-                768: {
-                    slidesPerView: 2,
-                },
-                1024: {
-                    slidesPerView: 2,
-                }
-            }
-        });
-    });
-
-    // Kategori değiştirme işlevi
-    const categoryButtons = document.querySelectorAll('.category-btn');
-    const categoryTitle = document.getElementById('categoryTitle');
-    const projectSliders = document.querySelectorAll('.projectSwiper');
-
-    categoryButtons.forEach(button => {
-        button.addEventListener('click', function () {
-            const category = this.dataset.category;
-
-            // Aktif kategori butonunu güncelle
-            categoryButtons.forEach(btn => {
-                btn.classList.remove('bg-[#004d2e]', 'text-white', 'hover:bg-[#003d24]');
-                btn.classList.add('bg-gray-200', 'text-gray-800', 'hover:bg-gray-300');
-            });
-            this.classList.remove('bg-gray-200', 'text-gray-800', 'hover:bg-gray-300');
-            this.classList.add('bg-[#004d2e]', 'text-white', 'hover:bg-[#003d24]');
-
-            // Başlığı güncelle
-            categoryTitle.textContent = this.textContent.trim();
-
-            // Slider'ları göster/gizle
-            projectSliders.forEach(slider => {
-                if (slider.dataset.category === category) {
-                    slider.classList.remove('hidden');
-                    swipers[category].update();
-                } else {
-                    slider.classList.add('hidden');
-                }
-            });
-        });
-    });
-});
+// Eski projeler slider kodu kaldırıldı - projects.blade.php dosyasında yeni sistem kullanılıyor
 
 // News Slider ve Cards Interaction kodları home.blade.php dosyasında yapılıyor - çakışmayı önlemek için kaldırıldı
 
-// Proje kategorileri ve başlıkları
-const projectCategories = document.querySelectorAll('.project-category');
-const projectSliders = document.querySelectorAll('.project-slider');
-const projectTitle = document.getElementById('projectTitle');
+// Eski projeler sistemi tamamen kaldırıldı - projects.blade.php dosyasında yeni izole sistem kullanılıyor
 
-// Her kategori için ayrı Swiper örneği oluştur
-const swipers = {};
-
-// Her slider için Swiper örneği oluştur
-projectSliders.forEach(slider => {
-    const category = slider.dataset.category;
-    swipers[category] = new Swiper(slider.querySelector('.projectSwiper'), {
-        slidesPerView: 2,
-        spaceBetween: 30,
-        loop: true,
-
-        pagination: {
-            el: slider.querySelector('.swiper-pagination'),
-            clickable: true,
-        },
-        navigation: {
-            nextEl: slider.querySelector('.swiper-button-next'),
-            prevEl: slider.querySelector('.swiper-button-prev'),
-        },
-        breakpoints: {
-            640: {
-                slidesPerView: 1,
-                spaceBetween: 20,
-            },
-            768: {
-                slidesPerView: 2,
-                spaceBetween: 30,
-            },
-        },
-    });
-});
-
-// Kategori başlıkları
-const categoryTitles = {
-    'gerceklesen': 'Gerçekleşen Projeler',
-    'planlanan': 'Planlanan Projeler',
-    'devam-eden': 'Devam Eden Projeler',
-    'uluslararasi': 'Uluslararası Projeler',
-    'sosyal': 'Sosyal Projeler'
-};
-
-// Eski projeler sistemi - Yeni sistem tarafından devre dışı bırakıldı
-// Bu kodlar artık çalışmayacak, yeni izole sistem kullanılıyor
-
-/*
-// Kategori değiştirme işlevi - DEVRE DIŞI
-function changeCategory(category) {
-    console.log('Bu fonksiyon yeni projeler sistemi tarafından devre dışı bırakıldı');
-    return false;
-}
-
-// Kategori tıklama olaylarını ekle - DEVRE DIŞI
-if (typeof projectCategories !== 'undefined') {
-    projectCategories.forEach(category => {
-        // Bu event listener'lar artık çalışmayacak
-    });
-}
-
-// Sayfa yüklendiğinde varsayılan kategoriyi göster - DEVRE DIŞI
-document.addEventListener('DOMContentLoaded', () => {
-    // Bu kod artık çalışmayacak
-});
-*/
-
-// Mevcut script içeriğine eklenecek
-const timelineSwiper = new Swiper('.timelineSwiper', {
-    slidesPerView: 3,
-    spaceBetween: 30,
-    navigation: {
-        nextEl: '.timeline-next',
-        prevEl: '.timeline-prev',
-    },
-    breakpoints: {
-        320: {
-            slidesPerView: 1,
-            spaceBetween: 20
-        },
-        768: {
-            slidesPerView: 2,
-            spaceBetween: 30
-        },
-        1024: {
-            slidesPerView: 3,
-            spaceBetween: 30
-        }
-    }
-});
-const servicesSwiper = new Swiper('.servicesSwiper', {
-    slidesPerView: 3,
-    spaceBetween: 30,
-    navigation: {
-        nextEl: '.service-next',
-        prevEl: '.service-prev',
-    },
-    breakpoints: {
-        320: {
-            slidesPerView: 1,
-            spaceBetween: 20
-        },
-        768: {
-            slidesPerView: 2,
-            spaceBetween: 30
-        },
-        1024: {
-            slidesPerView: 3,
-            spaceBetween: 30
-        }
-    }
-});
+// timelineSwiper ve servicesSwiper kaldırıldı - ilgili bölümler kendi JavaScript sistemlerini kullanıyor
 // Mobil menü toggle - KAPALI (header.blade.php'te aktif)
 /*
 document.addEventListener('DOMContentLoaded', function() {
@@ -380,188 +221,11 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 */
 
-// Mobil dropdown menüler
-const mobileDropdowns = document.querySelectorAll('.mobile-dropdown');
+// Kullanılmayan mobil menü kodları kaldırıldı - quickmenu.blade.php ve header.blade.php kendi sistemlerini kullanıyor
 
-mobileDropdowns.forEach(dropdown => {
-    const button = dropdown.querySelector('button');
-    const content = dropdown.querySelector('div');
-    const icon = button.querySelector('.material-icons');
+// Eski projeler slider sistemi kaldırıldı - projects.blade.php dosyasında izole sistem kullanılıyor
 
-    button.addEventListener('click', () => {
-        content.classList.toggle('hidden');
-        icon.style.transform = content.classList.contains('hidden') ? 'rotate(0deg)' : 'rotate(180deg)';
-    });
-});
-
-// Quick Mobile Menu Dropdowns
-const quickMobileDropdowns = document.querySelectorAll('.quick-mobile-dropdown');
-
-quickMobileDropdowns.forEach(dropdown => {
-    const button = dropdown.querySelector('button');
-    const content = dropdown.querySelector('div');
-    const icon = button.querySelector('.material-icons:last-child');
-
-    button.addEventListener('click', () => {
-        content.classList.toggle('hidden');
-        icon.style.transform = content.classList.contains('hidden') ? 'rotate(0deg)' : 'rotate(180deg)';
-    });
-});
-
-document.addEventListener('DOMContentLoaded', function () {
-    const quickMobileDropdowns = document.querySelectorAll('.quick-mobile-dropdown');
-
-    quickMobileDropdowns.forEach(dropdown => {
-        const button = dropdown.querySelector('button');
-        const content = dropdown.querySelector('div');
-        const icon = button.querySelector('.material-icons:last-child');
-
-        button.addEventListener('click', () => {
-            // Diğer tüm dropdown'ları kapat
-            quickMobileDropdowns.forEach(otherDropdown => {
-                if (otherDropdown !== dropdown) {
-                    const otherContent = otherDropdown.querySelector('div');
-                    const otherIcon = otherDropdown.querySelector('.material-icons:last-child');
-                    otherContent.classList.add('hidden');
-                    if (otherIcon) {
-                        otherIcon.style.transform = 'rotate(0deg)';
-                    }
-                }
-            });
-
-            // Tıklanan dropdown'ı aç/kapat
-            content.classList.toggle('hidden');
-            if (icon) {
-                icon.style.transform = content.classList.contains('hidden') ? 'rotate(0deg)' : 'rotate(180deg)';
-            }
-        });
-    });
-});
-
-// Quick Mobile Menu için yeni JavaScript kodu
-document.addEventListener('DOMContentLoaded', function () {
-    const mobileQuickMenus = document.querySelectorAll('.mobile-quick-menu');
-
-    mobileQuickMenus.forEach(menu => {
-        const button = menu.querySelector('button');
-        const content = menu.querySelector('div');
-        const icon = button.querySelector('.material-icons:last-child');
-
-        button.addEventListener('click', () => {
-            // Diğer tüm menüleri kapat
-            mobileQuickMenus.forEach(otherMenu => {
-                if (otherMenu !== menu) {
-                    const otherContent = otherMenu.querySelector('div');
-                    const otherIcon = otherMenu.querySelector('.material-icons:last-child');
-                    otherContent.classList.add('hidden');
-                    otherIcon.style.transform = 'rotate(0deg)';
-                }
-            });
-
-            // Tıklanan menüyü aç/kapat
-            content.classList.toggle('hidden');
-            icon.style.transform = content.classList.contains('hidden') ? 'rotate(0deg)' : 'rotate(180deg)';
-        });
-    });
-});
-
-var projectSwipers = {};
-
-function initProjectSwiper(category) {
-    if (projectSwipers[category]) {
-        projectSwipers[category].destroy();
-    }
-
-    projectSwipers[category] = new Swiper(`.project-slider[data-category="${category}"] .projectSwiper`, {
-        slidesPerView: 1,
-        spaceBetween: 16,
-        pagination: {
-            el: ".swiper-pagination",
-            clickable: true,
-        },
-        navigation: {
-            nextEl: ".swiper-button-next",
-            prevEl: ".swiper-button-prev",
-        },
-        breakpoints: {
-            640: {
-                slidesPerView: 2,
-                spaceBetween: 16,
-            },
-            1024: {
-                slidesPerView: 3,
-                spaceBetween: 24,
-            },
-        },
-    });
-}
-
-document.addEventListener('DOMContentLoaded', function () {
-    const categories = document.querySelectorAll('.project-category');
-    const projectTitle = document.getElementById('projectTitle');
-    const projectSliders = document.querySelectorAll('.project-slider');
-
-    // İlk slider'ı başlat
-    initProjectSwiper('gerceklesen');
-
-    categories.forEach(category => {
-        category.addEventListener('click', function () {
-            const selectedCategory = this.dataset.category;
-
-            // Aktif kategoriyi güncelle
-            categories.forEach(c => c.classList.remove('active'));
-            this.classList.add('active');
-
-            // Başlığı güncelle
-            projectTitle.textContent = this.querySelector('h3, p').textContent;
-
-            // Slider'ları güncelle
-            projectSliders.forEach(slider => {
-                if (slider.dataset.category === selectedCategory) {
-                    slider.classList.remove('hidden');
-                    initProjectSwiper(selectedCategory);
-                } else {
-                    slider.classList.add('hidden');
-                }
-            });
-        });
-    });
-});
-
-document.addEventListener('DOMContentLoaded', function () {
-    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-    const mobileMenuContent = document.getElementById('mobileMenuContent');
-    const mobileMenuIcon = document.getElementById('mobileMenuIcon');
-
-    mobileMenuBtn.addEventListener('click', function () {
-        mobileMenuContent.classList.toggle('hidden');
-        mobileMenuIcon.style.transform = mobileMenuContent.classList.contains('hidden') ? 'rotate(0deg)' : 'rotate(180deg)';
-    });
-});
-
-document.addEventListener('DOMContentLoaded', function () {
-    const mobileMenuBtns = document.querySelectorAll('.mobile-menu-btn');
-
-    mobileMenuBtns.forEach(btn => {
-        btn.addEventListener('click', function () {
-            const content = this.nextElementSibling;
-            const icon = this.querySelector('.material-icons:last-child');
-
-            // Diğer tüm menüleri kapat
-            document.querySelectorAll('.mobile-menu-content').forEach(menu => {
-                if (menu !== content && !menu.classList.contains('hidden')) {
-                    menu.classList.add('hidden');
-                    const btnIcon = menu.previousElementSibling.querySelector('.material-icons:last-child');
-                    btnIcon.style.transform = 'rotate(0deg)';
-                }
-            });
-
-            // Seçili menüyü aç/kapat
-            content.classList.toggle('hidden');
-            icon.style.transform = content.classList.contains('hidden') ? 'rotate(0deg)' : 'rotate(180deg)';
-        });
-    });
-});
+// Kullanılmayan mobileMenuBtn ve mobile-menu-btn kodları kaldırıldı
 
 document.addEventListener('DOMContentLoaded', function () {
     const searchButton = document.getElementById('searchButton');
@@ -732,181 +396,10 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-// Yatay kaydırma için ok tuşlarına tepki
-const tabContainer = document.querySelector('.hide-scrollbar');
-if (tabContainer) {
-    tabContainer.addEventListener('keydown', (e) => {
-        if (e.key === 'ArrowRight') {
-            tabContainer.scrollLeft += 100;
-        } else if (e.key === 'ArrowLeft') {
-            tabContainer.scrollLeft -= 100;
-        }
-    });
-    
-    // Dokunmatik kaydırma sonrası tıklama için düzeltme
-    tabContainer.addEventListener('scroll', () => {
-        const scrollLeft = tabContainer.scrollLeft;
-        localStorage.setItem('tabScrollPosition', scrollLeft);
-    });
-    
-    // Sayfa yüklendiğinde son kaydırma pozisyonunu geri yükle
-    const savedScrollPosition = localStorage.getItem('tabScrollPosition');
-    if (savedScrollPosition) {
-        tabContainer.scrollLeft = parseInt(savedScrollPosition);
-    }
-}
+// tabContainer kodu kaldırıldı - hide-scrollbar class'ı kullanılmıyor
 
-// Hizmetler Mega Menü
-document.addEventListener('DOMContentLoaded', function() {
-    // Tüm hizmet kartlarını seçelim
-    const serviceCards = document.querySelectorAll('.hover-mega-menu a[data-category]');
-    const categoryContainer = document.querySelector('.hover-mega-menu .mega-menu-content');
-    
-    if (serviceCards.length > 0 && categoryContainer) {
-        // Her bir karta tıklama olayı ekleyelim
-        serviceCards.forEach(card => {
-            card.addEventListener('click', function(e) {
-                e.preventDefault(); // Varsayılan link davranışını engelle
-                
-                // Tıklanan kategori adını al
-                const categoryId = this.getAttribute('data-category');
-                
-                // Tüm kategorileri gizle
-                document.querySelectorAll('.tab-pane').forEach(tab => {
-                    tab.classList.add('hidden');
-                });
-                
-                // İlgili kategoriyi göster
-                const activeCategory = document.getElementById(categoryId);
-                if (activeCategory) {
-                    // Kategori kartları konteynerini gizle
-                    const cardsContainer = document.querySelector('.hover-mega-menu .grid');
-                    cardsContainer.classList.add('hidden');
-                    
-                    // İlgili grupları gizle
-                    const relatedGroups = document.querySelector('.hover-mega-menu .mb-4');
-                    if (relatedGroups) {
-                        relatedGroups.classList.add('hidden');
-                    }
-                    
-                    // İçerik konteynerini göster
-                    const contentContainer = document.querySelector('.hover-mega-menu .hidden.mt-4');
-                    contentContainer.classList.remove('hidden');
-                    
-                    // Seçilen kategoriyi göster
-                    activeCategory.classList.remove('hidden');
-                    
-                    // Eğer yoksa, geri dönüş butonu ekle
-                    if (!document.querySelector('.back-to-categories')) {
-                        const backButton = document.createElement('div');
-                        backButton.className = 'back-to-categories flex items-center text-blue-600 mb-4 font-medium';
-                        backButton.innerHTML = '<span class="material-icons mr-1">arrow_back</span> Tüm Kategorilere Dön';
-                        
-                        // Geri butonu tıklama
-                        backButton.addEventListener('click', function() {
-                            // İçerik konteynerini gizle
-                            contentContainer.classList.add('hidden');
-                            
-                            // Tüm kategorileri gizle
-                            document.querySelectorAll('.tab-pane').forEach(tab => {
-                                tab.classList.add('hidden');
-                            });
-                            
-                            // Kategori kartlarını göster
-                            cardsContainer.classList.remove('hidden');
-                            
-                            // İlgili grupları göster
-                            if (relatedGroups) {
-                                relatedGroups.classList.remove('hidden');
-                            }
-                            
-                            // Geri butonunu kaldır
-                            this.remove();
-                        });
-                        
-                        // Geri butonunu içerik konteynerinin başına ekle
-                        contentContainer.insertBefore(backButton, contentContainer.firstChild);
-                    }
-                }
-            });
-        });
-    }
-});
+// Hizmetler Mega Menü kodu kaldırıldı - card_grid_mega_menu.blade.php dosyasında kendi JavaScript sistemi kullanılıyor
 
-// Hizmetler Menüsü Kart Fonksiyonalitesi
-document.addEventListener('DOMContentLoaded', function() {
-    // Tüm hizmet kartlarını seç
-    const serviceCards = document.querySelectorAll('[data-category]');
-    
-    // Her bir karta tıklama olayı ekle
-    serviceCards.forEach(card => {
-        card.addEventListener('click', function(e) {
-            e.preventDefault();
-            
-            // Tıklanan kartın kategorisini al
-            const category = this.getAttribute('data-category');
-            
-            // Tüm kategori içeriklerinin bulunduğu ana container'ı bul
-            const cardContainer = this.closest('.grid');
-            const contentContainer = cardContainer.nextElementSibling;
-            
-            // Kart container'ı gizle
-            cardContainer.classList.add('hidden');
-            
-            // "İlgili Gruplar" bölümünü gizle
-            const relatedGroupsSection = cardContainer.previousElementSibling;
-            if (relatedGroupsSection && relatedGroupsSection.querySelector('h3') && relatedGroupsSection.querySelector('h3').textContent.includes('İlgili Gruplar')) {
-                relatedGroupsSection.classList.add('hidden');
-            }
-            
-            // İçerik container'ı göster
-            contentContainer.classList.remove('hidden');
-            
-            // Seçilen kategori içeriğini göster
-            const targetContent = document.getElementById(category);
-            if (targetContent) {
-                // Önce tüm içerikleri gizle
-                const allContents = contentContainer.querySelectorAll('.tab-pane');
-                allContents.forEach(content => {
-                    content.classList.add('hidden');
-                });
-                
-                // Sonra seçilen içeriği göster
-                targetContent.classList.remove('hidden');
-                
-                // Geri butonu oluştur
-                const backButton = document.createElement('button');
-                backButton.innerHTML = '<span class="material-icons mr-2">arrow_back</span> Geri';
-                backButton.className = 'flex items-center mb-4 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-gray-700 text-sm transition';
-                
-                // Eğer zaten bir geri butonu varsa, onu kaldır
-                const existingBackButton = targetContent.querySelector('.back-button');
-                if (existingBackButton) {
-                    existingBackButton.remove();
-                }
-                
-                // Geri butonuna sınıf ekle
-                backButton.classList.add('back-button');
-                
-                // Geri butonuna tıklama olayı ekle
-                backButton.addEventListener('click', function() {
-                    // İçerik container'ı gizle
-                    contentContainer.classList.add('hidden');
-                    
-                    // Kart container'ı göster
-                    cardContainer.classList.remove('hidden');
-                    
-                    // "İlgili Gruplar" bölümünü göster
-                    if (relatedGroupsSection) {
-                        relatedGroupsSection.classList.remove('hidden');
-                    }
-                });
-                
-                // Geri butonunu içeriğin başına ekle
-                targetContent.insertBefore(backButton, targetContent.firstChild);
-            }
-        });
-    });
-});
+// Hizmetler Menüsü Kart Fonksiyonalitesi kodu kaldırıldı - card_grid_mega_menu.blade.php dosyasında kendi JavaScript sistemi kullanılıyor
 
 
