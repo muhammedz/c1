@@ -86,11 +86,7 @@
                     <span>{{ $category->name }}</span>
                 </div>
                 <h1 class="text-3xl md:text-4xl font-bold text-white mb-4">{{ $guidePlace->title }}</h1>
-                @if($guidePlace->address)
-                    <p class="text-white/80 text-lg mb-5">{{ $guidePlace->address }}</p>
-                @else
-                    <p class="text-white/80 text-lg mb-5">Bu lokasyon ile ilgili tüm iletişim bilgilerini ve detayları aşağıda bulabilirsiniz.</p>
-                @endif
+                <p class="text-white/80 text-lg mb-5">Bu lokasyon ile ilgili tüm iletişim bilgilerini ve detayları aşağıda bulabilirsiniz.</p>
                 
                 <div class="flex flex-wrap gap-4">
                     @if($guidePlace->phone)
@@ -168,6 +164,18 @@
             </div>
         @endif
         
+        <!-- İçerik Bölümü -->
+        @if($guidePlace->content)
+            <div class="mb-8">
+                <h2 class="text-xl font-bold text-gray-900 mb-4">Hakkında</h2>
+                <div class="bg-white rounded-lg p-6 border border-gray-200 shadow-sm">
+                    <div class="prose prose-gray max-w-none">
+                        {!! $guidePlace->content !!}
+                    </div>
+                </div>
+            </div>
+        @endif
+        
         <!-- İletişim Bilgileri - Geniş Layout -->
         <div class="bg-gray-50 rounded-lg p-6">
             <h3 class="text-xl font-bold text-gray-900 mb-6">İletişim Bilgileri</h3>
@@ -179,11 +187,6 @@
                     <div class="contact-item md:col-span-2 lg:col-span-3">
                         <div class="contact-label">📍 Adres</div>
                         <div class="contact-value">{{ $guidePlace->address }}</div>
-                    </div>
-                @else
-                    <div class="contact-item md:col-span-2 lg:col-span-3 bg-gray-100 border-dashed">
-                        <div class="contact-label text-gray-500">📍 Adres</div>
-                        <div class="contact-value text-gray-500 italic">Adres bilgisi eklenecektir</div>
                     </div>
                 @endif
                          
@@ -212,11 +215,6 @@
                                      <a href="tel:{{ $phone }}" class="phone-link">{{ $formatted_phone }}</a>
                                  </div>
                              </div>
-                         @else
-                             <div class="contact-item bg-gray-100 border-dashed">
-                                 <div class="contact-label text-gray-500">📞 Telefon</div>
-                                 <div class="contact-value text-gray-500 italic">Telefon bilgisi eklenecektir</div>
-                             </div>
                          @endif
                          
                          <!-- E-posta -->
@@ -226,11 +224,6 @@
                                  <div class="contact-value">
                                      <a href="mailto:{{ $guidePlace->email }}" class="phone-link">{{ $guidePlace->email }}</a>
                                  </div>
-                             </div>
-                         @else
-                             <div class="contact-item bg-gray-100 border-dashed">
-                                 <div class="contact-label text-gray-500">✉️ E-posta</div>
-                                 <div class="contact-value text-gray-500 italic">E-posta bilgisi eklenecektir</div>
                              </div>
                          @endif
                          
@@ -244,11 +237,6 @@
                                      </a>
                                  </div>
                              </div>
-                         @else
-                             <div class="contact-item bg-gray-100 border-dashed">
-                                 <div class="contact-label text-gray-500">🌐 Website</div>
-                                 <div class="contact-value text-gray-500 italic">Website bilgisi eklenecektir</div>
-                             </div>
                          @endif
                          
                 <!-- Çalışma Saatleri -->
@@ -256,11 +244,6 @@
                     <div class="contact-item md:col-span-2 lg:col-span-3">
                         <div class="contact-label">⏰ Çalışma Saatleri</div>
                         <div class="contact-value">{{ $guidePlace->working_hours }}</div>
-                    </div>
-                @else
-                    <div class="contact-item md:col-span-2 lg:col-span-3 bg-gray-100 border-dashed">
-                        <div class="contact-label text-gray-500">⏰ Çalışma Saatleri</div>
-                        <div class="contact-value text-gray-500 italic">Çalışma saatleri bilgisi eklenecektir</div>
                     </div>
                 @endif
             </div>

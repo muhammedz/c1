@@ -2,6 +2,10 @@
 
 @section('title', 'Yeni Rehber Yeri')
 
+@section('content_header')
+<meta name="csrf-token" content="{{ csrf_token() }}">
+@stop
+
 @section('styles')
 <link href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/min/dropzone.min.css" rel="stylesheet">
 <style>
@@ -71,7 +75,7 @@
         font-weight: 600;
     }
     
-    .dropzone {
+    .upload-dropzone {
         border: 2px dashed #3490dc;
         border-radius: 8px;
         background: #f8fafc;
@@ -84,12 +88,13 @@
         transition: all 0.3s ease;
     }
     
-    .dropzone:hover {
+    .upload-dropzone:hover,
+    .upload-dropzone.dragover {
         border-color: #2779bd;
         background: #f1f7fe;
     }
     
-    .gallery-container {
+    .gallery-grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
         gap: 15px;
@@ -211,7 +216,7 @@
         </ol>
     </nav>
     
-    <form action="{{ route('admin.guide-places.store') }}" method="POST" enctype="multipart/form-data">
+            <form action="{{ route('admin.guide-places.store') }}" method="POST" enctype="multipart/form-data" id="place-form">
         @csrf
         
         <div class="row">
@@ -401,23 +406,35 @@
                     </div>
                     <div class="card-body">
                         <div class="mb-3">
-                            <label for="images" class="form-label">
-                                Fotoğraflar
-                                <i class="fas fa-question-circle help-tooltip" title="Birden fazla fotoğraf seçebilirsiniz"></i>
-                            </label>
-                            <input type="file" class="form-control @error('images') is-invalid @enderror" 
-                                   id="images" name="images[]" multiple accept="image/*">
-                            <div class="form-text">
+                            <small class="text-muted d-block">
                                 <i class="fas fa-info-circle me-1"></i>
-                                JPG, PNG formatlarında birden fazla fotoğraf seçebilirsiniz. İlk fotoğraf vitrin fotoğrafı olarak kullanılacaktır.
-                            </div>
-                            @error('images')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
+                                Yere ait fotoğrafları yüklemek için birden fazla resim seçebilirsiniz.
+                            </small>
                         </div>
                         
-                        <div id="image-preview" class="gallery-container" style="display: none;">
-                            <!-- Seçilen fotoğrafların önizlemesi burada görünecek -->
+                        <div class="form-group">
+                            <label for="images">Resimler</label>
+                            <input type="file" 
+                                   class="form-control @error('images.*') is-invalid @enderror" 
+                                   id="images" 
+                                   name="images[]" 
+                                   multiple 
+                                   accept="image/*"
+                                   onchange="previewImages(this)">
+                            @error('images.*')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                            <small class="form-text text-muted">
+                                JPG, PNG, GIF formatlarında, maksimum 5MB boyutunda resimler yükleyebilirsiniz.
+                            </small>
+                        </div>
+                        
+                        <!-- Resim Önizleme -->
+                        <div id="image-preview" class="mt-3" style="display: none;">
+                            <h6>Seçilen Resimler:</h6>
+                            <div id="preview-container" class="d-flex flex-wrap gap-2">
+                                <!-- Önizlemeler buraya gelecek -->
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -575,296 +592,88 @@
 @endsection
 
 @section('js')
-<script src="{{ asset('js/slug-helper.js') }}"></script>
-
-<!-- TinyMCE Editör -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/6.4.2/tinymce.min.js"></script>
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // TinyMCE Editör
-    tinymce.init({
-        selector: '#content',
-        plugins: 'preview importcss searchreplace autolink autosave save directionality code visualblocks visualchars fullscreen image link media template codesample table charmap pagebreak nonbreaking anchor insertdatetime advlist lists wordcount help charmap quickbars emoticons',
-        menubar: 'file edit view insert format tools table help',
-        toolbar: 'undo redo | bold italic underline strikethrough | fontfamily image fontsize blocks | alignleft aligncenter alignright alignjustify | outdent indent |  numlist bullist | forecolor backcolor removeformat | pagebreak | charmap emoticons | fullscreen preview save print | insertfile media template link anchor codesample | ltr rtl',
-        toolbar_sticky: true,
-        image_advtab: false,
-        height: 500,
-        quickbars_selection_toolbar: 'bold italic | quicklink h2 h3 blockquote quickimage quicktable',
-        quickbars_insert_toolbar: 'quickimage | quicktable quicklink hr',
-        quickbars_insert_toolbar_hover: false,
-        quickbars_image_toolbar: false,
-        noneditable_class: 'mceNonEditable',
-        language: 'tr',
-        language_url: '/js/tinymce/langs/tr.js',
-        toolbar_mode: 'sliding',
-        contextmenu: 'link table',
-        skin: 'oxide',
-        content_css: 'default',
-        content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, San Francisco, Segoe UI, Roboto, Helvetica Neue, sans-serif; font-size: 16px; }',
-        relative_urls: false,
-        remove_script_host: false,
-        convert_urls: true,
-        branding: false,
-        promotion: false,
-        paste_data_images: true,
-        automatic_uploads: false,
-        object_resizing: 'img',
-        file_picker_types: 'file media',
+// Resim önizleme fonksiyonu
+function previewImages(input) {
+    const previewDiv = document.getElementById('image-preview');
+    const previewContainer = document.getElementById('preview-container');
+    
+    // Önceki önizlemeleri temizle
+    previewContainer.innerHTML = '';
+    
+    if (input.files && input.files.length > 0) {
+        previewDiv.style.display = 'block';
         
-        images_upload_handler: function (blobInfo, success, failure) {
-            failure('Görsel yükleme devre dışı.');
-        },
-        
-        image_title: false,
-        image_description: false, 
-        image_advtab: false,
-        image_uploadtab: false,
-        
-        file_picker_callback: function (callback, value, meta) {
-            if (meta.filetype === 'image') {
-                const tempId = Date.now();
-                const relatedType = 'guide_place_content';
-                
-                const mediapickerUrl = '/admin/filemanagersystem/mediapicker?type=image&filter=all&related_type=' + relatedType + '&related_id=' + tempId;
-                
-                $('#mediapickerFrame').attr('src', mediapickerUrl);
-                
-                var modal = new bootstrap.Modal(document.getElementById('mediapickerModal'));
-                modal.show();
-                
-                function handleFilePickerSelection(event) {
-                    try {
-                        if (event.data && event.data.type === 'mediaSelected') {
-                            let mediaUrl = '';
-                            let altText = event.data.mediaAlt || '';
-                            
-                            if (event.data.mediaUrl) {
-                                mediaUrl = event.data.mediaUrl;
-                                
-                                if (mediaUrl && mediaUrl.startsWith('/')) {
-                                    const baseUrl = window.location.protocol + '//' + window.location.host;
-                                    mediaUrl = baseUrl + mediaUrl;
-                                }
-                            } else if (event.data.mediaId) {
-                                const previewUrl = '/admin/filemanagersystem/media/preview/' + event.data.mediaId;
-                                mediaUrl = previewUrl;
-                            }
-                            
-                            if (mediaUrl) {
-                                callback(mediaUrl, { alt: altText });
-                                modal.hide();
-                                window.removeEventListener('message', handleFilePickerSelection);
-                            }
-                        } else if (event.data && event.data.type === 'mediapickerError') {
-                            console.error('FileManagerSystem hatası:', event.data.message);
-                            alert('Medya seçici hatası: ' + event.data.message);
-                            modal.hide();
-                            window.removeEventListener('message', handleFilePickerSelection);
-                        }
-                    } catch (error) {
-                        console.error('Medya seçimi işlenirken hata oluştu:', error);
-                        alert('Medya seçimi işlenirken bir hata oluştu.');
-                        window.removeEventListener('message', handleFilePickerSelection);
-                    }
-                }
-                
-                window.removeEventListener('message', handleFilePickerSelection);
-                window.addEventListener('message', handleFilePickerSelection);
-                
-                return false;
-            }
-            
-            if (meta.filetype === 'file' || meta.filetype === 'media') {
-                window.open('/filemanager/dialog.php?type=' + meta.filetype + '&field_id=tinymce-file', 'filemanager', 'width=900,height=600');
-                window.SetUrl = function (url, width, height, alt) {
-                    callback(url, {alt: alt});
+        Array.from(input.files).forEach((file, index) => {
+            if (file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const imageDiv = document.createElement('div');
+                    imageDiv.className = 'image-preview-item position-relative d-inline-block me-2 mb-2';
+                    imageDiv.innerHTML = `
+                        <img src="${e.target.result}" 
+                             class="img-thumbnail" 
+                             style="width: 100px; height: 100px; object-fit: cover;">
+                        <button type="button" 
+                                class="btn btn-danger btn-sm position-absolute" 
+                                style="top: -5px; right: -5px; width: 20px; height: 20px; padding: 0; border-radius: 50%; font-size: 10px;"
+                                onclick="removePreviewImage(this, ${index})">
+                            ×
+                        </button>
+                    `;
+                    previewContainer.appendChild(imageDiv);
                 };
+                reader.readAsDataURL(file);
             }
-        },
-        
-        setup: function (editor) {
-            editor.on('PreInit', function() {
-                editor.on('BeforeExecCommand', function(e) {
-                    if (e.command === 'mceImage') {
-                        openFileManagerSystemPicker(editor);
-                        e.preventDefault();
-                        return false;
-                    }
-                });
-            });
-            
-            editor.on('init', function() {
-                editor.ui.registry.addButton('customimage', {
-                    icon: 'image',
-                    tooltip: 'Resim Ekle/Düzenle',
-                    onAction: function() {
-                        openFileManagerSystemPicker(editor);
-                    }
-                });
-                
-                editor.ui.registry.addButton('quickimage', {
-                    icon: 'image',
-                    tooltip: 'Hızlı Resim Ekle',
-                    onAction: function() {
-                        openFileManagerSystemPicker(editor);
-                    }
-                });
-            });
+        });
+    } else {
+        previewDiv.style.display = 'none';
+    }
+}
+
+// Önizleme resmini kaldır
+function removePreviewImage(button, index) {
+    const input = document.getElementById('images');
+    const dt = new DataTransfer();
+    
+    // Mevcut dosyaları al ve belirtilen index'i hariç tut
+    Array.from(input.files).forEach((file, i) => {
+        if (i !== index) {
+            dt.items.add(file);
         }
     });
     
-    function openFileManagerSystemPicker(editor) {
-        const tempId = Date.now();
-        const relatedType = 'guide_place_content';
-        const mediapickerUrl = '/admin/filemanagersystem/mediapicker?type=image&filter=all&related_type=' + relatedType + '&related_id=' + tempId;
-        
-        $('#mediapickerFrame').attr('src', mediapickerUrl);
-        var modal = new bootstrap.Modal(document.getElementById('mediapickerModal'));
-        modal.show();
-        
-        function handleSelection(event) {
-            try {
-                if (event.data && event.data.type === 'mediaSelected') {
-                    let mediaUrl = '';
-                    let altText = event.data.mediaAlt || '';
-                    
-                    if (event.data.mediaUrl) {
-                        mediaUrl = event.data.mediaUrl;
-                        if (mediaUrl && mediaUrl.startsWith('/')) {
-                            const baseUrl = window.location.protocol + '//' + window.location.host;
-                            mediaUrl = baseUrl + mediaUrl;
-                        }
-                    } else if (event.data.mediaId) {
-                        mediaUrl = '/admin/filemanagersystem/media/preview/' + event.data.mediaId;
-                    }
-                    
-                    if (mediaUrl) {
-                        editor.insertContent('<img src="' + mediaUrl + '" alt="' + altText + '" />');
-                        modal.hide();
-                        window.removeEventListener('message', handleSelection);
-                    }
-                }
-            } catch (error) {
-                console.error('Medya seçimi hatası:', error);
-                window.removeEventListener('message', handleSelection);
-            }
-        }
-        
-        window.removeEventListener('message', handleSelection);
-        window.addEventListener('message', handleSelection);
-    }
+    // Input'u güncelle
+    input.files = dt.files;
     
-    // Slug otomatik oluşturma
+    // Önizlemeyi güncelle
+    previewImages(input);
+}
+
+// Slug otomatik oluşturma
+$(document).ready(function() {
     const titleInput = document.getElementById('title');
     const slugInput = document.getElementById('slug');
     
     if (titleInput && slugInput) {
         titleInput.addEventListener('input', function() {
-            if (!slugInput.value || slugInput.dataset.manual !== 'true') {
-                slugInput.value = createSlug(this.value);
-            }
-        });
-        
-        slugInput.addEventListener('input', function() {
-            this.dataset.manual = 'true';
-        });
-    }
-    
-    // Fotoğraf önizleme
-    const imageInput = document.getElementById('images');
-    const imagePreview = document.getElementById('image-preview');
-    
-    if (imageInput && imagePreview) {
-        imageInput.addEventListener('change', function() {
-            const files = this.files;
-            imagePreview.innerHTML = '';
-            
-            if (files.length > 0) {
-                imagePreview.style.display = 'grid';
-                
-                Array.from(files).forEach((file, index) => {
-                    if (file.type.startsWith('image/')) {
-                        const reader = new FileReader();
-                        reader.onload = function(e) {
-                            const div = document.createElement('div');
-                            div.className = 'gallery-item';
-                            div.innerHTML = `
-                                <img src="${e.target.result}" alt="Önizleme ${index + 1}">
-                                ${index === 0 ? '<div class="badge bg-primary position-absolute top-0 start-0 m-2">Vitrin</div>' : ''}
-                            `;
-                            imagePreview.appendChild(div);
-                        };
-                        reader.readAsDataURL(file);
-                    }
-                });
-            } else {
-                imagePreview.style.display = 'none';
+            if (slugInput.value === '') {
+                const title = this.value;
+                const slug = title.toLowerCase()
+                    .replace(/ğ/g, 'g')
+                    .replace(/ü/g, 'u')
+                    .replace(/ş/g, 's')
+                    .replace(/ı/g, 'i')
+                    .replace(/ö/g, 'o')
+                    .replace(/ç/g, 'c')
+                    .replace(/[^a-z0-9\s-]/g, '')
+                    .replace(/\s+/g, '-')
+                    .replace(/-+/g, '-')
+                    .trim('-');
+                slugInput.value = slug;
             }
         });
     }
-    
-    // Karakter sayacı
-    const metaTitleInput = document.getElementById('meta_title');
-    const metaDescInput = document.getElementById('meta_description');
-    
-    if (metaTitleInput) {
-        metaTitleInput.addEventListener('input', function() {
-            const length = this.value.length;
-            const maxLength = 60;
-            const color = length > maxLength ? 'text-danger' : (length > 50 ? 'text-warning' : 'text-success');
-            
-            let counter = this.parentNode.querySelector('.char-counter');
-            if (!counter) {
-                counter = document.createElement('div');
-                counter.className = 'char-counter form-text';
-                this.parentNode.appendChild(counter);
-            }
-            counter.className = `char-counter form-text ${color}`;
-            counter.textContent = `${length}/${maxLength} karakter`;
-        });
-    }
-    
-    if (metaDescInput) {
-        metaDescInput.addEventListener('input', function() {
-            const length = this.value.length;
-            const maxLength = 160;
-            const color = length > maxLength ? 'text-danger' : (length > 150 ? 'text-warning' : 'text-success');
-            
-            let counter = this.parentNode.querySelector('.char-counter');
-            if (!counter) {
-                counter = document.createElement('div');
-                counter.className = 'char-counter form-text';
-                this.parentNode.appendChild(counter);
-            }
-            counter.className = `char-counter form-text ${color}`;
-            counter.textContent = `${length}/${maxLength} karakter`;
-        });
-    }
-    
-    // Tooltip'leri başlat
-    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[title]'));
-    tooltipTriggerList.map(function (tooltipTriggerEl) {
-        return new bootstrap.Tooltip(tooltipTriggerEl);
-    });
 });
-
-// Slug oluşturma fonksiyonu
-function createSlug(text) {
-    const turkishMap = {
-        'ç': 'c', 'ğ': 'g', 'ı': 'i', 'ö': 'o', 'ş': 's', 'ü': 'u',
-        'Ç': 'c', 'Ğ': 'g', 'I': 'i', 'İ': 'i', 'Ö': 'o', 'Ş': 's', 'Ü': 'u'
-    };
-    
-    return text
-        .split('')
-        .map(char => turkishMap[char] || char)
-        .join('')
-        .toLowerCase()
-        .replace(/[^a-z0-9\s-]/g, '')
-        .replace(/\s+/g, '-')
-        .replace(/-+/g, '-')
-        .replace(/^-|-$/g, '');
-}
 </script>
 @endsection 

@@ -95,13 +95,6 @@
             <h1 class="text-3xl md:text-4xl font-bold text-white mb-4">
                 {{ $category->name }} <span class="text-[#e6a23c]">Rehberi</span>
             </h1>
-            <p class="text-white/80 text-lg mb-5 max-w-4xl">
-                @if($category->description)
-                    {{ $category->description }}
-                @else
-                    {{ $category->name }} kategorisindeki tüm lokasyonlara kolayca ulaşın. İhtiyacınız olan bilgilere hızlıca erişin.
-                @endif
-            </p>
             
             <!-- Arama Kutusu -->
             <form method="GET" class="mt-6 w-full max-w-2xl">
@@ -159,16 +152,12 @@
                         <div class="p-4 md:p-6">
                             <h3 class="text-lg md:text-xl font-bold text-gray-900 mb-2 md:mb-3 group-hover:text-[#004d2e] transition-colors duration-300 leading-tight">{{ $place->title }}</h3>
                             
-                            @if($place->excerpt)
-                                <p class="text-sm md:text-base text-gray-600 mb-3 md:mb-4 line-clamp-2 leading-relaxed">{{ $place->excerpt }}</p>
-                            @endif
-                            
                             <!-- İletişim Bilgileri -->
                             <div class="space-y-2 md:space-y-3 mb-4 md:mb-6">
                                 @if($place->address)
                                     <div class="flex items-start text-xs md:text-sm text-gray-600">
                                         <span class="material-icons text-[#004d2e] mr-2 md:mr-3 mt-0.5 text-sm md:text-base">location_on</span>
-                                        <span class="flex-1 leading-relaxed">{{ Str::limit($place->address, 45) }}</span>
+                                        <span class="flex-1 leading-relaxed">{{ $place->address }}</span>
                                     </div>
                                 @endif
                                 

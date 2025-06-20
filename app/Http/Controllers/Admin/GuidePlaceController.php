@@ -474,4 +474,6 @@ class GuidePlaceController extends Controller
         
         Storage::disk('public')->put($mediumPath . '/' . $mediumFilename, $image->encode());
     }
+    
+
 }

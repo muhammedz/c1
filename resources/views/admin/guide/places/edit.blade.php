@@ -3,6 +3,7 @@
 @section('title', 'Yer Düzenle - ' . $guidePlace->title)
 
 @section('content_header')
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <div class="d-flex justify-content-between align-items-center">
         <h1>Yer Düzenle</h1>
         <div>
@@ -340,28 +341,43 @@
         <!-- Yeni Resim Yükleme -->
         <div class="card">
             <div class="card-header">
-                <h3 class="card-title">Resim Yükle</h3>
+                <h3 class="card-title">
+                    <i class="fas fa-images me-2"></i>
+                    Resim Yükle
+                </h3>
             </div>
             <div class="card-body">
+                <div class="mb-3">
+                    <small class="text-muted d-block">
+                        <i class="fas fa-info-circle me-1"></i>
+                        Yere ait fotoğrafları yüklemek için birden fazla resim seçebilirsiniz.
+                    </small>
+                </div>
+                
                 <div class="form-group">
                     <label for="images">Resimler</label>
                     <input type="file" 
-                           class="form-control-file @error('images.*') is-invalid @enderror" 
+                           class="form-control @error('images.*') is-invalid @enderror" 
                            id="images" 
                            name="images[]" 
                            multiple 
                            accept="image/*"
-                           form="place-form">
+                           onchange="previewImages(this)">
                     @error('images.*')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                     <small class="form-text text-muted">
-                        Birden fazla resim seçebilirsiniz. Maksimum 5MB per resim.
+                        JPG, PNG, GIF formatlarında, maksimum 5MB boyutunda resimler yükleyebilirsiniz.
                     </small>
                 </div>
                 
                 <!-- Resim Önizleme -->
-                <div id="image-preview" class="row mt-3"></div>
+                <div id="image-preview" class="mt-3" style="display: none;">
+                    <h6>Seçilen Resimler:</h6>
+                    <div id="preview-container" class="d-flex flex-wrap gap-2">
+                        <!-- Önizlemeler buraya gelecek -->
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -370,6 +386,75 @@
 
 @section('css')
 <style>
+    .upload-dropzone {
+        border: 2px dashed #3490dc;
+        border-radius: 8px;
+        background: #f8fafc;
+        min-height: 150px;
+        padding: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .upload-dropzone:hover,
+    .upload-dropzone.dragover {
+        border-color: #2779bd;
+        background: #f1f7fe;
+    }
+    
+    .gallery-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 15px;
+        margin-top: 1rem;
+    }
+    
+    .gallery-item {
+        position: relative;
+        aspect-ratio: 1;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 4px rgba(0,0,0,.1);
+        background-color: #f8f9fa;
+        border: 1px solid #dee2e6;
+    }
+    
+    .gallery-item img {
+        width: 100% !important;
+        height: 100% !important;
+        object-fit: cover !important;
+        max-height: none !important;
+    }
+    
+    .gallery-item .remove-btn {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        background: rgba(255,255,255,.9);
+        border-radius: 50%;
+        width: 28px;
+        height: 28px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        border: none;
+        color: #e3342f;
+    }
+    
+    .gallery-item .remove-btn:hover {
+        background: #fff;
+        transform: scale(1.1);
+    }
+    
+    .character-count {
+        font-size: 0.875rem;
+        color: #6c757d;
+    }
+    
     .image-preview {
         position: relative;
         display: inline-block;
@@ -397,104 +482,66 @@
         font-size: 12px;
         cursor: pointer;
     }
-    
-    .character-count {
-        font-size: 0.875rem;
-        color: #6c757d;
-    }
 </style>
 @stop
 
 @section('js')
 <script>
-$(document).ready(function() {
-    // TinyMCE
-    if (typeof tinymce !== 'undefined') {
-        tinymce.init({
-            selector: '.tinymce',
-            height: 400,
-            language: 'tr',
-            plugins: 'advlist autolink lists link image charmap print preview anchor searchreplace visualblocks code fullscreen insertdatetime media table paste code help wordcount',
-            toolbar: 'undo redo | formatselect | bold italic backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | help',
-            file_picker_callback: function(callback, value, meta) {
-                if (typeof FileManagerSystem !== 'undefined') {
-                    FileManagerSystem.open(callback);
-                }
+// Resim önizleme fonksiyonu
+function previewImages(input) {
+    const previewDiv = document.getElementById('image-preview');
+    const previewContainer = document.getElementById('preview-container');
+    
+    // Önceki önizlemeleri temizle
+    previewContainer.innerHTML = '';
+    
+    if (input.files && input.files.length > 0) {
+        previewDiv.style.display = 'block';
+        
+        Array.from(input.files).forEach((file, index) => {
+            if (file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const imageDiv = document.createElement('div');
+                    imageDiv.className = 'image-preview-item position-relative d-inline-block me-2 mb-2';
+                    imageDiv.innerHTML = `
+                        <img src="${e.target.result}" 
+                             class="img-thumbnail" 
+                             style="width: 100px; height: 100px; object-fit: cover;">
+                        <button type="button" 
+                                class="btn btn-danger btn-sm position-absolute" 
+                                style="top: -5px; right: -5px; width: 20px; height: 20px; padding: 0; border-radius: 50%; font-size: 10px;"
+                                onclick="removePreviewImage(this, ${index})">
+                            ×
+                        </button>
+                    `;
+                    previewContainer.appendChild(imageDiv);
+                };
+                reader.readAsDataURL(file);
             }
         });
+    } else {
+        previewDiv.style.display = 'none';
     }
-    
-    // Karakter sayacları
-    function updateCharCount(inputId, countId, maxLength) {
-        const input = document.getElementById(inputId);
-        const counter = document.getElementById(countId);
-        
-        if (input && counter) {
-            const updateCount = () => {
-                const length = input.value.length;
-                counter.textContent = length;
-                counter.style.color = length > maxLength ? '#dc3545' : '#6c757d';
-            };
-            
-            input.addEventListener('input', updateCount);
-            updateCount();
-        }
-    }
-    
-    updateCharCount('title', 'titleCount', 255);
-    updateCharCount('excerpt', 'excerptCount', 500);
-    updateCharCount('meta_title', 'metaTitleCount', 60);
-    updateCharCount('meta_description', 'metaDescCount', 160);
-    
-    // Slug otomatik oluşturma
-    $('#title').on('input', function() {
-        if ($('#slug').val() === '') {
-            const title = $(this).val();
-            const slug = title.toLowerCase()
-                .replace(/ğ/g, 'g')
-                .replace(/ü/g, 'u')
-                .replace(/ş/g, 's')
-                .replace(/ı/g, 'i')
-                .replace(/ö/g, 'o')
-                .replace(/ç/g, 'c')
-                .replace(/[^a-z0-9\s-]/g, '')
-                .replace(/\s+/g, '-')
-                .replace(/-+/g, '-')
-                .trim('-');
-            $('#slug').val(slug);
-        }
-    });
-    
-    // Resim önizleme
-    $('#images').on('change', function() {
-        const files = this.files;
-        const preview = $('#image-preview');
-        preview.empty();
-        
-        for (let i = 0; i < files.length; i++) {
-            const file = files[i];
-            const reader = new FileReader();
-            
-            reader.onload = function(e) {
-                const imageDiv = $(`
-                    <div class="col-6 mb-2">
-                        <div class="image-preview">
-                            <img src="${e.target.result}" alt="Preview">
-                            <button type="button" class="remove-image" onclick="removePreviewImage(this)">×</button>
-                        </div>
-                    </div>
-                `);
-                preview.append(imageDiv);
-            };
-            
-            reader.readAsDataURL(file);
-        }
-    });
-});
+}
 
 // Önizleme resmini kaldır
-function removePreviewImage(button) {
-    $(button).closest('.col-6').remove();
+function removePreviewImage(button, index) {
+    const input = document.getElementById('images');
+    const dt = new DataTransfer();
+    
+    // Mevcut dosyaları al ve belirtilen index'i hariç tut
+    Array.from(input.files).forEach((file, i) => {
+        if (i !== index) {
+            dt.items.add(file);
+        }
+    });
+    
+    // Input'u güncelle
+    input.files = dt.files;
+    
+    // Önizlemeyi güncelle
+    previewImages(input);
 }
 
 // Öne çıkan resim toggle
@@ -544,5 +591,31 @@ function deleteImage(imageId) {
         });
     }
 }
+
+// Slug otomatik oluşturma
+$(document).ready(function() {
+    const titleInput = document.getElementById('title');
+    const slugInput = document.getElementById('slug');
+    
+    if (titleInput && slugInput) {
+        titleInput.addEventListener('input', function() {
+            if (slugInput.value === '') {
+                const title = this.value;
+                const slug = title.toLowerCase()
+                    .replace(/ğ/g, 'g')
+                    .replace(/ü/g, 'u')
+                    .replace(/ş/g, 's')
+                    .replace(/ı/g, 'i')
+                    .replace(/ö/g, 'o')
+                    .replace(/ç/g, 'c')
+                    .replace(/[^a-z0-9\s-]/g, '')
+                    .replace(/\s+/g, '-')
+                    .replace(/-+/g, '-')
+                    .trim('-');
+                slugInput.value = slug;
+            }
+        });
+    }
+});
 </script>
 @stop
