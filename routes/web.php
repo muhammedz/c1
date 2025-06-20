@@ -594,6 +594,7 @@ Route::prefix('mudurlukler')->name('mudurlukler.')->group(function () {
     Route::get('/', [App\Http\Controllers\Front\MudurlukController::class, 'index'])->name('index');
     Route::get('/{slug}', [App\Http\Controllers\Front\MudurlukController::class, 'show'])->name('show');
     Route::get('/{slug}/download/{file}', [App\Http\Controllers\Front\MudurlukController::class, 'downloadFile'])->name('download-file');
+    Route::get('/{slug}/view/{file}', [App\Http\Controllers\Front\MudurlukController::class, 'viewFile'])->name('view-file');
 });
 
 // Ön Yüz Sayfa Rotaları

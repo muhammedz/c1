@@ -110,4 +110,38 @@ class MudurlukController extends Controller
             $file->file_name
         );
     }
+
+    /**
+     * Dosya görüntüleme
+     */
+    public function viewFile($mudurlukSlug, MudurlukFile $file)
+    {
+        // Müdürlük kontrolü
+        $mudurluk = Mudurluk::where('slug', $mudurlukSlug)->firstOrFail();
+        
+        // Dosyanın bu müdürlüğe ait olduğunu kontrol et
+        if ($file->mudurluk_id !== $mudurluk->id) {
+            abort(404);
+        }
+
+        // Dosyanın aktif olduğunu kontrol et
+        if (!$file->is_active) {
+            abort(404, 'Dosya artık erişilebilir değil.');
+        }
+
+        // Dosyanın var olduğunu kontrol et
+        if (!Storage::disk('public')->exists($file->file_path)) {
+            abort(404, 'Dosya bulunamadı.');
+        }
+
+        // Dosyayı tarayıcıda görüntüle
+        return Storage::disk('public')->response(
+            $file->file_path,
+            $file->file_name,
+            [
+                'Content-Type' => 'application/pdf',
+                'Content-Disposition' => 'inline; filename="' . $file->file_name . '"'
+            ]
+        );
+    }
 }

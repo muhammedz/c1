@@ -613,7 +613,7 @@ input[name="project-category"] {
     }
     
     // Kategori değiştirme fonksiyonu
-    function changeCategory(selectedCategory) {
+    function changeCategory(selectedCategory, shouldScroll) {
         protectProjectsSection();
         
         const categoryLabel = document.querySelector('label[for="category-' + selectedCategory + '"]');
@@ -669,8 +669,8 @@ input[name="project-category"] {
             }
         }
         
-        // Mobilde proje alanına scroll yap
-        if (window.innerWidth <= 1024) { // lg breakpoint (1024px) altında mobil kabul et
+        // Mobilde proje alanına scroll yap (sadece kullanıcı tıkladığında)
+        if (shouldScroll && window.innerWidth <= 1024) { // lg breakpoint (1024px) altında mobil kabul et
             setTimeout(function() {
                 const projectsContainer = document.querySelector('#projects-section .lg\\:col-span-3');
                 if (projectsContainer) {
@@ -694,7 +694,7 @@ input[name="project-category"] {
                 radio.addEventListener('change', function(e) {
                     e.stopPropagation();
                     e.preventDefault();
-                    changeCategory(this.value);
+                    changeCategory(this.value, true); // Kullanıcı etkileşimi, scroll yap
             return false;
                 }, true);
             });
@@ -713,7 +713,7 @@ input[name="project-category"] {
                     const radio = document.getElementById(radioId);
                     if (radio) {
                         radio.checked = true;
-                        changeCategory(radio.value);
+                        changeCategory(radio.value, true); // Kullanıcı etkileşimi, scroll yap
                     }
                     
                     return false;
@@ -910,11 +910,11 @@ input[name="project-category"] {
         
         isInitialized = true;
         
-        // İlk kategoriyi seç
+        // İlk kategoriyi seç (scroll yapmadan)
         setTimeout(function() {
             const firstRadio = document.querySelector('input[name="project-category"]:checked');
             if (firstRadio) {
-                changeCategory(firstRadio.value);
+                changeCategory(firstRadio.value, false); // Initialization, scroll yapma
             }
         }, 100);
     }

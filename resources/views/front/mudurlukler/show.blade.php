@@ -300,7 +300,11 @@
                                         <h3 class="font-semibold text-gray-800">{{ $file->title }}</h3>
                                     </div>
                                     <p class="text-sm text-gray-600 mb-4">{{ $file->file_name }} • {{ number_format($file->file_size / 1024, 1) }} KB</p>
-                                    <div class="mt-auto flex items-center">
+                                    <div class="mt-auto flex items-center gap-4">
+                                        <a href="{{ route('mudurlukler.view-file', [$mudurluk->slug, $file]) }}" target="_blank" class="inline-flex items-center text-[#00352b] hover:text-[#20846c] transition-colors">
+                                            <span class="material-icons mr-1 text-sm">visibility</span>
+                                            <span class="text-sm font-medium">Görüntüle</span>
+                                        </a>
                                         <a href="{{ route('mudurlukler.download-file', [$mudurluk->slug, $file]) }}" class="inline-flex items-center text-[#00352b] hover:text-[#20846c] transition-colors">
                                             <span class="material-icons mr-1 text-sm">file_download</span>
                                             <span class="text-sm font-medium">İndir</span>
@@ -329,7 +333,11 @@
                                         <h3 class="font-semibold text-gray-800">{{ $file->title }}</h3>
                                     </div>
                                     <p class="text-sm text-gray-600 mb-4">{{ $file->file_name }} • {{ number_format($file->file_size / 1024, 1) }} KB</p>
-                                    <div class="mt-auto flex items-center">
+                                    <div class="mt-auto flex items-center gap-4">
+                                        <a href="{{ route('mudurlukler.view-file', [$mudurluk->slug, $file]) }}" target="_blank" class="inline-flex items-center text-[#00352b] hover:text-[#20846c] transition-colors">
+                                            <span class="material-icons mr-1 text-sm">visibility</span>
+                                            <span class="text-sm font-medium">Görüntüle</span>
+                                        </a>
                                         <a href="{{ route('mudurlukler.download-file', [$mudurluk->slug, $file]) }}" class="inline-flex items-center text-[#00352b] hover:text-[#20846c] transition-colors">
                                             <span class="material-icons mr-1 text-sm">file_download</span>
                                             <span class="text-sm font-medium">İndir</span>
@@ -358,7 +366,11 @@
                                         <h3 class="font-semibold text-gray-800">{{ $file->title }}</h3>
                                     </div>
                                     <p class="text-sm text-gray-600 mb-4">{{ $file->file_name }} • {{ number_format($file->file_size / 1024, 1) }} KB</p>
-                                    <div class="mt-auto flex items-center">
+                                    <div class="mt-auto flex items-center gap-4">
+                                        <a href="{{ route('mudurlukler.view-file', [$mudurluk->slug, $file]) }}" target="_blank" class="inline-flex items-center text-[#00352b] hover:text-[#20846c] transition-colors">
+                                            <span class="material-icons mr-1 text-sm">visibility</span>
+                                            <span class="text-sm font-medium">Görüntüle</span>
+                                        </a>
                                         <a href="{{ route('mudurlukler.download-file', [$mudurluk->slug, $file]) }}" class="inline-flex items-center text-[#00352b] hover:text-[#20846c] transition-colors">
                                             <span class="material-icons mr-1 text-sm">file_download</span>
                                             <span class="text-sm font-medium">İndir</span>
