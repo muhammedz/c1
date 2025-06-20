@@ -99,12 +99,14 @@ class FrontController extends Controller
                 $projects = Project::where('is_active', true)
                     ->where('category_id', $categoryId)
                     ->orderBy('order')
-                    ->paginate($projectSettings->items_per_page ?? 12);
+                    ->paginate($projectSettings->items_per_page ?? 12)
+                    ->appends($request->query());
             } else {
                 // Tüm projeler
                 $projects = Project::where('is_active', true)
                     ->orderBy('order')
-                    ->paginate($projectSettings->items_per_page ?? 12);
+                    ->paginate($projectSettings->items_per_page ?? 12)
+                    ->appends($request->query());
             }
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::error('Proje getirme hatası: ' . $e->getMessage());
@@ -148,7 +150,7 @@ class FrontController extends Controller
     /**
      * Kategori bazlı proje listesi
      */
-    public function projectCategory($slug)
+    public function projectCategory($slug, Request $request)
     {
         $projectSettings = ProjectSetting::getSettings();
         $categories = ProjectCategory::getActiveCategories();
@@ -163,7 +165,8 @@ class FrontController extends Controller
             $projects = Project::where('category_id', $category->id)
                 ->where('is_active', true)
                 ->orderBy('order')
-                ->paginate($projectSettings->items_per_page ?? 10);
+                ->paginate($projectSettings->items_per_page ?? 10)
+                ->appends($request->query());
                 
             return view('front.project-category', compact('category', 'categories', 'projects', 'projectSettings'));
         } catch (\Exception $e) {
