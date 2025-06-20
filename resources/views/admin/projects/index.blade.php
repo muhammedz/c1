@@ -65,6 +65,75 @@
                         </div>
                     @endif
                     
+                    <!-- Arama ve Filtreleme -->
+                    <div class="row mb-3">
+                        <div class="col-md-12">
+                            <form method="GET" action="{{ route('admin.projects.index') }}" class="form-inline">
+                                <!-- Arama -->
+                                <div class="form-group mr-3">
+                                    <div class="input-group">
+                                        <input type="text" name="search" class="form-control" placeholder="Proje ara..." value="{{ request('search') }}">
+                                        <div class="input-group-append">
+                                            <button class="btn btn-outline-secondary" type="submit">
+                                                <i class="fas fa-search"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Kategori Filtresi -->
+                                <div class="form-group mr-3">
+                                    <select name="category_id" class="form-control">
+                                        <option value="">Tüm Kategoriler</option>
+                                        @foreach($categories as $category)
+                                            <option value="{{ $category->id }}" {{ request('category_id') == $category->id ? 'selected' : '' }}>
+                                                {{ $category->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                
+                                <!-- Durum Filtresi -->
+                                <div class="form-group mr-3">
+                                    <select name="status" class="form-control">
+                                        <option value="">Tüm Durumlar</option>
+                                        <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>Aktif</option>
+                                        <option value="inactive" {{ request('status') == 'inactive' ? 'selected' : '' }}>Pasif</option>
+                                        <option value="homepage" {{ request('status') == 'homepage' ? 'selected' : '' }}>Anasayfada</option>
+                                    </select>
+                                </div>
+                                
+                                <!-- Sıralama -->
+                                <div class="form-group mr-3">
+                                    <select name="sort" class="form-control">
+                                        <option value="project_date" {{ request('sort', 'project_date') == 'project_date' ? 'selected' : '' }}>Proje Tarihi</option>
+                                        <option value="title" {{ request('sort') == 'title' ? 'selected' : '' }}>Proje Adı</option>
+                                        <option value="created_at" {{ request('sort') == 'created_at' ? 'selected' : '' }}>Oluşturulma Tarihi</option>
+                                        <option value="order" {{ request('sort') == 'order' ? 'selected' : '' }}>Sıra</option>
+                                    </select>
+                                </div>
+                                
+                                <!-- Sıralama Yönü -->
+                                <div class="form-group mr-3">
+                                    <select name="direction" class="form-control">
+                                        <option value="desc" {{ request('direction', 'desc') == 'desc' ? 'selected' : '' }}>Azalan</option>
+                                        <option value="asc" {{ request('direction') == 'asc' ? 'selected' : '' }}>Artan</option>
+                                    </select>
+                                </div>
+                                
+                                <!-- Filtrele Butonu -->
+                                <button type="submit" class="btn btn-primary mr-2">
+                                    <i class="fas fa-filter"></i> Filtrele
+                                </button>
+                                
+                                <!-- Temizle Butonu -->
+                                <a href="{{ route('admin.projects.index') }}" class="btn btn-secondary">
+                                    <i class="fas fa-times"></i> Temizle
+                                </a>
+                            </form>
+                        </div>
+                    </div>
+                    
                     <div class="table-responsive">
                         <table class="table table-bordered table-striped">
                             <thead>
@@ -73,6 +142,7 @@
                                     <th style="width: 100px;">Görsel</th>
                                     <th>Proje Adı</th>
                                     <th>Kategori</th>
+                                    <th>Proje Tarihi</th>
                                     <th>Durum</th>
                                     <th style="width: 200px;">İşlemler</th>
                                 </tr>
@@ -98,6 +168,13 @@
                                                 <span class="badge badge-primary">{{ $project->category->name }}</span>
                                             @else
                                                 <span class="badge badge-warning">Kategori Yok</span>
+                                            @endif
+                                        </td>
+                                        <td>
+                                            @if($project->project_date)
+                                                <span class="text-muted">{{ $project->project_date->format('d.m.Y') }}</span>
+                                            @else
+                                                <span class="text-muted">-</span>
                                             @endif
                                         </td>
                                         <td>
@@ -133,12 +210,25 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="6" class="text-center">Henüz proje eklenmemiş.</td>
+                                        <td colspan="7" class="text-center">
+                                            @if(request()->hasAny(['search', 'category_id', 'status']))
+                                                Arama kriterlerine uygun proje bulunamadı.
+                                            @else
+                                                Henüz proje eklenmemiş.
+                                            @endif
+                                        </td>
                                     </tr>
                                 @endforelse
                             </tbody>
                         </table>
                     </div>
+                    
+                    <!-- Sayfalama -->
+                    @if($projects->hasPages())
+                        <div class="d-flex justify-content-center">
+                            {{ $projects->links() }}
+                        </div>
+                    @endif
                 </div>
                 <div class="card-footer">
                     <a href="{{ route('admin.projects.create') }}" class="btn btn-primary">
@@ -154,8 +244,14 @@
         <div class="col-md-3">
             <div class="small-box bg-info">
                 <div class="inner">
-                    <h3>{{ $projects->count() }}</h3>
-                    <p>Toplam Proje</p>
+                    <h3>{{ $projects->total() }}</h3>
+                    <p>
+                        @if(request()->hasAny(['search', 'category_id', 'status']))
+                            Filtrelenmiş Proje
+                        @else
+                            Toplam Proje
+                        @endif
+                    </p>
                 </div>
                 <div class="icon">
                     <i class="fas fa-project-diagram"></i>
@@ -227,6 +323,11 @@
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
     <script>
         $(document).ready(function() {
+            // Otomatik filtreleme
+            $('select[name="category_id"], select[name="status"], select[name="sort"], select[name="direction"]').change(function() {
+                $(this).closest('form').submit();
+            });
+            
             // Modül Görünürlük Değiştirme
             $('#toggle-visibility-btn').click(function() {
                 $.ajax({

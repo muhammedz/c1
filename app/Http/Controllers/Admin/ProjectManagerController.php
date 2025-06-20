@@ -17,9 +17,48 @@ class ProjectManagerController extends Controller
     /**
      * Projelerin listelendiği ana sayfa
      */
-    public function index()
+    public function index(Request $request)
     {
-        $projects = Project::with('category')->orderBy('order', 'asc')->get();
+        $query = Project::with('category');
+        
+        // Arama
+        if ($request->filled('search')) {
+            $search = $request->get('search');
+            $query->where(function($q) use ($search) {
+                $q->where('title', 'LIKE', "%{$search}%")
+                  ->orWhere('description', 'LIKE', "%{$search}%");
+            });
+        }
+        
+        // Kategori filtresi
+        if ($request->filled('category_id')) {
+            $query->where('category_id', $request->get('category_id'));
+        }
+        
+        // Durum filtresi
+        if ($request->filled('status')) {
+            $status = $request->get('status');
+            if ($status === 'active') {
+                $query->where('is_active', true);
+            } elseif ($status === 'inactive') {
+                $query->where('is_active', false);
+            } elseif ($status === 'homepage') {
+                $query->where('show_on_homepage', true);
+            }
+        }
+        
+        // Sıralama (proje tarihine göre, en yeni üstte)
+        $sortField = $request->get('sort', 'project_date');
+        $sortDirection = $request->get('direction', 'desc');
+        
+        if ($sortField === 'project_date') {
+            $query->orderBy('project_date', $sortDirection)
+                  ->orderBy('created_at', $sortDirection);
+        } else {
+            $query->orderBy($sortField, $sortDirection);
+        }
+        
+        $projects = $query->paginate(15)->appends($request->query());
         $categories = ProjectCategory::orderBy('order', 'asc')->get();
         $settings = ProjectSettings::first() ?? new ProjectSettings(['is_active' => true]);
         
