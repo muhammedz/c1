@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\SearchSetting;
 use App\Models\SearchQuickLink;
 use App\Models\SearchPopularQuery;
+use App\Models\SearchPriorityLink;
 use App\Models\SearchLog;
 use Illuminate\Http\Request;
 
@@ -19,19 +20,32 @@ class SearchSettingController extends Controller
         $settings = SearchSetting::getSettings();
         $quickLinks = SearchQuickLink::orderBy('order')->get();
         $popularQueries = SearchPopularQuery::orderBy('order')->get();
-        
-        // Arama istatistikleri
-        $searchStats = SearchLog::getSearchStats();
-        $recentSearches = SearchLog::getRecentSearches(20);
-        $popularSearches = SearchLog::getPopularSearches(10);
+        $priorityLinks = SearchPriorityLink::ordered()->get();
         
         return view('admin.search_settings.index', compact(
             'settings', 
             'quickLinks', 
             'popularQueries',
+            'priorityLinks'
+        ));
+    }
+    
+    /**
+     * Yapılan aramalar sayfasını göster
+     */
+    public function searches()
+    {
+        // Arama istatistikleri
+        $searchStats = SearchLog::getSearchStats();
+        $recentSearches = SearchLog::getRecentSearches(50);
+        $popularSearches = SearchLog::getPopularSearches(20);
+        $zeroResultSearches = SearchLog::getZeroResultSearches(30);
+        
+        return view('admin.search_settings.searches', compact(
             'searchStats',
             'recentSearches',
-            'popularSearches'
+            'popularSearches',
+            'zeroResultSearches'
         ));
     }
     

@@ -151,6 +151,44 @@
                             <h3 class="text-base md:text-lg font-medium text-gray-700 mb-2">Toplam <span class="font-bold">0</span> kayıt bulunmuştur.</h3>
                         </div>
                     @else
+                        <!-- Öncelik Linkleri -->
+                        @if(isset($results['priority_links']) && $results['priority_links']->count() > 0)
+                            <div id="priority_links" class="mb-4 md:mb-6">
+                                <div class="space-y-3">
+                                    @foreach($results['priority_links'] as $priorityLink)
+                                        <div class="bg-gradient-to-r from-[#004d2e] to-[#005540] text-white rounded-lg overflow-hidden transition-all hover:shadow-lg transform hover:-translate-y-1">
+                                            <div class="p-4">
+                                                <div class="flex items-start">
+                                                    @if($priorityLink->icon)
+                                                        <div class="flex-shrink-0 mr-3">
+                                                            <div class="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
+                                                                <i class="{{ $priorityLink->icon }} text-white text-lg"></i>
+                                                            </div>
+                                                        </div>
+                                                    @endif
+                                                    <div class="flex-1">
+                                                        <a href="{{ $priorityLink->full_url }}" class="text-lg font-semibold text-white hover:text-yellow-200 block transition-colors">
+                                                            {{ $priorityLink->title }}
+                                                        </a>
+                                                        @if($priorityLink->description)
+                                                            <p class="text-white/80 text-sm mt-1">{{ $priorityLink->description }}</p>
+                                                        @endif
+                                                        <div class="flex items-center mt-2 text-white/60 text-xs">
+                                                            <span class="material-icons text-xs mr-1">open_in_new</span>
+                                                            <span>{{ $priorityLink->url }}</span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="flex-shrink-0 ml-3">
+                                                        <span class="material-icons text-white/60">arrow_forward</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                        @endif
+
                         <!-- Servisler Sonuçları -->
                         @if(isset($results['services']) && $results['services']->count() > 0)
                             <div id="services" class="mb-4 md:mb-6">

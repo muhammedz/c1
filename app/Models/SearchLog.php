@@ -98,4 +98,28 @@ class SearchLog extends Model
             'zero_results' => self::where('searched_at', '>=', $startDate)->where('results_count', 0)->count(),
         ];
     }
+    
+    /**
+     * Sonuçsuz aramaları getir
+     */
+    public static function getZeroResultSearches($limit = 50, $days = 30)
+    {
+        $results = self::select('query')
+            ->selectRaw('COUNT(*) as search_count')
+            ->selectRaw('MAX(searched_at) as last_searched_raw')
+            ->where('searched_at', '>=', Carbon::now()->subDays($days))
+            ->where('results_count', 0)
+            ->groupBy('query')
+            ->orderByDesc('search_count')
+            ->limit($limit)
+            ->get();
+            
+        // last_searched'i Carbon instance'a çevir
+        $results->each(function ($item) {
+            $item->last_searched = Carbon::parse($item->last_searched_raw);
+            unset($item->last_searched_raw);
+        });
+        
+        return $results;
+    }
 }

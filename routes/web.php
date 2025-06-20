@@ -725,6 +725,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     // Ana Arama Ayarları
     Route::get('/search-settings', [App\Http\Controllers\Admin\SearchSettingController::class, 'index'])->name('search-settings.index');
     Route::post('/search-settings', [App\Http\Controllers\Admin\SearchSettingController::class, 'update'])->name('search-settings.update');
+    Route::get('/search-settings/aramalar', [App\Http\Controllers\Admin\SearchSettingController::class, 'searches'])->name('search-settings.searches');
     
     // Hızlı Aramalar
     Route::resource('/search-quick-links', App\Http\Controllers\Admin\SearchQuickLinkController::class)->parameters([
@@ -740,6 +741,13 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     Route::post('/search-popular-queries/order', [App\Http\Controllers\Admin\SearchPopularQueryController::class, 'updateOrder'])->name('search-popular-queries.order');
     Route::patch('/search-popular-queries/{popularQuery}/toggle-active', [App\Http\Controllers\Admin\SearchPopularQueryController::class, 'toggleActive'])->name('search-popular-queries.toggle-active');
     Route::get('/search-icons', [App\Http\Controllers\Admin\SearchPopularQueryController::class, 'getIcons'])->name('search-icons');
+    
+    // Öncelik Linkleri
+    Route::resource('/search-priority-links', App\Http\Controllers\Admin\SearchPriorityLinkController::class)->parameters([
+        'search-priority-links' => 'priorityLink'
+    ])->except(['show']);
+    Route::post('/search-priority-links/order', [App\Http\Controllers\Admin\SearchPriorityLinkController::class, 'updateOrder'])->name('search-priority-links.order');
+    Route::patch('/search-priority-links/{priorityLink}/toggle-active', [App\Http\Controllers\Admin\SearchPriorityLinkController::class, 'toggleActive'])->name('search-priority-links.toggle-active');
     
     // Genel Ayarlar Routes
     Route::get('/settings', [App\Http\Controllers\Admin\SettingsController::class, 'index'])->name('settings.index');

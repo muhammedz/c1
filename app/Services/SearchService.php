@@ -8,6 +8,7 @@ use App\Models\Project;
 use App\Models\GuidePlace;
 use App\Models\CankayaHouse;
 use App\Models\Mudurluk;
+use App\Models\SearchPriorityLink;
 use Illuminate\Support\Collection;
 
 class SearchService
@@ -22,6 +23,7 @@ class SearchService
     {
         if (empty($query)) {
             return [
+                'priority_links' => collect(),
                 'services' => collect(),
                 'news' => collect(),
                 'projects' => collect(),
@@ -35,6 +37,9 @@ class SearchService
         // Arama sorgusunu normalize et
         $normalizedQuery = $this->normalizeQuery($query);
         
+        // Priority Links'i getir (önce)
+        $priorityLinks = SearchPriorityLink::getMatchingLinks($query);
+        
         // Farklı arama stratejileri uygula
         $services = $this->searchServices($normalizedQuery, $query);
         $news = $this->searchNews($normalizedQuery, $query);
@@ -43,10 +48,11 @@ class SearchService
         $cankayaHouses = $this->searchCankayaHouses($normalizedQuery, $query);
         $mudurlukler = $this->searchMudurlukler($normalizedQuery, $query);
         
-        $totalCount = $services->count() + $news->count() + $projects->count() + 
+        $totalCount = $priorityLinks->count() + $services->count() + $news->count() + $projects->count() + 
                      $guides->count() + $cankayaHouses->count() + $mudurlukler->count();
         
         return [
+            'priority_links' => $priorityLinks,
             'services' => $services,
             'news' => $news,
             'projects' => $projects,

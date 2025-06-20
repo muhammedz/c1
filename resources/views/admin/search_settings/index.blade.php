@@ -199,129 +199,87 @@
                 </div>
             </div>
             
-            <!-- Yapılan Aramalar -->
+            <!-- Öncelik Linkleri -->
             <div class="card mt-4">
                 <div class="card-header">
-                    <h3 class="card-title">Yapılan Aramalar</h3>
+                    <h3 class="card-title">
+                        <i class="fas fa-link"></i> Öncelik Linkleri
+                    </h3>
+                    <div class="card-tools">
+                        <a href="{{ route('admin.search-priority-links.create') }}" class="btn btn-sm btn-primary">
+                            <i class="fas fa-plus"></i> Yeni Ekle
+                        </a>
+                    </div>
                 </div>
                 <div class="card-body">
-                    <!-- İstatistikler -->
-                    <div class="row mb-4">
-                        <div class="col-md-3">
-                            <div class="info-box">
-                                <span class="info-box-icon bg-info"><i class="fas fa-search"></i></span>
-                                <div class="info-box-content">
-                                    <span class="info-box-text">Toplam Arama</span>
-                                    <span class="info-box-number">{{ $searchStats['total_searches'] ?? 0 }}</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="info-box">
-                                <span class="info-box-icon bg-success"><i class="fas fa-list"></i></span>
-                                <div class="info-box-content">
-                                    <span class="info-box-text">Farklı Kelime</span>
-                                    <span class="info-box-number">{{ $searchStats['unique_queries'] ?? 0 }}</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="info-box">
-                                <span class="info-box-icon bg-warning"><i class="fas fa-chart-line"></i></span>
-                                <div class="info-box-content">
-                                    <span class="info-box-text">Ort. Sonuç</span>
-                                    <span class="info-box-number">{{ number_format($searchStats['avg_results'] ?? 0, 1) }}</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="info-box">
-                                <span class="info-box-icon bg-danger"><i class="fas fa-exclamation-triangle"></i></span>
-                                <div class="info-box-content">
-                                    <span class="info-box-text">Sonuçsuz</span>
-                                    <span class="info-box-number">{{ $searchStats['zero_results'] ?? 0 }}</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="row">
-                        <!-- En Çok Aranan Kelimeler -->
-                        <div class="col-md-6">
-                            <h5>En Çok Aranan Kelimeler (Son 30 Gün)</h5>
-                            <div class="table-responsive">
-                                <table class="table table-sm table-striped">
-                                    <thead>
-                                        <tr>
-                                            <th>Arama Kelimesi</th>
-                                            <th>Arama Sayısı</th>
-                                            <th>Son Arama</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @forelse($popularSearches as $search)
-                                            <tr>
-                                                <td>
-                                                    <a href="{{ route('search') }}?q={{ urlencode($search->query) }}" target="_blank" class="text-decoration-none">
-                                                        {{ $search->query }}
-                                                        <i class="fas fa-external-link-alt fa-xs ml-1"></i>
-                                                    </a>
-                                                </td>
-                                                <td><span class="badge badge-primary">{{ $search->search_count }}</span></td>
-                                                <td><small class="text-muted">{{ $search->last_searched->diffForHumans() }}</small></td>
-                                            </tr>
-                                        @empty
-                                            <tr>
-                                                <td colspan="3" class="text-center text-muted">Henüz arama yapılmamış.</td>
-                                            </tr>
-                                        @endforelse
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                        
-                        <!-- Son Aramalar -->
-                        <div class="col-md-6">
-                            <h5>Son Aramalar</h5>
-                            <div class="table-responsive">
-                                <table class="table table-sm table-striped">
-                                    <thead>
-                                        <tr>
-                                            <th>Arama Kelimesi</th>
-                                            <th>Sonuç</th>
-                                            <th>Tarih</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @forelse($recentSearches as $search)
-                                            <tr>
-                                                <td>
-                                                    <a href="{{ route('search') }}?q={{ urlencode($search->query) }}" target="_blank" class="text-decoration-none">
-                                                        {{ Str::limit($search->query, 30) }}
-                                                        <i class="fas fa-external-link-alt fa-xs ml-1"></i>
-                                                    </a>
-                                                </td>
-                                                <td>
-                                                    @if($search->results_count > 0)
-                                                        <span class="badge badge-success">{{ $search->results_count }}</span>
-                                                    @else
-                                                        <span class="badge badge-danger">0</span>
-                                                    @endif
-                                                </td>
-                                                <td><small class="text-muted">{{ $search->searched_at->diffForHumans() }}</small></td>
-                                            </tr>
-                                        @empty
-                                            <tr>
-                                                <td colspan="3" class="text-center text-muted">Henüz arama yapılmamış.</td>
-                                            </tr>
-                                        @endforelse
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
+                    <div class="table-responsive">
+                        <table class="table table-striped" id="priorityLinksTable">
+                            <thead>
+                                <tr>
+                                    <th>Anahtar Kelimeler</th>
+                                    <th>Başlık</th>
+                                    <th>URL</th>
+                                    <th>İkon</th>
+                                    <th>Öncelik</th>
+                                    <th>Durum</th>
+                                    <th>İşlemler</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse($priorityLinks ?? [] as $link)
+                                    <tr>
+                                        <td>
+                                            <small class="text-muted">{{ Str::limit($link->search_keywords, 50) }}</small>
+                                        </td>
+                                        <td>
+                                            <strong>{{ $link->title }}</strong>
+                                            @if($link->description)
+                                                <br><small class="text-muted">{{ Str::limit($link->description, 60) }}</small>
+                                            @endif
+                                        </td>
+                                        <td>
+                                            <code>{{ $link->url }}</code>
+                                        </td>
+                                        <td class="text-center">
+                                            @if($link->icon)
+                                                <i class="{{ $link->icon }}" title="{{ $link->icon }}"></i>
+                                            @else
+                                                <span class="text-muted">-</span>
+                                            @endif
+                                        </td>
+                                        <td>
+                                            <input type="number" class="form-control form-control-sm priority-order-input" min="1" value="{{ $link->priority }}" data-id="{{ $link->id }}" style="width: 60px">
+                                        </td>
+                                        <td>
+                                            <div class="custom-control custom-switch">
+                                                <input type="checkbox" class="custom-control-input priority-toggle-active" id="priorityActive{{ $link->id }}" data-id="{{ $link->id }}" {{ $link->is_active ? 'checked' : '' }} data-url="{{ route('admin.search-priority-links.toggle-active', $link->id) }}">
+                                                <label class="custom-control-label" for="priorityActive{{ $link->id }}"></label>
+                                            </div>
+                                        </td>
+                                        <td class="text-center">
+                                            <a href="{{ route('admin.search-priority-links.edit', $link->id) }}" class="btn btn-sm btn-info">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <form action="{{ route('admin.search-priority-links.destroy', $link->id) }}" method="POST" class="d-inline-block">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Bu öncelik linkini silmek istediğinizden emin misiniz?')">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="7" class="text-center">Henüz öncelik linki eklenmemiş.</td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
+
         </div>
     </div>
 </div>
@@ -400,6 +358,60 @@
         $('.toggle-active').on('change', function() {
             const url = $(this).data('url');
             const id = $(this).data('id');
+            
+            $.ajax({
+                url: url,
+                type: 'PATCH',
+                data: {
+                    _token: '{{ csrf_token() }}'
+                },
+                success: function(response) {
+                    if (response.success) {
+                        toastr.success('Durum güncellendi');
+                    }
+                },
+                error: function() {
+                    toastr.error('Durum güncellenirken bir hata oluştu');
+                }
+            });
+        });
+        
+        // Priority Links için sıralama değişikliği
+        let priorityLinksTimer;
+        $('.priority-order-input').on('change', function() {
+            clearTimeout(priorityLinksTimer);
+            
+            const items = [];
+            $('.priority-order-input').each(function() {
+                items.push({
+                    id: $(this).data('id'),
+                    priority: $(this).val()
+                });
+            });
+            
+            priorityLinksTimer = setTimeout(function() {
+                $.ajax({
+                    url: '{{ route("admin.search-priority-links.order") }}',
+                    type: 'POST',
+                    data: {
+                        items: items,
+                        _token: '{{ csrf_token() }}'
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            toastr.success('Sıralama güncellendi');
+                        }
+                    },
+                    error: function() {
+                        toastr.error('Sıralama güncellenirken bir hata oluştu');
+                    }
+                });
+            }, 500);
+        });
+        
+        // Priority Links için aktiflik durumu değiştirme
+        $('.priority-toggle-active').on('change', function() {
+            const url = $(this).data('url');
             
             $.ajax({
                 url: url,
