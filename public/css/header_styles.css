@@ -47,7 +47,6 @@
 
 /* Mega Menü Konteyner */
 .mega-menu {
-    display: none;
     position: absolute;
     top: 100%;
     left: 0;
@@ -60,8 +59,9 @@
     border-top: 3px solid #007b32;
     opacity: 0;
     visibility: hidden;
-    transform: translateY(-10px);
-    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    transform: translateY(-15px) scale(0.95);
+    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+    pointer-events: none;
 }
 
 .group {
@@ -69,11 +69,11 @@
 }
 
 .group:hover .mega-menu {
-    display: block;
     opacity: 1;
     visibility: visible;
-    transform: translateY(0);
-    transition-delay: 0.15s;
+    transform: translateY(0) scale(1);
+    pointer-events: auto;
+    transition-delay: 0.1s;
 }
 
 /* Mega menüye giriş yolunu daha tolere edecek alan oluşturma */
@@ -96,7 +96,6 @@
 .mega-menu-category {
     opacity: 1;
     transform: translateY(0);
-    transition: all 0.3s ease;
 }
 
 .mega-menu-category h3 {
@@ -108,34 +107,14 @@
     color: #333;
 }
 
-/* Hover animasyonları için hazırlık */
-.group .mega-menu-category {
-    opacity: 0;
-    transform: translateY(10px);
-}
-
-.group:hover .mega-menu-category {
-    opacity: 1;
-    transform: translateY(0);
-    transition-delay: var(--delay, 0s);
-}
-
-/* Mega menü kategorilerinin sırayla animasyonu */
-.group:hover .mega-menu-category:nth-child(1) { --delay: 0.05s; }
-.group:hover .mega-menu-category:nth-child(2) { --delay: 0.1s; }
-.group:hover .mega-menu-category:nth-child(3) { --delay: 0.15s; }
-.group:hover .mega-menu-category:nth-child(4) { --delay: 0.2s; }
-
 /* Mega Menü Bağlantı Stili */
 .mega-menu-link {
     display: flex;
     align-items: center;
     padding: 6px 0;
     color: #4a5568;
-    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    transition: all 0.3s ease;
     font-size: 14px;
-    opacity: 1;
-    transform: translateX(0);
 }
 
 .mega-menu-link:hover {
@@ -143,30 +122,28 @@
     transform: translateX(4px);
 }
 
-/* Link animasyonları için hazırlık */
-.group .mega-menu-link {
-    opacity: 0;
-    transform: translateX(-5px);
-}
-
-.group:hover .mega-menu-link {
-    opacity: 1;
-    transform: translateX(0);
-    transition-delay: var(--link-delay, 0s);
-}
-
-/* Mega menü linklerinin sırayla animasyonu */
-.group:hover .mega-menu-link:nth-child(1) { --link-delay: 0.1s; }
-.group:hover .mega-menu-link:nth-child(2) { --link-delay: 0.15s; }
-.group:hover .mega-menu-link:nth-child(3) { --link-delay: 0.2s; }
-.group:hover .mega-menu-link:nth-child(4) { --link-delay: 0.25s; }
-.group:hover .mega-menu-link:nth-child(5) { --link-delay: 0.3s; }
-.group:hover .mega-menu-link:nth-child(6) { --link-delay: 0.35s; }
-
 .mega-menu-link-icon {
     font-size: 18px;
     margin-right: 8px;
     color: #007b32;
+}
+
+/* Buton Menü Stili (Tip 3) */
+.category-button-modern {
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.category-button-modern:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 8px 25px -3px rgba(0, 0, 0, 0.15);
+}
+
+.category-button-modern .icon-container {
+    transition: all 0.3s ease;
+}
+
+.category-button-modern:hover .icon-container {
+    transform: rotate(3deg) scale(1.05);
 }
 
 /* Standard Mega Menu Özellikleri */

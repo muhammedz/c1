@@ -55,25 +55,12 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
     
-    // Mega menü animasyonlarını sıfırlama fonksiyonu
+    // Mega menü animasyonlarını sıfırlama fonksiyonu (artık sadece kutu animasyonu olduğu için basitleştirdik)
     function resetMegaMenuAnimations(megaMenu) {
         if (!megaMenu) return;
         
-        // Kategorilerin animasyonlarını sıfırla
-        const categories = megaMenu.querySelectorAll('.mega-menu-category');
-        categories.forEach(category => {
-            category.style.animation = 'none';
-            category.offsetHeight; // Reflow zorla
-            category.style.animation = null;
-        });
-        
-        // Linklerin animasyonlarını sıfırla
-        const links = megaMenu.querySelectorAll('.mega-menu-link');
-        links.forEach(link => {
-            link.style.animation = 'none';
-            link.offsetHeight; // Reflow zorla
-            link.style.animation = null;
-        });
+        // Mega menü kutusu zaten CSS transition ile yönetiliyor
+        // Ek bir sıfırlama işlemi gerekmiyor
     }
     
     // Sayfa boyutu değiştiğinde mega menü genişliklerini yeniden ayarla
