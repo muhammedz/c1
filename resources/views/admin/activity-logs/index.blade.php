@@ -196,10 +196,34 @@
                     @endforelse
                 </tbody>
             </table>
-        </div>
+                </div>
         @if($activityLogs->hasPages())
-            <div class="card-footer">
-                {{ $activityLogs->withQueryString()->links() }}
+            <div class="card-footer text-center">
+                <div class="btn-group" role="group">
+                    @if($activityLogs->previousPageUrl())
+                        <a href="{{ $activityLogs->previousPageUrl() }}" class="btn btn-outline-primary">
+                            <i class="fas fa-chevron-left"></i> Geri
+                        </a>
+                    @else
+                        <button class="btn btn-outline-secondary" disabled>
+                            <i class="fas fa-chevron-left"></i> Geri
+                        </button>
+                    @endif
+                    
+                    <span class="btn btn-light">
+                        Sayfa {{ $activityLogs->currentPage() }} / {{ $activityLogs->lastPage() }}
+                    </span>
+                    
+                    @if($activityLogs->nextPageUrl())
+                        <a href="{{ $activityLogs->nextPageUrl() }}" class="btn btn-outline-primary">
+                            İleri <i class="fas fa-chevron-right"></i>
+                        </a>
+                    @else
+                        <button class="btn btn-outline-secondary" disabled>
+                            İleri <i class="fas fa-chevron-right"></i>
+                        </button>
+                    @endif
+                </div>
             </div>
         @endif
     </div>
@@ -269,6 +293,7 @@
 .badge {
     font-size: 0.8em;
 }
+
 </style>
 @stop
 

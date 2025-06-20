@@ -19,6 +19,36 @@ use App\Models\Project;
 use App\Models\Slider;
 use App\Models\NewsCategory;
 use App\Models\ServiceCategory;
+use App\Models\PageCategory;
+use App\Models\EventCategory;
+use App\Models\ProjectCategory;
+use App\Models\NewsTag;
+use App\Models\ServiceTag;
+use App\Models\PageTag;
+use App\Models\Mayor;
+use App\Models\MayorContent;
+use App\Models\Announcement;
+use App\Models\Tender;
+use App\Models\CankayaHouse;
+use App\Models\CankayaHouseCourse;
+use App\Models\MenuSystem;
+use App\Models\ArchiveDocumentCategory;
+use App\Models\ServiceTopic;
+use App\Models\HedefKitle;
+use App\Models\Category;
+use App\Models\ServicesUnit;
+use App\Models\Mudurluk;
+use App\Models\MudurlukFile;
+use App\Models\SearchSetting;
+use App\Models\MenuSystemItem;
+use App\Models\MenuCategory;
+use App\Models\MenuItem;
+use App\Models\FooterMenu;
+use App\Models\ArchiveDocument;
+use App\Models\NewsDocument;
+use App\Models\Gallery;
+use App\Models\HeaderSetting;
+use App\Models\Redirect;
 use App\Observers\NewsObserver;
 use App\Observers\PageObserver;
 use App\Observers\UserObserver;
@@ -34,6 +64,36 @@ use App\Observers\ProjectObserver;
 use App\Observers\SliderObserver;
 use App\Observers\NewsCategoryObserver;
 use App\Observers\ServiceCategoryObserver;
+use App\Observers\PageCategoryObserver;
+use App\Observers\EventCategoryObserver;
+use App\Observers\ProjectCategoryObserver;
+use App\Observers\NewsTagObserver;
+use App\Observers\ServiceTagObserver;
+use App\Observers\PageTagObserver;
+use App\Observers\MayorObserver;
+use App\Observers\MayorContentObserver;
+use App\Observers\AnnouncementObserver;
+use App\Observers\TenderObserver;
+use App\Observers\CankayaHouseObserver;
+use App\Observers\CankayaHouseCourseObserver;
+use App\Observers\MenuSystemObserver;
+use App\Observers\ArchiveDocumentCategoryObserver;
+use App\Observers\ServiceTopicObserver;
+use App\Observers\HedefKitleObserver;
+use App\Observers\CategoryObserver;
+use App\Observers\ServicesUnitObserver;
+use App\Observers\MudurlukObserver;
+use App\Observers\MudurlukFileObserver;
+use App\Observers\SearchSettingObserver;
+use App\Observers\MenuSystemItemObserver;
+use App\Observers\MenuCategoryObserver;
+use App\Observers\MenuItemObserver;
+use App\Observers\FooterMenuObserver;
+use App\Observers\ArchiveDocumentObserver;
+use App\Observers\NewsDocumentObserver;
+use App\Observers\GalleryObserver;
+use App\Observers\HeaderSettingObserver;
+use App\Observers\RedirectObserver;
 use Illuminate\Support\Facades\Blade;
 use App\Helpers\ImageHelper;
 use App\Helpers\SlugHelper;
@@ -73,6 +133,64 @@ class AppServiceProvider extends ServiceProvider
         Slider::observe(SliderObserver::class);
         NewsCategory::observe(NewsCategoryObserver::class);
         ServiceCategory::observe(ServiceCategoryObserver::class);
+        
+        // Kategori Observer'ları
+        PageCategory::observe(PageCategoryObserver::class);
+        EventCategory::observe(EventCategoryObserver::class);
+        ProjectCategory::observe(ProjectCategoryObserver::class);
+        
+        // Tag Observer'ları
+        NewsTag::observe(NewsTagObserver::class);
+        ServiceTag::observe(ServiceTagObserver::class);
+        PageTag::observe(PageTagObserver::class);
+        
+        // Başkan Observer'ları
+        Mayor::observe(MayorObserver::class);
+        MayorContent::observe(MayorContentObserver::class);
+        
+        // Duyuru/İhale Observer'ları
+        Announcement::observe(AnnouncementObserver::class);
+        Tender::observe(TenderObserver::class);
+        
+        // Çankaya Evleri Observer'ları
+        CankayaHouse::observe(CankayaHouseObserver::class);
+        CankayaHouseCourse::observe(CankayaHouseCourseObserver::class);
+        
+        // Menü Observer'ları
+        MenuSystem::observe(MenuSystemObserver::class);
+        
+        // Ek Kategori Observer'ları
+        ArchiveDocumentCategory::observe(ArchiveDocumentCategoryObserver::class);
+        ServiceTopic::observe(ServiceTopicObserver::class);
+        HedefKitle::observe(HedefKitleObserver::class);
+        Category::observe(CategoryObserver::class);
+        
+        // Hizmet Birimleri Observer'ları
+        ServicesUnit::observe(ServicesUnitObserver::class);
+        
+        // Müdürlük Observer'ları
+        Mudurluk::observe(MudurlukObserver::class);
+        MudurlukFile::observe(MudurlukFileObserver::class);
+        
+        // Arama Observer'ları
+        SearchSetting::observe(SearchSettingObserver::class);
+        
+        // Ek Menü Observer'ları
+        MenuSystemItem::observe(MenuSystemItemObserver::class);
+        MenuCategory::observe(MenuCategoryObserver::class);
+        MenuItem::observe(MenuItemObserver::class);
+        FooterMenu::observe(FooterMenuObserver::class);
+        
+        // Belge/Medya Observer'ları
+        ArchiveDocument::observe(ArchiveDocumentObserver::class);
+        NewsDocument::observe(NewsDocumentObserver::class);
+        Gallery::observe(GalleryObserver::class);
+        
+        // Ayar Observer'ları
+        HeaderSetting::observe(HeaderSettingObserver::class);
+        
+        // Diğer Observer'lar
+        Redirect::observe(RedirectObserver::class);
         
         // fixImageUrl fonksiyonunu Blade içinde kullanılabilir hale getir
         Blade::directive('fixImageUrl', function ($expression) {

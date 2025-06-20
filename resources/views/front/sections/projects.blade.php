@@ -669,6 +669,19 @@ input[name="project-category"] {
             }
         }
         
+        // Mobilde proje alanına scroll yap
+        if (window.innerWidth <= 1024) { // lg breakpoint (1024px) altında mobil kabul et
+            setTimeout(function() {
+                const projectsContainer = document.querySelector('#projects-section .lg\\:col-span-3');
+                if (projectsContainer) {
+                    projectsContainer.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            }, 100); // İçerik güncellendikten sonra scroll yap
+        }
+        
         // Korumayı yeniden uygula
         setTimeout(protectProjectsSection, 10);
     }
