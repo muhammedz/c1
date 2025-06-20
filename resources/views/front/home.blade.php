@@ -22,8 +22,7 @@
 @endsection
 
 @section('before_styles')
-    <!-- Swiper CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    <!-- Swiper CSS layout'ta yükleniyor - çakışmayı önlemek için kaldırıldı -->
 @endsection
 
 @section('after_styles')
@@ -31,8 +30,7 @@
 @endsection
 
 @section('before_scripts')
-    <!-- Swiper JS -->
-    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <!-- Swiper JS layout'ta yükleniyor - çakışmayı önlemek için kaldırıldı -->
     <script>
         // Hero Slider inicializasyonu slider.blade.php dosyasının içinde yapılıyor.
         // Çakışma olmaması için buradan kaldırıldı.

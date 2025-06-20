@@ -232,33 +232,36 @@ document.addEventListener('DOMContentLoaded', function () {
     const searchModal = document.getElementById('searchModal');
     const closeSearch = document.getElementById('closeSearch');
 
-    // Arama modalını aç
-    searchButton.addEventListener('click', () => {
-        searchModal.classList.remove('hidden');
-        document.body.style.overflow = 'hidden';
-    });
+    // Null kontrolleri ekle
+    if (searchButton && searchModal && closeSearch) {
+        // Arama modalını aç
+        searchButton.addEventListener('click', () => {
+            searchModal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        });
 
-    // Arama modalını kapat
-    closeSearch.addEventListener('click', () => {
-        searchModal.classList.add('hidden');
-        document.body.style.overflow = '';
-    });
-
-    // Modal dışına tıklandığında kapat
-    searchModal.addEventListener('click', (e) => {
-        if (e.target === searchModal) {
+        // Arama modalını kapat
+        closeSearch.addEventListener('click', () => {
             searchModal.classList.add('hidden');
             document.body.style.overflow = '';
-        }
-    });
+        });
 
-    // ESC tuşu ile kapat
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && !searchModal.classList.contains('hidden')) {
-            searchModal.classList.add('hidden');
-            document.body.style.overflow = '';
-        }
-    });
+        // Modal dışına tıklandığında kapat
+        searchModal.addEventListener('click', (e) => {
+            if (e.target === searchModal) {
+                searchModal.classList.add('hidden');
+                document.body.style.overflow = '';
+            }
+        });
+
+        // ESC tuşu ile kapat
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && !searchModal.classList.contains('hidden')) {
+                searchModal.classList.add('hidden');
+                document.body.style.overflow = '';
+            }
+        });
+    }
 });
 
 // Tab butonları için olay dinleyici

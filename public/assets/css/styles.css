@@ -778,9 +778,6 @@ body.is-scrolling .group:hover .mega-menu {
     width: 100%;
     justify-content: flex-start;
     min-width: 0; /* Taşmayı önlemek için */
-    opacity: 0;
-    transform: translateY(15px);
-    animation: fadeInUp 0.6s ease-out forwards;
 }
 
 .mega-menu-category ul {
@@ -822,9 +819,6 @@ body.is-scrolling .group:hover .mega-menu {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    opacity: 0;
-    transform: translateX(-8px);
-    animation: slideInLeft 0.5s ease-out forwards;
 }
 
 .mega-menu-link:hover {
@@ -846,34 +840,42 @@ body.is-scrolling .group:hover .mega-menu {
     color: #006428;
 }
 
-/* Mega menü animasyon keyframe'leri */
-@keyframes fadeInUp {
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+/* Mega menü hover animasyonları */
+.group .mega-menu-category {
+    opacity: 0;
+    transform: translateY(15px);
 }
 
-@keyframes slideInLeft {
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
+.group:hover .mega-menu-category {
+    opacity: 1;
+    transform: translateY(0);
+    transition-delay: var(--category-delay, 0s);
+}
+
+.group .mega-menu-link {
+    opacity: 0;
+    transform: translateX(-8px);
+}
+
+.group:hover .mega-menu-link {
+    opacity: 1;
+    transform: translateX(0);
+    transition-delay: var(--link-delay, 0s);
 }
 
 /* Mega menü kategorilerinin sırayla animasyonu */
-.group:hover .mega-menu-category:nth-child(1) { animation-delay: 0.05s; }
-.group:hover .mega-menu-category:nth-child(2) { animation-delay: 0.1s; }
-.group:hover .mega-menu-category:nth-child(3) { animation-delay: 0.15s; }
-.group:hover .mega-menu-category:nth-child(4) { animation-delay: 0.2s; }
+.group:hover .mega-menu-category:nth-child(1) { --category-delay: 0.05s; }
+.group:hover .mega-menu-category:nth-child(2) { --category-delay: 0.1s; }
+.group:hover .mega-menu-category:nth-child(3) { --category-delay: 0.15s; }
+.group:hover .mega-menu-category:nth-child(4) { --category-delay: 0.2s; }
 
 /* Mega menü linklerinin sırayla animasyonu */
-.group:hover .mega-menu-link:nth-child(1) { animation-delay: 0.15s; }
-.group:hover .mega-menu-link:nth-child(2) { animation-delay: 0.2s; }
-.group:hover .mega-menu-link:nth-child(3) { animation-delay: 0.25s; }
-.group:hover .mega-menu-link:nth-child(4) { animation-delay: 0.3s; }
-.group:hover .mega-menu-link:nth-child(5) { animation-delay: 0.35s; }
-.group:hover .mega-menu-link:nth-child(6) { animation-delay: 0.4s; }
+.group:hover .mega-menu-link:nth-child(1) { --link-delay: 0.15s; }
+.group:hover .mega-menu-link:nth-child(2) { --link-delay: 0.2s; }
+.group:hover .mega-menu-link:nth-child(3) { --link-delay: 0.25s; }
+.group:hover .mega-menu-link:nth-child(4) { --link-delay: 0.3s; }
+.group:hover .mega-menu-link:nth-child(5) { --link-delay: 0.35s; }
+.group:hover .mega-menu-link:nth-child(6) { --link-delay: 0.4s; }
 
 .mega-menu-link-icon {
     color: #007d32;
