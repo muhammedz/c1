@@ -3,8 +3,8 @@
         <div class="flex flex-col lg:flex-row gap-6">
             <!-- Ana Haber Slider -->
             <div class="w-full md:w-[55%] ">
-                <div class="swiper newsMainSwiper h-[250px] md:h-[350px] rounded-2xl overflow-hidden bg-black">
-                    <div class="swiper-wrapper">
+                <div class="swiper newsMainSwiper h-[250px] md:h-[350px] rounded-2xl overflow-hidden bg-black relative">
+                    <div class="swiper-wrapper relative w-full h-full">
                         @forelse($headlines as $headline)
                             <div class="swiper-slide relative">
                                 <a href="{{ route('news.show', $headline->slug) }}" class="absolute inset-0 z-10">
@@ -75,5 +75,41 @@
         </div>
     </section>
 
-    <!-- News Slider Initialize -->
+    <!-- CSS for Custom News Slider -->
+    <style>
+        .newsMainSwiper .swiper-wrapper {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .newsMainSwiper .swiper-slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+        }
+        
+        .newsMainSwiper .swiper-slide:first-child {
+            opacity: 1;
+        }
+        
+        .news-card.active a,
+        .news-card.active div {
+            background-color: #004d2e !important;
+        }
+        
+        .news-card.active h3 {
+            color: white !important;
+        }
+        
+        .news-prev-btn:disabled,
+        .news-next-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+    </style>
   
