@@ -75,11 +75,18 @@ class NewsRepository extends BaseRepository
         $sortField = $filters['sort'] ?? 'published_at';
         $sortDirection = $filters['direction'] ?? 'desc';
         
-        // published_at null ise created_at'e göre sırala
+        // Sadece yayın tarihine göre sırala (published_at)
         if ($sortField === 'published_at') {
-            $query->orderByRaw('COALESCE(published_at, created_at) ' . $sortDirection);
+            $query->orderBy('published_at', $sortDirection)
+                  ->orderBy('created_at', $sortDirection); // Aynı yayın tarihli haberler için
         } else {
             $query->orderBy($sortField, $sortDirection);
+        }
+        
+        // Eğer başka bir sıralama yapılmışsa da ikincil sıralama olarak published_at ekle
+        if ($sortField !== 'published_at') {
+            $query->orderBy('published_at', 'desc')
+                  ->orderBy('created_at', 'desc');
         }
         
         return $query->paginate(40)->appends($filters);

@@ -49,6 +49,14 @@ class NewsController extends Controller
             $filters['headline'] = 'all';
         }
         
+        // Varsayılan sıralama parametrelerini ayarla (yayın tarihine göre en yeni üstte)
+        if (!isset($filters['sort'])) {
+            $filters['sort'] = 'published_at';
+        }
+        if (!isset($filters['direction'])) {
+            $filters['direction'] = 'desc';
+        }
+        
         $news = $this->newsService->getNews($filters);
         $headlineCount = News::where('is_headline', true)->count();
         $newsCategories = NewsCategory::where('is_active', true)->orderBy('name')->get();

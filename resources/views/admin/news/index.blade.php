@@ -232,7 +232,7 @@ $(document).ready(function () {
     var newsTable = $('#news-table').DataTable({
         language: turkishLanguage,
         responsive: true,
-        order: [[6, 'desc']], // Tarih sütununa göre sırala
+        ordering: false, // Sıralamayı kapat, backend sıralamasını kullan
         columnDefs: [
             { orderable: false, targets: [0, 1, 7] } // Bu sütunları sıralanamaz yap
         ],
