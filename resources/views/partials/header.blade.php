@@ -354,6 +354,27 @@
             visibility: visible;
             opacity: 1;
         }
+
+        /* Mobil menü açık olduğunda body scroll'unu engelle */
+        body.mobile-menu-open {
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100% !important;
+            height: 100% !important;
+            overflow: hidden !important;
+            -webkit-overflow-scrolling: touch !important;
+            overscroll-behavior: none !important;
+        }
+
+        /* Mobil menü içeriği scroll edilebilir olsun */
+        #sideMenuContent {
+            position: relative !important;
+            height: calc(100vh - 48px) !important;
+            overflow-y: auto !important;
+            -webkit-overflow-scrolling: touch !important;
+            overscroll-behavior: contain !important;
+        }
         
         .side-menu-container {
             width: 85%;
@@ -816,6 +837,9 @@
                         return;
                     }
                     
+                    // Mevcut scroll pozisyonunu kaydet
+                    this.scrollPosition = window.pageYOffset || document.documentElement.scrollTop;
+                    
                     // CSS !important kuralını ezmek için inline style kullan
                     this.overlay.style.setProperty('display', 'block', 'important');
                     this.overlay.classList.add('active');
@@ -823,7 +847,9 @@
                     // Container'ı da force et
                     this.container.style.setProperty('transform', 'translateX(0)', 'important');
                     
-                    document.body.classList.add('overflow-hidden');
+                    // Body scroll'unu engelle
+                    document.body.classList.add('mobile-menu-open');
+                    document.body.style.top = `-${this.scrollPosition}px`;
                     
                     // Quick menu'yu gizle
                     const quickMenu = document.getElementById('quick-menu-section');
@@ -850,7 +876,15 @@
                     // Overlay'i gizle
                     this.overlay.style.setProperty('display', 'none', 'important');
                     this.overlay.classList.remove('active');
-                    document.body.classList.remove('overflow-hidden');
+                    
+                    // Body scroll'unu geri yükle
+                    document.body.classList.remove('mobile-menu-open');
+                    document.body.style.top = '';
+                    
+                    // Scroll pozisyonunu geri yükle
+                    if (this.scrollPosition !== undefined) {
+                        window.scrollTo(0, this.scrollPosition);
+                    }
                     
                     // Quick menu'yu geri göster
                     const quickMenu = document.getElementById('quick-menu-section');

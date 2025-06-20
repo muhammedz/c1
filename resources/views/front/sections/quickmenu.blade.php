@@ -615,6 +615,23 @@
                 color: rgba(255, 255, 255, 0.6) !important;
             }
         }
+
+        /* Quick menu dropdown açık olduğunda body scroll'unu engelle */
+        body.quick-menu-dropdown-open {
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100% !important;
+            height: 100% !important;
+            overflow: hidden !important;
+            -webkit-overflow-scrolling: touch !important;
+            overscroll-behavior: none !important;
+        }
+
+        /* Quick menu dropdown'lar için scroll engellemesi */
+        #quick-menu-section .group.active .quick-menu-dropdown {
+            overscroll-behavior: contain !important;
+        }
     }
 </style>
 
@@ -643,6 +660,13 @@ document.addEventListener('DOMContentLoaded', function() {
                             e.preventDefault();
                             e.stopPropagation();
                             
+                            const wasActive = group.classList.contains('active');
+                            
+                            // Scroll pozisyonunu kaydet
+                            if (!wasActive) {
+                                window.quickMenuScrollPosition = window.pageYOffset || document.documentElement.scrollTop;
+                            }
+                            
                             // Diğer tüm açık olan menüleri kapat
                             mobileGroups.forEach(otherGroup => {
                                 if (otherGroup !== group) {
@@ -651,8 +675,22 @@ document.addEventListener('DOMContentLoaded', function() {
                             });
                             
                             // Bu menüyü aç/kapat
-                            const wasActive = group.classList.contains('active');
                             group.classList.toggle('active');
+                            
+                            // Body scroll'unu yönet
+                            const hasActiveDropdown = quickMenuSection.querySelector('.group.active');
+                            if (hasActiveDropdown && !wasActive) {
+                                // Dropdown açılıyor - scroll'u engelle
+                                document.body.classList.add('quick-menu-dropdown-open');
+                                document.body.style.top = `-${window.quickMenuScrollPosition}px`;
+                            } else if (!hasActiveDropdown) {
+                                // Tüm dropdown'lar kapandı - scroll'u geri yükle
+                                document.body.classList.remove('quick-menu-dropdown-open');
+                                document.body.style.top = '';
+                                if (window.quickMenuScrollPosition !== undefined) {
+                                    window.scrollTo(0, window.quickMenuScrollPosition);
+                                }
+                            }
                         });
                         
                         // Touch event de ekle
@@ -664,5 +702,43 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
     }
+    
+    // Sayfa dışına tıklandığında dropdown'ları kapat
+    document.addEventListener('click', function(e) {
+        const quickMenuSection = document.getElementById('quick-menu-section');
+        if (quickMenuSection && !quickMenuSection.contains(e.target)) {
+            const activeGroups = quickMenuSection.querySelectorAll('.group.active');
+            if (activeGroups.length > 0) {
+                activeGroups.forEach(group => group.classList.remove('active'));
+                
+                // Body scroll'unu geri yükle
+                document.body.classList.remove('quick-menu-dropdown-open');
+                document.body.style.top = '';
+                if (window.quickMenuScrollPosition !== undefined) {
+                    window.scrollTo(0, window.quickMenuScrollPosition);
+                }
+            }
+        }
+    });
+    
+    // ESC tuşu ile dropdown'ları kapat
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            const quickMenuSection = document.getElementById('quick-menu-section');
+            if (quickMenuSection) {
+                const activeGroups = quickMenuSection.querySelectorAll('.group.active');
+                if (activeGroups.length > 0) {
+                    activeGroups.forEach(group => group.classList.remove('active'));
+                    
+                    // Body scroll'unu geri yükle
+                    document.body.classList.remove('quick-menu-dropdown-open');
+                    document.body.style.top = '';
+                    if (window.quickMenuScrollPosition !== undefined) {
+                        window.scrollTo(0, window.quickMenuScrollPosition);
+                    }
+                }
+            }
+        }
+    });
 });
 </script> 
