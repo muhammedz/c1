@@ -60,6 +60,9 @@ class RedirectObserver
 
     protected function getExcludedFields(): array
     {
-        return ['slug'];
+        return [
+            'slug',
+            'hit_count', // Hit sayısı değişikliği loglanmasın
+        ];
     }
 } 

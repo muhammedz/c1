@@ -185,9 +185,8 @@ Route::middleware(['auth', 'role:admin'])->name('admin.')->prefix('admin')->grou
     // Activity Logs Yönetimi
     Route::prefix('activity-logs')->name('activity-logs.')->group(function () {
         Route::get('/', [ActivityLogController::class, 'index'])->name('index');
-        Route::get('/{activityLog}', [ActivityLogController::class, 'show'])->name('show');
         Route::get('/stats/data', [ActivityLogController::class, 'stats'])->name('stats');
-        Route::delete('/cleanup', [ActivityLogController::class, 'cleanup'])->name('cleanup');
+        Route::get('/{activityLog}', [ActivityLogController::class, 'show'])->name('show');
     });
     
     // Arşivler Yönetimi

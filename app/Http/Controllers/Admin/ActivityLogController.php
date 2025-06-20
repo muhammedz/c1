@@ -158,19 +158,5 @@ class ActivityLogController extends Controller
             ->get();
     }
 
-    /**
-     * Delete old activity logs.
-     */
-    public function cleanup(Request $request)
-    {
-        $days = $request->get('days', 90);
-        $cutoffDate = Carbon::now()->subDays($days);
 
-        $deletedCount = ActivityLog::where('created_at', '<', $cutoffDate)->delete();
-
-        return response()->json([
-            'message' => "{$deletedCount} adet eski activity log silindi.",
-            'deleted_count' => $deletedCount
-        ]);
-    }
 }

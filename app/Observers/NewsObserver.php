@@ -130,6 +130,7 @@ class NewsObserver
     {
         return [
             'views', // Görüntülenme sayısı değişikliği loglanmasın
+            'view_count', // Görüntülenme sayısı değişikliği loglanmasın
             'slug', // Slug otomatik oluşturuluyor
         ];
     }

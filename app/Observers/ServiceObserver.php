@@ -84,6 +84,7 @@ class ServiceObserver
     {
         return [
             'views',
+            'view_count', // Görüntülenme sayısı değişikliği loglanmasın
             'slug',
         ];
     }

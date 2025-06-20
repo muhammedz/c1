@@ -2,6 +2,8 @@
 
 @section('title', 'Activity Logs')
 
+@section('plugins.Toastr', true)
+
 @section('content_header')
     <div class="container-fluid">
         <div class="row mb-2">
@@ -107,9 +109,6 @@
                     </a>
                     <button type="button" class="btn btn-info" id="btn-stats">
                         <i class="fas fa-chart-bar"></i> İstatistikler
-                    </button>
-                    <button type="button" class="btn btn-warning" id="btn-cleanup">
-                        <i class="fas fa-trash"></i> Eski Kayıtları Temizle
                     </button>
                 </div>
             </form>
@@ -248,41 +247,7 @@
     </div>
 </div>
 
-<!-- Cleanup Modal -->
-<div class="modal fade" id="cleanupModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title">Eski Kayıtları Temizle</h4>
-                <button type="button" class="close" data-dismiss="modal">
-                    <span>&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form id="cleanup-form">
-                    <div class="form-group">
-                        <label for="cleanup_days">Kaç günden eski kayıtlar silinsin?</label>
-                        <select id="cleanup_days" class="form-control">
-                            <option value="30">30 gün</option>
-                            <option value="60">60 gün</option>
-                            <option value="90" selected>90 gün</option>
-                            <option value="180">180 gün</option>
-                            <option value="365">1 yıl</option>
-                        </select>
-                    </div>
-                    <div class="alert alert-warning">
-                        <i class="fas fa-exclamation-triangle"></i>
-                        Bu işlem geri alınamaz! Seçilen tarihten eski tüm activity log kayıtları kalıcı olarak silinecektir.
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
-                <button type="button" class="btn btn-danger" id="confirm-cleanup">Temizle</button>
-            </div>
-        </div>
-    </div>
-</div>
+
 @stop
 
 @section('css')
@@ -363,32 +328,7 @@ $(document).ready(function() {
             }
         });
     });
-    
-    // Cleanup butonu
-    $('#btn-cleanup').click(function() {
-        $('#cleanupModal').modal('show');
-    });
-    
-    $('#confirm-cleanup').click(function() {
-        let days = $('#cleanup_days').val();
-        
-        $.ajax({
-            url: '{{ route("admin.activity-logs.cleanup") }}',
-            method: 'DELETE',
-            data: { days: days },
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            success: function(data) {
-                $('#cleanupModal').modal('hide');
-                toastr.success(data.message);
-                location.reload();
-            },
-            error: function() {
-                toastr.error('Temizleme işlemi sırasında hata oluştu.');
-            }
-        });
-    });
+
 });
 </script>
 @stop 
