@@ -215,7 +215,8 @@ class Project extends Model
     {
         return self::where('is_active', true)
             ->where('show_on_homepage', true)
-            ->orderBy('order')
+            ->orderBy('project_date', 'desc')
+            ->orderBy('created_at', 'desc')
             ->get();
     }
 

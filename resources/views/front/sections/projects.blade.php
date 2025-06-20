@@ -100,7 +100,8 @@
                             @php
                                 $categoryProjects = \App\Models\Project::where('category_id', $category->id)
                                     ->where('is_active', true)
-                                    ->orderBy('order')
+                                    ->orderBy('project_date', 'desc')
+                                    ->orderBy('created_at', 'desc')
                                     ->get();
                                 
                             // Projelerin kaydırma için grup grup bölünmesi (2'şer proje)
