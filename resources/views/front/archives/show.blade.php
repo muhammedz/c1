@@ -42,11 +42,18 @@
                 @endif
                 
                 <div class="flex flex-wrap gap-4">
-                    @if($archive->documents->count() > 0)
-                        <a href="#belgeler" class="inline-flex items-center px-5 py-2.5 bg-[#e6a23c] text-white rounded-md hover:bg-[#e6a23c]/90 transition-colors font-medium shadow-lg shadow-[#e6a23c]/20">
-                            <i class="fas fa-download mr-2 text-sm"></i>
-                            Belgeleri İndir
-                        </a>
+                    @if($archive->show_download_button && $archive->documents->count() > 0)
+                        @if($archive->download_button_url)
+                            <a href="{{ $archive->download_button_url }}" class="inline-flex items-center px-5 py-2.5 bg-[#e6a23c] text-white rounded-md hover:bg-[#e6a23c]/90 transition-colors font-medium shadow-lg shadow-[#e6a23c]/20" target="_blank">
+                                <i class="fas fa-download mr-2 text-sm"></i>
+                                {{ $archive->download_button_text ?: 'Belgeleri İndir' }}
+                            </a>
+                        @else
+                            <a href="#belgeler" class="inline-flex items-center px-5 py-2.5 bg-[#e6a23c] text-white rounded-md hover:bg-[#e6a23c]/90 transition-colors font-medium shadow-lg shadow-[#e6a23c]/20">
+                                <i class="fas fa-download mr-2 text-sm"></i>
+                                {{ $archive->download_button_text ?: 'Belgeleri İndir' }}
+                            </a>
+                        @endif
                     @endif
                     <a href="{{ route('archives.index') }}" class="inline-flex items-center px-5 py-2.5 bg-white/10 text-white border border-white/20 rounded-md hover:bg-white/20 transition-colors shadow-lg shadow-black/5">
                         <i class="fas fa-arrow-left mr-2 text-sm"></i>

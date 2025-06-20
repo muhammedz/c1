@@ -56,6 +56,9 @@ class ArchiveController extends Controller
             'excerpt' => 'nullable|string|max:500',
             'status' => 'required|in:draft,published,archived',
             'is_featured' => 'boolean',
+            'show_download_button' => 'boolean',
+            'download_button_text' => 'nullable|string|max:255',
+            'download_button_url' => 'nullable|url|max:500',
             'published_at' => 'nullable|date',
         ], [
             'slug.unique' => 'Bu slug zaten kullanılıyor. Lütfen farklı bir slug girin.',
@@ -112,6 +115,9 @@ class ArchiveController extends Controller
             'excerpt' => 'nullable|string|max:500',
             'status' => 'required|in:draft,published,archived',
             'is_featured' => 'boolean',
+            'show_download_button' => 'boolean',
+            'download_button_text' => 'nullable|string|max:255',
+            'download_button_url' => 'nullable|url|max:500',
             'published_at' => 'nullable|date',
         ], [
             'slug.unique' => 'Bu slug zaten kullanılıyor. Lütfen farklı bir slug girin.',

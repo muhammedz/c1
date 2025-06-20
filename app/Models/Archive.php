@@ -12,6 +12,11 @@ class Archive extends Model
 {
     use HasFactory, SoftDeletes;
 
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
     protected $fillable = [
         'title',
         'slug',
@@ -19,9 +24,11 @@ class Archive extends Model
         'excerpt',
         'status',
         'is_featured',
-        'view_count',
+        'show_download_button',
+        'download_button_text',
+        'download_button_url',
         'published_at',
-        'user_id'
+        'user_id',
     ];
 
     protected $casts = [

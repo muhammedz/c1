@@ -157,12 +157,71 @@
                         <!-- Yayın Tarihi -->
                         <div class="form-group">
                             <label for="published_at">Yayın Tarihi</label>
-                            <input type="datetime-local" class="form-control @error('published_at') is-invalid @enderror" 
-                                   id="published_at" name="published_at" 
+                            <input type="datetime-local" 
+                                   class="form-control @error('published_at') is-invalid @enderror" 
+                                   id="published_at" 
+                                   name="published_at" 
                                    value="{{ old('published_at', $archive->published_at ? $archive->published_at->format('Y-m-d\TH:i') : '') }}">
                             @error('published_at')
                                 <span class="invalid-feedback">{{ $message }}</span>
                             @enderror
+                        </div>
+
+                        <!-- İndirme Butonu Ayarları -->
+                        <div class="card mt-4">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">İndirme Butonu Ayarları</h5>
+                            </div>
+                            <div class="card-body">
+                                <!-- İndirme Butonunu Göster -->
+                                <div class="form-group">
+                                    <div class="custom-control custom-checkbox">
+                                        <input type="checkbox" class="custom-control-input" 
+                                               id="show_download_button" name="show_download_button" value="1" 
+                                               {{ old('show_download_button', $archive->show_download_button) ? 'checked' : '' }}>
+                                        <label class="custom-control-label" for="show_download_button">
+                                            İndirme Butonunu Göster
+                                        </label>
+                                    </div>
+                                    <small class="form-text text-muted">
+                                        Bu seçenek işaretliyse arşiv sayfasında indirme butonu görüntülenir.
+                                    </small>
+                                </div>
+
+                                <!-- Buton Metni -->
+                                <div class="form-group">
+                                    <label for="download_button_text">Buton Metni</label>
+                                    <input type="text" 
+                                           class="form-control @error('download_button_text') is-invalid @enderror" 
+                                           id="download_button_text" 
+                                           name="download_button_text" 
+                                           value="{{ old('download_button_text', $archive->download_button_text ?? 'Belgeleri İndir') }}"
+                                           placeholder="Belgeleri İndir">
+                                    @error('download_button_text')
+                                        <span class="invalid-feedback">{{ $message }}</span>
+                                    @enderror
+                                    <small class="form-text text-muted">
+                                        Butonda görünecek metin (örn: "Belgeleri İndir", "Dosyaları İndir")
+                                    </small>
+                                </div>
+
+                                <!-- Buton URL'si -->
+                                <div class="form-group">
+                                    <label for="download_button_url">Buton URL'si (Opsiyonel)</label>
+                                    <input type="url" 
+                                           class="form-control @error('download_button_url') is-invalid @enderror" 
+                                           id="download_button_url" 
+                                           name="download_button_url" 
+                                           value="{{ old('download_button_url', $archive->download_button_url) }}"
+                                           placeholder="https://example.com/dosya.zip">
+                                    @error('download_button_url')
+                                        <span class="invalid-feedback">{{ $message }}</span>
+                                    @enderror
+                                    <small class="form-text text-muted">
+                                        Boş bırakılırsa buton belge listesine yönlendirir. Doldurulursa belirtilen URL'ye yönlendirir.
+                                    </small>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
