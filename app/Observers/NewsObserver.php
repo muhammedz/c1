@@ -4,11 +4,13 @@ namespace App\Observers;
 
 use App\Models\News;
 use App\Models\NewsTag;
+use App\Traits\LogsActivity;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Log;
 
 class NewsObserver
 {
+    use LogsActivity;
+
     /**
      * Handle the News "created" event.
      */
@@ -17,8 +19,8 @@ class NewsObserver
         // Önbelleği temizle
         $this->clearNewsCache();
         
-        // İşlemi logla
-        Log::info('Yeni haber oluşturuldu', ['id' => $news->id, 'title' => $news->title]);
+        // Activity log kaydet
+        $this->logCreated($news);
     }
 
     /**
@@ -29,8 +31,8 @@ class NewsObserver
         // Önbelleği temizle
         $this->clearNewsCache();
         
-        // İşlemi logla
-        Log::info('Haber güncellendi', ['id' => $news->id, 'title' => $news->title]);
+        // Activity log kaydet
+        $this->logUpdated($news);
     }
 
     /**
@@ -46,8 +48,8 @@ class NewsObserver
             $tag->decrementUsage();
         }
         
-        // İşlemi logla
-        Log::info('Haber silindi', ['id' => $news->id, 'title' => $news->title]);
+        // Activity log kaydet
+        $this->logDeleted($news);
     }
 
     /**
@@ -63,8 +65,8 @@ class NewsObserver
             $tag->incrementUsage();
         }
         
-        // İşlemi logla
-        Log::info('Haber geri yüklendi', ['id' => $news->id, 'title' => $news->title]);
+        // Activity log kaydet
+        $this->logRestored($news);
     }
 
     /**
@@ -75,26 +77,60 @@ class NewsObserver
         // Önbelleği temizle
         $this->clearNewsCache();
         
-        // İşlemi logla
-        Log::info('Haber kalıcı olarak silindi', ['id' => $news->id, 'title' => $news->title]);
+        // Activity log kaydet
+        $this->logForceDeleted($news);
     }
     
     /**
-     * News ile ilgili tüm önbellekleri temizler
+     * News cache'ini temizle
      */
     private function clearNewsCache(): void
     {
-        Cache::forget('headlines');
-        Cache::forget('featured_news');
-        Cache::forget('latest_news');
-        Cache::forget('popular_news');
-        
-        // News ile ilgili diğer önbellekleri temizle
-        Cache::forget('news_home');
-        Cache::forget('news_list');
-        Cache::forget('news_archive');
-        
-        // Tagging sistemini kullanmamak için şunları direkt temizliyoruz:
-        // Cache::tags(['news', 'home'])->flush();
+        try {
+            // News ile ilgili cache anahtarlarını temizle
+            $cacheKeys = [
+                'news_latest',
+                'news_featured',
+                'news_categories',
+                'news_tags',
+                'news_sidebar',
+                'news_archive',
+            ];
+            
+            foreach ($cacheKeys as $key) {
+                Cache::forget($key);
+            }
+            
+            // Ek news cache anahtarları da temizlenebilir
+            $patterns = [
+                'news_',
+                'headlines_',
+                'featured_news_',
+                'popular_news_',
+            ];
+            
+            foreach ($patterns as $pattern) {
+                // Basit pattern matching ile cache temizleme
+                for ($i = 0; $i < 100; $i++) {
+                    Cache::forget($pattern . $i);
+                    Cache::forget($pattern . 'page_' . $i);
+                }
+            }
+            
+        } catch (\Exception $e) {
+            // Cache temizleme hatası ana işlemi etkilememelidir
+            \Log::warning('News cache clearing failed: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * News modeli için hariç tutulacak alanlar
+     */
+    protected function getExcludedFields(): array
+    {
+        return [
+            'views', // Görüntülenme sayısı değişikliği loglanmasın
+            'slug', // Slug otomatik oluşturuluyor
+        ];
     }
 }

@@ -50,6 +50,7 @@ use App\Http\Controllers\Admin\FooterMenuLinkController;
 use App\Http\Controllers\Admin\NotFoundController;
 use App\Http\Controllers\Admin\RedirectController;
 use App\Http\Controllers\PharmacyController;
+use App\Http\Controllers\Admin\ActivityLogController;
 use Illuminate\Support\Facades\Cache;
 
 /*
@@ -180,6 +181,14 @@ Route::middleware(['auth', 'role:admin'])->name('admin.')->prefix('admin')->grou
     // Test Sayfası
     Route::get('/test', [TestController::class, 'index'])->name('test.index');
     Route::get('/test-departments', [TestDepartmentController::class, 'index'])->name('test-departments.index');
+    
+    // Activity Logs Yönetimi
+    Route::prefix('activity-logs')->name('activity-logs.')->group(function () {
+        Route::get('/', [ActivityLogController::class, 'index'])->name('index');
+        Route::get('/{activityLog}', [ActivityLogController::class, 'show'])->name('show');
+        Route::get('/stats/data', [ActivityLogController::class, 'stats'])->name('stats');
+        Route::delete('/cleanup', [ActivityLogController::class, 'cleanup'])->name('cleanup');
+    });
     
     // Arşivler Yönetimi
     Route::resource('archives', ArchiveController::class);

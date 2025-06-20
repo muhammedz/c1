@@ -5,13 +5,40 @@ namespace App\Providers;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Schema;
 use App\Models\News;
+use App\Models\Page;
+use App\Models\User;
+use App\Models\Service;
+use App\Models\Event;
+use App\Models\Setting;
+use App\Models\CorporateMember;
+use App\Models\CorporateCategory;
+use App\Models\GuidePlace;
+use App\Models\GuideCategory;
+use App\Models\Archive;
+use App\Models\Project;
+use App\Models\Slider;
+use App\Models\NewsCategory;
+use App\Models\ServiceCategory;
 use App\Observers\NewsObserver;
+use App\Observers\PageObserver;
+use App\Observers\UserObserver;
+use App\Observers\ServiceObserver;
+use App\Observers\EventObserver;
+use App\Observers\SettingObserver;
+use App\Observers\CorporateMemberObserver;
+use App\Observers\CorporateCategoryObserver;
+use App\Observers\GuidePlaceObserver;
+use App\Observers\GuideCategoryObserver;
+use App\Observers\ArchiveObserver;
+use App\Observers\ProjectObserver;
+use App\Observers\SliderObserver;
+use App\Observers\NewsCategoryObserver;
+use App\Observers\ServiceCategoryObserver;
 use Illuminate\Support\Facades\Blade;
 use App\Helpers\ImageHelper;
 use App\Helpers\SlugHelper;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\View;
-use App\Models\Setting;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -32,6 +59,20 @@ class AppServiceProvider extends ServiceProvider
         
         // Observer sınıflarını kaydet
         News::observe(NewsObserver::class);
+        Page::observe(PageObserver::class);
+        User::observe(UserObserver::class);
+        Service::observe(ServiceObserver::class);
+        Event::observe(EventObserver::class);
+        Setting::observe(SettingObserver::class);
+        CorporateMember::observe(CorporateMemberObserver::class);
+        CorporateCategory::observe(CorporateCategoryObserver::class);
+        GuidePlace::observe(GuidePlaceObserver::class);
+        GuideCategory::observe(GuideCategoryObserver::class);
+        Archive::observe(ArchiveObserver::class);
+        Project::observe(ProjectObserver::class);
+        Slider::observe(SliderObserver::class);
+        NewsCategory::observe(NewsCategoryObserver::class);
+        ServiceCategory::observe(ServiceCategoryObserver::class);
         
         // fixImageUrl fonksiyonunu Blade içinde kullanılabilir hale getir
         Blade::directive('fixImageUrl', function ($expression) {

@@ -635,6 +635,12 @@ return [
         
         ['header' => 'SİSTEM YÖNETİMİ'],
         [
+            'text' => 'Aktivite Günlükleri',
+            'url'  => 'admin/activity-logs',
+            'icon' => 'fas fa-fw fa-history',
+            'active' => ['admin/activity-logs', 'admin/activity-logs/*']
+        ],
+        [
             'text' => 'Ayarlar',
             'url'  => 'admin/settings',
             'icon' => 'fas fa-fw fa-cogs',
