@@ -195,7 +195,7 @@
                 <!-- Arama İkonu, Slogan ve Atatürk Simgesi -->
                 <div class="flex items-center md:space-x-4 space-x-2">
                     <!-- Arama butonu - sadece desktop'ta görünür -->
-                    <button id="searchButton" class="hidden lg:flex w-11 h-11 bg-[#007b32] rounded-full items-center justify-center text-white shadow-md hover:bg-[#00352b] hover:scale-105 transition-all">
+                    <button id="searchButton" class="hidden lg:flex w-11 h-11 bg-[#007b32] rounded-lg items-center justify-center text-white shadow-md hover:bg-[#00352b] hover:scale-105 transition-all">
                         <i class="fas fa-search text-white text-xl"></i>
                     </button>
                     
@@ -207,7 +207,7 @@
                     <!-- Mobil + Tablet Arama ve Menü Butonları - desktop hariç her yerde görünür -->
                     <div class="lg:hidden flex items-center space-x-3">
                         <!-- Mobil Arama Butonu -->
-                        <button id="mobileSearchButton" class="w-11 h-11 bg-[#007b32] rounded-full flex items-center justify-center text-white shadow-md hover:bg-[#00352b] hover:scale-105 transition-all">
+                        <button id="mobileSearchButton" class="w-11 h-11 bg-[#007b32] rounded-lg flex items-center justify-center text-white shadow-md hover:bg-[#00352b] hover:scale-105 transition-all">
                             <i class="fas fa-search text-white text-xl"></i>
                         </button>
                         
