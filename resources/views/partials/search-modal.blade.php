@@ -93,19 +93,30 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const searchButton = document.getElementById('searchButton');
+        const mobileSearchButton = document.getElementById('mobileSearchButton');
         const searchModal = document.getElementById('searchModal');
         const closeSearch = document.getElementById('closeSearch');
         
-        if (searchButton && searchModal && closeSearch) {
-            // Arama modali açma
-            searchButton.addEventListener('click', () => {
-                searchModal.classList.remove('hidden');
-                // Otomatik olarak input'a odaklan
-                setTimeout(() => {
-                    const searchInput = searchModal.querySelector('input[name="q"]');
-                    if (searchInput) searchInput.focus();
-                }, 100);
-            });
+        // Arama modalini açma fonksiyonu
+        const openSearchModal = () => {
+            searchModal.classList.remove('hidden');
+            // Otomatik olarak input'a odaklan
+            setTimeout(() => {
+                const searchInput = searchModal.querySelector('input[name="q"]');
+                if (searchInput) searchInput.focus();
+            }, 100);
+        };
+        
+        if (searchModal && closeSearch) {
+            // Desktop arama butonu
+            if (searchButton) {
+                searchButton.addEventListener('click', openSearchModal);
+            }
+            
+            // Mobil arama butonu
+            if (mobileSearchButton) {
+                mobileSearchButton.addEventListener('click', openSearchModal);
+            }
             
             // Arama modali kapatma
             closeSearch.addEventListener('click', () => {

@@ -204,11 +204,18 @@
                         <img src="{{ asset('images/slogan.png') }}" alt="Çankaya Belediyesi Slogan" class="h-12">
                     </div>
                     
-                    <!-- Mobil + Tablet Menü Butonu - desktop hariç her yerde görünür -->
-                    <button class="lg:hidden"
-                        id="mobileMenuButton">
-                        <span style="font-size: 18px; line-height: 1; display: inline-block;">☰</span>
-                    </button>
+                    <!-- Mobil + Tablet Arama ve Menü Butonları - desktop hariç her yerde görünür -->
+                    <div class="lg:hidden flex items-center space-x-3">
+                        <!-- Mobil Arama Butonu -->
+                        <button id="mobileSearchButton" class="w-11 h-11 bg-[#007b32] rounded-full flex items-center justify-center text-white shadow-md hover:bg-[#00352b] hover:scale-105 transition-all">
+                            <i class="fas fa-search text-white text-xl"></i>
+                        </button>
+                        
+                        <!-- Mobil Menü Butonu -->
+                        <button id="mobileMenuButton">
+                            <span style="font-size: 18px; line-height: 1; display: inline-block;">☰</span>
+                        </button>
+                    </div>
                     
                     <!-- Atatürk simgesi - her zaman görünür, mobilde menünün sağında -->
                     <div class="text-xl font-bold relative flex items-end pb-1 z-10">

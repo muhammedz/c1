@@ -122,7 +122,7 @@
                                 <span class="material-icons text-sm" style="color: {{ $serviceTopic->color }};">extension</span>
                             @endif
                         </div>
-                        <h2 class="text-xl font-bold text-gray-800">{{ $serviceTopic->name }} Hizmetleri</h2>
+                        <h2 class="text-xl font-bold text-gray-800">{{ $serviceTopic->name }}</h2>
                     </div>
                     <span class="text-sm text-gray-600 bg-white px-3 py-1 rounded-full border border-gray-200">
                         {{ $services->count() }} hizmet bulundu
