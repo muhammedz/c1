@@ -89,7 +89,7 @@ class NewsRepository extends BaseRepository
                   ->orderBy('created_at', 'desc');
         }
         
-        return $query->paginate(40)->appends($filters);
+        return $query->paginate(100)->appends($filters);
     }
     
     /**

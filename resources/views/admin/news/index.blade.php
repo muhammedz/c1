@@ -233,13 +233,14 @@ $(document).ready(function () {
         language: turkishLanguage,
         responsive: true,
         ordering: false, // Sıralamayı kapat, backend sıralamasını kullan
+        pageLength: 40, // Varsayılan sayfa boyutu
         columnDefs: [
             { orderable: false, targets: [0, 1, 7] } // Bu sütunları sıralanamaz yap
         ],
         // Sayfalandırma alanı düzenlendi, sorunlu alan düzeltildi
         dom: "<'row'<'col-sm-12'tr>>" +
              "<'row mt-2'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7 d-flex justify-content-end align-items-center'lp>>",
-        lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "Tümü"]]
+        lengthMenu: [[10, 25, 40, 50, 100, -1], [10, 25, 40, 50, 100, "Tümü"]]
     });
     
     // DataTables özel arama kutusu
@@ -1087,7 +1088,7 @@ $(document).ready(function () {
                         </div>
                         <div>
                             <div class="stats-text">Toplam Haber</div>
-                            <h3 class="stats-number">{{ $news->total() }}</h3>
+                            <h3 class="stats-number">{{ App\Models\News::count() }}</h3>
                         </div>
                     </div>
                 </div>

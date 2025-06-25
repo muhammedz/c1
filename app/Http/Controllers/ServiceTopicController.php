@@ -15,14 +15,14 @@ class ServiceTopicController extends Controller
     public function index()
     {
         $serviceTopics = ServiceTopic::active()
-            ->ordered()
+            ->orderBy('name', 'asc')
             ->withCount(['services' => function ($query) {
                 $query->published();
             }])
             ->get();
 
         // Diğer kategoriler de ekleyelim
-        $categories = ServiceCategory::orderBy('order')->get();
+        $categories = ServiceCategory::orderBy('name', 'asc')->get();
 
         return view('front.services.topics', compact('serviceTopics', 'categories'));
     }
@@ -42,8 +42,8 @@ class ServiceTopicController extends Controller
             ->get();
 
         // Diğer kategoriler de ekleyelim
-        $categories = ServiceCategory::orderBy('order')->get();
-        $serviceTopics = ServiceTopic::active()->ordered()->get();
+        $categories = ServiceCategory::orderBy('name', 'asc')->get();
+        $serviceTopics = ServiceTopic::active()->orderBy('name', 'asc')->get();
 
         // SEO bilgileri
         $pageTitle = $serviceTopic->meta_title ?: $serviceTopic->name . ' | Çankaya Belediyesi';

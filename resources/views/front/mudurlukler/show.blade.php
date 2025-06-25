@@ -282,7 +282,7 @@
             @if($mudurluk->files->where('is_active', true)->count() > 0)
             <section id="dosyalar" class="service-content-section">
                 <h2>Dosyalar ve Dökümanlar</h2>
-                <p class="mb-5">{{ $mudurluk->name }} müdürlüğüne ait resmi belgeler ve dökümanları aşağıdan indirebilirsiniz:</p>
+                <p class="mb-5">{{ $mudurluk->name }} resmi belgeler ve dökümanları aşağıdan indirebilirsiniz:</p>
                 
                                                 <!-- Hizmet Standartları -->
                 @php
