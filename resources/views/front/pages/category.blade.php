@@ -89,6 +89,15 @@
                 @endforeach
             </div>
             
+            <!-- Sayfalama -->
+            @if($pages->hasPages())
+                <div class="mt-8 flex justify-center">
+                    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+                        {{ $pages->links() }}
+                    </div>
+                </div>
+            @endif
+            
             <!-- Alt bilgi alanı -->
             <div class="mt-8 bg-white p-6 rounded-lg shadow-sm border border-gray-200">
                 <div class="text-center">
