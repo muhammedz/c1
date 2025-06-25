@@ -155,6 +155,13 @@
                                     </div>
                                 </div>
                                 
+                                <div class="form-group">
+                                    <label for="logo_url">Bağlantı URL</label>
+                                    <input type="text" class="form-control" id="logo_url" name="logo_url" 
+                                           value="{{ old('logo_url', $logoPlans->logo_url) }}" placeholder="Örn: / (anasayfa için)">
+                                    <small class="text-muted">Logo kartına tıklandığında yönlendirilecek sayfa. Boş bırakılırsa tıklanabilir olmayacak.</small>
+                                </div>
+                                
                                 <!-- Önizleme -->
                                 <div class="card mt-4">
                                     <div class="card-header bg-light">

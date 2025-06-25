@@ -70,15 +70,27 @@
         @endif
 
         <!-- 3. Kart - Büyük Logo -->
-        <div class="bg-[{{ $logoPlans->logo_bg_color ?? '#004d2e' }}] w-full md:w-2/4 h-40 md:h-48 rounded-2xl p-4 md:p-8 flex items-center justify-center col-span-2 md:col-span-1" style="background-color: {{ $logoPlans->logo_bg_color ?? '#004d2e' }}">
-            <div class="text-center text-white">
-                @if($logoPlans->logo_image)
-                    <img src="{{ asset($logoPlans->logo_image) }}" alt="{{ $logoPlans->logo_title ?? 'Logo' }}" class="max-h-28 md:max-h-36 max-w-full mx-auto">
-                @else
-                    <p class="text-lg md:text-2xl font-medium">{{ $logoPlans->logo_title ?? 'Farklı Logo gelecek' }}<br><span class="text-sm md:text-base">Önerilen boyut: 300x100 piksel, PNG formatı</span></p>
-                @endif
+        @if($logoPlans->logo_url)
+            <a href="{{ $logoPlans->logo_url }}" class="bg-[{{ $logoPlans->logo_bg_color ?? '#004d2e' }}] w-full md:w-2/4 h-40 md:h-48 rounded-2xl p-4 md:p-8 flex items-center justify-center col-span-2 md:col-span-1 hover:shadow-md transition-shadow duration-200 cursor-pointer" style="background-color: {{ $logoPlans->logo_bg_color ?? '#004d2e' }}">
+                <div class="text-center text-white">
+                    @if($logoPlans->logo_image)
+                        <img src="{{ asset($logoPlans->logo_image) }}" alt="{{ $logoPlans->logo_title ?? 'Logo' }}" class="max-h-28 md:max-h-36 max-w-full mx-auto">
+                    @else
+                        <p class="text-lg md:text-2xl font-medium">{{ $logoPlans->logo_title ?? 'Farklı Logo gelecek' }}<br><span class="text-sm md:text-base">Önerilen boyut: 300x100 piksel, PNG formatı</span></p>
+                    @endif
+                </div>
+            </a>
+        @else
+            <div class="bg-[{{ $logoPlans->logo_bg_color ?? '#004d2e' }}] w-full md:w-2/4 h-40 md:h-48 rounded-2xl p-4 md:p-8 flex items-center justify-center col-span-2 md:col-span-1" style="background-color: {{ $logoPlans->logo_bg_color ?? '#004d2e' }}">
+                <div class="text-center text-white">
+                    @if($logoPlans->logo_image)
+                        <img src="{{ asset($logoPlans->logo_image) }}" alt="{{ $logoPlans->logo_title ?? 'Logo' }}" class="max-h-28 md:max-h-36 max-w-full mx-auto">
+                    @else
+                        <p class="text-lg md:text-2xl font-medium">{{ $logoPlans->logo_title ?? 'Farklı Logo gelecek' }}<br><span class="text-sm md:text-base">Önerilen boyut: 300x100 piksel, PNG formatı</span></p>
+                    @endif
+                </div>
             </div>
-        </div>
+        @endif
     </div>
 </section>
 @endif 

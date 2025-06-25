@@ -25,6 +25,7 @@ class LogoPlanSettings extends Model
         'logo_title',
         'logo_image',
         'logo_bg_color',
+        'logo_url',
     ];
     
     /**

@@ -631,6 +631,7 @@ class HomepageManagerController extends Controller
             'logo_title' => 'nullable|string|max:255',
             'logo_image' => 'nullable|string', // FileManagerSystem ile gelecek path
             'logo_bg_color' => 'nullable|string|max:30',
+            'logo_url' => 'nullable|string|max:255',
         ]);
         
         try {
@@ -652,6 +653,7 @@ class HomepageManagerController extends Controller
             $logoPlans->card2_url = $request->card2_url;
             $logoPlans->logo_title = $request->logo_title;
             $logoPlans->logo_bg_color = $request->logo_bg_color ?: '#004d2e';
+            $logoPlans->logo_url = $request->logo_url;
             
             // Debug bilgisi ekleyelim
             \Log::info('Logo ve planlar güncelleniyor', [
