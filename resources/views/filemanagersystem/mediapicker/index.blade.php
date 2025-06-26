@@ -23,7 +23,7 @@
             width: 100%;
             padding: 0;
             margin: 0;
-            height: 100vh;
+            height: 90vh;
             display: flex;
             flex-direction: column;
         }
@@ -58,7 +58,7 @@
         }
         .card-body {
             padding: 15px;
-            max-height: calc(100vh - 180px);
+            max-height: calc(90vh - 220px);
             overflow-y: auto;
         }
         .media-item {
@@ -158,6 +158,60 @@
         .btn-secondary {
             background-color: #6c757d;
             border-color: #6c757d;
+        }
+        
+        /* Pagination container için özel stil */
+        #paginationContainer {
+            background-color: #fff;
+            border-top: 1px solid #dee2e6;
+            padding: 15px;
+            margin-top: 20px;
+        }
+        
+        /* Medya container için flex ayarı */
+        .content {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        
+        .card {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        
+        /* Arama kutusu stil iyileştirmesi */
+        #searchInput {
+            border-radius: 0.25rem 0 0 0.25rem;
+        }
+        
+        #searchButton {
+            border-radius: 0 0.25rem 0.25rem 0;
+        }
+        
+        /* Loading spinner stil */
+        .search-loading {
+            position: relative;
+        }
+        
+        .search-loading::after {
+            content: '';
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 16px;
+            height: 16px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #007bff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: translateY(-50%) rotate(0deg); }
+            100% { transform: translateY(-50%) rotate(360deg); }
         }
     </style>
 </head>
@@ -397,8 +451,19 @@
                 loadMedia();
             });
             
+            // Enter tuşu ile arama + debounce
+            let searchTimeout;
+            $('#searchInput').on('input', function() {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(function() {
+                    page = 1;
+                    loadMedia();
+                }, 500); // 500ms debounce
+            });
+            
             $('#searchInput').keypress(function(e) {
                 if (e.which === 13) {
+                    clearTimeout(searchTimeout);
                     page = 1;
                     loadMedia();
                 }
@@ -413,7 +478,14 @@
             
             // Medya dosyalarını listele
             function loadMedia() {
+                // Loading state
                 $('#mediaList').html('<div class="col-12 text-center py-5"><div class="spinner-border text-primary" role="status"><span class="sr-only">Yükleniyor...</span></div><p class="mt-2">Medya dosyaları yükleniyor...</p></div>');
+                
+                // Arama kutusuna loading ekle
+                const searchValue = $('#searchInput').val();
+                if (searchValue.length > 0) {
+                    $('#searchInput').addClass('search-loading');
+                }
                 
                 // AJAX istek parametreleri
                 var requestParams = {
@@ -421,7 +493,7 @@
                     related_id: relatedId,
                     filter: filter,
                     page: page,
-                    search: $('#searchInput').val(),
+                    search: searchValue,
                     type: type
                 };
                 
@@ -432,6 +504,9 @@
                         type: 'GET',
                         data: requestParams,
                         success: function(response) {
+                            // Loading spinner'ı kaldır
+                            $('#searchInput').removeClass('search-loading');
+                            
                             if (response.success) {
                                 $('#mediaList').html(response.html);
                                 $('#paginationContainer').html(response.pagination);
@@ -445,6 +520,9 @@
                             }
                         },
                         error: function(xhr, status, error) {
+                            // Loading spinner'ı kaldır
+                            $('#searchInput').removeClass('search-loading');
+                            
                             // Hata kontrolü
                             console.error("MediaPicker Hatası:", xhr, status, error);
                             $('#mediaList').html('<div class="col-12 text-center py-5"><div class="alert alert-danger">Hata: Sunucu ile iletişim sırasında bir sorun oluştu.</div></div>');

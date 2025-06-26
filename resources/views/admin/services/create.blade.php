@@ -1773,7 +1773,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
             </div>
             <div class="modal-body p-0">
-                <iframe id="mediapickerFrame" style="width: 100%; height: 80vh; border: none;"></iframe>
+                <iframe id="mediapickerFrame" style="width: 100%; height: 85vh; border: none;"></iframe>
             </div>
         </div>
     </div>

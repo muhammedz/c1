@@ -51,6 +51,7 @@ class MediaPickerController extends Controller
             $filter = $request->input('filter', 'related');
             $page = $request->input('page', 1);
             $type = $request->input('type');
+            $search = $request->input('search', '');
             
             // İlgili dosyaları getir
             $query = Media::query();
@@ -68,6 +69,19 @@ class MediaPickerController extends Controller
             } elseif ($filter === 'type-related') {
                 $query->whereHas('relations', function($q) use ($relatedType) {
                     $q->where('related_type', $relatedType);
+                });
+            }
+            
+            // Arama filtresi
+            if (!empty($search)) {
+                $searchTerm = '%' . str_replace(['ı', 'İ', 'ş', 'Ş', 'ğ', 'Ğ', 'ü', 'Ü', 'ö', 'Ö', 'ç', 'Ç'], 
+                                               ['i', 'i', 's', 's', 'g', 'g', 'u', 'u', 'o', 'o', 'c', 'c'], 
+                                               strtolower($search)) . '%';
+                $query->where(function($q) use ($search, $searchTerm) {
+                    $q->where('original_name', 'LIKE', '%' . $search . '%')
+                      ->orWhere('name', 'LIKE', '%' . $search . '%')
+                      ->orWhere('original_name', 'LIKE', $searchTerm)
+                      ->orWhere('name', 'LIKE', $searchTerm);
                 });
             }
             
@@ -98,7 +112,8 @@ class MediaPickerController extends Controller
                     'filter' => $filter,
                     'relatedType' => $relatedType,
                     'relatedId' => $relatedId,
-                    'type' => $type
+                    'type' => $type,
+                    'search' => $search
                 ])->render(),
             ]);
             
