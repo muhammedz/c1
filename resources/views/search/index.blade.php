@@ -384,20 +384,26 @@ document.addEventListener('DOMContentLoaded', function() {
     
     priorityLinks.forEach(function(link) {
         link.addEventListener('click', function(e) {
+            e.preventDefault(); // Varsayılan link davranışını engelle
+            
             const linkId = this.getAttribute('data-link-id');
+            const originalUrl = this.getAttribute('href'); // Orijinal URL'yi al
             
             console.log('Link tıklandı! ID:', linkId);
+            console.log('Orijinal URL:', originalUrl);
             
             if (!linkId) {
                 console.log('Link ID yok!');
+                // ID yoksa normal link davranışını yap
+                window.location.href = originalUrl;
                 return;
             }
             
             // Tıklama sayısını artır
-            const url = '{{ route("priority-link.track-click", ":id") }}'.replace(':id', linkId);
-            console.log('Gönderilecek URL:', url);
+            const trackUrl = '{{ route("priority-link.track-click", ":id") }}'.replace(':id', linkId);
+            console.log('Tracking URL:', trackUrl);
             
-            fetch(url, {
+            fetch(trackUrl, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
@@ -410,9 +416,13 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .then(data => {
                 console.log('Response data:', data);
+                // Tracking tamamlandıktan sonra orijinal sayfaya git
+                window.location.href = originalUrl;
             })
             .catch(error => {
-                console.error('Hata:', error);
+                console.error('Tracking hatası:', error);
+                // Hata olsa bile orijinal sayfaya git
+                window.location.href = originalUrl;
             });
         });
     });
