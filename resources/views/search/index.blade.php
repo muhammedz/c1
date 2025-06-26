@@ -2,7 +2,7 @@
 
 @section('title')
 @if(isset($query) && !empty($query))
-{{ ucfirst($query) }} Arama Sonuçları - Çankaya Belediyesi
+{{ ucfirst($query) }} Arama Sonuçları
 @else
 Arama - Çankaya Belediyesi
 @endif
