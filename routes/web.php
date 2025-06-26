@@ -83,6 +83,9 @@ Route::get('/arama', function() {
     ]);
 })->name('search');
 
+// Öncelikli link tıklama tracking (public)
+Route::post('/priority-link-click/{priorityLink}', [App\Http\Controllers\Admin\SearchPriorityLinkController::class, 'trackClick'])->name('priority-link.track-click');
+
 Route::get('/', [App\Http\Controllers\FrontController::class, 'index'])->name('front.home');
 
 // İletişim Sayfası

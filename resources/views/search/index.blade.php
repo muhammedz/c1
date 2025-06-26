@@ -376,22 +376,29 @@ Arama - Çankaya Belediyesi
 
 @section('scripts')
 <script>
-$(document).ready(function() {
+document.addEventListener('DOMContentLoaded', function() {
     // Priority Link tıklama tracking'i
-    $('.priority-link-click').on('click', function(e) {
-        const linkId = $(this).data('link-id');
-        
-        // Tıklama sayısını artır (AJAX ile)
-        $.ajax({
-            url: '{{ route("admin.search-priority-links.track-click", ":id") }}'.replace(':id', linkId),
-            type: 'POST',
-            data: {
-                _token: '{{ csrf_token() }}'
-            },
-            beforeSend: function() {
-                // Link normal şekilde çalışsın
-                return true;
-            }
+    const priorityLinks = document.querySelectorAll('.priority-link-click');
+    
+    priorityLinks.forEach(function(link) {
+        link.addEventListener('click', function(e) {
+            const linkId = this.getAttribute('data-link-id');
+            
+            if (!linkId) return;
+            
+            // Tıklama sayısını artır
+            const url = '{{ route("priority-link.track-click", ":id") }}'.replace(':id', linkId);
+            
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({
+                    _token: '{{ csrf_token() }}'
+                })
+            }).catch(() => {}); // Sessizce hata yakala
         });
     });
 });
