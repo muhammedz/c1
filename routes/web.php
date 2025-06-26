@@ -757,6 +757,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     ])->except(['show']);
     Route::post('/search-priority-links/order', [App\Http\Controllers\Admin\SearchPriorityLinkController::class, 'updateOrder'])->name('search-priority-links.order');
     Route::patch('/search-priority-links/{priorityLink}/toggle-active', [App\Http\Controllers\Admin\SearchPriorityLinkController::class, 'toggleActive'])->name('search-priority-links.toggle-active');
+    Route::post('/search-priority-links/{priorityLink}/track-click', [App\Http\Controllers\Admin\SearchPriorityLinkController::class, 'trackClick'])->name('search-priority-links.track-click');
     
     // Genel Ayarlar Routes
     Route::get('/settings', [App\Http\Controllers\Admin\SettingsController::class, 'index'])->name('settings.index');

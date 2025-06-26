@@ -20,13 +20,17 @@ class SearchSettingController extends Controller
         $settings = SearchSetting::getSettings();
         $quickLinks = SearchQuickLink::orderBy('order')->get();
         $popularQueries = SearchPopularQuery::orderBy('order')->get();
+        
+        // Priority links'i hem varsayılan sıralama hem de tıklama sayısına göre getir
         $priorityLinks = SearchPriorityLink::ordered()->get();
+        $priorityLinksByClicks = SearchPriorityLink::orderByClicks()->take(10)->get();
         
         return view('admin.search_settings.index', compact(
             'settings', 
             'quickLinks', 
             'popularQueries',
-            'priorityLinks'
+            'priorityLinks',
+            'priorityLinksByClicks'
         ));
     }
     

@@ -1,5 +1,21 @@
 @extends('layouts.front')
 
+@section('title')
+@if(isset($query) && !empty($query))
+{{ ucfirst($query) }} Arama Sonuçları - Çankaya Belediyesi
+@else
+Arama - Çankaya Belediyesi
+@endif
+@endsection
+
+@section('meta_description')
+@if(isset($query) && !empty($query))
+"{{ $query }}" kelimesi için Çankaya Belediyesi arama sonuçları. {{ isset($results['total']) ? $results['total'] : 0 }} sonuç bulundu.
+@else
+Çankaya Belediyesi hizmetleri, haberleri, projeleri ve daha fazlası için arama yapın.
+@endif
+@endsection
+
 @section('content')
 <!-- Hero Bölümü -->
 <div class="relative bg-gradient-to-r from-[#00352b] to-[#20846c] overflow-hidden">
@@ -167,7 +183,7 @@
                                                         </div>
                                                     @endif
                                                     <div class="flex-1">
-                                                        <a href="{{ $priorityLink->full_url }}" class="text-lg font-semibold text-white hover:text-yellow-200 block transition-colors">
+                                                        <a href="{{ $priorityLink->full_url }}" class="text-lg font-semibold text-white hover:text-yellow-200 block transition-colors priority-link-click" data-link-id="{{ $priorityLink->id }}">
                                                             {{ $priorityLink->title }}
                                                         </a>
                                                         @if($priorityLink->description)
@@ -356,4 +372,28 @@
         </div>
     </div>
 </div>
-@endsection 
+@endsection
+
+@section('scripts')
+<script>
+$(document).ready(function() {
+    // Priority Link tıklama tracking'i
+    $('.priority-link-click').on('click', function(e) {
+        const linkId = $(this).data('link-id');
+        
+        // Tıklama sayısını artır (AJAX ile)
+        $.ajax({
+            url: '{{ route("admin.search-priority-links.track-click", ":id") }}'.replace(':id', linkId),
+            type: 'POST',
+            data: {
+                _token: '{{ csrf_token() }}'
+            },
+            beforeSend: function() {
+                // Link normal şekilde çalışsın
+                return true;
+            }
+        });
+    });
+});
+</script>
+@endsection

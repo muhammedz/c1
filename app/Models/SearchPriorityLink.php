@@ -16,12 +16,14 @@ class SearchPriorityLink extends Model
         'description',
         'icon',
         'priority',
-        'is_active'
+        'is_active',
+        'click_count'
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
-        'priority' => 'integer'
+        'priority' => 'integer',
+        'click_count' => 'integer'
     ];
 
     /**
@@ -66,6 +68,22 @@ class SearchPriorityLink extends Model
     public function scopeOrdered($query)
     {
         return $query->orderBy('priority')->orderBy('title');
+    }
+
+    /**
+     * Tıklama sayısına göre sırala (en çok tıklanan önce)
+     */
+    public function scopeOrderByClicks($query)
+    {
+        return $query->orderBy('click_count', 'desc');
+    }
+
+    /**
+     * Tıklama sayısını artır
+     */
+    public function incrementClickCount()
+    {
+        $this->increment('click_count');
     }
 
     /**

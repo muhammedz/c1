@@ -221,6 +221,7 @@
                                     <th>URL</th>
                                     <th>İkon</th>
                                     <th>Öncelik</th>
+                                    <th>Tıklama Sayısı</th>
                                     <th>Durum</th>
                                     <th>İşlemler</th>
                                 </tr>
@@ -250,6 +251,10 @@
                                         <td>
                                             <input type="number" class="form-control form-control-sm priority-order-input" min="1" value="{{ $link->priority }}" data-id="{{ $link->id }}" style="width: 60px">
                                         </td>
+                                        <td class="text-center">
+                                            <span class="badge badge-primary">{{ $link->click_count ?? 0 }}</span>
+                                            <small class="text-muted d-block">tıklama</small>
+                                        </td>
                                         <td>
                                             <div class="custom-control custom-switch">
                                                 <input type="checkbox" class="custom-control-input priority-toggle-active" id="priorityActive{{ $link->id }}" data-id="{{ $link->id }}" {{ $link->is_active ? 'checked' : '' }} data-url="{{ route('admin.search-priority-links.toggle-active', $link->id) }}">
@@ -271,12 +276,70 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="7" class="text-center">Henüz öncelik linki eklenmemiş.</td>
+                                        <td colspan="8" class="text-center">Henüz öncelik linki eklenmemiş.</td>
                                     </tr>
                                 @endforelse
                             </tbody>
                         </table>
                     </div>
+                </div>
+            </div>
+
+            <!-- En Çok Tıklanan Öncelik Linkleri -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-chart-line"></i> En Çok Tıklanan Öncelik Linkleri
+                    </h3>
+                </div>
+                <div class="card-body">
+                    @if($priorityLinksByClicks->count() > 0)
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Başlık</th>
+                                        <th>URL</th>
+                                        <th>Tıklama Sayısı</th>
+                                        <th>Durum</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($priorityLinksByClicks as $index => $link)
+                                        <tr>
+                                            <td>
+                                                <span class="badge badge-{{ $index < 3 ? 'success' : 'secondary' }}">{{ $index + 1 }}</span>
+                                            </td>
+                                            <td>
+                                                <strong>{{ $link->title }}</strong>
+                                                @if($link->description)
+                                                    <br><small class="text-muted">{{ Str::limit($link->description, 40) }}</small>
+                                                @endif
+                                            </td>
+                                            <td>
+                                                <code>{{ $link->url }}</code>
+                                            </td>
+                                            <td class="text-center">
+                                                <span class="badge badge-primary badge-lg">{{ $link->click_count }}</span>
+                                            </td>
+                                            <td class="text-center">
+                                                @if($link->is_active)
+                                                    <span class="badge badge-success">Aktif</span>
+                                                @else
+                                                    <span class="badge badge-secondary">Pasif</span>
+                                                @endif
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    @else
+                        <div class="text-center text-muted">
+                            <p>Henüz tıklama verisi bulunmuyor.</p>
+                        </div>
+                    @endif
                 </div>
             </div>
 

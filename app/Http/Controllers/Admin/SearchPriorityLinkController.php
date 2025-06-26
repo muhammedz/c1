@@ -173,4 +173,17 @@ class SearchPriorityLinkController extends Controller
             'is_active' => $priorityLink->is_active
         ]);
     }
+
+    /**
+     * Tıklama sayısını takip et
+     */
+    public function trackClick(SearchPriorityLink $priorityLink)
+    {
+        $priorityLink->incrementClickCount();
+
+        return response()->json([
+            'success' => true,
+            'click_count' => $priorityLink->click_count
+        ]);
+    }
 }
