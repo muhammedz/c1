@@ -380,25 +380,40 @@ document.addEventListener('DOMContentLoaded', function() {
     // Priority Link tıklama tracking'i
     const priorityLinks = document.querySelectorAll('.priority-link-click');
     
+    console.log('Priority link sayısı:', priorityLinks.length);
+    
     priorityLinks.forEach(function(link) {
         link.addEventListener('click', function(e) {
             const linkId = this.getAttribute('data-link-id');
             
-            if (!linkId) return;
+            console.log('Link tıklandı! ID:', linkId);
+            
+            if (!linkId) {
+                console.log('Link ID yok!');
+                return;
+            }
             
             // Tıklama sayısını artır
             const url = '{{ route("priority-link.track-click", ":id") }}'.replace(':id', linkId);
+            console.log('Gönderilecek URL:', url);
             
             fetch(url, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    'Content-Type': 'application/x-www-form-urlencoded',
                 },
-                body: JSON.stringify({
-                    _token: '{{ csrf_token() }}'
-                })
-            }).catch(() => {}); // Sessizce hata yakala
+                body: 'tracking=1'
+            })
+            .then(response => {
+                console.log('Response status:', response.status);
+                return response.text();
+            })
+            .then(data => {
+                console.log('Response data:', data);
+            })
+            .catch(error => {
+                console.error('Hata:', error);
+            });
         });
     });
 });
