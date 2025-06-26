@@ -374,7 +374,7 @@ Arama - Çankaya Belediyesi
 </div>
 @endsection
 
-@section('scripts')
+@section('after_scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     // Priority Link tıklama tracking'i
