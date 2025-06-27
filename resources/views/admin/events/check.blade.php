@@ -363,22 +363,103 @@
                     
                     $('#preview-button').prop('disabled', false).html('<i class="fas fa-eye"></i> Etkinlikleri Göster (Eklemeden)');
                     
+                    var errorData = null;
                     var errorMsg = 'Bir hata oluştu!';
-                    if (xhr.responseJSON && xhr.responseJSON.error) {
-                        errorMsg = xhr.responseJSON.error;
-                    } else if (xhr.status) {
-                        errorMsg = 'HTTP Hata Kodu: ' + xhr.status + ' - ' + error;
+                    var errorDetails = null;
+                    
+                    // JSON yanıtını parse etmeye çalış
+                    try {
+                        if (xhr.responseJSON) {
+                            errorData = xhr.responseJSON;
+                        } else if (xhr.responseText) {
+                            errorData = JSON.parse(xhr.responseText);
+                        }
+                    } catch (e) {
+                        console.warn('JSON parse hatası:', e);
                     }
                     
-                    $('#preview-content').html(
-                        '<div class="alert alert-danger">' +
-                        '<h5><i class="icon fas fa-ban"></i> Hata!</h5>' +
-                        errorMsg +
-                        '<hr>' +
-                        '<p>Teknik Detaylar:</p>' +
-                        '<pre style="max-height: 200px; overflow: auto;">' + escapeHtml(xhr.responseText) + '</pre>' +
-                        '</div>'
-                    );
+                    // Hata mesajını belirle
+                    if (errorData) {
+                        errorMsg = errorData.message || errorData.error || errorMsg;
+                        errorDetails = errorData.error_details;
+                    } else if (xhr.status) {
+                        if (xhr.status === 0) {
+                            errorMsg = 'Bağlantı hatası - Sunucuya ulaşılamıyor';
+                        } else if (xhr.status >= 500) {
+                            errorMsg = 'Sunucu hatası (HTTP ' + xhr.status + ')';
+                        } else if (xhr.status >= 400) {
+                            errorMsg = 'İstek hatası (HTTP ' + xhr.status + ')';
+                        } else {
+                            errorMsg = 'HTTP Hata Kodu: ' + xhr.status + ' - ' + error;
+                        }
+                    } else if (status === 'timeout') {
+                        errorMsg = 'İstek zaman aşımına uğradı (Timeout)';
+                        errorDetails = {
+                            'Hata Türü': 'Zaman Aşımı (Timeout)',
+                            'Açıklama': 'İstek 30 saniye içinde tamamlanamadı',
+                            'Çözüm Önerileri': [
+                                '1. İnternet bağlantınızı kontrol edin',
+                                '2. Hedef web sitesinin hızlı olduğunu kontrol edin',
+                                '3. Birkaç dakika sonra tekrar deneyin'
+                            ]
+                        };
+                    } else if (status === 'error') {
+                        errorMsg = 'Ağ bağlantı hatası';
+                    }
+                    
+                    // Hata görüntüleme HTML'i oluştur
+                    var errorHtml = '<div class="alert alert-danger">' +
+                        '<h5><i class="icon fas fa-ban"></i> Hata Oluştu!</h5>' +
+                        '<p class="mb-3"><strong>' + errorMsg + '</strong></p>';
+                    
+                    // Hata detayları varsa göster
+                    if (errorDetails) {
+                        errorHtml += '<div class="card mt-3">' +
+                            '<div class="card-header bg-danger text-white">' +
+                                '<h6 class="mb-0"><i class="fas fa-info-circle mr-2"></i>Hata Detayları</h6>' +
+                            '</div>' +
+                            '<div class="card-body">';
+                        
+                        // Hata detaylarını listele
+                        for (var key in errorDetails) {
+                            if (errorDetails.hasOwnProperty(key)) {
+                                var value = errorDetails[key];
+                                if (Array.isArray(value)) {
+                                    errorHtml += '<p><strong>' + key + ':</strong></p><ul>';
+                                    for (var i = 0; i < value.length; i++) {
+                                        errorHtml += '<li>' + value[i] + '</li>';
+                                    }
+                                    errorHtml += '</ul>';
+                                } else {
+                                    errorHtml += '<p><strong>' + key + ':</strong> ' + value + '</p>';
+                                }
+                            }
+                        }
+                        
+                        errorHtml += '</div></div>';
+                    }
+                    
+                    // Teknik detaylar (collapsible)
+                    if (xhr.responseText && xhr.responseText.length > 0) {
+                        errorHtml += '<div class="card mt-3">' +
+                            '<div class="card-header bg-secondary text-white" data-toggle="collapse" href="#technicalDetails" role="button" aria-expanded="false">' +
+                                '<h6 class="mb-0"><i class="fas fa-code mr-2"></i>Teknik Detaylar (Genişletmek için tıklayın)</h6>' +
+                            '</div>' +
+                            '<div class="collapse" id="technicalDetails">' +
+                                '<div class="card-body">' +
+                                    '<p><strong>HTTP Durum:</strong> ' + xhr.status + ' ' + xhr.statusText + '</p>' +
+                                    '<p><strong>AJAX Durum:</strong> ' + status + '</p>' +
+                                    '<p><strong>Hata:</strong> ' + error + '</p>' +
+                                    '<p><strong>Sunucu Yanıtı:</strong></p>' +
+                                    '<pre style="max-height: 200px; overflow: auto; font-size: 11px;">' + escapeHtml(xhr.responseText) + '</pre>' +
+                                '</div>' +
+                            '</div>' +
+                        '</div>';
+                    }
+                    
+                    errorHtml += '</div>';
+                    
+                    $('#preview-content').html(errorHtml);
                     
                     // Debug bilgilerini göster
                     $('#debug-html-content').text('Hata nedeniyle HTML içeriği alınamadı.');
@@ -455,17 +536,59 @@
                 error: function(xhr) {
                     console.error('Hata:', xhr);
                     
+                    var errorData = null;
                     var errorMsg = 'Bir hata oluştu!';
-                    if (xhr.responseJSON && xhr.responseJSON.error) {
-                        errorMsg = xhr.responseJSON.error;
+                    
+                    // JSON yanıtını parse etmeye çalış
+                    try {
+                        if (xhr.responseJSON) {
+                            errorData = xhr.responseJSON;
+                        } else if (xhr.responseText) {
+                            errorData = JSON.parse(xhr.responseText);
+                        }
+                    } catch (e) {
+                        console.warn('JSON parse hatası:', e);
+                    }
+                    
+                    // Hata mesajını belirle
+                    if (errorData) {
+                        errorMsg = errorData.message || errorData.error || errorMsg;
+                    } else if (xhr.status) {
+                        if (xhr.status === 0) {
+                            errorMsg = 'Bağlantı hatası - Sunucuya ulaşılamıyor';
+                        } else if (xhr.status >= 500) {
+                            errorMsg = 'Sunucu hatası (HTTP ' + xhr.status + ')';
+                        } else if (xhr.status >= 400) {
+                            errorMsg = 'İstek hatası (HTTP ' + xhr.status + ')';
+                        } else {
+                            errorMsg = 'HTTP Hata Kodu: ' + xhr.status;
+                        }
                     }
                     
                     $('#result-message').html('<i class="fas fa-exclamation-triangle"></i> ' + errorMsg);
                     $('#error-count').text(parseInt($('#error-count').text()) + 1);
                     $('#scrape-button').prop('disabled', false).html('<i class="fas fa-sync-alt"></i> Etkinlikleri Çek');
                     
+                    // Detaylı hata mesajı oluştur
                     var errorAlert = '<div class="alert alert-danger mt-3">' +
-                                    '<i class="icon fas fa-ban"></i> Etkinlik çekme sırasında bir hata oluştu: ' + errorMsg + '</div>';
+                                    '<i class="icon fas fa-ban"></i> <strong>Etkinlik çekme sırasında hata oluştu:</strong><br>' +
+                                    errorMsg;
+                    
+                    // Hata detayları varsa ekle
+                    if (errorData && errorData.error_details) {
+                        errorAlert += '<div class="mt-2"><small><strong>Detaylar:</strong></small>';
+                        for (var key in errorData.error_details) {
+                            if (errorData.error_details.hasOwnProperty(key) && key !== 'Çözüm Önerileri') {
+                                var value = errorData.error_details[key];
+                                if (!Array.isArray(value)) {
+                                    errorAlert += '<br><small><strong>' + key + ':</strong> ' + value + '</small>';
+                                }
+                            }
+                        }
+                        errorAlert += '</div>';
+                    }
+                    
+                    errorAlert += '</div>';
                     $('#result-details').append(errorAlert);
                 }
             });
@@ -603,14 +726,56 @@
         // Önizleme hatasını görüntüleme fonksiyonu
         function displayPreviewError(response) {
             var html = '<div class="alert alert-danger">' +
-                       '<h5><i class="icon fas fa-ban"></i> Hata!</h5>' +
-                       (response.message || 'Etkinlikler çekilemedi.') +
-                       '</div>';
+                       '<h5><i class="icon fas fa-ban"></i> Hata Oluştu!</h5>' +
+                       '<p class="mb-3"><strong>' + (response.message || 'Etkinlikler çekilemedi.') + '</strong></p>';
             
+            // Hata detayları varsa göster
+            if (response.error_details) {
+                html += '<div class="card mt-3">' +
+                    '<div class="card-header bg-danger text-white">' +
+                        '<h6 class="mb-0"><i class="fas fa-info-circle mr-2"></i>Hata Detayları</h6>' +
+                    '</div>' +
+                    '<div class="card-body">';
+                
+                // Hata detaylarını listele
+                for (var key in response.error_details) {
+                    if (response.error_details.hasOwnProperty(key)) {
+                        var value = response.error_details[key];
+                        if (Array.isArray(value)) {
+                            html += '<p><strong>' + key + ':</strong></p><ul>';
+                            for (var i = 0; i < value.length; i++) {
+                                html += '<li>' + value[i] + '</li>';
+                            }
+                            html += '</ul>';
+                        } else {
+                            html += '<p><strong>' + key + ':</strong> ' + value + '</p>';
+                        }
+                    }
+                }
+                
+                html += '</div></div>';
+            }
+            
+            // Teknik mesaj varsa göster (collapsible)
+            if (response.technical_message) {
+                html += '<div class="card mt-3">' +
+                    '<div class="card-header bg-secondary text-white" data-toggle="collapse" href="#technicalMessage" role="button" aria-expanded="false">' +
+                        '<h6 class="mb-0"><i class="fas fa-code mr-2"></i>Teknik Mesaj (Genişletmek için tıklayın)</h6>' +
+                    '</div>' +
+                    '<div class="collapse" id="technicalMessage">' +
+                        '<div class="card-body">' +
+                            '<pre style="max-height: 200px; overflow: auto; font-size: 11px;">' + escapeHtml(response.technical_message) + '</pre>' +
+                        '</div>' +
+                    '</div>' +
+                '</div>';
+            }
+            
+            html += '</div>';
+            
+            // Debug bilgilerini hazırla
             if (response.html) {
-                // Debug bilgilerini hazırla
                 $('#debug-html-content').text(response.html);
-                $('#debug-debug').show();
+                $('#preview-debug').show();
             }
             
             $('#preview-content').html(html);

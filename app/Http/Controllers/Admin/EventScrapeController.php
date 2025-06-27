@@ -63,11 +63,70 @@ class EventScrapeController extends Controller
             cache()->put('last_event_scrape', now(), now()->addDays(30));
             
             return response()->json($result);
-        } catch (\Exception $e) {
-            Log::error('Etkinlik çekme hatası: ' . $e->getMessage());
+        } catch (\Illuminate\Http\Client\ConnectionException $e) {
+            Log::error('Etkinlik çekme bağlantı hatası: ' . $e->getMessage(), [
+                'url' => $url,
+                'page' => $page,
+                'error_type' => 'connection_timeout'
+            ]);
+            
             return response()->json([
                 'success' => false,
-                'error' => $e->getMessage(),
+                'error' => 'Hedef web sitesine bağlanılamadı (Timeout Hatası)',
+                'error_type' => 'connection_timeout',
+                'error_details' => [
+                    'Hata Türü' => 'Bağlantı Hatası (Connection Timeout)',
+                    'Hedef URL' => $url,
+                    'Sayfa' => $page,
+                    'Hata Mesajı' => $e->getMessage(),
+                    'Zaman' => now()->format('d.m.Y H:i:s')
+                ],
+                'page' => $page
+            ], 500);
+        } catch (\Illuminate\Http\Client\RequestException $e) {
+            Log::error('Etkinlik çekme HTTP hatası: ' . $e->getMessage(), [
+                'url' => $url,
+                'page' => $page,
+                'error_type' => 'http_request'
+            ]);
+            
+            $statusCode = $e->response ? $e->response->status() : 'Bilinmiyor';
+            
+            return response()->json([
+                'success' => false,
+                'error' => "Web sitesinden veri alınamadı (HTTP {$statusCode} Hatası)",
+                'error_type' => 'http_request',
+                'error_details' => [
+                    'Hata Türü' => 'HTTP İstek Hatası',
+                    'Hedef URL' => $url,
+                    'Sayfa' => $page,
+                    'HTTP Durum Kodu' => $statusCode,
+                    'Hata Mesajı' => $e->getMessage(),
+                    'Zaman' => now()->format('d.m.Y H:i:s')
+                ],
+                'page' => $page
+            ], 500);
+        } catch (\Exception $e) {
+            Log::error('Etkinlik çekme hatası: ' . $e->getMessage(), [
+                'url' => $url,
+                'page' => $page,
+                'error_type' => 'general',
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            return response()->json([
+                'success' => false,
+                'error' => 'Etkinlik çekme sırasında beklenmeyen bir hata oluştu',
+                'error_type' => 'general',
+                'error_details' => [
+                    'Hata Türü' => 'Genel İşlem Hatası',
+                    'Hedef URL' => $url,
+                    'Sayfa' => $page,
+                    'Hata Mesajı' => $e->getMessage(),
+                    'Hata Kodu' => $e->getCode(),
+                    'Zaman' => now()->format('d.m.Y H:i:s')
+                ],
+                'technical_message' => $e->getMessage(),
                 'page' => $page
             ], 500);
         }
@@ -83,11 +142,71 @@ class EventScrapeController extends Controller
             $result = $this->scraperService->scrapeAllPages();
             
             return response()->json($result);
-        } catch (\Exception $e) {
-            Log::error('Toplu etkinlik çekme hatası: ' . $e->getMessage());
+        } catch (\Illuminate\Http\Client\ConnectionException $e) {
+            Log::error('Toplu etkinlik çekme bağlantı hatası: ' . $e->getMessage(), [
+                'error_type' => 'connection_timeout'
+            ]);
+            
             return response()->json([
                 'success' => false,
-                'error' => $e->getMessage()
+                'error' => 'Hedef web sitesine bağlanılamadı (Timeout Hatası)',
+                'error_type' => 'connection_timeout',
+                'error_details' => [
+                    'Hata Türü' => 'Bağlantı Hatası (Connection Timeout)',
+                    'Hata Mesajı' => $e->getMessage(),
+                    'Zaman' => now()->format('d.m.Y H:i:s'),
+                    'Çözüm Önerileri' => [
+                        '1. İnternet bağlantınızı kontrol edin',
+                        '2. Hedef web sitesinin erişilebilir olduğunu kontrol edin',
+                        '3. Birkaç dakika sonra tekrar deneyin'
+                    ]
+                ]
+            ], 500);
+        } catch (\Illuminate\Http\Client\RequestException $e) {
+            Log::error('Toplu etkinlik çekme HTTP hatası: ' . $e->getMessage(), [
+                'error_type' => 'http_request'
+            ]);
+            
+            $statusCode = $e->response ? $e->response->status() : 'Bilinmiyor';
+            
+            return response()->json([
+                'success' => false,
+                'error' => "Web sitesinden veri alınamadı (HTTP {$statusCode} Hatası)",
+                'error_type' => 'http_request',
+                'error_details' => [
+                    'Hata Türü' => 'HTTP İstek Hatası',
+                    'HTTP Durum Kodu' => $statusCode,
+                    'Hata Mesajı' => $e->getMessage(),
+                    'Zaman' => now()->format('d.m.Y H:i:s'),
+                    'Çözüm Önerileri' => [
+                        '1. Hedef web sitesinin aktif olduğunu kontrol edin',
+                        '2. Web sitesi geçici olarak bakımda olabilir',
+                        '3. Birkaç dakika sonra tekrar deneyin'
+                    ]
+                ]
+            ], 500);
+        } catch (\Exception $e) {
+            Log::error('Toplu etkinlik çekme hatası: ' . $e->getMessage(), [
+                'error_type' => 'general',
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            return response()->json([
+                'success' => false,
+                'error' => 'Toplu etkinlik çekme sırasında beklenmeyen bir hata oluştu',
+                'error_type' => 'general',
+                'error_details' => [
+                    'Hata Türü' => 'Genel İşlem Hatası',
+                    'Hata Mesajı' => $e->getMessage(),
+                    'Hata Kodu' => $e->getCode(),
+                    'Zaman' => now()->format('d.m.Y H:i:s'),
+                    'Çözüm Önerileri' => [
+                        '1. Sayfayı yenileyin ve tekrar deneyin',
+                        '2. Sistem yöneticisine başvurun',
+                        '3. Hata loglarını kontrol edin'
+                    ]
+                ],
+                'technical_message' => $e->getMessage()
             ], 500);
         }
     }
@@ -356,35 +475,106 @@ class EventScrapeController extends Controller
             Log::error('Bağlantı hatası: ' . $e->getMessage(), [
                 'url' => $url,
                 'limit' => $limit,
-                'error_type' => 'connection_timeout'
+                'error_type' => 'connection_timeout',
+                'error_details' => [
+                    'message' => $e->getMessage(),
+                    'code' => $e->getCode(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine()
+                ]
             ]);
+            
+            $errorDetails = [
+                'Hata Türü' => 'Bağlantı Hatası (Connection Timeout)',
+                'Hedef URL' => $url,
+                'Hata Mesajı' => $e->getMessage(),
+                'Hata Kodu' => $e->getCode(),
+                'Zaman' => now()->format('d.m.Y H:i:s'),
+                'Çözüm Önerileri' => [
+                    '1. İnternet bağlantınızı kontrol edin',
+                    '2. Hedef web sitesinin erişilebilir olduğunu kontrol edin',
+                    '3. Birkaç dakika sonra tekrar deneyin',
+                    '4. VPN kullanıyorsanız kapatmayı deneyin'
+                ]
+            ];
             
             return response()->json([
                 'success' => false,
-                'message' => 'Hedef web sitesine bağlanılamadı. Lütfen internet bağlantınızı kontrol edin veya daha sonra tekrar deneyin. Hata: ' . $e->getMessage()
+                'message' => 'Hedef web sitesine bağlanılamadı (Timeout Hatası)',
+                'error_type' => 'connection_timeout',
+                'error_details' => $errorDetails,
+                'technical_message' => $e->getMessage()
             ], 500);
         } catch (\Illuminate\Http\Client\RequestException $e) {
             Log::error('HTTP istek hatası: ' . $e->getMessage(), [
                 'url' => $url,
                 'limit' => $limit,
-                'error_type' => 'http_request'
+                'error_type' => 'http_request',
+                'response_status' => $e->response ? $e->response->status() : 'N/A',
+                'response_body' => $e->response ? substr($e->response->body(), 0, 500) : 'N/A'
             ]);
+            
+            $statusCode = $e->response ? $e->response->status() : 'Bilinmiyor';
+            $statusText = $e->response ? $e->response->reason() : 'Bilinmiyor';
+            
+            $errorDetails = [
+                'Hata Türü' => 'HTTP İstek Hatası',
+                'Hedef URL' => $url,
+                'HTTP Durum Kodu' => $statusCode,
+                'HTTP Durum Metni' => $statusText,
+                'Hata Mesajı' => $e->getMessage(),
+                'Zaman' => now()->format('d.m.Y H:i:s'),
+                'Çözüm Önerileri' => [
+                    '1. Hedef web sitesinin aktif olduğunu kontrol edin',
+                    '2. URL adresinin doğru olduğunu kontrol edin',
+                    '3. Web sitesi geçici olarak bakımda olabilir',
+                    '4. Birkaç dakika sonra tekrar deneyin'
+                ]
+            ];
             
             return response()->json([
                 'success' => false,
-                'message' => 'Web sitesinden veri alınırken hata oluştu. Hedef site geçici olarak erişilemeyebilir. Hata: ' . $e->getMessage()
+                'message' => "Web sitesinden veri alınamadı (HTTP {$statusCode} Hatası)",
+                'error_type' => 'http_request',
+                'error_details' => $errorDetails,
+                'technical_message' => $e->getMessage()
             ], 500);
         } catch (\Exception $e) {
             Log::error('Etkinlik önizleme hatası: ' . $e->getMessage(), [
                 'url' => $url,
                 'limit' => $limit,
                 'trace' => $e->getTraceAsString(),
-                'error_type' => 'general'
+                'error_type' => 'general',
+                'error_details' => [
+                    'message' => $e->getMessage(),
+                    'code' => $e->getCode(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine()
+                ]
             ]);
+            
+            $errorDetails = [
+                'Hata Türü' => 'Genel İşlem Hatası',
+                'Hedef URL' => $url,
+                'Hata Mesajı' => $e->getMessage(),
+                'Hata Kodu' => $e->getCode(),
+                'Hata Dosyası' => basename($e->getFile()),
+                'Hata Satırı' => $e->getLine(),
+                'Zaman' => now()->format('d.m.Y H:i:s'),
+                'Çözüm Önerileri' => [
+                    '1. Sayfayı yenileyin ve tekrar deneyin',
+                    '2. Farklı bir URL deneyin',
+                    '3. Sistem yöneticisine başvurun',
+                    '4. Hata loglarını kontrol edin'
+                ]
+            ];
             
             return response()->json([
                 'success' => false,
-                'message' => 'Etkinlik önizleme sırasında beklenmeyen bir hata oluştu. Lütfen daha sonra tekrar deneyin. Hata: ' . $e->getMessage()
+                'message' => 'Etkinlik önizleme sırasında beklenmeyen bir hata oluştu',
+                'error_type' => 'general',
+                'error_details' => $errorDetails,
+                'technical_message' => $e->getMessage()
             ], 500);
         }
     }
@@ -713,12 +903,30 @@ class EventScrapeController extends Controller
                 'hata' => $e->getMessage(),
                 'satır' => $e->getLine(),
                 'dosya' => $e->getFile(),
-                'trace' => $e->getTraceAsString()
+                'trace' => $e->getTraceAsString(),
+                'error_type' => 'general'
             ]);
+            
+            $errorDetails = [
+                'Hata Türü' => 'Etkinlik Ekleme Hatası',
+                'Hata Mesajı' => $e->getMessage(),
+                'Hata Kodu' => $e->getCode(),
+                'Hata Dosyası' => basename($e->getFile()),
+                'Hata Satırı' => $e->getLine(),
+                'Zaman' => now()->format('d.m.Y H:i:s'),
+                'Çözüm Önerileri' => [
+                    '1. Etkinlik verilerini kontrol edin',
+                    '2. Sayfayı yenileyin ve tekrar deneyin',
+                    '3. Sistem yöneticisine başvurun'
+                ]
+            ];
             
             return response()->json([
                 'success' => false,
-                'message' => 'Sistem hatası: ' . $e->getMessage()
+                'message' => 'Etkinlik eklenirken beklenmeyen bir hata oluştu',
+                'error_type' => 'general',
+                'error_details' => $errorDetails,
+                'technical_message' => $e->getMessage()
             ], 500);
         }
     }
