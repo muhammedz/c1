@@ -304,14 +304,14 @@ class FilemanagersystemMediaController extends Controller
         
         // Normal form isteği ise redirect döndür
         if ($successCount > 0 && $errorCount === 0) {
-            return redirect()->route('admin.filemanagersystem.media.index', ['folder_id' => $request->folder_id])
+            return redirect()->route('admin.filemanagersystem.index')
                 ->with('success', $successCount . ' adet dosya başarıyla yüklendi.');
         } elseif ($successCount > 0 && $errorCount > 0) {
-            return redirect()->route('admin.filemanagersystem.media.index', ['folder_id' => $request->folder_id])
+            return redirect()->route('admin.filemanagersystem.index')
                 ->with('warning', $successCount . ' dosya yüklendi, ' . $errorCount . ' dosyada hata oluştu.')
                 ->with('errors', $errors);
         } else {
-            return redirect()->route('admin.filemanagersystem.media.create')
+            return redirect()->route('admin.filemanagersystem.index')
                 ->with('error', 'Hiçbir dosya yüklenemedi.')
                 ->with('errors', $errors);
         }
@@ -453,7 +453,7 @@ class FilemanagersystemMediaController extends Controller
         $media->is_public = $request->has('is_public') ? $request->is_public : false;
         $media->save();
         
-        return redirect()->route('admin.filemanagersystem.media.index', ['folder_id' => $media->folder_id])
+        return redirect()->route('admin.filemanagersystem.index')
             ->with('success', 'Dosya bilgileri başarıyla güncellendi.');
     }
 
@@ -487,7 +487,7 @@ class FilemanagersystemMediaController extends Controller
             }
             
             // Normal istek ise yönlendirme döndür
-            return redirect()->route('admin.filemanagersystem.media.index', ['folder_id' => $folderId])
+            return redirect()->route('admin.filemanagersystem.index')
                 ->with('success', 'Dosya başarıyla silindi.');
         } catch (\Exception $e) {
             // AJAX isteği ise JSON yanıt döndür

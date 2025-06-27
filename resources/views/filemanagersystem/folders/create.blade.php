@@ -59,7 +59,7 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ route('admin.filemanagersystem.media.index') }}">
+                            <a class="nav-link" href="{{ route('admin.filemanagersystem.index') }}">
                                 <i class="fas fa-file"></i> Tüm Dosyalar
                             </a>
                         </li>

@@ -36,15 +36,17 @@ class FilemanagersystemController extends Controller
         $folders = Folder::withCount('medias')->get();
         $categories = Category::withCount('medias')->get();
         
-        // URL bilgilerini tamamlayarak dosyaları getir
-        $recentFiles = Media::latest()->take(20)->get();
+        // URL bilgilerini tamamlayarak dosyaları getir (sayfalama ile)
+        $recentFiles = Media::latest()->paginate(20);
         
-        foreach ($recentFiles as $file) {
+        // Collection'ı transform et
+        $recentFiles->getCollection()->transform(function ($file) {
             // Eğer URL zaten tam yol içeriyorsa, dokunma
             if (!$file->url || (strpos($file->url, 'http://') !== 0 && strpos($file->url, 'https://') !== 0)) {
                 $file->url = FileManagerHelper::getFileUrl('uploads/' . $file->path);
             }
-        }
+            return $file;
+        });
         
         return view('filemanagersystem.index', compact('folders', 'categories', 'recentFiles'));
     }
@@ -316,7 +318,7 @@ class FilemanagersystemController extends Controller
     public function preview($id)
     {
         // Doğrudan media.show sayfasına yönlendir
-        return redirect()->route('admin.filemanagersystem.media.show', ['media' => $id]);
+                        return redirect()->route('admin.filemanagersystem.preview', ['id' => $id]);
     }
 
     /**

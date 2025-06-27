@@ -70,9 +70,9 @@
                 <div class="card-header">
                     <h3 class="card-title">Dosyalar</h3>
                     <div class="card-tools">
-                        <a href="{{ route('admin.filemanagersystem.media.create') }}" class="btn btn-primary btn-sm">
+                        <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#uploadModal">
                             <i class="fas fa-upload"></i> Dosya Yükle
-                        </a>
+                        </button>
                     </div>
                 </div>
                 <div class="card-body">
@@ -148,6 +148,7 @@
 
                     <!-- Dosya Listesi -->
                     <div class="row" id="file-list">
+                                            @if($recentFiles->count() > 0)
                         @foreach($recentFiles as $file)
                             <div class="col-md-3 col-sm-6">
                                 <div class="card file-item">
@@ -180,9 +181,9 @@
                                             <a href="{{ route('admin.filemanagersystem.preview', $file->id) }}" class="btn btn-sm btn-info">
                                                 <i class="fas fa-eye"></i>
                                             </a>
-                                            <a href="{{ route('admin.filemanagersystem.media.edit', $file->id) }}" class="btn btn-sm btn-warning">
+                                            <button type="button" class="btn btn-sm btn-warning" onclick="editFile({{ $file->id }})">
                                                 <i class="fas fa-edit"></i>
-                                            </a>
+                                            </button>
                                             <button type="button" class="btn btn-sm btn-danger" onclick="deleteFile({{ $file->id }})">
                                                 <i class="fas fa-trash"></i>
                                             </button>
@@ -191,6 +192,13 @@
                                 </div>
                             </div>
                         @endforeach
+                    @else
+                        <div class="col-12 text-center py-5">
+                            <i class="fas fa-file-upload fa-3x mb-3 text-muted"></i>
+                            <h5 class="text-muted">Henüz dosya yok</h5>
+                            <p class="text-muted">İlk dosyalarınızı yüklemek için yukarıdaki "Dosya Yükle" butonunu kullanın.</p>
+                        </div>
+                    @endif
                     </div>
                     
                     <!-- Yükleniyor göstergesi -->
@@ -202,7 +210,17 @@
                     
                     <!-- Sayfalama -->
                     <div class="mt-3" id="pagination-container">
-                        <!-- AJAX ile doldurulacak -->
+                        @if($recentFiles->hasPages())
+                            <div class="d-flex justify-content-center">
+                                {{ $recentFiles->appends(request()->query())->links('custom.pagination') }}
+                            </div>
+                            <div class="text-center mt-2 text-muted">
+                                <small>
+                                    Toplam {{ $recentFiles->total() }} dosyadan 
+                                    {{ $recentFiles->firstItem() }}-{{ $recentFiles->lastItem() }} arası gösteriliyor
+                                </small>
+                            </div>
+                        @endif
                     </div>
                 </div>
             </div>
@@ -285,6 +303,12 @@
             text-align: center;
             flex-direction: column;
         }
+        
+        /* Sayfalama butonları özelleştirmesi */
+        .pagination .page-link {
+            border-radius: 0.25rem !important;
+            margin: 0 2px;
+        }
     </style>
 @stop
 
@@ -337,6 +361,29 @@
                 $(this).addClass('active');
                 performSearch();
             });
+            
+            // Sayfa yenilendiğinde Laravel sayfalama linklerini göster
+            function resetToDefaultPagination() {
+                $('#file-list').empty().html($('#original-file-list').html());
+                $('#pagination-container').html($('#original-pagination').html());
+            }
+            
+            // Orijinal içeriği sakla
+            const originalFileList = $('#file-list').html();
+            const originalPagination = $('#pagination-container').html();
+            $('body').append('<div id="original-file-list" style="display:none;">' + originalFileList + '</div>');
+            $('body').append('<div id="original-pagination" style="display:none;">' + originalPagination + '</div>');
+            
+            // "Tüm Dosyalar" linkine tıklandığında orijinal görünüme dön
+            $('.nav-link[data-folder-id=""]').on('click', function() {
+                if (!$('#search-input').val() && !$('#filter-type').val() && 
+                    !$('#filter-date').val() && !$('#filter-size').val()) {
+                    // Eğer hiç filtre yoksa orijinal görünüme dön
+                    setTimeout(function() {
+                        $('#pagination-container .d-flex, #pagination-container .text-center').show();
+                    }, 100);
+                }
+            });
         });
 
         // Arama fonksiyonu
@@ -349,6 +396,17 @@
             // Loading göster
             $('#loading-indicator').removeClass('d-none');
             $('#file-list').addClass('opacity-50');
+            
+            // Mevcut sayfalama linklerini temizle (AJAX sonuçları için)
+            const hasSearch = $('#search-input').val() || $('#filter-type').val() || 
+                            $('#filter-date').val() || $('#filter-size').val() ||
+                            $('.nav-link.active[data-folder-id]').length > 0 ||
+                            $('.nav-link.active[data-category-id]').length > 0;
+            
+            if (hasSearch) {
+                // Eğer arama/filtreleme yapılıyorsa Laravel sayfalama linklerini gizle
+                $('#pagination-container .d-flex, #pagination-container .text-center').hide();
+            }
 
             // Parametreleri topla
             const params = {
@@ -378,6 +436,9 @@
                     if (response.success) {
                         renderFiles(response.data);
                         renderPagination(response.pagination);
+                        
+                        // Arama sonuçları varsa Laravel sayfalama linklerini gizle
+                        $('#pagination-container .d-flex, #pagination-container .text-center').hide();
                     } else {
                         showError('Arama sırasında bir hata oluştu: ' + response.message);
                     }
@@ -460,11 +521,16 @@
                 return;
             }
 
-            let paginationHtml = '<nav><ul class="pagination justify-content-center">';
+            let paginationHtml = '<nav aria-label="Dosya sayfalama"><ul class="pagination justify-content-center">';
             
-            // Önceki sayfa
+            // İlk sayfa
+            if (pagination.current_page > 2) {
+                paginationHtml += `<li class="page-item"><a class="page-link" href="#" data-page="1">&laquo; İlk</a></li>`;
+            }
+            
+            // Geri butonu
             if (pagination.current_page > 1) {
-                paginationHtml += `<li class="page-item"><a class="page-link" href="#" data-page="${pagination.current_page - 1}">Önceki</a></li>`;
+                paginationHtml += `<li class="page-item"><a class="page-link" href="#" data-page="${pagination.current_page - 1}">Geri</a></li>`;
             }
             
             // Sayfa numaraları
@@ -476,14 +542,19 @@
                 paginationHtml += `<li class="page-item ${isActive}"><a class="page-link" href="#" data-page="${i}">${i}</a></li>`;
             }
             
-            // Sonraki sayfa
+            // İleri butonu
             if (pagination.current_page < pagination.last_page) {
-                paginationHtml += `<li class="page-item"><a class="page-link" href="#" data-page="${pagination.current_page + 1}">Sonraki</a></li>`;
+                paginationHtml += `<li class="page-item"><a class="page-link" href="#" data-page="${pagination.current_page + 1}">İleri</a></li>`;
             }
             
             paginationHtml += '</ul></nav>';
             
-            container.html(paginationHtml);
+            // Sayfa bilgisi ekle
+            const info = `<div class="text-center mt-2 text-muted">
+                <small>Toplam ${pagination.total} dosyadan ${((pagination.current_page - 1) * pagination.per_page) + 1}-${Math.min(pagination.current_page * pagination.per_page, pagination.total)} arası gösteriliyor</small>
+            </div>`;
+            
+            container.html(paginationHtml + info);
             
             // Sayfalama tıklama eventi
             container.find('.page-link').on('click', function(e) {
@@ -550,6 +621,74 @@
                 
                 return false;
             }
+        }
+
+        function editFile(fileId) {
+            alert('Dosya düzenleme özelliği ana sayfa üzerinden çalışır. Preview sayfasından düzenleyebilirsiniz.');
+        }
+    </script>
+
+    <!-- Upload Modal -->
+    <div class="modal fade" id="uploadModal" tabindex="-1" role="dialog" aria-labelledby="uploadModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="uploadModalLabel">Dosya Yükle</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="uploadForm" action="{{ route('admin.filemanagersystem.media.store') }}" method="POST" enctype="multipart/form-data">
+                        @csrf
+                        <div class="form-group">
+                            <label for="files">Dosyalar</label>
+                            <input type="file" class="form-control-file" id="files" name="files[]" multiple required>
+                            <small class="form-text text-muted">Birden fazla dosya seçebilirsiniz. Maksimum dosya boyutu: 50MB</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="folder_id">Klasör</label>
+                            <select class="form-control" id="folder_id" name="folder_id">
+                                <option value="">Ana Klasör</option>
+                                @foreach($folders as $folder)
+                                    <option value="{{ $folder->id }}">{{ $folder->folder_name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="1" id="is_public" name="is_public" checked>
+                                <label class="form-check-label" for="is_public">
+                                    Dosyayı herkese açık yap
+                                </label>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+                    <button type="button" class="btn btn-primary" onclick="submitUpload()">Yükle</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function submitUpload() {
+            const form = document.getElementById('uploadForm');
+            const fileInput = document.getElementById('files');
+            
+            if (fileInput.files.length === 0) {
+                alert('Lütfen en az bir dosya seçin.');
+                return;
+            }
+            
+            // Loading göster
+            const submitBtn = event.target;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Yükleniyor...';
+            
+            form.submit();
         }
     </script>
 @stop 

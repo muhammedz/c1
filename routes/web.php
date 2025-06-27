@@ -698,20 +698,14 @@ Route::prefix('admin/filemanagersystem')->name('admin.filemanagersystem.')->midd
         Route::delete('/{id}', [FilemanagersystemFolderController::class, 'destroy'])->name('destroy');
     });
 
-    // Medya işlemleri
-    Route::prefix('media')->name('media.')->group(function () {
-        Route::get('/', [FilemanagersystemMediaController::class, 'index'])->name('index');
-        Route::get('/create', [FilemanagersystemMediaController::class, 'create'])->name('create');
-        Route::post('/', [FilemanagersystemMediaController::class, 'store'])
-            ->middleware('filemanagersystem.upload.security')
-            ->name('store');
-        Route::get('/get-file-path/{id}', [FilemanagersystemMediaController::class, 'getFilePath'])->name('get-file-path');
-        Route::get('/{media}', [FilemanagersystemMediaController::class, 'show'])->name('show');
-        Route::get('/{media}/edit', [FilemanagersystemMediaController::class, 'edit'])->name('edit');
-        Route::put('/{media}', [FilemanagersystemMediaController::class, 'update'])->name('update');
-        Route::delete('/{media}', [FilemanagersystemMediaController::class, 'destroy'])->name('destroy');
-        Route::get('/{media}/download', [FilemanagersystemMediaController::class, 'download'])->name('download');
-    });
+    // Medya işlemleri (sadece gerekli route'lar)
+    Route::post('/upload', [FilemanagersystemMediaController::class, 'store'])
+        ->middleware('filemanagersystem.upload.security')
+        ->name('media.store');
+    Route::get('/get-file-path/{id}', [FilemanagersystemMediaController::class, 'getFilePath'])->name('media.get-file-path');
+    Route::get('/media/{media}/download', [FilemanagersystemMediaController::class, 'download'])->name('media.download');
+    Route::put('/media/{media}', [FilemanagersystemMediaController::class, 'update'])->name('media.update');
+    Route::delete('/media/{media}', [FilemanagersystemMediaController::class, 'destroy'])->name('media.destroy');
 
     // Kategori işlemleri
     Route::prefix('categories')->name('categories.')->group(function () {

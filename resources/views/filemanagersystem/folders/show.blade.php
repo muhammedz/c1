@@ -50,7 +50,7 @@
                                 <i class="fas fa-trash"></i> Sil
                             </button>
                         </form>
-                        <a href="{{ route('admin.filemanagersystem.media.create', ['folder_id' => $folder->id]) }}" class="btn btn-success">
+                        <a href="{{ route('admin.filemanagersystem.index') }}" class="btn btn-success">
                             <i class="fas fa-upload"></i> Dosya Yükle
                         </a>
                     </div>
@@ -141,12 +141,12 @@
                                         <td>{{ $media->size }} byte</td>
                                         <td>{{ $media->created_at->format('d.m.Y H:i') }}</td>
                                         <td>
-                                            <a href="{{ route('admin.filemanagersystem.media.show', $media->id) }}" class="btn btn-sm btn-info">
+                                            <a href="{{ route('admin.filemanagersystem.preview', $media->id) }}" class="btn btn-sm btn-info">
                                                 <i class="fas fa-eye"></i>
                                             </a>
-                                            <a href="{{ route('admin.filemanagersystem.media.edit', $media->id) }}" class="btn btn-sm btn-primary">
+                                            <button type="button" class="btn btn-sm btn-primary" onclick="alert('Ana dosya yönetim sayfasından düzenleyebilirsiniz.')">
                                                 <i class="fas fa-edit"></i>
-                                            </a>
+                                            </button>
                                             <form action="{{ route('admin.filemanagersystem.media.destroy', $media->id) }}" method="POST" class="d-inline">
                                                 @csrf
                                                 @method('DELETE')

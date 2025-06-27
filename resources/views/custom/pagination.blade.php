@@ -3,9 +3,9 @@
         <ul class="pagination justify-content-center">
             {{-- Previous Page Link --}}
             @if ($paginator->onFirstPage())
-                <li class="page-item disabled"><span class="page-link">Önceki</span></li>
+                <li class="page-item disabled"><span class="page-link">Geri</span></li>
             @else
-                <li class="page-item"><a class="page-link" href="{{ $paginator->previousPageUrl() }}" rel="prev">Önceki</a></li>
+                <li class="page-item"><a class="page-link" href="{{ $paginator->previousPageUrl() }}" rel="prev">Geri</a></li>
             @endif
 
             {{-- Pagination Elements --}}
@@ -29,9 +29,9 @@
 
             {{-- Next Page Link --}}
             @if ($paginator->hasMorePages())
-                <li class="page-item"><a class="page-link" href="{{ $paginator->nextPageUrl() }}" rel="next">Sonraki</a></li>
+                <li class="page-item"><a class="page-link" href="{{ $paginator->nextPageUrl() }}" rel="next">İleri</a></li>
             @else
-                <li class="page-item disabled"><span class="page-link">Sonraki</span></li>
+                <li class="page-item disabled"><span class="page-link">İleri</span></li>
             @endif
         </ul>
     </nav>

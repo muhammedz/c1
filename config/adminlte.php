@@ -433,12 +433,6 @@ return [
                     'active' => ['admin/filemanagersystem/folders', 'admin/filemanagersystem/folders/*']
                 ],
                 [
-                    'text' => 'Dosyalar',
-                    'url'  => 'admin/filemanagersystem/media',
-                    'icon' => 'fas fa-fw fa-file',
-                    'active' => ['admin/filemanagersystem/media', 'admin/filemanagersystem/media/*']
-                ],
-                [
                     'text' => 'Kategoriler',
                     'url' => 'admin/filemanagersystem/categories',
                     'icon' => 'fas fa-fw fa-tags',
