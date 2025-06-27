@@ -6,7 +6,7 @@
 @section('css')
 <style>
     .search-hero {
-        background: linear-gradient(135deg, #004d2e 0%, #006b3f 100%);
+        background: linear-gradient(135deg, #00352b 0%, #20846c 100%);
     }
     
     .search-box {
@@ -117,259 +117,139 @@
 @endsection
 
 @section('content')
-<!-- Hero Section -->
-<section class="search-hero py-16 text-white">
-    <div class="container max-w-7xl mx-auto px-4">
-        <!-- Breadcrumb -->
-        <nav class="mb-8">
-            <ol class="flex items-center space-x-2 text-sm">
-                <li><a href="{{ route('guide.index') }}" class="breadcrumb-item hover:underline">Rehber</a></li>
-                <li><span class="breadcrumb-separator">></span></li>
-                <li class="text-white font-medium">Arama Sonuçları</li>
-            </ol>
-        </nav>
-        
-        <div class="text-center">
-            <h1 class="text-4xl md:text-5xl font-bold mb-4">Arama Sonuçları</h1>
-            @if(request('q'))
-                <p class="text-xl md:text-2xl mb-6 opacity-90">
-                    "<strong>{{ request('q') }}</strong>" için sonuçlar
+<!-- Hero Bölümü -->
+<div class="relative bg-gradient-to-r from-[#00352b] to-[#20846c] overflow-hidden">
+    <div class="absolute inset-0 opacity-20">
+        <!-- Pattern overlay -->
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-full h-full" preserveAspectRatio="none">
+            <defs>
+                <pattern id="hero-pattern" width="40" height="40" patternUnits="userSpaceOnUse">
+                    <path d="M0 20 L40 20 M20 0 L20 40" stroke="currentColor" stroke-width="1" fill="none" />
+                </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#hero-pattern)" />
+        </svg>
+    </div>
+    
+    <!-- Dekoratif şekiller -->
+    <div class="absolute -right-20 -bottom-20 w-64 h-64 rounded-full bg-[#e6a23c]/10 blur-3xl"></div>
+    <div class="absolute -left-10 top-10 w-40 h-40 rounded-full bg-white/5 blur-2xl"></div>
+    
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 md:py-4 relative z-10">
+        <div class="grid grid-cols-1 md:grid-cols-1 gap-4 items-center">
+            <div>
+                <h1 class="text-2xl md:text-3xl font-bold text-white mb-2">Rehber Arama Sonuçları</h1>
+                @if(request('q'))
+                <p class="text-white/80 text-base mb-2">
+                    "<span class="font-medium">{{ request('q') }}</span>" için {{ $totalResults }} sonuç bulundu
                 </p>
-                <div class="inline-flex items-center bg-white/20 rounded-full px-4 py-2">
-                    <span class="material-icons mr-2">search</span>
-                    <span class="font-medium">{{ $totalResults }} sonuç bulundu</span>
-                </div>
-            @else
-                <p class="text-xl md:text-2xl mb-6 opacity-90">
-                    Arama yapmak için aşağıdaki kutuyu kullanın
-                </p>
-            @endif
-        </div>
-        
-        <!-- Arama Kutusu -->
-        <div class="max-w-2xl mx-auto mt-8">
-            <form action="{{ route('guide.search') }}" method="GET" class="search-box p-6">
-                <div class="flex flex-col md:flex-row gap-4">
-                    <div class="flex-1">
-                        <input type="text" 
-                               name="q" 
-                               value="{{ request('q') }}"
-                               placeholder="Aradığınız hizmet, kurum veya yer..." 
-                               class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#004d2e] focus:border-transparent text-gray-800"
-                               required>
-                    </div>
-                    <button type="submit" 
-                            class="action-btn action-btn-primary px-8 py-3">
-                        <span class="material-icons mr-2">search</span>Ara
-                    </button>
-                </div>
-            </form>
+                @endif
+            </div>
         </div>
     </div>
-</section>
+</div>
 
-@if(request('q'))
-<!-- Sonuçlar -->
-<section class="py-12 bg-gray-50">
-    <div class="container max-w-7xl mx-auto px-4">
-        <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
-            <!-- Filtre Sidebar -->
-            <div class="lg:col-span-1">
-                <div class="filter-sidebar p-6 sticky top-8">
-                    <h3 class="text-lg font-bold text-gray-800 mb-6">Sonuç Türü</h3>
+<div class="bg-gray-50 py-12">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="max-w-5xl mx-auto">
+            <!-- Sol Taraf Bilgi ve Filtreler -->
+            <div class="flex flex-col lg:flex-row gap-6 lg:gap-8">
+                <!-- Sol Kenar - Bilgi ve Filtreler -->
+                <div class="w-full lg:w-64 flex-shrink-0 order-2 lg:order-1">
+                    <div class="bg-gray-100 p-4 md:p-5 rounded-lg mb-4 md:mb-6">
+                        <div class="flex items-start mb-3 md:mb-4">
+                            <span class="material-icons text-gray-400 mr-2 mt-1 text-lg md:text-xl">info</span>
+                            <p class="text-gray-600 text-sm">Rehber içerisinde arama yaparak ihtiyacınız olan hizmet ve kurumları kolayca bulabilirsiniz.</p>
+                        </div>
+                    </div>
                     
-                    <div class="space-y-2">
-                        <div class="filter-item {{ !request('type') ? 'active' : '' }}" 
-                             onclick="filterResults('')">
-                            <div class="flex items-center justify-between">
+                    <div class="border border-gray-200 rounded-lg overflow-hidden mb-4 md:mb-6">
+                        <div class="bg-white p-3 md:p-4 border-b border-gray-200">
+                            <h3 class="font-medium text-gray-700 text-sm md:text-base">Tüm Sonuçlar ({{ $totalResults }})</h3>
+                        </div>
+                        
+                        <div class="bg-white p-3 md:p-4 border-b border-gray-200">
+                            <a href="javascript:void(0)" onclick="filterResults('')" class="text-[#004d2e] hover:underline flex justify-between text-sm md:text-base {{ !request('type') ? 'font-semibold' : '' }}">
                                 <span>Tümü</span>
-                                <span class="text-sm">{{ $totalResults }}</span>
-                            </div>
+                                <span>{{ $totalResults }}</span>
+                            </a>
                         </div>
                         
                         @if($categories->count() > 0)
-                            <div class="filter-item {{ request('type') === 'categories' ? 'active' : '' }}" 
-                                 onclick="filterResults('categories')">
-                                <div class="flex items-center justify-between">
-                                    <span>Kategoriler</span>
-                                    <span class="text-sm">{{ $categories->count() }}</span>
-                                </div>
-                            </div>
+                        <div class="bg-white p-3 md:p-4 border-b border-gray-200">
+                            <a href="javascript:void(0)" onclick="filterResults('categories')" class="text-[#004d2e] hover:underline flex justify-between text-sm md:text-base {{ request('type') === 'categories' ? 'font-semibold' : '' }}">
+                                <span>Kategoriler</span>
+                                <span>{{ $categories->count() }}</span>
+                            </a>
+                        </div>
                         @endif
                         
                         @if($places->count() > 0)
-                            <div class="filter-item {{ request('type') === 'places' ? 'active' : '' }}" 
-                                 onclick="filterResults('places')">
-                                <div class="flex items-center justify-between">
-                                    <span>Yerler</span>
-                                    <span class="text-sm">{{ $places->count() }}</span>
-                                </div>
-                            </div>
+                        <div class="bg-white p-3 md:p-4">
+                            <a href="javascript:void(0)" onclick="filterResults('places')" class="text-[#004d2e] hover:underline flex justify-between text-sm md:text-base {{ request('type') === 'places' ? 'font-semibold' : '' }}">
+                                <span>Yerler</span>
+                                <span>{{ $places->count() }}</span>
+                            </a>
+                        </div>
                         @endif
                     </div>
                 </div>
-            </div>
-            
-            <!-- Ana İçerik -->
-            <div class="lg:col-span-3">
-                @if($totalResults > 0)
-                    <!-- Kategori Sonuçları -->
-                    @if($categories->count() > 0 && (!request('type') || request('type') === 'categories'))
-                        <div class="mb-12" id="category-results">
-                            <h2 class="text-2xl font-bold text-gray-800 mb-6">
-                                <span class="material-icons mr-2 text-[#004d2e]">category</span>
-                                Kategoriler ({{ $categories->count() }})
-                            </h2>
-                            
-                            <div class="space-y-4">
-                                @foreach($categories as $category)
-                                    <div class="result-card category-result p-6">
-                                        <div class="flex items-start gap-4">
-                                            <div class="w-16 h-16 bg-[#004d2e] rounded-full flex items-center justify-center flex-shrink-0">
-                                                @if($category->icon)
-                                                    @if(Str::startsWith($category->icon, 'fas ') || Str::startsWith($category->icon, 'far ') || Str::startsWith($category->icon, 'fab '))
-                                                        <i class="{{ $category->icon }} text-white text-xl"></i>
-                                                    @else
-                                                        <span class="material-icons text-white text-xl">{{ $category->icon }}</span>
-                                                    @endif
-                                                @else
-                                                    <span class="material-icons text-white text-xl">location_on</span>
-                                                @endif
-                                            </div>
-                                            
-                                            <div class="flex-1">
-                                                <h3 class="text-xl font-bold text-gray-800 mb-2">
-                                                    {!! highlightSearchTerm($category->name, request('q')) !!}
-                                                </h3>
-                                                
-                                                @if($category->description)
-                                                    <p class="text-gray-600 mb-4">
-                                                        {!! highlightSearchTerm(Str::limit($category->description, 150), request('q')) !!}
-                                                    </p>
-                                                @endif
-                                                
-                                                <div class="flex items-center justify-between">
-                                                    <div class="flex items-center text-sm text-gray-500">
-                                                        <span class="material-icons mr-1 text-sm">location_on</span>
-                                                        <span>{{ $category->active_places_count }} yer</span>
-                                                    </div>
-                                                    
-                                                    <a href="{{ route('guide.category', $category->slug) }}" 
-                                                       class="action-btn action-btn-primary">
-                                                        <span class="material-icons mr-2">visibility</span>Görüntüle
-                                                    </a>
-                                                </div>
-                                            </div>
-                                        </div>
+                
+                <!-- Sağ Taraf - Arama ve Sonuçlar -->
+                <div class="flex-1 order-1 lg:order-2">
+                    <!-- Arama Formu -->
+                    <div class="bg-white p-4 md:p-6 rounded-lg shadow-sm mb-6 border border-gray-200">
+                        <div class="mb-4">
+                            <label for="search_query" class="block text-gray-700 font-medium mb-3 text-sm md:text-base">Aranan Kelime</label>
+                            <form action="{{ route('guide.search') }}" method="GET" class="space-y-4">
+                                <div class="flex flex-col sm:flex-row gap-3">
+                                    <div class="flex-1">
+                                        <input 
+                                            type="text" 
+                                            id="search_query"
+                                            name="q" 
+                                            value="{{ request('q') }}" 
+                                            placeholder="Rehber içinde aramak istediğiniz kelimeyi girin..." 
+                                            class="w-full px-4 py-3 md:py-2 text-base md:text-sm rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#004d2e] focus:border-transparent"
+                                        >
                                     </div>
-                                @endforeach
-                            </div>
+                                    
+                                    <div class="w-full sm:w-auto">
+                                        <button 
+                                            type="submit" 
+                                            class="w-full sm:w-auto bg-[#004d2e] hover:bg-green-800 text-white py-3 md:py-2 px-6 rounded-md transition-colors font-medium text-base md:text-sm"
+                                        >
+                                            Ara
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
                         </div>
-                    @endif
+                    </div>
                     
-                    <!-- Yer Sonuçları -->
-                    @if($places->count() > 0 && (!request('type') || request('type') === 'places'))
-                        <div id="place-results">
-                            <h2 class="text-2xl font-bold text-gray-800 mb-6">
-                                <span class="material-icons mr-2 text-[#004d2e]">location_on</span>
-                                Yerler ({{ $places->count() }})
-                            </h2>
-                            
-                            <div class="space-y-4">
-                                @foreach($places as $place)
-                                    <div class="result-card place-result p-6">
-                                        <div class="flex flex-col md:flex-row gap-4">
-                                            <!-- Resim -->
-                                            <div class="md:w-32 md:h-32 w-full h-48 flex-shrink-0">
-                                                @if($place->featured_image_url)
-                                                    <img src="{{ $place->featured_image_url }}" 
-                                                         alt="{{ $place->title }}"
-                                                         class="w-full h-full object-cover rounded-lg">
-                                                @else
-                                                    <div class="w-full h-full bg-gray-100 rounded-lg flex items-center justify-center">
-                                                        <span class="material-icons text-gray-400 text-3xl">business</span>
-                                                    </div>
-                                                @endif
-                                            </div>
-                                            
-                                            <!-- İçerik -->
-                                            <div class="flex-1">
-                                                <div class="flex items-start justify-between mb-2">
-                                                    <h3 class="text-xl font-bold text-gray-800">
-                                                        {!! highlightSearchTerm($place->title, request('q')) !!}
-                                                    </h3>
-                                                    <span class="text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded-full ml-2">
-                                                        {{ $place->category->name }}
-                                                    </span>
-                                                </div>
-                                                
-                                                @if($place->excerpt)
-                                                    <p class="text-gray-600 mb-4">
-                                                        {!! highlightSearchTerm(Str::limit($place->excerpt, 150), request('q')) !!}
-                                                    </p>
-                                                @endif
-                                                
-                                                <!-- İletişim Bilgileri -->
-                                                <div class="space-y-2 mb-4">
-                                                    @if($place->address)
-                                                        <div class="flex items-start text-sm text-gray-600">
-                                                            <span class="material-icons text-gray-400 mr-2 mt-0.5 text-base">location_on</span>
-                                                            <span class="flex-1">{!! highlightSearchTerm($place->address, request('q')) !!}</span>
-                                                        </div>
-                                                    @endif
-                                                    
-                                                    @if($place->phone)
-                                                        <div class="flex items-center text-sm text-gray-600">
-                                                            <span class="material-icons text-gray-400 mr-2 text-base">phone</span>
-                                                            <span>{{ $place->phone }}</span>
-                                                        </div>
-                                                    @endif
-                                                </div>
-                                                
-                                                <!-- Aksiyon Butonları -->
-                                                <div class="flex flex-wrap gap-2">
-                                                    <a href="{{ route('guide.place', [$place->category->slug, $place->slug]) }}" 
-                                                       class="action-btn action-btn-primary">
-                                                        <span class="material-icons mr-2">visibility</span>Detaylar
-                                                    </a>
-                                                    
-                                                    @if($place->phone)
-                                                        <a href="tel:{{ $place->phone }}" 
-                                                           class="action-btn action-btn-secondary">
-                                                            <span class="material-icons mr-2">phone</span>Ara
-                                                        </a>
-                                                    @endif
-                                                    
-                                                    @if($place->maps_link)
-                                                        <a href="{{ $place->maps_link }}" 
-                                                           target="_blank"
-                                                           class="action-btn action-btn-secondary">
-                                                            <span class="material-icons mr-2">map</span>Konum
-                                                        </a>
-                                                    @endif
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                @endforeach
-                            </div>
+                    @if(!request('q'))
+                        <!-- Boş arama başlangıcı -->
+                        <div class="bg-amber-50 border border-amber-200 rounded-lg p-4 md:p-5 mb-4 md:mb-6 flex items-center">
+                            <span class="material-icons text-amber-400 mr-2 md:mr-3 text-xl md:text-2xl">warning</span>
+                            <p class="text-amber-800 text-sm md:text-base">Lütfen arama yapmak istediğiniz kelimeyi/kelimeleri giriniz.</p>
                         </div>
-                    @endif
-                @else
-                    <!-- Sonuç Bulunamadı -->
-                    <div class="text-center py-16">
-                        <div class="w-24 h-24 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-6">
-                            <span class="material-icons text-gray-400 text-3xl">search_off</span>
+                        
+                        <div class="bg-white border border-gray-200 p-4 md:p-6 rounded-lg">
+                            <h3 class="text-base md:text-lg font-medium text-gray-700 mb-2">Toplam <span class="font-bold">0</span> kayıt bulunmuştur.</h3>
                         </div>
-                        <h3 class="text-xl font-semibold text-gray-700 mb-2">Sonuç bulunamadı</h3>
-                        <p class="text-gray-500 mb-6">
-                            "<strong>{{ request('q') }}</strong>" için sonuç bulunamadı. Farklı kelimeler deneyin.
-                        </p>
+                    @elseif($totalResults == 0)
+                        <!-- Sonuç Bulunamadı -->
+                        <div class="bg-amber-50 border border-amber-200 rounded-lg p-4 md:p-5 mb-4 md:mb-6 flex items-center">
+                            <span class="material-icons text-amber-400 mr-2 md:mr-3 text-xl md:text-2xl">search_off</span>
+                            <p class="text-amber-800 text-sm md:text-base">
+                                "<strong>{{ request('q') }}</strong>" için sonuç bulunamadı. Farklı kelimeler deneyin.
+                            </p>
+                        </div>
                         
                         <!-- Öneriler -->
-                        <div class="max-w-md mx-auto">
+                        <div class="bg-white border border-gray-200 p-4 md:p-6 rounded-lg mb-6">
                             <h4 class="text-lg font-semibold text-gray-700 mb-4">Arama önerileri:</h4>
-                            <ul class="text-left text-gray-600 space-y-2">
+                            <ul class="text-gray-600 space-y-2">
                                 <li>• Daha genel kelimeler kullanın</li>
                                 <li>• Yazım hatalarını kontrol edin</li>
                                 <li>• Farklı kelime kombinasyonları deneyin</li>
@@ -377,19 +257,101 @@
                             </ul>
                         </div>
                         
-                        <div class="mt-8">
-                            <a href="{{ route('guide.index') }}" 
-                               class="action-btn action-btn-primary">
-                                <span class="material-icons mr-2">arrow_back</span>Ana Sayfaya Dön
-                            </a>
+                        <div class="bg-white border border-gray-200 p-4 md:p-6 rounded-lg">
+                            <h3 class="text-base md:text-lg font-medium text-gray-700">Toplam <span class="font-bold">0</span> kayıt bulunmuştur.</h3>
                         </div>
-                    </div>
-                @endif
+                    @else
+                        <!-- Kategori Sonuçları -->
+                        @if($categories->count() > 0 && (!request('type') || request('type') === 'categories'))
+                            <div id="categories" class="mb-4 md:mb-6">
+                                <h2 class="text-lg md:text-xl font-bold text-gray-900 mb-2 md:mb-3 border-b border-gray-200 pb-2">Kategoriler ({{ $categories->count() }})</h2>
+                                <div class="space-y-2">
+                                    @foreach($categories as $category)
+                                        <div class="bg-white border border-gray-200 rounded-lg overflow-hidden transition-all hover:shadow-md">
+                                            <div class="p-3 md:p-4">
+                                                <div class="flex-1">
+                                                    <a href="{{ route('guide.category', $category->slug) }}" class="text-sm md:text-base font-medium text-[#004d2e] hover:underline block">
+                                                        {!! highlightSearchTerm($category->name, request('q')) !!}
+                                                    </a>
+                                                    <span class="text-xs text-gray-400 block italic hidden md:block">{{ route('guide.category', $category->slug) }}</span>
+                                                    
+                                                    @if($category->description)
+                                                        <p class="text-xs text-gray-600 mt-1">
+                                                            {!! highlightSearchTerm(Str::limit($category->description, 100), request('q')) !!}
+                                                        </p>
+                                                    @endif
+                                                    
+                                                    <div class="flex items-center justify-between mt-2">
+                                                        <div class="flex items-center text-xs text-gray-500">
+                                                            <span class="material-icons text-xs mr-1">location_on</span>
+                                                            <span>{{ $category->active_places_count }} yer</span>
+                                                        </div>
+                                                        <span class="inline-block bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">Kategori</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                        @endif
+                        
+                        <!-- Yerler Sonuçları -->
+                        @if($places->count() > 0 && (!request('type') || request('type') === 'places'))
+                            <div id="places" class="mb-4 md:mb-6">
+                                <h2 class="text-lg md:text-xl font-bold text-gray-900 mb-2 md:mb-3 border-b border-gray-200 pb-2">Yerler ({{ $places->count() }})</h2>
+                                <div class="space-y-2">
+                                    @foreach($places as $place)
+                                        <div class="bg-white border border-gray-200 rounded-lg overflow-hidden transition-all hover:shadow-md">
+                                            <div class="p-3 md:p-4">
+                                                <div class="flex-1">
+                                                    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-1 sm:gap-2">
+                                                        <a href="{{ route('guide.place', [$place->category->slug, $place->slug]) }}" class="text-sm md:text-base font-medium text-[#004d2e] hover:underline block">
+                                                            {!! highlightSearchTerm($place->title, request('q')) !!}
+                                                        </a>
+                                                        <span class="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full whitespace-nowrap">
+                                                            {{ $place->category->name }}
+                                                        </span>
+                                                    </div>
+                                                    <span class="text-xs text-gray-400 block italic hidden md:block">{{ route('guide.place', [$place->category->slug, $place->slug]) }}</span>
+                                                    
+                                                    @if($place->excerpt)
+                                                        <p class="text-xs text-gray-600 mt-1">
+                                                            {!! highlightSearchTerm(Str::limit($place->excerpt, 100), request('q')) !!}
+                                                        </p>
+                                                    @endif
+                                                    
+                                                    @if($place->address)
+                                                        <p class="text-xs text-gray-600 flex items-center mt-1">
+                                                            <span class="material-icons text-xs mr-1">place</span>
+                                                            {!! highlightSearchTerm(Str::limit($place->address, 60), request('q')) !!}
+                                                        </p>
+                                                    @endif
+                                                    
+                                                    @if($place->phone)
+                                                        <p class="text-xs text-gray-600 flex items-center mt-1">
+                                                            <span class="material-icons text-xs mr-1">phone</span>
+                                                            {{ $place->phone }}
+                                                        </p>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                        @endif
+                        
+                        <!-- Toplam Sonuç -->
+                        <div class="bg-white border border-gray-200 p-4 md:p-6 rounded-lg">
+                            <h3 class="text-base md:text-lg font-medium text-gray-700">Toplam <span class="font-bold">{{ $totalResults }}</span> kayıt bulunmuştur.</h3>
+                        </div>
+                    @endif
+                </div>
             </div>
         </div>
     </div>
-</section>
-@endif
+</div>
 @endsection
 
 @section('after_scripts')
@@ -434,52 +396,18 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // Kart hover efektleri
-    const resultCards = document.querySelectorAll('.result-card');
-    
-    resultCards.forEach(card => {
-        card.addEventListener('mouseenter', function() {
-            this.style.transform = 'translateY(-5px)';
-        });
-        
-        card.addEventListener('mouseleave', function() {
-            this.style.transform = 'translateY(0)';
-        });
-    });
-    
-    // Smooth scroll for filter results
-    const filterItems = document.querySelectorAll('.filter-item');
-    filterItems.forEach(item => {
-        item.addEventListener('click', function() {
-            // Aktif durumu güncelle
-            filterItems.forEach(f => f.classList.remove('active'));
-            this.classList.add('active');
-        });
-    });
+    // Arama terimini vurgulama fonksiyonu (PHP'den gelen veri için)
+    @if(request('q'))
+        // Sayfa yüklendikten sonra vurgulamaları kontrol et
+        setTimeout(function() {
+            const highlights = document.querySelectorAll('.highlight');
+            highlights.forEach(highlight => {
+                highlight.style.backgroundColor = '#fff3cd';
+                highlight.style.fontWeight = '600';
+            });
+        }, 100);
+    @endif
 });
-
-// Arama terimini vurgulama fonksiyonu (PHP'den gelen veri için)
-@if(request('q'))
-    // Sayfa yüklendikten sonra vurgulamaları kontrol et
-    setTimeout(function() {
-        const highlights = document.querySelectorAll('.highlight');
-        highlights.forEach(highlight => {
-            highlight.style.backgroundColor = '#fff3cd';
-            highlight.style.fontWeight = '600';
-        });
-    }, 100);
-@endif
 </script>
 @endsection
 
-@php
-// Arama terimini vurgulama helper fonksiyonu
-if (!function_exists('highlightSearchTerm')) {
-    function highlightSearchTerm($text, $searchTerm) {
-        if (!$searchTerm) return $text;
-        
-        $pattern = '/(' . preg_quote($searchTerm, '/') . ')/iu';
-        return preg_replace($pattern, '<span class="highlight">$1</span>', $text);
-    }
-}
-@endphp
