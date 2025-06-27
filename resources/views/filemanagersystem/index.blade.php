@@ -178,7 +178,7 @@
                                             @endif
                                         </p>
                                         <div class="btn-group">
-                                            <a href="{{ route('admin.filemanagersystem.preview', $file->id) }}" class="btn btn-sm btn-info">
+                                            <a href="{{ $file->url }}" target="_blank" class="btn btn-sm btn-info" title="Dosyayı görüntüle">
                                                 <i class="fas fa-eye"></i>
                                             </a>
                                             <button type="button" class="btn btn-sm btn-warning" onclick="editFile({{ $file->id }})">
@@ -496,7 +496,7 @@
                                 ${file.formatted_date ? '<br>' + file.formatted_date : ''}
                             </p>
                             <div class="btn-group">
-                                <a href="/admin/filemanagersystem/preview/${file.id}" class="btn btn-sm btn-info">
+                                <a href="${file.url || file.file_url}" target="_blank" class="btn btn-sm btn-info" title="Dosyayı görüntüle">
                                     <i class="fas fa-eye"></i>
                                 </a>
                                 <a href="/admin/filemanagersystem/media/${file.id}/edit" class="btn btn-sm btn-warning">

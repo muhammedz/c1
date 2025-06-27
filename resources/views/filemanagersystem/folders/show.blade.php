@@ -141,7 +141,7 @@
                                         <td>{{ $media->size }} byte</td>
                                         <td>{{ $media->created_at->format('d.m.Y H:i') }}</td>
                                         <td>
-                                            <a href="{{ route('admin.filemanagersystem.preview', $media->id) }}" class="btn btn-sm btn-info">
+                                            <a href="{{ $media->url }}" target="_blank" class="btn btn-sm btn-info" title="Dosyayı görüntüle">
                                                 <i class="fas fa-eye"></i>
                                             </a>
                                             <button type="button" class="btn btn-sm btn-primary" onclick="alert('Ana dosya yönetim sayfasından düzenleyebilirsiniz.')">

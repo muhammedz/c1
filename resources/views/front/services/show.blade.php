@@ -161,7 +161,7 @@
                             {{ $service->cta_text }}
                         </a>
                     @endif
-                    @if(isset($service->features['is_standard_forms_visible']) && $service->features['is_standard_forms_visible'])
+                    @if(isset($service->features['is_standard_forms_visible']) && $service->features['is_standard_forms_visible'] && (isset($service->features['standard_forms']) && !empty($service->features['standard_forms']) || isset($service->features['documents']) && is_array($service->features['documents']) && !empty($service->features['documents'])))
                     <a href="#standart-formlar" class="inline-flex items-center px-5 py-2.5 bg-white/10 text-white border border-white/20 rounded-md hover:bg-white/20 transition-colors shadow-lg shadow-black/5">
                         <span class="material-icons mr-2 text-sm">download</span>
                         Formları İndir
