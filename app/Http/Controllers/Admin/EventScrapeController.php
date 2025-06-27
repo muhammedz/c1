@@ -74,15 +74,13 @@ class EventScrapeController extends Controller
                 'success' => false,
                 'error' => 'Hedef web sitesine bağlanılamadı (Timeout Hatası)',
                 'error_type' => 'connection_timeout',
-                                 'error_details' => [
-                     'Hata Türü' => 'Bağlantı Hatası (Connection Timeout)',
-                     'Hedef URL' => $url,
-                     'Hedef Domain' => parse_url($url, PHP_URL_HOST),
-                     'Sayfa' => $page,
-                     'Hata Mesajı' => $e->getMessage(),
-                     'Zaman' => now()->format('d.m.Y H:i:s'),
-                     'Timeout Süresi' => '90 saniye'
-                 ],
+                'error_details' => [
+                    'Hata Türü' => 'Bağlantı Hatası (Connection Timeout)',
+                    'Hedef URL' => $url,
+                    'Sayfa' => $page,
+                    'Hata Mesajı' => $e->getMessage(),
+                    'Zaman' => now()->format('d.m.Y H:i:s')
+                ],
                 'page' => $page
             ], 500);
         } catch (\Illuminate\Http\Client\RequestException $e) {
@@ -486,28 +484,17 @@ class EventScrapeController extends Controller
                 ]
             ]);
             
-            // Ağ bilgilerini topla
-            $networkInfo = $this->getNetworkInfo($url);
-            
             $errorDetails = [
                 'Hata Türü' => 'Bağlantı Hatası (Connection Timeout)',
                 'Hedef URL' => $url,
-                'Hedef Domain' => parse_url($url, PHP_URL_HOST),
-                'Hedef Port' => parse_url($url, PHP_URL_PORT) ?: (parse_url($url, PHP_URL_SCHEME) === 'https' ? 443 : 80),
-                'Kendi IP Adresimiz' => $networkInfo['local_ip'],
-                'DNS Çözümleme' => $networkInfo['dns_resolution'],
-                'Ping Durumu' => $networkInfo['ping_status'],
                 'Hata Mesajı' => $e->getMessage(),
                 'Hata Kodu' => $e->getCode(),
                 'Zaman' => now()->format('d.m.Y H:i:s'),
-                'User Agent' => 'Mozilla/5.0 (Laravel Event Scraper)',
-                'Timeout Süresi' => '90 saniye',
                 'Çözüm Önerileri' => [
                     '1. İnternet bağlantınızı kontrol edin',
                     '2. Hedef web sitesinin erişilebilir olduğunu kontrol edin',
                     '3. Birkaç dakika sonra tekrar deneyin',
-                    '4. VPN kullanıyorsanız kapatmayı deneyin',
-                    '5. Firewall ayarlarınızı kontrol edin'
+                    '4. VPN kullanıyorsanız kapatmayı deneyin'
                 ]
             ];
             
@@ -530,21 +517,13 @@ class EventScrapeController extends Controller
             $statusCode = $e->response ? $e->response->status() : 'Bilinmiyor';
             $statusText = $e->response ? $e->response->reason() : 'Bilinmiyor';
             
-            // Ağ bilgilerini topla
-            $networkInfo = $this->getNetworkInfo($url);
-            
             $errorDetails = [
                 'Hata Türü' => 'HTTP İstek Hatası',
                 'Hedef URL' => $url,
-                'Hedef Domain' => parse_url($url, PHP_URL_HOST),
-                'Hedef Port' => parse_url($url, PHP_URL_PORT) ?: (parse_url($url, PHP_URL_SCHEME) === 'https' ? 443 : 80),
                 'HTTP Durum Kodu' => $statusCode,
                 'HTTP Durum Metni' => $statusText,
-                'Kendi IP Adresimiz' => $networkInfo['local_ip'],
-                'DNS Çözümleme' => $networkInfo['dns_resolution'],
                 'Hata Mesajı' => $e->getMessage(),
                 'Zaman' => now()->format('d.m.Y H:i:s'),
-                'User Agent' => 'Mozilla/5.0 (Laravel Event Scraper)',
                 'Çözüm Önerileri' => [
                     '1. Hedef web sitesinin aktif olduğunu kontrol edin',
                     '2. URL adresinin doğru olduğunu kontrol edin',
@@ -949,88 +928,6 @@ class EventScrapeController extends Controller
                 'error_details' => $errorDetails,
                 'technical_message' => $e->getMessage()
             ], 500);
-        }
-    }
-
-    /**
-     * Ağ bilgilerini toplar (debug için)
-     */
-    private function getNetworkInfo($url)
-    {
-        $host = parse_url($url, PHP_URL_HOST);
-        $networkInfo = [
-            'local_ip' => 'Bilinmiyor',
-            'dns_resolution' => 'Bilinmiyor',
-            'ping_status' => 'Test edilmedi'
-        ];
-
-        try {
-            // Kendi IP adresimizi al
-            $networkInfo['local_ip'] = $this->getLocalIpAddress();
-            
-            // DNS çözümleme testi
-            $ip = gethostbyname($host);
-            if ($ip && $ip !== $host) {
-                $networkInfo['dns_resolution'] = "Başarılı ({$ip})";
-                
-                // Basit ping testi (fsockopen ile)
-                $pingResult = $this->testConnection($host, parse_url($url, PHP_URL_SCHEME) === 'https' ? 443 : 80);
-                $networkInfo['ping_status'] = $pingResult ? 'Bağlantı mümkün' : 'Bağlantı başarısız';
-            } else {
-                $networkInfo['dns_resolution'] = 'DNS çözümleme başarısız';
-            }
-        } catch (\Exception $e) {
-            // Ağ testlerinde hata olursa sessizce devam et
-            Log::debug('Ağ bilgisi toplama hatası: ' . $e->getMessage());
-        }
-
-        return $networkInfo;
-    }
-
-    /**
-     * Yerel IP adresini al
-     */
-    private function getLocalIpAddress()
-    {
-        try {
-            // Önce dış IP'yi almaya çalış
-            $externalIp = @file_get_contents('http://ipecho.net/plain', false, stream_context_create([
-                'http' => [
-                    'timeout' => 5,
-                    'method' => 'GET'
-                ]
-            ]));
-            
-            if ($externalIp && filter_var(trim($externalIp), FILTER_VALIDATE_IP)) {
-                return trim($externalIp) . ' (Dış IP)';
-            }
-
-            // Dış IP alınamazsa yerel IP'yi bul
-            $localIp = @gethostbyname(gethostname());
-            if ($localIp && filter_var($localIp, FILTER_VALIDATE_IP)) {
-                return $localIp . ' (Yerel IP)';
-            }
-
-            return 'IP tespit edilemedi';
-        } catch (\Exception $e) {
-            return 'IP alma hatası';
-        }
-    }
-
-    /**
-     * Basit bağlantı testi
-     */
-    private function testConnection($host, $port, $timeout = 5)
-    {
-        try {
-            $connection = @fsockopen($host, $port, $errno, $errstr, $timeout);
-            if ($connection) {
-                fclose($connection);
-                return true;
-            }
-            return false;
-        } catch (\Exception $e) {
-            return false;
         }
     }
 } 

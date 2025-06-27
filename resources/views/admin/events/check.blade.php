@@ -394,70 +394,17 @@
                         }
                     } else if (status === 'timeout') {
                         errorMsg = 'İstek zaman aşımına uğradı (Timeout)';
-                        
-                        // URL'den ağ bilgilerini çıkar
-                        var url = $('#url').val();
-                        var urlParts = null;
-                        
-                        try {
-                            urlParts = url ? new URL(url) : null;
-                        } catch (e) {
-                            console.warn('URL parse hatası:', e);
-                        }
-                        
                         errorDetails = {
                             'Hata Türü': 'Zaman Aşımı (Timeout)',
-                            'Hedef URL': url || 'Belirtilmemiş',
-                            'Hedef Domain': urlParts ? urlParts.hostname : 'Bilinmiyor',
-                            'Hedef Port': urlParts ? (urlParts.port || (urlParts.protocol === 'https:' ? 443 : 80)) : 'Bilinmiyor',
-                            'Protokol': urlParts ? urlParts.protocol.replace(':', '') : 'Bilinmiyor',
-                            'Timeout Süresi': '30 saniye (JavaScript)',
-                            'Hata Kaynağı': 'Frontend (JavaScript AJAX)',
                             'Açıklama': 'İstek 30 saniye içinde tamamlanamadı',
-                            'Zaman': new Date().toLocaleString('tr-TR'),
-                            'Tarayıcı': navigator.userAgent.split(' ')[0] || 'Bilinmiyor',
-                            'User Agent': navigator.userAgent,
                             'Çözüm Önerileri': [
                                 '1. İnternet bağlantınızı kontrol edin',
                                 '2. Hedef web sitesinin hızlı olduğunu kontrol edin',
-                                '3. Birkaç dakika sonra tekrar deneyin',
-                                '4. VPN kullanıyorsanız kapatmayı deneyin',
-                                '5. Farklı bir ağ bağlantısı deneyin',
-                                '6. Tarayıcı cache\'ini temizleyin'
+                                '3. Birkaç dakika sonra tekrar deneyin'
                             ]
                         };
                     } else if (status === 'error') {
                         errorMsg = 'Ağ bağlantı hatası';
-                        
-                        // URL'den ağ bilgilerini çıkar
-                        var url = $('#url').val();
-                        var urlParts = null;
-                        
-                        try {
-                            urlParts = url ? new URL(url) : null;
-                        } catch (e) {
-                            console.warn('URL parse hatası:', e);
-                        }
-                        
-                        errorDetails = {
-                            'Hata Türü': 'Ağ Bağlantı Hatası',
-                            'Hedef URL': url || 'Belirtilmemiş',
-                            'Hedef Domain': urlParts ? urlParts.hostname : 'Bilinmiyor',
-                            'Hedef Port': urlParts ? (urlParts.port || (urlParts.protocol === 'https:' ? 443 : 80)) : 'Bilinmiyor',
-                            'Protokol': urlParts ? urlParts.protocol.replace(':', '') : 'Bilinmiyor',
-                            'Hata Kaynağı': 'Frontend (JavaScript AJAX)',
-                            'Açıklama': 'Ağ bağlantısında genel bir hata oluştu',
-                            'Zaman': new Date().toLocaleString('tr-TR'),
-                            'Tarayıcı': navigator.userAgent.split(' ')[0] || 'Bilinmiyor',
-                            'User Agent': navigator.userAgent,
-                            'Çözüm Önerileri': [
-                                '1. İnternet bağlantınızı kontrol edin',
-                                '2. Proxy veya VPN ayarlarınızı kontrol edin',
-                                '3. Firewall ayarlarınızı kontrol edin',
-                                '4. DNS ayarlarınızı kontrol edin',
-                                '5. Farklı bir ağ bağlantısı deneyin'
-                            ]
-                        };
                     }
                     
                     // Hata görüntüleme HTML'i oluştur
@@ -483,14 +430,9 @@
                                         errorHtml += '<li>' + value[i] + '</li>';
                                     }
                                     errorHtml += '</ul>';
-                                                                 } else {
-                                     // Hata kodu için özel stil ekle
-                                     if (key === 'Hata Kodu' || key === 'HTTP Durum Kodu') {
-                                         errorHtml += '<p><strong>' + key + ':</strong> <span style="color: #000000; font-weight: bold;">' + value + '</span></p>';
-                                     } else {
-                                         errorHtml += '<p><strong>' + key + ':</strong> ' + value + '</p>';
-                                     }
-                                 }
+                                } else {
+                                    errorHtml += '<p><strong>' + key + ':</strong> ' + value + '</p>';
+                                }
                             }
                         }
                         
@@ -636,17 +578,12 @@
                     if (errorData && errorData.error_details) {
                         errorAlert += '<div class="mt-2"><small><strong>Detaylar:</strong></small>';
                         for (var key in errorData.error_details) {
-                                                         if (errorData.error_details.hasOwnProperty(key) && key !== 'Çözüm Önerileri') {
-                                 var value = errorData.error_details[key];
-                                 if (!Array.isArray(value)) {
-                                     // Hata kodu için özel stil ekle
-                                     if (key === 'Hata Kodu' || key === 'HTTP Durum Kodu') {
-                                         errorAlert += '<br><small><strong>' + key + ':</strong> <span style="color: #000000; font-weight: bold;">' + value + '</span></small>';
-                                     } else {
-                                         errorAlert += '<br><small><strong>' + key + ':</strong> ' + value + '</small>';
-                                     }
-                                 }
-                             }
+                            if (errorData.error_details.hasOwnProperty(key) && key !== 'Çözüm Önerileri') {
+                                var value = errorData.error_details[key];
+                                if (!Array.isArray(value)) {
+                                    errorAlert += '<br><small><strong>' + key + ':</strong> ' + value + '</small>';
+                                }
+                            }
                         }
                         errorAlert += '</div>';
                     }
@@ -810,14 +747,9 @@
                                 html += '<li>' + value[i] + '</li>';
                             }
                             html += '</ul>';
-                                                 } else {
-                             // Hata kodu için özel stil ekle
-                             if (key === 'Hata Kodu' || key === 'HTTP Durum Kodu') {
-                                 html += '<p><strong>' + key + ':</strong> <span style="color: #000000; font-weight: bold;">' + value + '</span></p>';
-                             } else {
-                                 html += '<p><strong>' + key + ':</strong> ' + value + '</p>';
-                             }
-                         }
+                        } else {
+                            html += '<p><strong>' + key + ':</strong> ' + value + '</p>';
+                        }
                     }
                 }
                 
