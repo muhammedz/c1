@@ -22,8 +22,29 @@ class EventScrapeController extends Controller
      */
     public function check()
     {
-        $lastScrape = cache()->get('last_event_scrape');
-        return view('admin.events.check', compact('lastScrape'));
+        try {
+            $lastScrape = cache()->get('last_event_scrape');
+            return view('admin.events.check', compact('lastScrape'));
+        } catch (\Exception $e) {
+            // Hata detaylarını log'a yaz
+            Log::error('EventScrapeController check metodu hatası: ' . $e->getMessage(), [
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            // Hata sayfasını debug bilgileriyle göster
+            return response()->view('errors.debug', [
+                'error' => $e,
+                'message' => 'EventScrapeController check metodunda hata oluştu',
+                'details' => [
+                    'Hata Mesajı' => $e->getMessage(),
+                    'Dosya' => $e->getFile(),
+                    'Satır' => $e->getLine(),
+                    'Trace' => $e->getTraceAsString()
+                ]
+            ], 500);
+        }
     }
 
     /**
