@@ -430,9 +430,14 @@
                                         errorHtml += '<li>' + value[i] + '</li>';
                                     }
                                     errorHtml += '</ul>';
-                                } else {
-                                    errorHtml += '<p><strong>' + key + ':</strong> ' + value + '</p>';
-                                }
+                                                                 } else {
+                                     // Hata kodu için özel stil ekle
+                                     if (key === 'Hata Kodu' || key === 'HTTP Durum Kodu') {
+                                         errorHtml += '<p><strong>' + key + ':</strong> <span style="color: #000000; font-weight: bold;">' + value + '</span></p>';
+                                     } else {
+                                         errorHtml += '<p><strong>' + key + ':</strong> ' + value + '</p>';
+                                     }
+                                 }
                             }
                         }
                         
@@ -578,12 +583,17 @@
                     if (errorData && errorData.error_details) {
                         errorAlert += '<div class="mt-2"><small><strong>Detaylar:</strong></small>';
                         for (var key in errorData.error_details) {
-                            if (errorData.error_details.hasOwnProperty(key) && key !== 'Çözüm Önerileri') {
-                                var value = errorData.error_details[key];
-                                if (!Array.isArray(value)) {
-                                    errorAlert += '<br><small><strong>' + key + ':</strong> ' + value + '</small>';
-                                }
-                            }
+                                                         if (errorData.error_details.hasOwnProperty(key) && key !== 'Çözüm Önerileri') {
+                                 var value = errorData.error_details[key];
+                                 if (!Array.isArray(value)) {
+                                     // Hata kodu için özel stil ekle
+                                     if (key === 'Hata Kodu' || key === 'HTTP Durum Kodu') {
+                                         errorAlert += '<br><small><strong>' + key + ':</strong> <span style="color: #000000; font-weight: bold;">' + value + '</span></small>';
+                                     } else {
+                                         errorAlert += '<br><small><strong>' + key + ':</strong> ' + value + '</small>';
+                                     }
+                                 }
+                             }
                         }
                         errorAlert += '</div>';
                     }
@@ -747,9 +757,14 @@
                                 html += '<li>' + value[i] + '</li>';
                             }
                             html += '</ul>';
-                        } else {
-                            html += '<p><strong>' + key + ':</strong> ' + value + '</p>';
-                        }
+                                                 } else {
+                             // Hata kodu için özel stil ekle
+                             if (key === 'Hata Kodu' || key === 'HTTP Durum Kodu') {
+                                 html += '<p><strong>' + key + ':</strong> <span style="color: #000000; font-weight: bold;">' + value + '</span></p>';
+                             } else {
+                                 html += '<p><strong>' + key + ':</strong> ' + value + '</p>';
+                             }
+                         }
                     }
                 }
                 
