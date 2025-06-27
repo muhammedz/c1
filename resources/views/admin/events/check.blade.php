@@ -394,17 +394,70 @@
                         }
                     } else if (status === 'timeout') {
                         errorMsg = 'İstek zaman aşımına uğradı (Timeout)';
+                        
+                        // URL'den ağ bilgilerini çıkar
+                        var url = $('#url').val();
+                        var urlParts = null;
+                        
+                        try {
+                            urlParts = url ? new URL(url) : null;
+                        } catch (e) {
+                            console.warn('URL parse hatası:', e);
+                        }
+                        
                         errorDetails = {
                             'Hata Türü': 'Zaman Aşımı (Timeout)',
+                            'Hedef URL': url || 'Belirtilmemiş',
+                            'Hedef Domain': urlParts ? urlParts.hostname : 'Bilinmiyor',
+                            'Hedef Port': urlParts ? (urlParts.port || (urlParts.protocol === 'https:' ? 443 : 80)) : 'Bilinmiyor',
+                            'Protokol': urlParts ? urlParts.protocol.replace(':', '') : 'Bilinmiyor',
+                            'Timeout Süresi': '30 saniye (JavaScript)',
+                            'Hata Kaynağı': 'Frontend (JavaScript AJAX)',
                             'Açıklama': 'İstek 30 saniye içinde tamamlanamadı',
+                            'Zaman': new Date().toLocaleString('tr-TR'),
+                            'Tarayıcı': navigator.userAgent.split(' ')[0] || 'Bilinmiyor',
+                            'User Agent': navigator.userAgent,
                             'Çözüm Önerileri': [
                                 '1. İnternet bağlantınızı kontrol edin',
                                 '2. Hedef web sitesinin hızlı olduğunu kontrol edin',
-                                '3. Birkaç dakika sonra tekrar deneyin'
+                                '3. Birkaç dakika sonra tekrar deneyin',
+                                '4. VPN kullanıyorsanız kapatmayı deneyin',
+                                '5. Farklı bir ağ bağlantısı deneyin',
+                                '6. Tarayıcı cache\'ini temizleyin'
                             ]
                         };
                     } else if (status === 'error') {
                         errorMsg = 'Ağ bağlantı hatası';
+                        
+                        // URL'den ağ bilgilerini çıkar
+                        var url = $('#url').val();
+                        var urlParts = null;
+                        
+                        try {
+                            urlParts = url ? new URL(url) : null;
+                        } catch (e) {
+                            console.warn('URL parse hatası:', e);
+                        }
+                        
+                        errorDetails = {
+                            'Hata Türü': 'Ağ Bağlantı Hatası',
+                            'Hedef URL': url || 'Belirtilmemiş',
+                            'Hedef Domain': urlParts ? urlParts.hostname : 'Bilinmiyor',
+                            'Hedef Port': urlParts ? (urlParts.port || (urlParts.protocol === 'https:' ? 443 : 80)) : 'Bilinmiyor',
+                            'Protokol': urlParts ? urlParts.protocol.replace(':', '') : 'Bilinmiyor',
+                            'Hata Kaynağı': 'Frontend (JavaScript AJAX)',
+                            'Açıklama': 'Ağ bağlantısında genel bir hata oluştu',
+                            'Zaman': new Date().toLocaleString('tr-TR'),
+                            'Tarayıcı': navigator.userAgent.split(' ')[0] || 'Bilinmiyor',
+                            'User Agent': navigator.userAgent,
+                            'Çözüm Önerileri': [
+                                '1. İnternet bağlantınızı kontrol edin',
+                                '2. Proxy veya VPN ayarlarınızı kontrol edin',
+                                '3. Firewall ayarlarınızı kontrol edin',
+                                '4. DNS ayarlarınızı kontrol edin',
+                                '5. Farklı bir ağ bağlantısı deneyin'
+                            ]
+                        };
                     }
                     
                     // Hata görüntüleme HTML'i oluştur
