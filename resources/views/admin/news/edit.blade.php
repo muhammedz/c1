@@ -1038,41 +1038,7 @@
                     </div>
                 </div>
                 
-                <!-- Galeri -->
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <h5 class="mb-0">Galeri</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="mb-4">
-                            <label class="form-label d-flex justify-content-between align-items-center">
-                                <span>Galeri</span>
-                                <small class="text-muted">En fazla 10 görsel ekleyebilirsiniz</small>
-                            </label>
-                            <div class="d-flex mb-3">
-                                <button type="button" id="gallery-browser" class="btn btn-outline-primary">
-                                    <i class="fas fa-images me-1"></i> Görsel Ekle
-                                </button>
-                            </div>
-                            <div class="gallery-container" id="gallery-preview" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px;">
-                                @if(isset($news->filemanagersystem_gallery) && is_array($news->filemanagersystem_gallery))
-                                    @foreach($news->filemanagersystem_gallery as $galleryImage)
-                                        @if(!empty($galleryImage))
-                                            <div class="gallery-item" data-url="{{ $galleryImage }}">
-                                                <img src="{{ $galleryImage }}" alt="Gallery Image">
-                                                <button type="button" class="remove-btn" data-url="{{ $galleryImage }}">
-                                                    <i class="fas fa-times"></i>
-                                                </button>
-                                                <input type="hidden" name="filemanagersystem_gallery[]" value="{{ $galleryImage }}">
-                                            </div>
-                                        @endif
-                                    @endforeach
-                                @endif
-                            </div>
-                            <div id="gallery-inputs"></div>
-                        </div>
-                    </div>
-                </div>
+
                 
                 <!-- Hedef Kitleler -->
                 <div class="card mb-4">
@@ -2194,33 +2160,41 @@ $(document).ready(function() {
         console.log('updateGalleryDisplay çağrıldı, galleryImages:', galleryImages);
         
         const galleryGrid = $('#gallery-grid');
+        const galleryPreview = $('#gallery-preview');
+        const galleryCount = $('#gallery-count');
+        
         console.log('Gallery grid elementi:', galleryGrid.length);
+        console.log('Gallery preview elementi:', galleryPreview.length);
+        console.log('Gallery count elementi:', galleryCount.length);
         
         galleryGrid.empty();
         
         if (galleryImages.length === 0) {
             console.log('Galeri boş, gizleniyor');
-            $('#gallery-preview').hide();
+            galleryPreview.hide();
+            galleryCount.text('0');
+            // Hidden input'u boş array olarak güncelle
+            $('#filemanagersystem_gallery').val('[]');
             return;
         }
         
         console.log('Galeri gösteriliyor, resim sayısı:', galleryImages.length);
-        $('#gallery-preview').show();
-        $('#gallery-count').text(galleryImages.length);
+        galleryPreview.show();
+        galleryCount.text(galleryImages.length);
         
         galleryImages.forEach(function(image, index) {
             const imageItem = $(`
                 <div class="gallery-item" data-index="${index}">
                     <div class="gallery-image">
-                        <img src="${image.url}" alt="${image.name}" loading="lazy">
+                        <img src="${image.url}" alt="${image.name}" loading="lazy" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0xMDAgMTAwTDEwMCAxMDBaIiBzdHJva2U9IiM5Q0EzQUYiIHN0cm9rZS13aWR0aD0iMiIvPgo8L3N2Zz4K';">
                         <div class="gallery-overlay">
-                            <button type="button" class="btn btn-sm btn-danger remove-gallery-image" data-index="${index}">
+                            <button type="button" class="btn btn-sm btn-danger remove-gallery-image" data-index="${index}" title="Sil">
                                 <i class="fas fa-trash"></i>
                             </button>
-                            <button type="button" class="btn btn-sm btn-primary move-up" data-index="${index}" ${index === 0 ? 'disabled' : ''}>
+                            <button type="button" class="btn btn-sm btn-primary move-up" data-index="${index}" ${index === 0 ? 'disabled' : ''} title="Yukarı Taşı">
                                 <i class="fas fa-arrow-up"></i>
                             </button>
-                            <button type="button" class="btn btn-sm btn-primary move-down" data-index="${index}" ${index === galleryImages.length - 1 ? 'disabled' : ''}>
+                            <button type="button" class="btn btn-sm btn-primary move-down" data-index="${index}" ${index === galleryImages.length - 1 ? 'disabled' : ''} title="Aşağı Taşı">
                                 <i class="fas fa-arrow-down"></i>
                             </button>
                         </div>
@@ -2234,8 +2208,13 @@ $(document).ready(function() {
             galleryGrid.append(imageItem);
         });
         
-        // Hidden input'u güncelle
-        $('#filemanagersystem_gallery').val(JSON.stringify(galleryImages));
+        // Hidden input'u güncelle - sadece URL'leri kaydet (geriye uyumluluk için)
+        const galleryUrls = galleryImages.map(function(image) {
+            return image.url;
+        });
+        $('#filemanagersystem_gallery').val(JSON.stringify(galleryUrls));
+        
+        console.log('Hidden input güncellendi:', JSON.stringify(galleryUrls));
     }
     
     // Galeri resmi silme
@@ -2277,8 +2256,10 @@ $(document).ready(function() {
     });
     
     // Tüm galeriyi temizleme
-    $('#clear-gallery').on('click', function() {
+    $(document).on('click', '#clear-gallery', function() {
+        console.log('Tümünü temizle butonuna tıklandı');
         if (confirm('Tüm galeri resimlerini kaldırmak istediğinizden emin misiniz?')) {
+            console.log('Galeri temizleniyor...');
             galleryImages = [];
             updateGalleryDisplay();
             showGalleryMessage('info', 'Galeri temizlendi.');
@@ -2320,13 +2301,48 @@ $(document).ready(function() {
     
     // Sayfa yüklendiğinde mevcut galeri verilerini yükle
     const existingGallery = $('#filemanagersystem_gallery').val();
-    if (existingGallery && existingGallery !== '[]') {
+    console.log('Mevcut galeri verisi:', existingGallery);
+    
+    if (existingGallery && existingGallery !== '[]' && existingGallery !== '') {
         try {
-            galleryImages = JSON.parse(existingGallery);
-            updateGalleryDisplay();
+            const parsedGallery = JSON.parse(existingGallery);
+            console.log('Parse edilen galeri:', parsedGallery);
+            
+            // Mevcut galeri verilerini uygun formata çevir
+            if (Array.isArray(parsedGallery)) {
+                galleryImages = [];
+                parsedGallery.forEach(function(item, index) {
+                    if (typeof item === 'string') {
+                        // String URL formatında ise
+                        galleryImages.push({
+                            id: 'existing_' + index,
+                            url: item,
+                            name: 'Mevcut Resim ' + (index + 1),
+                            size: 0,
+                            order: index
+                        });
+                    } else if (typeof item === 'object' && item.url) {
+                        // Object formatında ise
+                        galleryImages.push({
+                            id: item.id || 'existing_' + index,
+                            url: item.url,
+                            name: item.name || 'Mevcut Resim ' + (index + 1),
+                            size: item.size || 0,
+                            order: index
+                        });
+                    }
+                });
+                
+                console.log('Yüklenen galeri resimleri:', galleryImages);
+                updateGalleryDisplay();
+            }
         } catch (e) {
             console.error('Mevcut galeri verileri parse edilemedi:', e);
+            console.error('Hatalı veri:', existingGallery);
         }
+    } else {
+        // Galeri boşsa da display'i güncelle (sayacı sıfırla)
+        updateGalleryDisplay();
     }
     
     // ===== GALERİ YÖNETİMİ BİTİŞ =====

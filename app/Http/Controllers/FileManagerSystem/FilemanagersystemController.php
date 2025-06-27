@@ -317,8 +317,8 @@ class FilemanagersystemController extends Controller
      */
     public function preview($id)
     {
-        // Doğrudan media.show sayfasına yönlendir
-                        return redirect()->route('admin.filemanagersystem.preview', ['id' => $id]);
+        // MediaPickerController'ın mediaPreview metoduna yönlendir
+        return redirect()->route('admin.filemanagersystem.mediapicker.preview', ['id' => $id]);
     }
 
     /**
