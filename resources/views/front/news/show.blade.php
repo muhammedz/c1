@@ -423,6 +423,165 @@
     .fa-file-alt { color: #6c757d; }
     .fa-file-archive { color: #ffc107; }
 
+    /* Galeri Stilleri */
+    .gallery-section {
+        margin-top: 2rem;
+        padding-top: 2rem;
+        border-top: 1px solid #eaeaea;
+    }
+    
+    .gallery-header {
+        margin-bottom: 1.5rem;
+    }
+    
+    .gallery-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #00352b;
+        margin: 0 0 0.5rem 0;
+        display: flex;
+        align-items: center;
+    }
+    
+    .gallery-count {
+        background-color: #20846c;
+        color: white;
+        font-size: 0.875rem;
+        padding: 0.25rem 0.75rem;
+        border-radius: 9999px;
+        margin-left: 0.75rem;
+        font-weight: 500;
+    }
+    
+    .gallery-subtitle {
+        color: #6b7280;
+        font-size: 0.875rem;
+        margin: 0;
+    }
+    
+    .gallery-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 1rem;
+        max-width: 100%;
+    }
+    
+    .gallery-item {
+        position: relative;
+        width: 200px;
+        height: 150px;
+        border-radius: 0.75rem;
+        overflow: hidden;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        margin: 0 auto;
+    }
+    
+    .gallery-item:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+    }
+    
+    .gallery-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+    }
+    
+    .gallery-item:hover .gallery-image {
+        transform: scale(1.05);
+    }
+    
+    .gallery-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 53, 43, 0.7);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    
+    .gallery-item:hover .gallery-overlay {
+        opacity: 1;
+    }
+    
+    .gallery-overlay i {
+        color: white;
+        font-size: 2rem;
+    }
+    
+    /* Galeri Modal */
+    .gallery-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.9);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+    }
+    
+    .gallery-modal-content {
+        position: relative;
+        max-width: 90%;
+        max-height: 90%;
+    }
+    
+    .gallery-modal-image {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+        border-radius: 0.5rem;
+    }
+    
+    .gallery-modal-close {
+        position: absolute;
+        top: -40px;
+        right: 0;
+        background: none;
+        border: none;
+        color: white;
+        font-size: 2rem;
+        cursor: pointer;
+        padding: 0.5rem;
+    }
+    
+    .gallery-modal-nav {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background: rgba(255, 255, 255, 0.1);
+        border: none;
+        color: white;
+        font-size: 2rem;
+        padding: 1rem;
+        cursor: pointer;
+        border-radius: 0.5rem;
+        transition: background-color 0.3s ease;
+    }
+    
+    .gallery-modal-nav:hover {
+        background: rgba(255, 255, 255, 0.2);
+    }
+    
+    .gallery-modal-prev {
+        left: -60px;
+    }
+    
+    .gallery-modal-next {
+        right: -60px;
+    }
+
     @media (max-width: 768px) {
         .news-detail-grid {
             grid-template-columns: 1fr;
@@ -456,6 +615,29 @@
         
         .document-meta {
             align-items: center;
+        }
+        
+        .gallery-grid {
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 0.75rem;
+        }
+        
+        .gallery-item {
+            width: 150px;
+            height: 120px;
+        }
+        
+        .gallery-modal-nav {
+            font-size: 1.5rem;
+            padding: 0.75rem;
+        }
+        
+        .gallery-modal-prev {
+            left: -45px;
+        }
+        
+        .gallery-modal-next {
+            right: -45px;
         }
     }
 </style>
@@ -517,6 +699,47 @@
                     <div class="news-content">
                         {!! html_entity_decode($news->content) !!}
                     </div>
+
+                    <!-- Galeri Bölümü -->
+                    @if(!empty($news->filemanagersystem_gallery))
+                    @php
+                        $galleryItems = $news->filemanagersystem_gallery;
+                        if (is_string($galleryItems)) {
+                            $galleryItems = json_decode($galleryItems, true);
+                        }
+                    @endphp
+                    
+                    @if(is_array($galleryItems) && !empty($galleryItems))
+                    <div class="gallery-section mt-8">
+                        <div class="gallery-header">
+                            <h3 class="gallery-title">
+                                <i class="fas fa-images mr-2"></i>
+                                Fotoğraf Galerisi
+                                <span class="gallery-count">{{ count($galleryItems) }}</span>
+                            </h3>
+                            <p class="gallery-subtitle">Bu haber ile ilgili fotoğrafları görüntüleyebilirsiniz.</p>
+                        </div>
+                        
+                        <div class="gallery-grid">
+                            @foreach($galleryItems as $index => $item)
+                                @php
+                                    $imageUrl = is_string($item) ? $item : (isset($item['url']) ? $item['url'] : '');
+                                    $imageName = is_array($item) && isset($item['name']) ? $item['name'] : 'Galeri Resmi ' . ($index + 1);
+                                @endphp
+                                
+                                @if($imageUrl)
+                                <div class="gallery-item" data-index="{{ $index }}" onclick="openGalleryModal({{ $index }})" style="cursor: pointer;">
+                                    <img src="{{ $imageUrl }}" alt="{{ $imageName }}" class="gallery-image" loading="lazy">
+                                    <div class="gallery-overlay">
+                                        <i class="fas fa-search-plus"></i>
+                                    </div>
+                                </div>
+                                @endif
+                            @endforeach
+                        </div>
+                    </div>
+                    @endif
+                    @endif
 
                     <!-- Belgeler Bölümü -->
                     @if($news->documents && $news->documents->count() > 0)
@@ -663,4 +886,126 @@
         </div>
     </div>
 </div>
+
+<!-- Galeri Modal -->
+<div id="galleryModal" class="gallery-modal">
+    <div class="gallery-modal-content">
+        <button class="gallery-modal-close" onclick="closeGalleryModal()">&times;</button>
+        <button class="gallery-modal-nav gallery-modal-prev" onclick="previousImage()">&#8249;</button>
+        <img id="galleryModalImage" class="gallery-modal-image" src="" alt="">
+        <button class="gallery-modal-nav gallery-modal-next" onclick="nextImage()">&#8250;</button>
+    </div>
+</div>
+
+@section('after_scripts')
+<script>
+let galleryImages = [];
+let currentImageIndex = 0;
+
+// Galeri verilerini hazırla
+@if(!empty($news->filemanagersystem_gallery))
+    @php
+        $galleryItems = $news->filemanagersystem_gallery;
+        if (is_string($galleryItems)) {
+            $galleryItems = json_decode($galleryItems, true);
+        }
+    @endphp
+    
+    @if(is_array($galleryItems) && !empty($galleryItems))
+        galleryImages = [
+            @foreach($galleryItems as $index => $item)
+                @php
+                    $imageUrl = is_string($item) ? $item : (isset($item['url']) ? $item['url'] : '');
+                    $imageName = is_array($item) && isset($item['name']) ? $item['name'] : 'Galeri Resmi ' . ($index + 1);
+                @endphp
+                @if($imageUrl)
+                "{{ $imageUrl }}"@if(!$loop->last),@endif
+                @endif
+            @endforeach
+        ];
+        
+        console.log('Galeri resimleri yüklendi:', galleryImages);
+    @endif
+@endif
+
+function openGalleryModal(index) {
+    console.log('Modal açılıyor, index:', index, 'galleryImages:', galleryImages);
+    
+    if (galleryImages.length === 0) {
+        console.log('Galeri resimleri yok');
+        return;
+    }
+    
+    currentImageIndex = index;
+    const modal = document.getElementById('galleryModal');
+    const modalImage = document.getElementById('galleryModalImage');
+    
+    console.log('Modal elementi:', modal);
+    console.log('Modal image elementi:', modalImage);
+    console.log('Yüklenecek resim URL:', galleryImages[currentImageIndex]);
+    
+    if (modal && modalImage) {
+        modalImage.src = galleryImages[currentImageIndex];
+        modalImage.alt = 'Galeri Resmi ' + (currentImageIndex + 1);
+        
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+        
+        console.log('Modal açıldı');
+    } else {
+        console.error('Modal veya modal image elementi bulunamadı');
+    }
+}
+
+function closeGalleryModal() {
+    const modal = document.getElementById('galleryModal');
+    modal.style.display = 'none';
+    document.body.style.overflow = 'auto';
+}
+
+function previousImage() {
+    if (galleryImages.length === 0) return;
+    
+    currentImageIndex = (currentImageIndex - 1 + galleryImages.length) % galleryImages.length;
+    const modalImage = document.getElementById('galleryModalImage');
+    modalImage.src = galleryImages[currentImageIndex];
+    modalImage.alt = 'Galeri Resmi ' + (currentImageIndex + 1);
+}
+
+function nextImage() {
+    if (galleryImages.length === 0) return;
+    
+    currentImageIndex = (currentImageIndex + 1) % galleryImages.length;
+    const modalImage = document.getElementById('galleryModalImage');
+    modalImage.src = galleryImages[currentImageIndex];
+    modalImage.alt = 'Galeri Resmi ' + (currentImageIndex + 1);
+}
+
+// Klavye navigasyonu
+document.addEventListener('keydown', function(e) {
+    const modal = document.getElementById('galleryModal');
+    if (modal.style.display === 'flex') {
+        switch(e.key) {
+            case 'Escape':
+                closeGalleryModal();
+                break;
+            case 'ArrowLeft':
+                previousImage();
+                break;
+            case 'ArrowRight':
+                nextImage();
+                break;
+        }
+    }
+});
+
+// Modal dışına tıklayınca kapat
+document.getElementById('galleryModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeGalleryModal();
+    }
+});
+</script>
+@endsection
+
 @endsection 

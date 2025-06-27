@@ -217,14 +217,36 @@ class NewsService
             if (!empty($data['filemanagersystem_gallery'])) {
                 $galleryData = $data['filemanagersystem_gallery'];
                 
+                Log::info('Galeri güncelleme başlıyor:', [
+                    'news_id' => $news->id,
+                    'gallery_data_type' => gettype($galleryData),
+                    'gallery_data' => is_string($galleryData) ? $galleryData : json_encode($galleryData)
+                ]);
+                
                 // JSON string ise decode et
                 if (is_string($galleryData)) {
-                    $galleryData = json_decode($galleryData, true);
+                    $decodedData = json_decode($galleryData, true);
+                    if (json_last_error() === JSON_ERROR_NONE) {
+                        $galleryData = $decodedData;
+                        Log::info('JSON decode başarılı:', ['decoded_data' => json_encode($galleryData)]);
+                    } else {
+                        Log::error('JSON decode hatası:', ['error' => json_last_error_msg(), 'data' => $galleryData]);
+                    }
                 }
                 
                 if (is_array($galleryData) && !empty($galleryData)) {
+                    Log::info('Galeri ilişkileri güncelleniyor:', ['item_count' => count($galleryData)]);
                     $this->updateGalleryMediaRelations($news, $galleryData);
+                } else {
+                    Log::warning('Galeri verisi boş veya geçersiz:', ['data' => $galleryData]);
                 }
+            } else {
+                Log::info('Galeri verisi boş, galeri ilişkileri temizleniyor.');
+                // Boş galeri verisi durumunda mevcut ilişkileri temizle
+                \App\Models\FileManagerSystem\MediaRelation::where('related_type', 'news')
+                    ->where('related_id', $news->id)
+                    ->where('field_name', 'gallery')
+                    ->delete();
             }
             
             DB::commit();
@@ -449,29 +471,50 @@ class NewsService
                 
                 if (is_array($item) && isset($item['id'])) {
                     $mediaId = $item['id'];
+                } elseif (is_array($item) && isset($item['url'])) {
+                    // URL'den ID'yi çıkart
+                    if (preg_match('#^/uploads/media/(\d+)$#', $item['url'], $matches)) {
+                        $mediaId = $matches[1];
+                    } elseif (preg_match('#/media/preview/(\d+)#', $item['url'], $matches)) {
+                        $mediaId = $matches[1];
+                    } elseif (preg_match('#/admin/filemanagersystem/media/preview/(\d+)#', $item['url'], $matches)) {
+                        $mediaId = $matches[1];
+                    }
                 } elseif (is_string($item)) {
                     // URL'den ID'yi çıkart
                     if (preg_match('#^/uploads/media/(\d+)$#', $item, $matches)) {
                         $mediaId = $matches[1];
                     } elseif (preg_match('#/media/preview/(\d+)#', $item, $matches)) {
                         $mediaId = $matches[1];
+                    } elseif (preg_match('#/admin/filemanagersystem/media/preview/(\d+)#', $item, $matches)) {
+                        $mediaId = $matches[1];
                     }
                 }
                 
                 if ($mediaId) {
-                    // Galeri için ilişki oluştur
-                    $mediaRelation = new \App\Models\FileManagerSystem\MediaRelation();
-                    $mediaRelation->media_id = $mediaId;
-                    $mediaRelation->related_type = 'news';
-                    $mediaRelation->related_id = $news->id;
-                    $mediaRelation->field_name = 'gallery';
-                    $mediaRelation->order = $index;
-                    $mediaRelation->save();
+                    // Mevcut ilişkiyi kontrol et (duplikasyon önleme)
+                    $existingRelation = \App\Models\FileManagerSystem\MediaRelation::where('media_id', $mediaId)
+                        ->where('related_type', 'news')
+                        ->where('related_id', $news->id)
+                        ->where('field_name', 'gallery')
+                        ->first();
+                    
+                    if (!$existingRelation) {
+                        // Galeri için ilişki oluştur
+                        $mediaRelation = new \App\Models\FileManagerSystem\MediaRelation();
+                        $mediaRelation->media_id = $mediaId;
+                        $mediaRelation->related_type = 'news';
+                        $mediaRelation->related_id = $news->id;
+                        $mediaRelation->field_name = 'gallery';
+                        $mediaRelation->order = $index;
+                        $mediaRelation->save();
+                    }
                 }
             }
         } catch (\Exception $e) {
             \Log::error('Haber galeri ilişkisi oluşturma hatası: ' . $e->getMessage(), [
                 'news_id' => $news->id,
+                'galleryItems' => json_encode($galleryItems),
                 'trace' => $e->getTraceAsString()
             ]);
         }

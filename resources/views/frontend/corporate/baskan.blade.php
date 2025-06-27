@@ -303,9 +303,9 @@
             </div>
             
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                @foreach($gallery as $photo)
+                @foreach($gallery as $index => $photo)
                 <!-- Fotoğraf -->
-                <div class="relative overflow-hidden rounded-lg group h-48 md:h-64 cursor-pointer" onclick="acFotoLightbox('{{ $photo->image_url ?? 'https://cankaya.epoxsoft.net.tr/images/huseyincanguner/huseyincanguner5.jpeg' }}', '{{ $photo->title }}')">
+                <div class="relative overflow-hidden rounded-lg group h-48 md:h-64 cursor-pointer" onclick="acFotoLightbox({{ $index }})">
                     <img src="{{ $photo->image_url ?? 'https://cankaya.epoxsoft.net.tr/images/huseyincanguner/huseyincanguner5.jpeg' }}" alt="{{ $photo->title }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
                     <div class="absolute inset-0 bg-black opacity-0 group-hover:opacity-50 transition-opacity"></div>
                     <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
@@ -332,9 +332,25 @@
         <span class="material-icons text-4xl">close</span>
     </button>
     
+    <!-- Sol navigasyon butonu -->
+    <button id="prevFotoButton" onclick="oncekiFoto(event)" class="absolute left-6 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white w-12 h-12 rounded-full flex items-center justify-center z-20 transition-all">
+        <span class="material-icons text-2xl">chevron_left</span>
+    </button>
+    
+    <!-- Sağ navigasyon butonu -->
+    <button id="nextFotoButton" onclick="sonrakiFoto(event)" class="absolute right-6 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white w-12 h-12 rounded-full flex items-center justify-center z-20 transition-all">
+        <span class="material-icons text-2xl">chevron_right</span>
+    </button>
+    
     <div class="relative max-w-4xl max-h-full" onclick="event.stopPropagation()">
         <!-- Fotoğraf -->
         <img id="lightboxFoto" src="" alt="" class="max-w-full max-h-[90vh] object-contain rounded-lg">
+        
+        <!-- Fotoğraf başlığı -->
+        <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4">
+            <h3 id="lightboxFotoBaslik" class="text-white text-lg font-semibold"></h3>
+            <p id="lightboxFotoSayac" class="text-white/80 text-sm mt-1"></p>
+        </div>
     </div>
 </div>
 
@@ -441,11 +457,49 @@
         }
     }
     
+    // Fotoğraf verileri
+    const fotograflar = [
+        @foreach($gallery as $photo)
+        {
+            url: "{{ $photo->image_url ?? 'https://cankaya.epoxsoft.net.tr/images/huseyincanguner/huseyincanguner5.jpeg' }}",
+            baslik: "{{ $photo->title }}"
+        }@if(!$loop->last),@endif
+        @endforeach
+    ];
+    
+    let aktifFotoIndex = 0;
+    
     // Fotoğraf Lightbox fonksiyonları
-    function acFotoLightbox(fotoUrl, baslik) {
-        document.getElementById('lightboxFoto').src = fotoUrl;
+    function acFotoLightbox(index) {
+        aktifFotoIndex = index;
+        fotografGoster(index);
         document.getElementById('fotoLightbox').style.display = 'flex';
         document.body.style.overflow = 'hidden';
+        
+        // Navigasyon butonlarının görünürlüğünü ayarla
+        document.getElementById('prevFotoButton').style.display = fotograflar.length > 1 ? 'flex' : 'none';
+        document.getElementById('nextFotoButton').style.display = fotograflar.length > 1 ? 'flex' : 'none';
+    }
+    
+    function fotografGoster(index) {
+        if (fotograflar.length === 0) return;
+        
+        const foto = fotograflar[index];
+        document.getElementById('lightboxFoto').src = foto.url;
+        document.getElementById('lightboxFotoBaslik').textContent = foto.baslik;
+        document.getElementById('lightboxFotoSayac').textContent = `${index + 1} / ${fotograflar.length}`;
+    }
+    
+    function sonrakiFoto(event) {
+        event.stopPropagation();
+        aktifFotoIndex = (aktifFotoIndex + 1) % fotograflar.length;
+        fotografGoster(aktifFotoIndex);
+    }
+    
+    function oncekiFoto(event) {
+        event.stopPropagation();
+        aktifFotoIndex = (aktifFotoIndex - 1 + fotograflar.length) % fotograflar.length;
+        fotografGoster(aktifFotoIndex);
     }
     
     function kapatFotoLightbox() {
@@ -453,7 +507,7 @@
         document.body.style.overflow = '';
     }
     
-    // Fotoğraf lightbox için ESC tuşu desteği
+    // Klavye navigasyonu
     document.addEventListener('keydown', function(event) {
         if (event.key === 'Escape') {
             if (document.getElementById('fotoLightbox').style.display === 'flex') {
@@ -462,11 +516,15 @@
                 kapatLightbox();
             }
         } else if (event.key === 'ArrowRight') {
-            if (!document.getElementById('lightbox').classList.contains('hidden')) {
+            if (document.getElementById('fotoLightbox').style.display === 'flex') {
+                sonrakiFoto(event);
+            } else if (!document.getElementById('lightbox').classList.contains('hidden')) {
                 sonrakiHikaye(event);
             }
         } else if (event.key === 'ArrowLeft') {
-            if (!document.getElementById('lightbox').classList.contains('hidden')) {
+            if (document.getElementById('fotoLightbox').style.display === 'flex') {
+                oncekiFoto(event);
+            } else if (!document.getElementById('lightbox').classList.contains('hidden')) {
                 oncekiHikaye(event);
             }
         }

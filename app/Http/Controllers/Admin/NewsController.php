@@ -174,6 +174,81 @@ class NewsController extends Controller
         // Documents ilişkisini yükle
         $news->load('documents');
         
+        // Galeri verilerini hem MediaRelation'lardan hem de JSON alanından yükle
+        $galleryData = [];
+        
+        // Debug: Mevcut galeri verilerini logla
+        \Log::info('Edit sayfası galeri debug:', [
+            'news_id' => $news->id,
+            'filemanagersystem_gallery_raw' => $news->getRawOriginal('filemanagersystem_gallery'),
+            'filemanagersystem_gallery_cast' => $news->filemanagersystem_gallery,
+            'filemanagersystem_gallery_type' => gettype($news->filemanagersystem_gallery)
+        ]);
+        
+        // Önce MediaRelation'lardan kontrol et
+        $galleryImages = $news->galleryImages();
+        \Log::info('MediaRelation galeri sayısı:', ['count' => $galleryImages->count()]);
+        
+        if ($galleryImages->count() > 0) {
+            foreach ($galleryImages as $media) {
+                $galleryData[] = [
+                    'id' => $media->id,
+                    'url' => $media->url,
+                    'name' => $media->original_name ?? 'Galeri Resmi',
+                    'size' => $media->size ?? 0
+                ];
+            }
+            \Log::info('MediaRelation\'dan yüklenen galeri:', ['count' => count($galleryData)]);
+        } 
+        // Eğer MediaRelation'larda veri yoksa, JSON alanından yükle
+        elseif (!empty($news->filemanagersystem_gallery)) {
+            $existingGallery = $news->filemanagersystem_gallery;
+            \Log::info('JSON alanından galeri yükleniyor:', [
+                'type' => gettype($existingGallery),
+                'data' => $existingGallery
+            ]);
+            
+            // String ise JSON decode et
+            if (is_string($existingGallery)) {
+                $decodedGallery = json_decode($existingGallery, true);
+                if (json_last_error() === JSON_ERROR_NONE && is_array($decodedGallery)) {
+                    $existingGallery = $decodedGallery;
+                    \Log::info('String JSON decode edildi:', ['decoded' => $existingGallery]);
+                }
+            }
+            
+            if (is_array($existingGallery)) {
+                foreach ($existingGallery as $index => $item) {
+                    if (is_string($item)) {
+                        // String URL formatında
+                        $galleryData[] = [
+                            'id' => 'existing_' . $index,
+                            'url' => $item,
+                            'name' => 'Mevcut Resim ' . ($index + 1),
+                            'size' => 0
+                        ];
+                    } elseif (is_array($item) && isset($item['url'])) {
+                        // Object formatında
+                        $galleryData[] = [
+                            'id' => $item['id'] ?? 'existing_' . $index,
+                            'url' => $item['url'],
+                            'name' => $item['name'] ?? 'Mevcut Resim ' . ($index + 1),
+                            'size' => $item['size'] ?? 0
+                        ];
+                    }
+                }
+                \Log::info('JSON\'dan yüklenen galeri:', ['count' => count($galleryData), 'data' => $galleryData]);
+            } else {
+                \Log::warning('Galeri verisi array değil:', ['type' => gettype($existingGallery), 'data' => $existingGallery]);
+            }
+        } else {
+            \Log::info('Galeri verisi bulunamadı');
+        }
+        
+        // filemanagersystem_gallery alanını güncel verilerle doldur
+        $news->filemanagersystem_gallery = $galleryData;
+        \Log::info('Final galeri verisi:', ['count' => count($galleryData), 'data' => $galleryData]);
+        
         $headlineCount = News::where('is_headline', true)->count();
         $maxHeadlinesReached = $headlineCount >= 4 && !$news->is_headline;
         $newsCategories = NewsCategory::where('is_active', true)->orderBy('name')->get();
