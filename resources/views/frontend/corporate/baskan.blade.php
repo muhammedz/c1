@@ -101,7 +101,7 @@
                 
                 <!-- Başlık (üst overlay) -->
                 <div class="absolute top-0 left-0 right-0 bg-gradient-to-b from-black/70 to-transparent p-4">
-                    <h3 id="lightboxTitle" class="text-xl font-bold text-white"></h3>
+                    <h3 id="lightboxTitle" class="text-xl font-bold text-white">Başkan Fotoğrafları</h3>
                 </div>
                 
                 <!-- Açıklama (alt overlay) -->
@@ -348,7 +348,7 @@
         
         <!-- Fotoğraf başlığı -->
         <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4">
-            <h3 id="lightboxFotoBaslik" class="text-white text-lg font-semibold"></h3>
+                            <h3 id="lightboxFotoBaslik" class="text-white text-lg font-semibold">Fotoğraf Detayı</h3>
             <p id="lightboxFotoSayac" class="text-white/80 text-sm mt-1"></p>
         </div>
     </div>

@@ -81,6 +81,42 @@
            width: 100%;
            max-width: 100%;
        }
+       
+       /* News Section Slider Styles */
+       .newsMainSwiper .swiper-wrapper {
+           position: relative;
+           width: 100%;
+           height: 100%;
+       }
+       
+       .newsMainSwiper .swiper-slide {
+           position: absolute;
+           top: 0;
+           left: 0;
+           width: 100%;
+           height: 100%;
+           opacity: 0;
+           transition: opacity 0.5s ease-in-out;
+       }
+       
+       .newsMainSwiper .swiper-slide:first-child {
+           opacity: 1;
+       }
+       
+       .news-card.active a,
+       .news-card.active div {
+           background-color: #004d2e !important;
+       }
+       
+       .news-card.active h3 {
+           color: white !important;
+       }
+       
+       .news-prev-btn:disabled,
+       .news-next-btn:disabled {
+           opacity: 0.5;
+           cursor: not-allowed;
+       }
     </style>
     
     @yield('css')

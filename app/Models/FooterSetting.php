@@ -37,6 +37,12 @@ class FooterSetting extends Model
 
     public function getLogoUrlAttribute()
     {
-        return $this->logo ? asset('uploads/' . $this->logo) : null;
+        if (!$this->logo) {
+            return null;
+        }
+        
+        // URL'deki boşluk karakterlerini %20 ile değiştir
+        $logoPath = str_replace(' ', '%20', $this->logo);
+        return asset('uploads/' . $logoPath);
     }
 }
