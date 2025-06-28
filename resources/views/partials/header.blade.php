@@ -223,7 +223,7 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </nav>
     </div>
 
     <!-- Mobil Menü (Küçük ekranlarda görünür) -->
@@ -240,7 +240,7 @@
                 <button id="sideMenuBack" class="text-white text-lg hidden" style="padding: 4px 6px !important;">
                     <i class="fas fa-chevron-left" style="font-size: 16px !important;"></i>
                 </button>
-                <h3 id="sideMenuTitle" class="font-medium text-base tracking-wide" style="font-size: 15px !important; line-height: 1.4 !important;"></h3>
+                <h3 id="sideMenuTitle" class="font-medium text-base tracking-wide" style="font-size: 15px !important; line-height: 1.4 !important;">Menü</h3>
                 <button id="sideMenuClose" class="text-white text-lg" style="padding: 4px 6px !important;">
                     <i class="fas fa-times" style="font-size: 16px !important;"></i>
                 </button>
@@ -252,8 +252,9 @@
             </div>
         </div>
     </div>
+</section>
 
-    <style>
+<style>
         /* Menü için aktif durum stili - yeşil çizgi */
         .active-nav, .group:hover > a {
             position: relative;
@@ -1219,7 +1220,13 @@
                 `;
             }
             
-
+            createMenuList(items) {
+                return `
+                    <div>
+                        ${items.map(item => this.createMenuItem(item)).join('')}
+                    </div>
+                `;
+            }
         }
         
         // Basit Side Menu'yu başlat
