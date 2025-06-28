@@ -34,7 +34,7 @@ class EventScraperService
     /**
      * Tüm sayfaları çekerek işler
      */
-    public function scrapeAllPages()
+    public function scrapeAllPages($targetIp = null)
     {
         $baseUrl = 'https://kultursanat.cankaya.bel.tr/etkinlikler';
         $currentPage = 1;
@@ -45,7 +45,7 @@ class EventScraperService
         $errors = [];
         
         // İlk sayfayı çek ve toplam sayfa sayısını belirle
-        $content = Http::withOptions([
+        $httpOptions = [
             'verify' => false,
             'timeout' => 90,
             'connect_timeout' => 60,
@@ -54,7 +54,30 @@ class EventScraperService
                 'Cache-Control' => 'no-cache',
                 'Pragma' => 'no-cache'
             ]
-        ])->get($baseUrl)->body();
+        ];
+        
+        // Eğer hedef IP belirtilmişse, domain'i bu IP'ye yönlendir
+        if ($targetIp) {
+            $parsedUrl = parse_url($baseUrl);
+            $domain = $parsedUrl['host'];
+            $port = $parsedUrl['scheme'] === 'https' ? 443 : 80;
+            
+            // CURL resolve seçeneği ekle
+            $httpOptions['curl'] = [
+                CURLOPT_RESOLVE => [
+                    "$domain:$port:$targetIp"
+                ]
+            ];
+            
+            Log::info('EventScraperService scrapeAllPages: IP yönlendirmesi aktif', [
+                'domain' => $domain,
+                'port' => $port,
+                'target_ip' => $targetIp,
+                'resolve_entry' => "$domain:$port:$targetIp"
+            ]);
+        }
+        
+        $content = Http::withOptions($httpOptions)->get($baseUrl)->body();
         $totalPages = $this->getTotalPageCount($content);
         
         $results = [
@@ -71,7 +94,7 @@ class EventScraperService
         
         while ($currentPage <= $totalPages && $hasNextPage) {
             $url = $currentPage === 1 ? $baseUrl : $baseUrl . '?page=' . $currentPage;
-            $pageResult = $this->scrapePage($url, $currentPage);
+            $pageResult = $this->scrapePage($url, $currentPage, $targetIp);
             
             // Sayfa sonuçlarını genel sonuçlara ekle
             $totalEvents += $pageResult['totalEvents'];
@@ -104,11 +127,11 @@ class EventScraperService
     /**
      * Belirtilen sayfadaki etkinlikleri çek ve işle
      */
-    public function scrapePage($url, $page = 1)
+    public function scrapePage($url, $page = 1, $targetIp = null)
     {
         try {
-            // Sayfayı HTTP ile çek - SSL doğrulamasını devre dışı bırak
-            $response = Http::withOptions([
+            // HTTP seçeneklerini hazırla
+            $httpOptions = [
                 'verify' => false,
                 'timeout' => 90,         // 90 saniye timeout (daha da artırıldı)
                 'connect_timeout' => 60, // 60 saniye bağlantı timeout (artırıldı)
@@ -128,7 +151,33 @@ class EventScraperService
                     'Cache-Control' => 'no-cache',
                     'Pragma' => 'no-cache'
                 ]
-            ])->get($url);
+            ];
+            
+            // Eğer hedef IP belirtilmişse, domain'i bu IP'ye yönlendir
+            if ($targetIp) {
+                $parsedUrl = parse_url($url);
+                $domain = $parsedUrl['host'];
+                $port = $parsedUrl['scheme'] === 'https' ? 443 : 80;
+                
+                // CURL resolve seçeneği ekle
+                $httpOptions['curl'] = [
+                    CURLOPT_RESOLVE => [
+                        "$domain:$port:$targetIp"
+                    ]
+                ];
+                
+                Log::info('EventScraperService: IP yönlendirmesi aktif', [
+                    'domain' => $domain,
+                    'port' => $port,
+                    'target_ip' => $targetIp,
+                    'resolve_entry' => "$domain:$port:$targetIp",
+                    'url' => $url,
+                    'page' => $page
+                ]);
+            }
+            
+            // Sayfayı HTTP ile çek - SSL doğrulamasını devre dışı bırak
+            $response = Http::withOptions($httpOptions)->get($url);
             $content = $response->body();
             
             // DOM oluştur

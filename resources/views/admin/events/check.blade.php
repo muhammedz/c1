@@ -140,6 +140,17 @@
                             <small class="form-text text-muted">Etkinliklerin çekileceği sayfanın URL'ini girin.</small>
                         </div>
                         
+                        <div class="form-group">
+                            <label for="target_ip">Hedef IP Adresi (İsteğe Bağlı)</label>
+                            <input type="text" class="form-control" id="target_ip" name="target_ip" 
+                                placeholder="Örnek: 192.168.1.100" pattern="^(\d{1,3}\.){3}\d{1,3}$">
+                            <small class="form-text text-muted">
+                                <i class="fas fa-info-circle text-info"></i> 
+                                Bu IP adresi belirtilirse, domain bu IP'ye yönlendirilecek (hosts dosyası benzeri). 
+                                Boş bırakılırsa normal DNS çözümlemesi yapılır.
+                            </small>
+                        </div>
+                        
                         <div class="mt-4 mb-4">
                             <button type="submit" id="scrape-button" class="btn btn-primary">
                                 <i class="fas fa-sync-alt"></i> Etkinlikleri Çek
@@ -337,6 +348,7 @@
                 data: {
                     _token: $('input[name="_token"]').val(),
                     url: $('#url').val(),
+                    target_ip: $('#target_ip').val(),
                     limit: 1 // Sadece 1 etkinlik getir
                 },
                 dataType: 'json', // JSON yanıt bekliyoruz
@@ -500,6 +512,7 @@
                 data: {
                     _token: $('input[name="_token"]').val(),
                     url: $('#url').val(),
+                    target_ip: $('#target_ip').val(),
                     page: page
                 },
                 success: function(response) {

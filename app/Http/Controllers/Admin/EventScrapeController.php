@@ -53,11 +53,24 @@ class EventScrapeController extends Controller
     public function scrape(Request $request)
     {
         $page = $request->input('page', 1);
+        $targetIp = $request->input('target_ip');
         $baseUrl = 'https://kultursanat.cankaya.bel.tr/etkinlikler';
         $url = $page > 1 ? $baseUrl . "?page=" . $page : $baseUrl;
         
+        // IP format kontrolü
+        if ($targetIp && !filter_var($targetIp, FILTER_VALIDATE_IP)) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Geçersiz IP adresi formatı',
+                'error_details' => [
+                    'Girilen IP' => $targetIp,
+                    'Beklenen Format' => 'xxx.xxx.xxx.xxx (örn: 192.168.1.100)'
+                ]
+            ], 400);
+        }
+        
         try {
-            $result = $this->scraperService->scrapePage($url, $page);
+            $result = $this->scraperService->scrapePage($url, $page, $targetIp);
             
             // Son çekme zamanını cache'e kaydet
             cache()->put('last_event_scrape', now(), now()->addDays(30));
@@ -217,12 +230,25 @@ class EventScrapeController extends Controller
     public function preview(Request $request)
     {
         $url = $request->input('url');
+        $targetIp = $request->input('target_ip');
         $limit = $request->input('limit', 1);
         
         if (empty($url)) {
             return response()->json([
                 'success' => false,
                 'message' => 'URL parametresi gereklidir.'
+            ], 400);
+        }
+        
+        // IP format kontrolü
+        if ($targetIp && !filter_var($targetIp, FILTER_VALIDATE_IP)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Geçersiz IP adresi formatı',
+                'error_details' => [
+                    'Girilen IP' => $targetIp,
+                    'Beklenen Format' => 'xxx.xxx.xxx.xxx (örn: 192.168.1.100)'
+                ]
             ], 400);
         }
         
@@ -244,7 +270,7 @@ class EventScrapeController extends Controller
                 try {
                     Log::info("HTTP isteği deneme #{$attempt}", ['url' => $url]);
                     
-                    $httpClient = Http::withOptions([
+                    $httpOptions = [
                         'verify' => false,       // SSL doğrulamasını atla
                         'timeout' => 90,         // 90 saniye timeout (daha da artırıldı)
                         'connect_timeout' => 60, // 60 saniye bağlantı timeout (artırıldı)
@@ -264,7 +290,30 @@ class EventScrapeController extends Controller
                             'Cache-Control' => 'no-cache',
                             'Pragma' => 'no-cache'
                         ]
-                    ]);
+                    ];
+                    
+                    // Eğer hedef IP belirtilmişse, domain'i bu IP'ye yönlendir
+                    if ($targetIp) {
+                        $parsedUrl = parse_url($url);
+                        $domain = $parsedUrl['host'];
+                        $port = $parsedUrl['scheme'] === 'https' ? 443 : 80;
+                        
+                        // CURL resolve seçeneği ekle
+                        $httpOptions['curl'] = [
+                            CURLOPT_RESOLVE => [
+                                "$domain:$port:$targetIp"
+                            ]
+                        ];
+                        
+                        Log::info('IP yönlendirmesi aktif', [
+                            'domain' => $domain,
+                            'port' => $port,
+                            'target_ip' => $targetIp,
+                            'resolve_entry' => "$domain:$port:$targetIp"
+                        ]);
+                    }
+                    
+                    $httpClient = Http::withOptions($httpOptions);
                     
                     $response = $httpClient->get($url);
                     
