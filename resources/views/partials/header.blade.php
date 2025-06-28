@@ -205,7 +205,7 @@
                     </div>
                     
                     <!-- Mobil + Tablet Arama ve Menü Butonları - desktop hariç her yerde görünür -->
-                    <div class="mobile-header-controls lg:hidden flex items-center space-x-3">
+                    <div class="mobile-header-controls mobile-header-controls-only flex items-center space-x-3">
                         <!-- Mobil Arama Butonu -->
                         <button id="mobileSearchButton" class="w-11 h-11 bg-[#007b32] rounded-lg flex items-center justify-center text-white shadow-md hover:bg-[#00352b] hover:scale-105 transition-all">
                             <i class="fas fa-search text-white text-xl"></i>
@@ -229,7 +229,7 @@
     <!-- Mobil Menü (Küçük ekranlarda görünür) -->
     <!-- Modern Side Menu Overlay -->
     <!-- Basit Side Menu -->
-            <div id="sideMenuOverlay" class="mobile-menu-overlay fixed inset-0 lg:hidden" style="z-index: 999999 !important; position: fixed !important;">
+            <div id="sideMenuOverlay" class="mobile-menu-overlay fixed inset-0 mobile-menu-overlay-only" style="z-index: 999999 !important; position: fixed !important;">
         <!-- Backdrop -->
         <div class="fixed inset-0 bg-black bg-opacity-70 transition-opacity duration-200" id="sideMenuBackdrop" style="z-index: 999998;"></div>
         

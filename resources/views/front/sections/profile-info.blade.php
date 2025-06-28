@@ -9,7 +9,7 @@
                     <div class="w-full relative">
                         @if($profileSettings->filemanagersystem_profile_photo)
                             <!-- Mobil görünüm -->
-                            <div class="mobile-profile-photo md:hidden relative">
+                            <div class="mobile-profile-photo mobile-profile-photo-only relative">
                                 <a href="/baskan">
                                     <img src="{{ asset($profileSettings->filemanagersystem_profile_photo) }}" alt="{{ $profileSettings->filemanagersystem_profile_photo_alt ?? $profileSettings->name }}" class="w-full">
                                 </a>
@@ -105,7 +105,7 @@
                             </div>
                         @elseif($profileSettings->profile_photo)
                             <!-- Mobil görünüm -->
-                            <div class="mobile-profile-fallback md:hidden relative">
+                            <div class="mobile-profile-fallback mobile-profile-fallback-only relative">
                                 <a href="/baskan">
                                     <img src="{{ asset('storage/' . $profileSettings->profile_photo) }}" alt="{{ $profileSettings->name }}" class="w-full">
                                 </a>
@@ -201,7 +201,7 @@
                             </div>
                         @else
                             <!-- Mobil görünüm -->
-                            <div class="mobile-profile-default md:hidden relative">
+                            <div class="mobile-profile-default mobile-profile-default-only relative">
                                 <a href="/baskan">
                                     <img src="{{ asset('assets/image/person.png') }}" alt="{{ $profileSettings->name ?? 'Profil' }}" class="w-full">
                                 </a>
@@ -307,7 +307,7 @@
                 <div class="flex flex-col md:flex-row h-full">
                     <div class="w-full">
                         <!-- Mobil görünüm -->
-                        <div class="mobile-contact-section md:hidden flex h-full">
+                        <div class="mobile-contact-section mobile-contact-only flex h-full">
                             <div class="w-2/5 bg-white p-2 flex flex-col justify-center items-start pl-4" style="padding-top: 30px">
                                 <div class="text-left">
                                     <div class="flex flex-col items-start">

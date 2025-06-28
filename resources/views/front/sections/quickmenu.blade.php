@@ -170,7 +170,7 @@
     </div>
 
     <!-- Mobile Menu -->
-    <div class="mobile-menu-container md:hidden">
+    <div class="mobile-menu-container mobile-quickmenu-container">
         <div class="flex flex-col divide-y divide-white/20">
             @if(isset($quickMenuCategories) && $quickMenuCategories->count() > 0)
                 @foreach($quickMenuCategories->take(4) as $category)
