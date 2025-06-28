@@ -4,9 +4,25 @@
 @endphp
 
 <!-- Footer kısmı -->
-<footer id="footer-section" class="footer-section bg-[#065a28] text-white py-12 mt-12" style="font-family: 'TT Norms Pro', sans-serif;">
+<footer id="footer-section" class="footer-section bg-[#065a28] text-white mt-12" style="font-family: 'TT Norms Pro', sans-serif;">
     <div class="container max-w-7xl mx-auto px-4">
-        <div class="grid grid-cols-1 md:grid-cols-5 gap-8">
+        <!-- Logo Bölümü - En üstte -->
+        <div class="text-center pt-6 pb-8">
+            <div class="flex justify-center items-center">
+                @if($footerSettings && $footerSettings->logo)
+                    <img src="{{ $footerSettings->logo_url }}" alt="Logo" class="w-48 h-48 object-contain">
+                @else
+                    <div class="w-48 h-48 bg-white rounded-full flex items-center justify-center">
+                        <svg class="w-32 h-32 text-[#065a28]" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 2L2 7v10c0 5.55 3.84 9.74 9 11 5.16-1.26 9-5.45 9-11V7l-10-5z"/>
+                        </svg>
+                    </div>
+                @endif
+            </div>
+        </div>
+
+        <!-- Menüler ve İletişim -->
+        <div class="grid grid-cols-1 md:grid-cols-5 gap-8 pb-8">
             @foreach($footerMenus as $menu)
                 <div>
                     <h3 class="text-xl font-bold mb-6 text-white">{{ $menu->title }}</h3>
@@ -20,25 +36,9 @@
                 </div>
             @endforeach
 
-            <!-- İLETİŞİM VE LOGO -->
+            <!-- İLETİŞİM BİLGİLERİ -->
             <div class="text-center">
-                <!-- Logo -->
-                <div>
-                    <div class="flex justify-center items-center">
-                        @if($footerSettings && $footerSettings->logo)
-                            <img src="{{ $footerSettings->logo_url }}" alt="{{ $footerSettings->company_name }}" class="w-48 h-48 object-contain">
-                        @else
-                            <div class="w-48 h-48 bg-white rounded-full flex items-center justify-center">
-                                <svg class="w-32 h-32 text-[#065a28]" fill="currentColor" viewBox="0 0 24 24">
-                                    <path d="M12 2L2 7v10c0 5.55 3.84 9.74 9 11 5.16-1.26 9-5.45 9-11V7l-10-5z"/>
-                                </svg>
-                            </div>
-                        @endif
-                    </div>
-                </div>
-
-                <!-- İletişim Bilgileri -->
-                <div class="text-sm space-y-3 mb-6 mt-2">
+                <div class="text-sm space-y-3 mb-6">
                     @if($footerSettings)
                         @if($footerSettings->address_line1 || $footerSettings->address_line2)
                         <div>
