@@ -6,13 +6,30 @@
 <html lang="tr" class="overflow-x-hidden">
 
 <head>
-    <!-- Google tag (gtag.js) -->
+    <!-- Google tag (gtag.js) - Chrome Uyumlu -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-80L32HWP74"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
         function gtag(){dataLayer.push(arguments);}
+        
+        // Consent Mode v2 - Chrome'un yeni politikalarına uyumlu
+        gtag('consent', 'default', {
+            'analytics_storage': 'granted',
+            'ad_storage': 'denied',
+            'ad_user_data': 'denied',
+            'ad_personalization': 'denied',
+            'functionality_storage': 'granted',
+            'personalization_storage': 'granted',
+            'security_storage': 'granted'
+        });
+        
         gtag('js', new Date());
-        gtag('config', 'G-80L32HWP74');
+        gtag('config', 'G-80L32HWP74', {
+            'anonymize_ip': true,
+            'cookie_flags': 'SameSite=None;Secure',
+            'cookie_expires': 63072000, // 2 yıl
+            'send_page_view': true
+        });
     </script>
     
     <meta charset="UTF-8">
@@ -71,8 +88,8 @@
     <!-- Material Icons -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     
-    <!-- Font Awesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Font Awesome Icons - Yerel -->
+    <link rel="stylesheet" href="{{ asset('vendor/fontawesome-free/css/all.min.css') }}">
     
     <!-- Font tanımlamaları -->
     <style>
