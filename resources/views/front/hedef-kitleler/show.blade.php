@@ -116,9 +116,9 @@
                                         <!-- Mini resim -->
                                         <div class="flex-shrink-0 w-14 h-14 mr-4 rounded-md overflow-hidden bg-slate-100 shadow-sm border border-slate-200">
                                             @if($item->filemanagersystem_image)
-                                                <img src="{{ asset($item->filemanagersystem_image) }}" alt="{{ $item->title }}" class="w-full h-full object-cover">
+                                                <img src="{{ asset($item->filemanagersystem_image) }}" alt="Haber görseli" class="w-full h-full object-cover">
                                             @elseif($item->image)
-                                                <img src="{{ asset($item->image) }}" alt="{{ $item->title }}" class="w-full h-full object-cover">
+                                                <img src="{{ asset($item->image) }}" alt="Haber görseli" class="w-full h-full object-cover">
                                             @else
                                                 <div class="w-full h-full flex items-center justify-center bg-slate-200">
                                                     <span class="material-icons text-slate-400">article</span>
@@ -220,7 +220,7 @@
                                         <!-- Mini resim -->
                                         <div class="flex-shrink-0 w-14 h-14 mr-4 rounded-md overflow-hidden bg-slate-100 shadow-sm border border-slate-200">
                                             @if($service->image)
-                                                <img src="{{ asset($service->image) }}" alt="{{ $service->title }}" class="w-full h-full object-cover">
+                                                <img src="{{ asset($service->image) }}" alt="{{ $service->title }} hizmet görseli" class="w-full h-full object-cover">
                                             @else
                                                 <div class="w-full h-full flex items-center justify-center bg-slate-200">
                                                     <span class="material-icons text-slate-400">business</span>

@@ -365,7 +365,7 @@
                     @if($item->image)
                         <div class="news-card-image-container">
                             <a href="{{ route('news.show', $item->slug) }}">
-                                <img src="{{ str_replace('/storage/storage/', '/storage/', $item->image) }}" class="news-card-image" alt="{{ $item->title }}">
+                                <img src="{{ str_replace('/storage/storage/', '/storage/', $item->image) }}" class="news-card-image" alt="{{ $item->title }} haber görseli">
                             </a>
                         </div>
                     @else

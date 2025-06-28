@@ -229,7 +229,7 @@
                 @foreach($news as $item)
                 <article class="news-card">
                     @if($item->image)
-                    <img src="{{ asset($item->image) }}" alt="{{ $item->title }}" class="news-card-image">
+                    <img src="{{ asset($item->image) }}" alt="{{ $item->title }} haber görseli" class="news-card-image">
                     @endif
                     
                     <div class="news-card-content">

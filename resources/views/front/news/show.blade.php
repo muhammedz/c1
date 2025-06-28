@@ -672,7 +672,7 @@
             <div class="news-main-content">
                 @if($news->image)
                 <div class="news-image-container">
-                    <img src="{{ str_replace('/storage/storage/', '/storage/', $news->image) }}" class="news-image" alt="{{ $news->title }}">
+                    <img src="{{ str_replace('/storage/storage/', '/storage/', $news->image) }}" class="news-image" alt="{{ $news->title }} haber görseli">
                 </div>
                 @endif
                 
@@ -827,7 +827,7 @@
                         @foreach($popularNews as $item)
                             <a href="{{ route('news.show', $item->slug) }}" class="related-news-item">
                                 @if($item->image)
-                                    <img src="{{ str_replace('/storage/storage/', '/storage/', $item->image) }}" class="related-news-image" alt="{{ $item->title }}">
+                                    <img src="{{ str_replace('/storage/storage/', '/storage/', $item->image) }}" class="related-news-image" alt="{{ $item->title }} haber görseli">
                                 @else
                                     <div class="related-news-image bg-gray-200 flex items-center justify-center">
                                         <i class="fas fa-newspaper text-gray-400"></i>
@@ -867,7 +867,7 @@
                         @foreach($relatedNews as $item)
                             <a href="{{ route('news.show', $item->slug) }}" class="related-news-item">
                                 @if($item->image)
-                                    <img src="{{ str_replace('/storage/storage/', '/storage/', $item->image) }}" class="related-news-image" alt="{{ $item->title }}">
+                                    <img src="{{ str_replace('/storage/storage/', '/storage/', $item->image) }}" class="related-news-image" alt="{{ $item->title }} haber görseli">
                                 @else
                                     <div class="related-news-image bg-gray-200 flex items-center justify-center">
                                         <i class="fas fa-newspaper text-gray-400"></i>

@@ -28,7 +28,7 @@ function titleCase($string) {
                 <!-- Etkinlik Görseli -->
                 <div class="event-featured-image">
                     @if($event->cover_image)
-                        <img src="{{ $event->cover_image_url }}" alt="{{ titleCase($event->title) }}" class="w-full h-full object-cover">
+                        <img src="{{ $event->cover_image_url }}" alt="Etkinlik görseli" class="w-full h-full object-cover">
                     @else
                         <div class="w-full h-full bg-gradient-to-r from-[#004d2e] to-[#006a3e] flex items-center justify-center text-white p-4">
                             <span class="text-xl font-semibold text-center">{{ titleCase($event->title) }}</span>

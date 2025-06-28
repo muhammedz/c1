@@ -394,7 +394,7 @@
                     <article class="news-card">
                         <div class="news-card-image-container">
                             @if($item->image)
-                                <img src="{{ str_replace('/storage/storage/', '/storage/', $item->image) }}" class="news-card-image" alt="{{ $item->title }}">
+                                <img src="{{ str_replace('/storage/storage/', '/storage/', $item->image) }}" class="news-card-image" alt="{{ $item->title }} haber görseli">
                             @else
                                 <i class="fas fa-newspaper"></i>
                             @endif
@@ -459,7 +459,7 @@
                             <article class="news-card">
                                 <div class="news-card-image-container">
                                     @if($item->image)
-                                        <img src="{{ str_replace('/storage/storage/', '/storage/', $item->image) }}" class="news-card-image" alt="{{ $item->title }}">
+                                        <img src="{{ str_replace('/storage/storage/', '/storage/', $item->image) }}" class="news-card-image" alt="{{ $item->title }} haber görseli">
                                     @else
                                         <i class="fas fa-newspaper"></i>
                                     @endif

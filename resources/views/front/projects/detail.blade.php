@@ -561,7 +561,7 @@
                         <div class="related-projects-list">
                             @foreach($relatedProjects->take(3) as $relatedProject)
                                 <a href="{{ route('front.projects.detail', $relatedProject->slug) }}" class="related-project-item">
-                                    <img src="{{ $relatedProject->cover_image_url }}" class="related-project-image" alt="{{ $relatedProject->title }}">
+                                    <img src="{{ $relatedProject->cover_image_url }}" class="related-project-image" alt="{{ $relatedProject->title }} proje görseli">
                                     <div class="related-project-info">
                                         <h4 class="related-project-title">{{ $relatedProject->title }}</h4>
                                         <p class="related-project-category">{{ $relatedProject->category ? $relatedProject->category->name : 'Genel' }}</p>
@@ -579,7 +579,7 @@
                 <div class="project-main-content">
                     @if($project->cover_image_url)
                     <div class="project-image-container">
-                        <img src="{{ $project->cover_image_url }}" class="project-image" alt="{{ $project->title }}">
+                        <img src="{{ $project->cover_image_url }}" class="project-image" alt="{{ $project->title }} proje görseli">
                     </div>
                     @endif
                     

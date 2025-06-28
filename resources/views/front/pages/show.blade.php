@@ -329,7 +329,7 @@
                 <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
                     @foreach($page->gallery as $image)
                         <a href="{{ asset($image) }}" data-fancybox="gallery" class="gallery-item block rounded-lg overflow-hidden shadow-md border-0 aspect-square bg-white hover:shadow-lg transition-all">
-                            <img src="{{ asset($image) }}" alt="{{ $page->title }} - Görsel {{ $loop->iteration }}" class="w-full h-full object-cover hover:scale-105 transition-transform duration-300">
+                            <img src="{{ asset($image) }}" alt="{{ $page->title }} sayfa görseli {{ $loop->iteration }}" class="w-full h-full object-cover hover:scale-105 transition-transform duration-300">
                         </a>
                     @endforeach
                 </div>
