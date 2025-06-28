@@ -70,6 +70,7 @@
         font-size: 0.75rem;
         position: relative;
         z-index: 20;
+        flex-wrap: wrap;
     }
     
     .breadcrumb-item {
@@ -329,6 +330,58 @@
         transform: scale(1.05);
     }
     
+    .gallery-item {
+        cursor: pointer;
+    }
+    
+    /* Modal Styles */
+    .image-modal {
+        display: none;
+        position: fixed;
+        z-index: 9999;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.9);
+        animation: fadeIn 0.3s ease;
+    }
+    
+    .image-modal.active {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .modal-content {
+        max-width: 90%;
+        max-height: 90%;
+        object-fit: contain;
+        border-radius: 8px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    }
+    
+    .modal-close {
+        position: absolute;
+        top: 20px;
+        right: 30px;
+        color: white;
+        font-size: 40px;
+        font-weight: bold;
+        cursor: pointer;
+        z-index: 10000;
+        transition: color 0.3s ease;
+    }
+    
+    .modal-close:hover {
+        color: #ccc;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+    
     .category-list {
         display: flex;
         flex-wrap: wrap;
@@ -392,6 +445,19 @@
     @media (max-width: 768px) {
         .project-detail-grid {
             grid-template-columns: 1fr;
+            grid-template-areas: 
+                "content"
+                "sidebar";
+        }
+        
+        .project-sidebar {
+            grid-area: sidebar;
+            order: 2;
+        }
+        
+        .project-main-content-wrapper {
+            grid-area: content;
+            order: 1;
         }
         
         .project-title {
@@ -404,6 +470,23 @@
         
         .project-content-wrapper {
             padding: 1.5rem;
+        }
+        
+        .breadcrumb {
+            font-size: 0.7rem;
+        }
+        
+        .breadcrumb-link,
+        .breadcrumb-item {
+            padding: 0.1rem 0.3rem;
+        }
+        
+        .breadcrumb-item:last-child {
+            display: none;
+        }
+        
+        .breadcrumb-separator:last-of-type {
+            display: none;
         }
     }
     
@@ -450,31 +533,10 @@
         <div class="project-detail-grid">
             <!-- Yan Menü - Sol tarafta -->
             <div class="project-sidebar">
-                <!-- Proje Bilgileri -->
+                <!-- Diğer Projeler -->
                 <div class="project-sidebar-section">
                     <div class="sidebar-header">
-                        <h3 class="sidebar-title">Proje Bilgileri</h3>
-                    </div>
-                    <div class="sidebar-content">
-                        <div class="sidebar-list">
-                            <div class="sidebar-item">
-                                <span class="sidebar-item-icon"><i class="fas fa-tag"></i></span>
-                                <span>Durum: {{ $project->status_text }}</span>
-                            </div>
-                            @if($project->category)
-                            <div class="sidebar-item">
-                                <span class="sidebar-item-icon"><i class="fas fa-folder"></i></span>
-                                <span>Kategori: {{ $project->category->name }}</span>
-                            </div>
-                            @endif
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Kategoriler -->
-                <div class="project-sidebar-section">
-                    <div class="sidebar-header">
-                        <h3 class="sidebar-title">Kategoriler</h3>
+                        <h3 class="sidebar-title">Diğer Projeler</h3>
                     </div>
                     <div class="sidebar-content">
                         <div class="category-list">
@@ -513,7 +575,7 @@
             </div>
             
             <!-- Ana İçerik - Sağ tarafta -->
-            <div>
+            <div class="project-main-content-wrapper">
                 <div class="project-main-content">
                     @if($project->cover_image_url)
                     <div class="project-image-container">
@@ -547,11 +609,17 @@
                     <h2 class="gallery-title">Proje Galerisi</h2>
                     <div class="gallery-grid">
                         @foreach($project->gallery as $image)
-                        <div class="gallery-item">
+                        <div class="gallery-item" onclick="openImageModal('{{ $image->image_url }}', '{{ $project->title }} görseli')">
                             <img src="{{ $image->image_url }}" alt="{{ $project->title }} görseli" class="gallery-image">
                         </div>
                         @endforeach
                     </div>
+                </div>
+                
+                <!-- Image Modal -->
+                <div id="imageModal" class="image-modal" onclick="closeImageModal()">
+                    <span class="modal-close" onclick="closeImageModal()">&times;</span>
+                    <img id="modalImage" class="modal-content" alt="">
                 </div>
                 @endif
             </div>
@@ -566,4 +634,38 @@
         </div>
     </div>
 @endif
+
+<script>
+function openImageModal(imageSrc, imageAlt) {
+    const modal = document.getElementById('imageModal');
+    const modalImage = document.getElementById('modalImage');
+    
+    modalImage.src = imageSrc;
+    modalImage.alt = imageAlt;
+    modal.classList.add('active');
+    
+    // Body scroll'unu engelle
+    document.body.style.overflow = 'hidden';
+}
+
+function closeImageModal() {
+    const modal = document.getElementById('imageModal');
+    modal.classList.remove('active');
+    
+    // Body scroll'unu geri aç
+    document.body.style.overflow = 'auto';
+}
+
+// ESC tuşu ile modal'ı kapat
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+        closeImageModal();
+    }
+});
+
+// Modal içeriğine tıklanınca kapanmasını engelle
+document.getElementById('modalImage').addEventListener('click', function(event) {
+    event.stopPropagation();
+});
+</script>
 @endsection 
