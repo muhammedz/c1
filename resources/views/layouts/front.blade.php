@@ -1304,6 +1304,16 @@
        }
     </style>
     
+    <!-- Dinamik Header CSS -->
+    @php
+        $headerSettings = app(\App\Services\HeaderService::class)->getHeaderSettings();
+    @endphp
+    @if($headerSettings->custom_css)
+    <style>
+        {!! $headerSettings->custom_css !!}
+    </style>
+    @endif
+    
     @yield('css')
 </head>
 
@@ -1316,6 +1326,11 @@
 
     <!-- Header Alanı -->
     @include('partials.header')
+    
+    <!-- Dinamik Header HTML -->
+    @if($headerSettings->custom_header_html)
+        {!! $headerSettings->custom_header_html !!}
+    @endif
     
     <!-- Ana İçerik -->
     <main class="overflow-x-hidden">
@@ -1344,6 +1359,50 @@
     
     <!-- Swiper JS -->
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    
+    <!-- Dinamik Header JavaScript -->
+    @if($headerSettings->sticky_header)
+    <script>
+        // Sticky Header İşlevi
+        document.addEventListener('DOMContentLoaded', function() {
+            const header = document.getElementById('header-section');
+            const headerHeight = {{ $headerSettings->header_height + 4 }};
+            
+            if (header) {
+                window.addEventListener('scroll', function() {
+                    if (window.scrollY > headerHeight) {
+                        header.classList.add('fixed', 'top-0', 'left-0', 'right-0');
+                        header.style.position = 'fixed';
+                        header.style.top = '0';
+                        header.style.left = '0';
+                        header.style.right = '0';
+                        header.style.width = '100%';
+                        header.style.zIndex = '999999';
+                        
+                        // Body'ye padding ekle
+                        document.body.style.paddingTop = headerHeight + 'px';
+                    } else {
+                        header.classList.remove('fixed', 'top-0', 'left-0', 'right-0');
+                        header.style.position = 'relative';
+                        header.style.top = 'auto';
+                        header.style.left = 'auto';
+                        header.style.right = 'auto';
+                        header.style.width = 'auto';
+                        
+                        // Body'den padding kaldır
+                        document.body.style.paddingTop = '0';
+                    }
+                });
+            }
+        });
+    </script>
+    @endif
+    
+    @if($headerSettings->additional_scripts)
+    <script>
+        {!! $headerSettings->additional_scripts !!}
+    </script>
+    @endif
     
     @yield('after_scripts')
 </body>

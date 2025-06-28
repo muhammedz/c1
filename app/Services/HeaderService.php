@@ -13,11 +13,22 @@ class HeaderService
      */
     public function getHeaderSettings()
     {
-        // Şimdilik varsayılan ayarları döndürüyoruz
-        // İleride header ayarları eklendikçe buradan döndürülebilir
+        // Gerçek header ayarlarını veritabanından al
+        $headerSettings = \App\Models\HeaderSetting::getSettings();
+        
         return (object) [
-            'logo_path' => 'images/logo-cankaya.png',
-            'header_height' => 96,
+            'logo_path' => $headerSettings->logo_path ? asset('storage/' . $headerSettings->logo_path) : asset('images/logo-cankaya.png'),
+            'secondary_logo_path' => $headerSettings->secondary_logo_path ? asset('storage/' . $headerSettings->secondary_logo_path) : null,
+            'slogan_path' => $headerSettings->slogan_path ? asset('storage/' . $headerSettings->slogan_path) : asset('images/slogan.png'),
+            'show_search_button' => $headerSettings->show_search_button,
+            'header_bg_color' => $headerSettings->header_bg_color ?: '#ffffff',
+            'header_text_color' => $headerSettings->header_text_color ?: '#00352b',
+            'header_height' => $headerSettings->header_height ?: 96,
+            'sticky_header' => $headerSettings->sticky_header,
+            'custom_css' => $headerSettings->custom_css,
+            'additional_scripts' => $headerSettings->additional_scripts,
+            'custom_header_html' => $headerSettings->custom_header_html,
+            'mobile_logo_path' => $headerSettings->mobile_logo_path ? asset('storage/' . $headerSettings->mobile_logo_path) : null,
         ];
     }
 

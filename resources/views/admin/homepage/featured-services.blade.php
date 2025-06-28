@@ -174,7 +174,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <small class="form-text text-muted">Font Awesome ikonu veya SVG kodu ekleyebilirsiniz.</small>
+                            <small class="form-text text-muted">Font Awesome ikonu, SVG kodu veya resim dosyası (PNG, JPG) yükleyebilirsiniz.</small>
                         </div>
                         
                         <div class="form-group">
@@ -228,7 +228,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <small class="form-text text-muted">Font Awesome ikonu veya SVG kodu ekleyebilirsiniz.</small>
+                            <small class="form-text text-muted">Font Awesome ikonu, SVG kodu veya resim dosyası (PNG, JPG) yükleyebilirsiniz.</small>
                         </div>
                         
                         <div class="form-group">
@@ -506,6 +506,17 @@
             display: flex;
             align-items: center;
             justify-content: center;
+        }
+        
+        .icon-preview img {
+            max-width: 48px;
+            max-height: 48px;
+            object-fit: contain;
+        }
+        
+        .icon-preview svg {
+            max-width: 48px;
+            max-height: 48px;
         }
         
         .icon-item {

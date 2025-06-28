@@ -43,15 +43,24 @@ class FeaturedService extends Model
             return '<i class="fas fa-cube"></i>';
         }
         
+        // Data URL (base64 encoded image) kontrolü
+        if (str_starts_with($this->icon, 'data:image/')) {
+            return '<img src="' . $this->icon . '" alt="İkon" style="width: 48px; height: 48px; object-fit: contain;">';
+        }
+        
         // SVG içeriği kontrolü
         if (str_starts_with($this->icon, '<svg')) {
             // SVG'deki duplicate ID'leri benzersiz hale getir
             $svgContent = $this->icon;
             
-            // katman_1 ID'sini benzersiz yap
-            if (strpos($svgContent, 'id="katman_1"') !== false) {
-                $uniqueId = 'katman_' . $this->id . '_' . uniqid();
-                $svgContent = str_replace('id="katman_1"', 'id="' . $uniqueId . '"', $svgContent);
+            // Tüm ID'leri benzersiz yap
+            $svgContent = preg_replace_callback('/id="([^"]+)"/', function($matches) {
+                return 'id="' . $matches[1] . '_' . $this->id . '_' . uniqid() . '"';
+            }, $svgContent);
+            
+            // SVG'ye stil ekle
+            if (strpos($svgContent, 'style=') === false && strpos($svgContent, '<svg') !== false) {
+                $svgContent = str_replace('<svg', '<svg style="width: 48px; height: 48px;"', $svgContent);
             }
             
             return $svgContent;

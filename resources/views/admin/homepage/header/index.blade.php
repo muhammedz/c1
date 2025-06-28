@@ -230,22 +230,53 @@
 @section('js')
     <script>
         function openFileManager(inputId) {
-            window.open('/admin/filemanagersystem/mediapicker?input_id=' + inputId, 'FileManager', 'width=900,height=600');
-            window.SetUrl = function(url, file_path) {
-                document.getElementById(inputId).value = file_path;
-                // Görsel ön izleme oluştur
-                const previewId = inputId + '_preview';
-                let previewElement = document.getElementById(previewId);
-                
-                if (!previewElement) {
-                    previewElement = document.createElement('img');
-                    previewElement.id = previewId;
-                    previewElement.className = 'preview-image';
-                    document.getElementById(inputId).parentNode.parentNode.appendChild(previewElement);
+            const relatedType = 'header_settings';
+            const relatedId = '{{ $headerSettings->id ?? "header_main" }}';
+            const type = 'image';
+            
+            // MediaPicker URL'ini doğru parametrelerle oluştur
+            const mediapickerUrl = '/admin/filemanagersystem/mediapicker?type=' + 
+                encodeURIComponent(type) + '&related_type=' + 
+                encodeURIComponent(relatedType) + '&related_id=' + 
+                encodeURIComponent(relatedId) + '&filter=all';
+            
+            // Popup pencere aç
+            const popup = window.open(mediapickerUrl, 'FileManager', 'width=900,height=600');
+            
+            // Mesaj dinleyici ekle
+            function handleMessage(event) {
+                if (event.data && event.data.type === 'mediaSelected') {
+                    // Seçilen dosyayı input'a yaz
+                    document.getElementById(inputId).value = event.data.mediaUrl;
+                    
+                    // Görsel ön izleme oluştur
+                    const previewId = inputId + '_preview';
+                    let previewElement = document.getElementById(previewId);
+                    
+                    if (!previewElement) {
+                        previewElement = document.createElement('img');
+                        previewElement.id = previewId;
+                        previewElement.className = 'preview-image';
+                        document.getElementById(inputId).parentNode.parentNode.appendChild(previewElement);
+                    }
+                    
+                    previewElement.src = event.data.mediaUrl;
+                    
+                    // Mesaj dinleyiciyi kaldır
+                    window.removeEventListener('message', handleMessage);
                 }
-                
-                previewElement.src = url;
-            };
+            }
+            
+            // Mesaj dinleyici ekle
+            window.addEventListener('message', handleMessage);
+            
+            // Popup kapatıldığında dinleyiciyi temizle
+            const checkClosed = setInterval(function() {
+                if (popup.closed) {
+                    clearInterval(checkClosed);
+                    window.removeEventListener('message', handleMessage);
+                }
+            }, 1000);
         }
         
         // Renk seçici değişiklikleri izleme

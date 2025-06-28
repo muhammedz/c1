@@ -1,14 +1,20 @@
 <!-- Header kısmı buraya gelecek -->
 <!-- #### Header Section -->
-<section id="header-section" class="header-section relative w-full h-24 pt-1 bg-white" style="z-index: 999997;">
-    <div class="head w-full h-24 bg-white relative" style="z-index: 999997;">
+@php
+    $headerSettings = app(\App\Services\HeaderService::class)->getHeaderSettings();
+@endphp
+<section id="header-section" class="header-section relative w-full pt-1" 
+    style="z-index: 999997; height: {{ $headerSettings->header_height + 4 }}px; background-color: {{ $headerSettings->header_bg_color }};">
+    <div class="head w-full relative" 
+        style="z-index: 999997; height: {{ $headerSettings->header_height }}px; background-color: {{ $headerSettings->header_bg_color }}; color: {{ $headerSettings->header_text_color }};"
+        @if($headerSettings->sticky_header) data-sticky="true" @endif>
         <nav class="container max-w-7xl h-full mx-auto px-4">
-            <div class="flex items-center justify-between h-24">
+            <div class="flex items-center justify-between" style="height: {{ $headerSettings->header_height }}px;">
                 <!-- Logo Alanı -->
-                <div class="flex items-center text-[#00352b] space-x-10 md:space-x-10 space-x-2">
+                <div class="flex items-center space-x-10 md:space-x-10 space-x-2" style="color: {{ $headerSettings->header_text_color }};">
                     <div class="text-xl font-bold">
                         <a href="/">
-                            <img src="{{ asset('images/logo-cankaya.png') }}" alt="Çankaya Belediyesi Logo" class="h-16 md:h-16 h-12">
+                            <img src="{{ $headerSettings->logo_path }}" alt="Logo" style="height: {{ min(64, $headerSettings->header_height - 20) }}px;">
                         </a>
                     </div>
                 </div>
@@ -21,7 +27,8 @@
                                 <!-- Küçük menü için sadece link göster -->
                                 <div class="relative h-full flex items-center">
                                     <a href="{{ $menu->url ?? '#' }}"
-                                        class="text-[#00352b] h-full px-3 font-semibold hover:text-gray-900 text-md flex items-center">
+                                        class="h-full px-3 font-semibold hover:opacity-80 text-md flex items-center"
+                                        style="color: {{ $headerSettings->header_text_color }};">
                                         {{ $menu->name }}
                                     </a>
                                 </div>
@@ -29,7 +36,8 @@
                                 <!-- Büyük menü için mega menü göster -->
                                 <div class="group relative h-full flex items-center">
                                     <a href="{{ $menu->url ?? '#' }}"
-                                        class="text-[#00352b] h-full px-3 font-semibold hover:text-gray-900 text-md flex items-center">
+                                        class="h-full px-3 font-semibold hover:opacity-80 text-md flex items-center"
+                                        style="color: {{ $headerSettings->header_text_color }};">
                                         {{ $menu->name }}
                                         <span class="material-icons text-sm ml-1">expand_more</span>
                                     </a>
@@ -127,22 +135,22 @@
                     @else
                         <!-- Örnek Sabit Menüler -->
                         <div class="relative h-full flex items-center">
-                            <a href="/haberler" class="text-[#00352b] h-full px-3 font-semibold hover:text-gray-900 text-md flex items-center">
+                            <a href="/haberler" class="h-full px-3 font-semibold hover:opacity-80 text-md flex items-center" style="color: {{ $headerSettings->header_text_color }};">
                                 Haberler
                             </a>
                         </div>
                         <div class="relative h-full flex items-center">
-                            <a href="/sayfalar" class="text-[#00352b] h-full px-3 font-semibold hover:text-gray-900 text-md flex items-center">
+                            <a href="/sayfalar" class="h-full px-3 font-semibold hover:opacity-80 text-md flex items-center" style="color: {{ $headerSettings->header_text_color }};">
                                 Sayfalar
                             </a>
                         </div>
                         <div class="relative h-full flex items-center">
-                            <a href="/hedefkitleler" class="text-[#00352b] h-full px-3 font-semibold hover:text-gray-900 text-md flex items-center">
+                            <a href="/hedefkitleler" class="h-full px-3 font-semibold hover:opacity-80 text-md flex items-center" style="color: {{ $headerSettings->header_text_color }};">
                                 Hedef Kitleler
                             </a>
                         </div>
                         <div class="relative h-full flex items-center">
-                            <a href="/iletisim" class="text-[#00352b] h-full px-3 font-semibold hover:text-gray-900 text-md flex items-center">
+                            <a href="/iletisim" class="h-full px-3 font-semibold hover:opacity-80 text-md flex items-center" style="color: {{ $headerSettings->header_text_color }};">
                                 İletişim
                             </a>
                         </div>
@@ -150,7 +158,8 @@
                         <!-- Kurumsal Mega Menü -->
                         <div class="group relative h-full flex items-center">
                             <a href="#"
-                                class="text-[#00352b] h-full px-3 font-semibold hover:text-gray-900 text-md flex items-center">
+                                class="h-full px-3 font-semibold hover:opacity-80 text-md flex items-center"
+                                style="color: {{ $headerSettings->header_text_color }};">
                                 Menü Adı
                                 <i class="fas fa-chevron-down text-sm ml-1"></i>
                             </a>
@@ -195,21 +204,25 @@
                 <!-- Arama İkonu, Slogan ve Atatürk Simgesi -->
                 <div class="flex items-center md:space-x-4 space-x-2">
                     <!-- Arama butonu - sadece desktop'ta görünür -->
+                    @if($headerSettings->show_search_button)
                     <button id="searchButton" class="hidden lg:flex w-11 h-11 bg-[#007b32] rounded-lg items-center justify-center text-white shadow-md hover:bg-[#00352b] hover:scale-105 transition-all" aria-label="Arama modalını aç">
                         <i class="fas fa-search text-white text-xl"></i>
                     </button>
+                    @endif
                     
                     <!-- Slogan - sadece desktop'ta görünür -->
-                    <div class="text-md text-[#00352b] font-bold hidden lg:block">
-                        <img src="{{ asset('images/slogan.png') }}" alt="Çankaya Belediyesi Slogan" class="h-12">
+                    <div class="font-bold hidden lg:block" style="color: {{ $headerSettings->header_text_color }};">
+                        <img src="{{ $headerSettings->slogan_path }}" alt="Slogan" style="height: {{ min(48, $headerSettings->header_height - 30) }}px;">
                     </div>
                     
                     <!-- Mobil + Tablet Arama ve Menü Butonları - desktop hariç her yerde görünür -->
                     <div class="mobile-header-controls mobile-header-controls-only flex items-center space-x-3">
                         <!-- Mobil Arama Butonu -->
+                        @if($headerSettings->show_search_button)
                         <button id="mobileSearchButton" class="w-11 h-11 bg-[#007b32] rounded-lg flex items-center justify-center text-white shadow-md hover:bg-[#00352b] hover:scale-105 transition-all" aria-label="Arama modalını aç">
                             <i class="fas fa-search text-white text-xl"></i>
                         </button>
+                        @endif
                         
                         <!-- Mobil Menü Butonu -->
                         <button id="mobileMenuButton" aria-label="Mobil menüyü aç">

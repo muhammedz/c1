@@ -266,7 +266,7 @@ function initIconPicker() {
         }
     });
     
-    // SVG yükleme özelliğini kurulum
+    // Dosya yükleme özelliğini kurulum (SVG ve resim)
     setupSvgUpload();
 
     // Sayfa yüklendiğinde mevcut ikonları göster
@@ -275,7 +275,10 @@ function initIconPicker() {
         var previewElement = $(this).closest('.icon-picker-wrapper').find('.icon-preview span');
         
         if (iconValue) {
-            if (iconValue.startsWith('<svg') || iconValue.includes('<?xml')) {
+            if (iconValue.startsWith('data:image/')) {
+                // Base64 encoded resim
+                previewElement.html('<img src="' + iconValue + '" alt="İkon" style="width: 48px; height: 48px; object-fit: contain;">');
+            } else if (iconValue.startsWith('<svg') || iconValue.includes('<?xml')) {
                 // SVG içeriği - önce XML deklarasyonlarını temizle
                 const cleanedSvg = sanitizeSvg(iconValue);
                 $(this).val(cleanedSvg); // İçeriği temizle ve güncelle
@@ -453,54 +456,86 @@ function renderIconsGrid(iconType) {
 
 // SVG yükleme işlevini kurma
 function setupSvgUpload() {
-    // Icon Picker modal'a SVG yükleme bölümü ekle
-    if (!document.getElementById('svg-upload-section')) {
-        const svgUploadHTML = `
-            <div id="svg-upload-section" class="mt-4 border-top pt-3">
-                <h6>Özel SVG İkon Yükle</h6>
-                <div class="custom-file mb-2">
-                    <input type="file" class="custom-file-input" id="svg-file-upload" accept=".svg">
-                    <label class="custom-file-label" for="svg-file-upload">SVG dosyası seçin...</label>
+    // Icon Picker modal'a dosya yükleme bölümü ekle
+    if (!document.getElementById('file-upload-section')) {
+        const fileUploadHTML = `
+            <div id="file-upload-section" class="mt-4 border-top pt-3">
+                <h6>Özel İkon Yükle</h6>
+                <div class="mb-3">
+                    <div class="btn-group btn-group-toggle w-100" data-toggle="buttons">
+                        <label class="btn btn-outline-primary active">
+                            <input type="radio" name="fileType" value="svg" checked> SVG Dosyası
+                        </label>
+                        <label class="btn btn-outline-primary">
+                            <input type="radio" name="fileType" value="image"> PNG/JPG Resmi
+                        </label>
+                    </div>
                 </div>
-                <div id="svg-preview-container" class="mt-2 text-center d-none">
-                    <div class="mb-2" id="svg-preview"></div>
-                    <button type="button" class="btn btn-sm btn-primary" id="use-svg-button">Bu SVG'yi Kullan</button>
+                <div class="custom-file mb-2">
+                    <input type="file" class="custom-file-input" id="icon-file-upload" accept=".svg">
+                    <label class="custom-file-label" for="icon-file-upload">Dosya seçin...</label>
+                </div>
+                <div id="file-preview-container" class="mt-2 text-center d-none">
+                    <div class="mb-2" id="file-preview"></div>
+                    <button type="button" class="btn btn-sm btn-primary" id="use-file-button">Bu İkonu Kullan</button>
                 </div>
             </div>
         `;
         
         const modalBody = document.querySelector('#iconPickerModal .modal-body');
         if (modalBody) {
-            modalBody.insertAdjacentHTML('beforeend', svgUploadHTML);
+            modalBody.insertAdjacentHTML('beforeend', fileUploadHTML);
             
-            // SVG dosya yükleme olayını dinle
-            const svgFileInput = document.getElementById('svg-file-upload');
-            if (svgFileInput) {
-                svgFileInput.addEventListener('change', handleSvgFileUpload);
+            // Dosya tipi değiştiğinde accept attributesunu güncelle
+            document.querySelectorAll('input[name="fileType"]').forEach(function(radio) {
+                radio.addEventListener('change', function() {
+                    const fileInput = document.getElementById('icon-file-upload');
+                    const label = document.querySelector('label[for="icon-file-upload"]');
+                    
+                    if (this.value === 'svg') {
+                        fileInput.accept = '.svg';
+                        label.textContent = 'SVG dosyası seçin...';
+                    } else if (this.value === 'image') {
+                        fileInput.accept = '.png,.jpg,.jpeg';
+                        label.textContent = 'PNG/JPG dosyası seçin...';
+                    }
+                    
+                    // Mevcut seçimi temizle
+                    fileInput.value = '';
+                    document.getElementById('file-preview-container').classList.add('d-none');
+                });
+            });
+            
+            // Dosya yükleme olayını dinle
+            const fileInput = document.getElementById('icon-file-upload');
+            if (fileInput) {
+                fileInput.addEventListener('change', handleFileUpload);
                 
                 // Custom-file input için dosya adı gösterim özelliği
-                svgFileInput.addEventListener('change', function(e) {
-                    const fileName = e.target.files[0]?.name || 'SVG dosyası seçin...';
+                fileInput.addEventListener('change', function(e) {
+                    const fileName = e.target.files[0]?.name || 'Dosya seçin...';
                     const label = e.target.nextElementSibling;
                     if (label) {
                         label.textContent = fileName;
                     }
                 });
                 
-                // SVG kullanma butonu olayını dinle
-                document.getElementById('use-svg-button')?.addEventListener('click', function() {
-                    const svgContent = document.getElementById('svg-preview')?.innerHTML;
-                    if (svgContent && activeIconInput) {
-                        // SVG içeriğini tekrar sanitize et (preview içerisinden alınıyor olsa bile)
-                        const finalSvgContent = sanitizeSvg(svgContent);
-                        activeIconInput.value = finalSvgContent;
+                // Dosya kullanma butonu olayını dinle
+                document.getElementById('use-file-button')?.addEventListener('click', function() {
+                    const fileContent = document.getElementById('file-preview')?.innerHTML;
+                    const fileData = document.getElementById('file-preview')?.dataset.fileContent;
+                    
+                    if ((fileContent || fileData) && activeIconInput) {
+                        // SVG ise içeriği, resim ise data URL'i kullan
+                        const finalContent = fileData || fileContent;
+                        activeIconInput.value = finalContent;
                         
                         // Önizleme ikonunu güncelle
                         const wrapper = activeIconInput.closest('.icon-picker-wrapper');
                         const previewIcon = wrapper.querySelector('.icon-preview span');
                         
                         if (previewIcon) {
-                            previewIcon.innerHTML = finalSvgContent;
+                            previewIcon.innerHTML = fileContent; // Görsel önizleme için HTML içeriği kullan
                         }
                         
                         // Change event tetikle
@@ -516,10 +551,15 @@ function setupSvgUpload() {
     }
 }
 
-// SVG Dosya yükleme işleyicisi
-function handleSvgFileUpload(e) {
+// Dosya yükleme işleyicisi (SVG ve Resim)
+function handleFileUpload(e) {
     const file = e.target.files[0];
-    if (file && file.type === 'image/svg+xml') {
+    if (!file) return;
+    
+    const selectedFileType = document.querySelector('input[name="fileType"]:checked')?.value;
+    
+    if (selectedFileType === 'svg' && file.type === 'image/svg+xml') {
+        // SVG dosya işleme
         const reader = new FileReader();
         
         reader.onload = function(event) {
@@ -529,15 +569,16 @@ function handleSvgFileUpload(e) {
             const sanitizedSvg = sanitizeSvg(svgContent);
             
             // Önizleme konteynerini göster
-            const previewContainer = document.getElementById('svg-preview-container');
-            const svgPreview = document.getElementById('svg-preview');
+            const previewContainer = document.getElementById('file-preview-container');
+            const filePreview = document.getElementById('file-preview');
             
-            if (previewContainer && svgPreview) {
+            if (previewContainer && filePreview) {
                 previewContainer.classList.remove('d-none');
-                svgPreview.innerHTML = sanitizedSvg;
+                filePreview.innerHTML = sanitizedSvg;
+                filePreview.dataset.fileContent = sanitizedSvg; // Gerçek içeriği data attribute'te sakla
                 
                 // SVG boyutlandırma ve renk düzenleme
-                const svgElement = svgPreview.querySelector('svg');
+                const svgElement = filePreview.querySelector('svg');
                 if (svgElement) {
                     // Boyutlandırma
                     svgElement.setAttribute('width', '48');
@@ -566,9 +607,38 @@ function handleSvgFileUpload(e) {
         };
         
         reader.readAsText(file);
+        
+    } else if (selectedFileType === 'image' && (file.type === 'image/png' || file.type === 'image/jpeg' || file.type === 'image/jpg')) {
+        // Resim dosya işleme
+        const reader = new FileReader();
+        
+        reader.onload = function(event) {
+            const imageDataUrl = event.target.result;
+            
+            // Önizleme konteynerini göster
+            const previewContainer = document.getElementById('file-preview-container');
+            const filePreview = document.getElementById('file-preview');
+            
+            if (previewContainer && filePreview) {
+                previewContainer.classList.remove('d-none');
+                
+                // Resmi önizleme için img elementi oluştur
+                const imgElement = `<img src="${imageDataUrl}" alt="Yüklenen ikon" style="width: 48px; height: 48px; object-fit: contain;">`;
+                filePreview.innerHTML = imgElement;
+                filePreview.dataset.fileContent = imageDataUrl; // Data URL'i sakla
+            }
+        };
+        
+        reader.readAsDataURL(file);
+        
     } else {
-        alert('Lütfen geçerli bir SVG dosyası seçin.');
+        // Hatalı dosya tipi
+        const expectedTypes = selectedFileType === 'svg' ? 'SVG' : 'PNG/JPG';
+        alert(`Lütfen geçerli bir ${expectedTypes} dosyası seçin.`);
         e.target.value = '';
+        
+        // Önizleme konteynerini gizle
+        document.getElementById('file-preview-container').classList.add('d-none');
     }
 }
 
@@ -577,17 +647,33 @@ function sanitizeSvg(svgContent) {
     // XML Deklarasyonunu kaldır
     let sanitized = svgContent.replace(/<\?xml[^>]*\?>/gi, '');
     
+    // DOCTYPE deklarasyonlarını kaldır
+    sanitized = sanitized.replace(/<!DOCTYPE[^>]*>/gi, '');
+    
     // SVG tag'ini içeren kısmı bul
-    const svgMatch = sanitized.match(/<svg[\s\S]*<\/svg>/i);
+    const svgMatch = sanitized.match(/<svg[\s\S]*?<\/svg>/i);
     if (svgMatch) {
         sanitized = svgMatch[0];
     }
     
-    // Basit bir sanitizasyon: script tag'lerini kaldır
-    sanitized = sanitized.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
+    // Güvenlik: Zararlı elementleri kaldır
+    const dangerousElements = ['script', 'object', 'embed', 'iframe', 'link'];
+    dangerousElements.forEach(element => {
+        const regex = new RegExp(`<${element}\\b[^<]*(?:(?!<\\/${element}>)<[^<]*)*<\\/${element}>`, 'gi');
+        sanitized = sanitized.replace(regex, '');
+    });
     
-    // onclick, onload gibi event handler'ları kaldır
+    // Event handler'ları kaldır
     sanitized = sanitized.replace(/\son\w+\s*=\s*["'][^"']*["']/gi, '');
+    
+    // href attribute'lerinde javascript: protokolünü kaldır
+    sanitized = sanitized.replace(/href\s*=\s*["']javascript:[^"']*["']/gi, '');
+    
+    // style attribute'lerinde expression() kullanımını kaldır
+    sanitized = sanitized.replace(/style\s*=\s*["'][^"']*expression\([^"']*\)[^"']*["']/gi, '');
+    
+    // Boş satırları ve fazla boşlukları temizle
+    sanitized = sanitized.replace(/\s+/g, ' ').trim();
     
     return sanitized;
 } 
