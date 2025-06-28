@@ -21,7 +21,7 @@
             @endforeach
 
             <!-- İLETİŞİM VE LOGO -->
-            <div class="text-center">
+            <div class="text-center pt-4">
                 <!-- Logo -->
                 <div class="flex justify-center items-center mb-4">
                     @if($footerSettings && $footerSettings->logo)
