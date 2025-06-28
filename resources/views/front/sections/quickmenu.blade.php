@@ -170,7 +170,7 @@
     </div>
 
     <!-- Mobile Menu -->
-    <div class="md:hidden">
+    <div class="mobile-menu-container md:hidden">
         <div class="flex flex-col divide-y divide-white/20">
             @if(isset($quickMenuCategories) && $quickMenuCategories->count() > 0)
                 @foreach($quickMenuCategories->take(4) as $category)
@@ -519,84 +519,84 @@
             transform: rotate(180deg) !important;
         }
         
-        /* Mobil menü tıklanabilirlik için - daha spesifik seçici */
-        #quick-menu-section .md\\:hidden .group > a {
+        /* Mobil menü tıklanabilirlik için - W3C uyumlu seçici */
+        #quick-menu-section .mobile-menu-container .group > a {
             cursor: pointer !important;
             user-select: none !important;
             -webkit-tap-highlight-color: rgba(0,0,0,0.1) !important;
             transition: all 0.3s ease !important;
         }
         
-        /* Normal durumda yazı renklerini belirle - daha spesifik seçici */
-        #quick-menu-section .md\\:hidden .group > a .font-semibold {
+        /* Normal durumda yazı renklerini belirle - W3C uyumlu seçici */
+        #quick-menu-section .mobile-menu-container .group > a .font-semibold {
             color: white !important;
             transition: color 0.3s ease !important;
         }
         
-        #quick-menu-section .md\\:hidden .group > a .text-white\/60,
-        #quick-menu-section .md\\:hidden .group > a .text-xs {
+        #quick-menu-section .mobile-menu-container .group > a .text-white\/60,
+        #quick-menu-section .mobile-menu-container .group > a .text-xs {
             color: rgba(255, 255, 255, 0.6) !important;
             transition: color 0.3s ease !important;
         }
         
         /* Açıklama yazıları için özel seçici - text-white/60 sınıfı için */
-        #quick-menu-section .md\\:hidden .group > a span.text-white\/60 {
+        #quick-menu-section .mobile-menu-container .group > a span.text-white\/60 {
             color: rgba(255, 255, 255, 0.6) !important;
             transition: color 0.3s ease !important;
         }
         
-        #quick-menu-section .md\\:hidden .group > a .group-hover\:text-black {
+        #quick-menu-section .mobile-menu-container .group > a .group-hover\:text-black {
             color: rgba(255, 255, 255, 0.6) !important;
             transition: color 0.3s ease !important;
         }
         
-        /* Sadece gerçek hover destekleyen cihazlarda hover efekti - spesifik seçici */
+        /* Sadece gerçek hover destekleyen cihazlarda hover efekti - W3C uyumlu seçici */
         @media (hover: hover) and (pointer: fine) {
-            #quick-menu-section .md\\:hidden .group > a:hover {
+            #quick-menu-section .mobile-menu-container .group > a:hover {
                 background-color: white !important;
                 border-radius: 8px !important;
             }
             
-            #quick-menu-section .md\\:hidden .group > a:hover .font-semibold {
+            #quick-menu-section .mobile-menu-container .group > a:hover .font-semibold {
                 color: #333 !important;
             }
             
-            #quick-menu-section .md\\:hidden .group > a:hover .text-white\/60,
-            #quick-menu-section .md\\:hidden .group > a:hover .text-xs {
+            #quick-menu-section .mobile-menu-container .group > a:hover .text-white\/60,
+            #quick-menu-section .mobile-menu-container .group > a:hover .text-xs {
                 color: #666 !important;
             }
             
             /* Açıklama yazıları için özel hover seçici */
-            #quick-menu-section .md\\:hidden .group > a:hover span.text-white\/60 {
+            #quick-menu-section .mobile-menu-container .group > a:hover span.text-white\/60 {
                 color: #666 !important;
             }
             
-            #quick-menu-section .md\\:hidden .group > a:hover .group-hover\:text-black {
+            #quick-menu-section .mobile-menu-container .group > a:hover .group-hover\:text-black {
                 color: #333 !important;
             }
         }
         
-        /* Touch cihazlarda sadece active efekti - spesifik seçici */
-        #quick-menu-section .md\\:hidden .group > a:active {
+        /* Touch cihazlarda sadece active efekti - W3C uyumlu seçici */
+        #quick-menu-section .mobile-menu-container .group > a:active {
             background-color: white !important;
             border-radius: 8px !important;
         }
         
-        #quick-menu-section .md\\:hidden .group > a:active .font-semibold {
+        #quick-menu-section .mobile-menu-container .group > a:active .font-semibold {
             color: #333 !important;
         }
         
-        #quick-menu-section .md\\:hidden .group > a:active .text-white\/60,
-        #quick-menu-section .md\\:hidden .group > a:active .text-xs {
+        #quick-menu-section .mobile-menu-container .group > a:active .text-white\/60,
+        #quick-menu-section .mobile-menu-container .group > a:active .text-xs {
             color: #666 !important;
         }
         
         /* Açıklama yazıları için özel active seçici */
-        #quick-menu-section .md\\:hidden .group > a:active span.text-white\/60 {
+        #quick-menu-section .mobile-menu-container .group > a:active span.text-white\/60 {
             color: #666 !important;
         }
         
-        #quick-menu-section .md\\:hidden .group > a:active .group-hover\:text-black {
+        #quick-menu-section .mobile-menu-container .group > a:active .group-hover\:text-black {
             color: #333 !important;
         }
         
@@ -605,13 +605,13 @@
             display: none !important;
         }
         
-        /* Mobilde tüm hover efektlerini devre dışı bırak - spesifik seçici */
+        /* Mobilde tüm hover efektlerini devre dışı bırak - W3C uyumlu seçici */
         @media (hover: none) and (pointer: coarse) {
-            #quick-menu-section .md\\:hidden .group > a:hover {
+            #quick-menu-section .mobile-menu-container .group > a:hover {
                 background-color: transparent !important;
             }
             
-            #quick-menu-section .md\\:hidden .group > a:hover .group-hover\:text-black {
+            #quick-menu-section .mobile-menu-container .group > a:hover .group-hover\:text-black {
                 color: rgba(255, 255, 255, 0.6) !important;
             }
         }
@@ -628,7 +628,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Mobile menu functionality - Daha spesifik seçici kullan
     const quickMenuSection = document.getElementById('quick-menu-section');
     if (quickMenuSection) {
-        const mobileContainer = quickMenuSection.querySelector('.md\\:hidden');
+        const mobileContainer = quickMenuSection.querySelector('.mobile-menu-container');
         if (mobileContainer) {
             const mobileGroups = mobileContainer.querySelectorAll('.group');
             

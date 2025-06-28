@@ -2,7 +2,7 @@
 <section id="hero-slider-section" class="hero-slider-section relative w-full overflow-hidden" style="margin-top: -100px;">
     <h2 class="sr-only">Ana Sayfa Slider</h2>
     <!-- Mobil Görsel -->
-    <div class="block md:hidden w-full bg-white" style="margin-top: 0;">
+    <div class="mobile-slider-section block md:hidden w-full bg-white" style="margin-top: 0;">
         <div class="w-full">
             <a href="/baskan" class="block w-full">
                 <img src="https://cankaya.bel.tr/uploads/images/cankayamobil_1749978637_aJd14YaH.jpg" 

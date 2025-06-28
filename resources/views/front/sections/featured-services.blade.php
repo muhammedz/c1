@@ -21,7 +21,7 @@
     </div>
 
     <!-- Mobil: 3x3 Statik Grid -->
-    <div class="mobile-services-grid md:hidden">
+            <div class="mobile-services-grid mobile-services-container md:hidden">
         @forelse($featuredServices as $service)
         <div class="service-item">
             @if($service->url)
