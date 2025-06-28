@@ -11,8 +11,6 @@ class FooterSetting extends Model
 
     protected $fillable = [
         'logo',
-        'company_name',
-        'company_subtitle',
         'address_line1',
         'address_line2',
         'contact_center_title',

@@ -55,31 +55,7 @@
                             @enderror
                         </div>
 
-                        <!-- Şirket Bilgileri -->
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="company_name">Şirket Adı</label>
-                                    <input type="text" class="form-control @error('company_name') is-invalid @enderror" 
-                                           id="company_name" name="company_name" 
-                                           value="{{ old('company_name', $settings->company_name) }}">
-                                    @error('company_name')
-                                        <span class="invalid-feedback">{{ $message }}</span>
-                                    @enderror
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="company_subtitle">Alt Başlık</label>
-                                    <input type="text" class="form-control @error('company_subtitle') is-invalid @enderror" 
-                                           id="company_subtitle" name="company_subtitle" 
-                                           value="{{ old('company_subtitle', $settings->company_subtitle) }}">
-                                    @error('company_subtitle')
-                                        <span class="invalid-feedback">{{ $message }}</span>
-                                    @enderror
-                                </div>
-                            </div>
-                        </div>
+
 
                         <!-- Adres Bilgileri -->
                         <div class="row">

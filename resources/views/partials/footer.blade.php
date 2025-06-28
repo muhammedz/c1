@@ -23,8 +23,8 @@
             <!-- İLETİŞİM VE LOGO -->
             <div class="text-center">
                 <!-- Logo -->
-                <div class="mb-6">
-                    <div class="flex justify-center items-center mb-4">
+                <div>
+                    <div class="flex justify-center items-center">
                         @if($footerSettings && $footerSettings->logo)
                             <img src="{{ $footerSettings->logo_url }}" alt="{{ $footerSettings->company_name }}" class="w-48 h-48 object-contain">
                         @else
@@ -35,25 +35,10 @@
                             </div>
                         @endif
                     </div>
-                    @if($footerSettings)
-                        @if($footerSettings->company_name)
-                            <h4 class="text-lg font-bold text-white">{{ $footerSettings->company_name }}</h4>
-                        @else
-                            <h4 class="text-lg font-bold text-white">Çankaya</h4>
-                        @endif
-                        @if($footerSettings->company_subtitle)
-                            <p class="text-sm text-white/80">{{ $footerSettings->company_subtitle }}</p>
-                        @else
-                            <p class="text-sm text-white/80">BELEDİYESİ</p>
-                        @endif
-                    @else
-                        <h4 class="text-lg font-bold text-white">Çankaya</h4>
-                        <p class="text-sm text-white/80">BELEDİYESİ</p>
-                    @endif
                 </div>
 
                 <!-- İletişim Bilgileri -->
-                <div class="text-sm space-y-3 mb-6">
+                <div class="text-sm space-y-3 mb-6 mt-2">
                     @if($footerSettings)
                         @if($footerSettings->address_line1 || $footerSettings->address_line2)
                         <div>

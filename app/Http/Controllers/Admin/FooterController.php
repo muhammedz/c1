@@ -21,8 +21,6 @@ class FooterController extends Controller
     public function updateSettings(Request $request)
     {
         $request->validate([
-            'company_name' => 'nullable|string|max:255',
-            'company_subtitle' => 'nullable|string|max:255',
             'address_line1' => 'nullable|string|max:255',
             'address_line2' => 'nullable|string|max:255',
             'contact_center_title' => 'nullable|string|max:255',
