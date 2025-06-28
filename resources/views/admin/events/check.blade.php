@@ -221,30 +221,44 @@
                                 <div class="card-body">
                                     <div class="row">
                                         <div class="col-md-6">
-                                            <h6 class="text-info">HTTP Proxy'ler:</h6>
+                                            <h6 class="text-info">Premium HTTP Proxy'ler (Kimlik Doğrulamalı):</h6>
                                             <div class="proxy-list">
-                                                <button type="button" class="btn btn-sm btn-outline-primary mb-1 proxy-btn" data-proxy="http://47.74.152.29:8888">47.74.152.29:8888</button>
-                                                <button type="button" class="btn btn-sm btn-outline-primary mb-1 proxy-btn" data-proxy="http://103.149.162.194:80">103.149.162.194:80</button>
-                                                <button type="button" class="btn btn-sm btn-outline-primary mb-1 proxy-btn" data-proxy="http://185.32.6.129:8090">185.32.6.129:8090</button>
-                                                <button type="button" class="btn btn-sm btn-outline-primary mb-1 proxy-btn" data-proxy="http://103.167.135.110:80">103.167.135.110:80</button>
-                                                <button type="button" class="btn btn-sm btn-outline-primary mb-1 proxy-btn" data-proxy="http://91.107.208.14:8080">91.107.208.14:8080</button>
+                                                <button type="button" class="btn btn-sm btn-outline-primary mb-1 proxy-btn" data-proxy="http://198.23.239.134:6540" data-user="btlxqsjo" data-pass="3zvzih1cif58" title="Premium - Auth">198.23.239.134:6540 🔐</button>
+                                                <button type="button" class="btn btn-sm btn-outline-primary mb-1 proxy-btn" data-proxy="http://207.244.217.165:6712" data-user="btlxqsjo" data-pass="3zvzih1cif58" title="Premium - Auth">207.244.217.165:6712 🔐</button>
+                                                <button type="button" class="btn btn-sm btn-outline-primary mb-1 proxy-btn" data-proxy="http://107.172.163.27:6543" data-user="btlxqsjo" data-pass="3zvzih1cif58" title="Premium - Auth">107.172.163.27:6543 🔐</button>
+                                                <button type="button" class="btn btn-sm btn-outline-primary mb-1 proxy-btn" data-proxy="http://23.94.138.75:6349" data-user="btlxqsjo" data-pass="3zvzih1cif58" title="Premium - Auth">23.94.138.75:6349 🔐</button>
+                                                <button type="button" class="btn btn-sm btn-outline-primary mb-1 proxy-btn" data-proxy="http://216.10.27.159:6837" data-user="btlxqsjo" data-pass="3zvzih1cif58" title="Premium - Auth">216.10.27.159:6837 🔐</button>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
-                                            <h6 class="text-success">HTTPS Proxy'ler:</h6>
+                                            <h6 class="text-success">Premium HTTPS Proxy'ler (Kimlik Doğrulamalı):</h6>
                                             <div class="proxy-list">
-                                                <button type="button" class="btn btn-sm btn-outline-success mb-1 proxy-btn" data-proxy="https://103.149.162.195:80">103.149.162.195:80</button>
-                                                <button type="button" class="btn btn-sm btn-outline-success mb-1 proxy-btn" data-proxy="https://185.32.6.130:8090">185.32.6.130:8090</button>
-                                                <button type="button" class="btn btn-sm btn-outline-success mb-1 proxy-btn" data-proxy="https://47.74.152.30:8888">47.74.152.30:8888</button>
-                                                <button type="button" class="btn btn-sm btn-outline-success mb-1 proxy-btn" data-proxy="https://103.167.135.111:80">103.167.135.111:80</button>
-                                                <button type="button" class="btn btn-sm btn-outline-success mb-1 proxy-btn" data-proxy="https://91.107.208.15:8080">91.107.208.15:8080</button>
+                                                <button type="button" class="btn btn-sm btn-outline-success mb-1 proxy-btn" data-proxy="https://136.0.207.84:6661" data-user="btlxqsjo" data-pass="3zvzih1cif58" title="Premium - Auth">136.0.207.84:6661 🔐</button>
+                                                <button type="button" class="btn btn-sm btn-outline-success mb-1 proxy-btn" data-proxy="https://64.64.118.149:6732" data-user="btlxqsjo" data-pass="3zvzih1cif58" title="Premium - Auth">64.64.118.149:6732 🔐</button>
+                                                <button type="button" class="btn btn-sm btn-outline-success mb-1 proxy-btn" data-proxy="https://142.147.128.93:6593" data-user="btlxqsjo" data-pass="3zvzih1cif58" title="Premium - Auth">142.147.128.93:6593 🔐</button>
+                                                <button type="button" class="btn btn-sm btn-outline-success mb-1 proxy-btn" data-proxy="https://104.239.105.125:6655" data-user="btlxqsjo" data-pass="3zvzih1cif58" title="Premium - Auth">104.239.105.125:6655 🔐</button>
+                                                <button type="button" class="btn btn-sm btn-outline-success mb-1 proxy-btn" data-proxy="https://173.0.9.70:5653" data-user="btlxqsjo" data-pass="3zvzih1cif58" title="Premium - Auth">173.0.9.70:5653 🔐</button>
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="alert alert-warning mt-3 mb-0">
-                                        <i class="fas fa-exclamation-triangle mr-2"></i>
-                                        <strong>Uyarı:</strong> Ücretsiz proxy'ler yavaş olabilir ve her zaman çalışmayabilir. 
-                                        Güvenlik için hassas verilerde kullanmayın.
+                                    <div class="row mt-3">
+                                        <div class="col-md-12">
+                                            <button type="button" class="btn btn-sm btn-warning mr-2" id="random_proxy_btn">
+                                                <i class="fas fa-random"></i> Rastgele Premium Proxy Seç
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-info mr-2" id="test_proxy_btn">
+                                                <i class="fas fa-check-circle"></i> Seçili Proxy'yi Test Et
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-success" id="test_all_proxies_btn">
+                                                <i class="fas fa-search"></i> Çalışan Proxy Bul
+                                            </button>
+                                            <div id="proxy_test_result" class="mt-2" style="display: none;"></div>
+                                        </div>
+                                    </div>
+                                    <div class="alert alert-info mt-3 mb-0">
+                                        <i class="fas fa-shield-alt mr-2"></i>
+                                        <strong>Premium Proxy'ler:</strong> Bu proxy'ler kimlik doğrulamalı ve yüksek performanslıdır. 
+                                        Güvenli bağlantı için kullanıcı adı/şifre otomatik doldurulur.
                                     </div>
                                 </div>
                             </div>
@@ -455,7 +469,7 @@
                     limit: 1 // Sadece 1 etkinlik getir
                 },
                 dataType: 'json', // JSON yanıt bekliyoruz
-                timeout: 30000, // 30 saniyelik timeout
+                timeout: 60000, // 60 saniyelik timeout
                 beforeSend: function(xhr) {
                     console.log('AJAX isteği gönderiliyor - ' + new Date().toLocaleTimeString());
                 },
@@ -1009,34 +1023,272 @@
         // Proxy butonlarına tıklama
         $('.proxy-btn').click(function() {
             var proxyUrl = $(this).data('proxy');
+            var proxyUser = $(this).data('user');
+            var proxyPass = $(this).data('pass');
+            
             $('#proxy_url').val(proxyUrl);
+            if (proxyUser && proxyPass) {
+                $('#proxy_username').val(proxyUser);
+                $('#proxy_password').val(proxyPass);
+            }
             
             // Butonu vurgula
             $('.proxy-btn').removeClass('btn-primary btn-success').addClass('btn-outline-primary');
             $(this).removeClass('btn-outline-primary btn-outline-success').addClass(
                 proxyUrl.startsWith('https') ? 'btn-success' : 'btn-primary'
             );
+            
+            // Bilgi mesajı
+            toastr.success('Premium proxy seçildi: ' + proxyUrl);
         });
         
-        // Ücretsiz proxy doldur butonu
+        // Premium proxy doldur butonu
         $('#fill_free_proxy').click(function() {
-            var freeProxies = [
-                'http://47.74.152.29:8888',
-                'http://103.149.162.194:80',
-                'http://185.32.6.129:8090',
-                'https://103.149.162.195:80',
-                'https://185.32.6.130:8090'
+            var premiumProxies = [
+                'http://198.23.239.134:6540',
+                'http://207.244.217.165:6712',
+                'http://107.172.163.27:6543',
+                'http://23.94.138.75:6349',
+                'http://216.10.27.159:6837',
+                'https://136.0.207.84:6661',
+                'https://64.64.118.149:6732',
+                'https://142.147.128.93:6593',
+                'https://104.239.105.125:6655',
+                'https://173.0.9.70:5653'
             ];
             
             // Rastgele bir proxy seç
-            var randomProxy = freeProxies[Math.floor(Math.random() * freeProxies.length)];
+            var randomProxy = premiumProxies[Math.floor(Math.random() * premiumProxies.length)];
             $('#proxy_url').val(randomProxy);
+            $('#proxy_username').val('btlxqsjo');
+            $('#proxy_password').val('3zvzih1cif58');
             
             // Bilgi mesajı göster
             $(this).html('<i class="fas fa-check text-success"></i> Dolduruldu').prop('disabled', true);
             setTimeout(function() {
-                $('#fill_free_proxy').html('<i class="fas fa-magic"></i> Ücretsiz Proxy Doldur').prop('disabled', false);
+                $('#fill_free_proxy').html('<i class="fas fa-magic"></i> Premium Proxy Doldur').prop('disabled', false);
             }, 2000);
+        });
+
+        // Rastgele proxy seçme butonu
+        $('#random_proxy_btn').click(function() {
+            var allProxies = [
+                'http://198.23.239.134:6540',
+                'http://207.244.217.165:6712',
+                'http://107.172.163.27:6543',
+                'http://23.94.138.75:6349',
+                'http://216.10.27.159:6837',
+                'https://136.0.207.84:6661',
+                'https://64.64.118.149:6732',
+                'https://142.147.128.93:6593',
+                'https://104.239.105.125:6655',
+                'https://173.0.9.70:5653'
+            ];
+            
+            var randomProxy = allProxies[Math.floor(Math.random() * allProxies.length)];
+            $('#proxy_url').val(randomProxy);
+            $('#proxy_username').val('btlxqsjo');
+            $('#proxy_password').val('3zvzih1cif58');
+            
+            // Tüm butonları resetle
+            $('.proxy-btn').removeClass('btn-primary btn-success').addClass(function() {
+                return $(this).data('proxy').startsWith('https') ? 'btn-outline-success' : 'btn-outline-primary';
+            });
+            
+            // Seçilen proxy'nin butonunu vurgula
+            $('.proxy-btn[data-proxy="' + randomProxy + '"]').removeClass('btn-outline-primary btn-outline-success').addClass(
+                randomProxy.startsWith('https') ? 'btn-success' : 'btn-primary'
+            );
+            
+            $(this).html('<i class="fas fa-check text-success"></i> Seçildi').prop('disabled', true);
+            setTimeout(function() {
+                $('#random_proxy_btn').html('<i class="fas fa-random"></i> Rastgele Premium Proxy Seç').prop('disabled', false);
+            }, 1500);
+        });
+
+        // Proxy test etme butonu
+        $('#test_proxy_btn').click(function() {
+            var proxyUrl = $('#proxy_url').val();
+            var proxyUsername = $('#proxy_username').val();
+            var proxyPassword = $('#proxy_password').val();
+            
+            if (!proxyUrl) {
+                $('#proxy_test_result').html(
+                    '<div class="alert alert-warning"><i class="fas fa-exclamation-triangle mr-2"></i>Lütfen önce bir proxy adresi girin.</div>'
+                ).show();
+                return;
+            }
+            
+            var $btn = $(this);
+            $btn.html('<i class="fas fa-spinner fa-spin"></i> Test Ediliyor...').prop('disabled', true);
+            $('#proxy_test_result').html(
+                '<div class="alert alert-info"><i class="fas fa-clock mr-2"></i>Proxy test ediliyor, lütfen bekleyin...</div>'
+            ).show();
+            
+            // Test isteği gönder
+            $.ajax({
+                url: '{{ route("admin.events.test-proxy") }}',
+                type: 'POST',
+                data: {
+                    _token: '{{ csrf_token() }}',
+                    proxy_url: proxyUrl,
+                    proxy_username: proxyUsername,
+                    proxy_password: proxyPassword
+                },
+                timeout: 20000, // 20 saniye timeout
+                success: function(response) {
+                    if (response.success) {
+                        $('#proxy_test_result').html(
+                            '<div class="alert alert-success">' +
+                            '<i class="fas fa-check-circle mr-2"></i><strong>Proxy Çalışıyor!</strong><br>' +
+                            '<small>Yanıt Süresi: ' + (response.response_time || 'Bilinmiyor') + 'ms</small><br>' +
+                            '<small>Test URL: ' + (response.test_url || 'https://httpbin.org/ip') + '</small>' +
+                            (response.ip_info ? '<br><small>IP Bilgisi: ' + response.ip_info + '</small>' : '') +
+                            '</div>'
+                        );
+                    } else {
+                        $('#proxy_test_result').html(
+                            '<div class="alert alert-danger">' +
+                            '<i class="fas fa-times-circle mr-2"></i><strong>Proxy Çalışmıyor!</strong><br>' +
+                            '<small>' + (response.message || 'Bilinmeyen hata') + '</small>' +
+                            '</div>'
+                        );
+                    }
+                },
+                error: function(xhr, status, error) {
+                    var errorMsg = 'Proxy test edilemedi.';
+                    if (status === 'timeout') {
+                        errorMsg = 'Premium proxy testi zaman aşımına uğradı (20s).';
+                    } else if (xhr.responseJSON && xhr.responseJSON.message) {
+                        errorMsg = xhr.responseJSON.message;
+                    }
+                    
+                    $('#proxy_test_result').html(
+                        '<div class="alert alert-danger">' +
+                        '<i class="fas fa-times-circle mr-2"></i><strong>Test Hatası!</strong><br>' +
+                        '<small>' + errorMsg + '</small>' +
+                        '</div>'
+                    );
+                },
+                complete: function() {
+                    $btn.html('<i class="fas fa-check-circle"></i> Seçili Proxy\'yi Test Et').prop('disabled', false);
+                }
+            });
+        });
+
+        // Tüm proxy'leri test etme butonu
+        $('#test_all_proxies_btn').click(function() {
+            var allProxies = [
+                {url: 'http://198.23.239.134:6540', user: 'btlxqsjo', pass: '3zvzih1cif58'},
+                {url: 'http://207.244.217.165:6712', user: 'btlxqsjo', pass: '3zvzih1cif58'},
+                {url: 'http://107.172.163.27:6543', user: 'btlxqsjo', pass: '3zvzih1cif58'},
+                {url: 'http://23.94.138.75:6349', user: 'btlxqsjo', pass: '3zvzih1cif58'},
+                {url: 'http://216.10.27.159:6837', user: 'btlxqsjo', pass: '3zvzih1cif58'},
+                {url: 'https://136.0.207.84:6661', user: 'btlxqsjo', pass: '3zvzih1cif58'},
+                {url: 'https://64.64.118.149:6732', user: 'btlxqsjo', pass: '3zvzih1cif58'},
+                {url: 'https://142.147.128.93:6593', user: 'btlxqsjo', pass: '3zvzih1cif58'},
+                {url: 'https://104.239.105.125:6655', user: 'btlxqsjo', pass: '3zvzih1cif58'},
+                {url: 'https://173.0.9.70:5653', user: 'btlxqsjo', pass: '3zvzih1cif58'}
+            ];
+            
+            var $btn = $(this);
+            var currentIndex = 0;
+            var workingProxy = null;
+            
+            $btn.html('<i class="fas fa-spinner fa-spin"></i> Test Ediliyor...').prop('disabled', true);
+            $('#proxy_test_result').html(
+                '<div class="alert alert-info">' +
+                '<i class="fas fa-clock mr-2"></i>Proxy\'ler test ediliyor, lütfen bekleyin...<br>' +
+                '<div class="progress mt-2">' +
+                '<div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%"></div>' +
+                '</div>' +
+                '<small class="text-muted">0 / ' + allProxies.length + ' proxy test edildi</small>' +
+                '</div>'
+            ).show();
+            
+            function testNextProxy() {
+                if (currentIndex >= allProxies.length) {
+                    // Tüm proxy'ler test edildi, hiçbiri çalışmıyor
+                    $('#proxy_test_result').html(
+                        '<div class="alert alert-danger">' +
+                        '<i class="fas fa-times-circle mr-2"></i><strong>Hiçbir Proxy Çalışmıyor!</strong><br>' +
+                        '<small>Toplam ' + allProxies.length + ' proxy test edildi, hiçbiri bağlanabilir değil.</small><br>' +
+                        '<small class="mt-1">Öneriler:</small>' +
+                        '<ul class="small mt-1 mb-0">' +
+                        '<li>İnternet bağlantınızı kontrol edin</li>' +
+                        '<li>Firewall ayarlarınızı kontrol edin</li>' +
+                        '<li>Daha sonra tekrar deneyin</li>' +
+                        '</ul>' +
+                        '</div>'
+                    );
+                    $btn.html('<i class="fas fa-search"></i> Çalışan Proxy Bul').prop('disabled', false);
+                    return;
+                }
+                
+                var currentProxy = allProxies[currentIndex];
+                var progress = Math.round(((currentIndex + 1) / allProxies.length) * 100);
+                
+                // Progress bar güncelle
+                $('#proxy_test_result .progress-bar').css('width', progress + '%');
+                $('#proxy_test_result small').text((currentIndex + 1) + ' / ' + allProxies.length + ' proxy test edildi - ' + currentProxy.url);
+                
+                // Proxy'yi test et
+                $.ajax({
+                    url: '{{ route("admin.events.test-proxy") }}',
+                    type: 'POST',
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                        proxy_url: currentProxy.url,
+                        proxy_username: currentProxy.user,
+                        proxy_password: currentProxy.pass
+                    },
+                    timeout: 15000, // 15 saniye timeout (premium proxy için)
+                    success: function(response) {
+                        if (response.success) {
+                            // Çalışan proxy bulundu!
+                            workingProxy = currentProxy;
+                            $('#proxy_url').val(currentProxy.url);
+                            $('#proxy_username').val(currentProxy.user);
+                            $('#proxy_password').val(currentProxy.pass);
+                            
+                            // Tüm butonları resetle
+                            $('.proxy-btn').removeClass('btn-primary btn-success').addClass(function() {
+                                return $(this).data('proxy').startsWith('https') ? 'btn-outline-success' : 'btn-outline-primary';
+                            });
+                            
+                            // Çalışan proxy'nin butonunu vurgula
+                            $('.proxy-btn[data-proxy="' + currentProxy.url + '"]').removeClass('btn-outline-primary btn-outline-success').addClass(
+                                currentProxy.url.startsWith('https') ? 'btn-success' : 'btn-primary'
+                            );
+                            
+                            $('#proxy_test_result').html(
+                                '<div class="alert alert-success">' +
+                                '<i class="fas fa-check-circle mr-2"></i><strong>Çalışan Premium Proxy Bulundu!</strong><br>' +
+                                '<strong>Proxy:</strong> ' + currentProxy.url + '<br>' +
+                                '<small>Yanıt Süresi: ' + (response.response_time || 'Bilinmiyor') + 'ms</small><br>' +
+                                '<small>Test URL: ' + (response.test_url || 'https://httpbin.org/ip') + '</small>' +
+                                (response.ip_info ? '<br><small>IP Bilgisi: ' + response.ip_info + '</small>' : '') +
+                                '<br><small class="text-success">Bu proxy otomatik olarak seçildi ve kullanıma hazır.</small>' +
+                                '</div>'
+                            );
+                            $btn.html('<i class="fas fa-check text-success"></i> Çalışan Proxy Bulundu').prop('disabled', false);
+                            return;
+                        } else {
+                            // Bu proxy çalışmıyor, sonrakine geç
+                            currentIndex++;
+                            setTimeout(testNextProxy, 500); // 0.5 saniye bekle
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        // Bu proxy çalışmıyor, sonrakine geç
+                        currentIndex++;
+                        setTimeout(testNextProxy, 500); // 0.5 saniye bekle
+                    }
+                });
+            }
+            
+            // Test işlemini başlat
+            testNextProxy();
         });
     });
 </script>

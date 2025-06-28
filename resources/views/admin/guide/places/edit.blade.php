@@ -350,33 +350,33 @@
                 <div class="mb-3">
                     <small class="text-muted d-block">
                         <i class="fas fa-info-circle me-1"></i>
-                        Yere ait fotoğrafları yüklemek için birden fazla resim seçebilirsiniz.
+                        FileManagerSystem'den resim seçerek yere ait fotoğrafları ekleyebilirsiniz.
                     </small>
                 </div>
                 
                 <div class="form-group">
-                    <label for="images">Resimler</label>
-                    <input type="file" 
-                           class="form-control @error('images.*') is-invalid @enderror" 
-                           id="images" 
-                           name="images[]" 
-                           multiple 
-                           accept="image/*"
-                           onchange="previewImages(this)">
-                    @error('images.*')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                    <small class="form-text text-muted">
-                        JPG, PNG, GIF formatlarında, maksimum 5MB boyutunda resimler yükleyebilirsiniz.
-                    </small>
-                </div>
-                
-                <!-- Resim Önizleme -->
-                <div id="image-preview" class="mt-3" style="display: none;">
-                    <h6>Seçilen Resimler:</h6>
-                    <div id="preview-container" class="d-flex flex-wrap gap-2">
-                        <!-- Önizlemeler buraya gelecek -->
+                    <label for="filemanagersystem_images">Resimler</label>
+                    <div class="input-group">
+                        <button type="button" class="btn btn-outline-primary" id="filemanagersystem_images_button">
+                            <i class="fas fa-images"></i> Resim Seç
+                        </button>
+                        <button type="button" class="btn btn-outline-danger" id="filemanagersystem_images_clear">
+                            <i class="fas fa-times"></i> Temizle
+                        </button>
                     </div>
+                    <input type="hidden" id="filemanagersystem_images" name="filemanagersystem_images" value="" form="place-form">
+                    
+                    <!-- Seçilen Resimler Önizleme -->
+                    <div id="filemanagersystem_images_preview" class="mt-3" style="display: none;">
+                        <h6>Seçilen Resimler:</h6>
+                        <div id="selected-images-container" class="row">
+                            <!-- Seçilen resimler buraya gelecek -->
+                        </div>
+                    </div>
+                    
+                    <small class="form-text text-muted">
+                        FileManagerSystem'den birden fazla resim seçebilirsiniz.
+                    </small>
                 </div>
             </div>
         </div>
@@ -386,25 +386,6 @@
 
 @section('css')
 <style>
-    .upload-dropzone {
-        border: 2px dashed #3490dc;
-        border-radius: 8px;
-        background: #f8fafc;
-        min-height: 150px;
-        padding: 20px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        transition: all 0.3s ease;
-    }
-    
-    .upload-dropzone:hover,
-    .upload-dropzone.dragover {
-        border-color: #2779bd;
-        background: #f1f7fe;
-    }
-    
     .gallery-grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
@@ -455,93 +436,265 @@
         color: #6c757d;
     }
     
-    .image-preview {
+    /* FileManagerSystem Resim Önizleme */
+    #selected-images-container .col-md-3 {
+        margin-bottom: 15px;
+    }
+    
+    .selected-image-item {
         position: relative;
-        display: inline-block;
-        margin: 5px;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 4px rgba(0,0,0,.1);
+        background-color: #f8f9fa;
+        border: 1px solid #dee2e6;
     }
     
-    .image-preview img {
-        width: 100px;
-        height: 100px;
+    .selected-image-item img {
+        width: 100%;
+        height: 150px;
         object-fit: cover;
-        border-radius: 5px;
-        border: 2px solid #ddd;
     }
     
-    .image-preview .remove-image {
+    .selected-image-item .remove-selected-image {
         position: absolute;
-        top: -5px;
-        right: -5px;
-        background: #dc3545;
-        color: white;
-        border: none;
+        top: 8px;
+        right: 8px;
+        background: rgba(255,255,255,.9);
         border-radius: 50%;
-        width: 20px;
-        height: 20px;
-        font-size: 12px;
+        width: 28px;
+        height: 28px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
         cursor: pointer;
+        border: none;
+        color: #e3342f;
+        font-size: 14px;
+    }
+    
+    .selected-image-item .remove-selected-image:hover {
+        background: #fff;
+        transform: scale(1.1);
+    }
+    
+    /* Media Picker Modal */
+    #mediapickerModal .modal-dialog {
+        max-width: 90%;
+    }
+    
+    #mediapickerFrame {
+        width: 100%;
+        height: 80vh;
+        border: none;
     }
 </style>
 @stop
 
 @section('js')
 <script>
-// Resim önizleme fonksiyonu
-function previewImages(input) {
-    const previewDiv = document.getElementById('image-preview');
-    const previewContainer = document.getElementById('preview-container');
-    
-    // Önceki önizlemeleri temizle
-    previewContainer.innerHTML = '';
-    
-    if (input.files && input.files.length > 0) {
-        previewDiv.style.display = 'block';
+// Seçilen resimler dizisi
+let selectedImages = [];
+
+// Mevcut FileManagerSystem resimlerini yükle
+function loadExistingFileManagerSystemImages() {
+    @if($guidePlace->images->isNotEmpty())
+        @foreach($guidePlace->images as $image)
+            @if(str_starts_with($image->image_path, 'filemanagersystem/'))
+                @php
+                    $mediaId = str_replace('filemanagersystem/', '', $image->image_path);
+                @endphp
+                selectedImages.push({
+                    id: '{{ $mediaId }}',
+                    url: '{{ $image->image_url }}',
+                    alt: '{{ $image->alt_text }}',
+                    title: '{{ $image->alt_text }}'
+                });
+            @endif
+        @endforeach
         
-        Array.from(input.files).forEach((file, index) => {
-            if (file.type.startsWith('image/')) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const imageDiv = document.createElement('div');
-                    imageDiv.className = 'image-preview-item position-relative d-inline-block me-2 mb-2';
-                    imageDiv.innerHTML = `
-                        <img src="${e.target.result}" 
-                             class="img-thumbnail" 
-                             style="width: 100px; height: 100px; object-fit: cover;">
-                        <button type="button" 
-                                class="btn btn-danger btn-sm position-absolute" 
-                                style="top: -5px; right: -5px; width: 20px; height: 20px; padding: 0; border-radius: 50%; font-size: 10px;"
-                                onclick="removePreviewImage(this, ${index})">
-                            ×
-                        </button>
-                    `;
-                    previewContainer.appendChild(imageDiv);
-                };
-                reader.readAsDataURL(file);
-            }
-        });
-    } else {
-        previewDiv.style.display = 'none';
-    }
+        if (selectedImages.length > 0) {
+            updateSelectedImagesDisplay();
+            updateHiddenInput();
+            console.log('Mevcut FileManagerSystem resimleri yüklendi:', selectedImages);
+        }
+    @endif
 }
 
-// Önizleme resmini kaldır
-function removePreviewImage(button, index) {
-    const input = document.getElementById('images');
-    const dt = new DataTransfer();
+$(document).ready(function() {
+    // Sayfa yüklendiğinde mevcut FileManagerSystem resimlerini yükle
+    loadExistingFileManagerSystemImages();
     
-    // Mevcut dosyaları al ve belirtilen index'i hariç tut
-    Array.from(input.files).forEach((file, i) => {
-        if (i !== index) {
-            dt.items.add(file);
+    // FileManagerSystem resim seçici
+    $('#filemanagersystem_images_button').on('click', function() {
+    const tempId = Date.now();
+    const relatedType = 'guide_place';
+    
+    // MediaPicker URL
+    const mediapickerUrl = '/admin/filemanagersystem/mediapicker?type=image&filter=all&related_type=' + relatedType + '&related_id=' + tempId + '&multiple=true';
+    
+    console.log('FileManagerSystem açılıyor:', mediapickerUrl);
+    
+    // iFrame'i güncelle
+    $('#mediapickerFrame').attr('src', mediapickerUrl);
+    
+    // Bootstrap 5 Modal oluştur ve aç
+    var modal = new bootstrap.Modal(document.getElementById('mediapickerModal'));
+    modal.show();
+    
+    // Mesaj dinleme işlevi
+    function handleMediaSelection(event) {
+        try {
+            if (event.data && event.data.type === 'mediaSelected') {
+                console.log('Seçilen medya:', event.data);
+                
+                // Tek resim seçimi
+                if (event.data.mediaUrl || event.data.mediaId) {
+                    addSelectedImage(event.data);
+                }
+                // Çoklu resim seçimi
+                else if (event.data.selectedMedia && Array.isArray(event.data.selectedMedia)) {
+                    event.data.selectedMedia.forEach(media => {
+                        addSelectedImage(media);
+                    });
+                }
+                
+                updateSelectedImagesDisplay();
+                updateHiddenInput();
+                
+                // Modalı kapat
+                modal.hide();
+                
+                // Event listener'ı kaldır
+                window.removeEventListener('message', handleMediaSelection);
+            }
+        } catch (error) {
+            console.error('Medya seçimi işlenirken hata oluştu:', error);
+            alert('Medya seçimi işlenirken bir hata oluştu: ' + error.message);
+            
+            // Event listener'ı kaldır
+            window.removeEventListener('message', handleMediaSelection);
+        }
+    }
+    
+        // Mevcut event listener'ı kaldır ve yenisini ekle
+        window.removeEventListener('message', handleMediaSelection);
+        window.addEventListener('message', handleMediaSelection);
+    });
+    
+    // Tümünü temizle
+    $('#filemanagersystem_images_clear').on('click', function() {
+        selectedImages = [];
+        updateSelectedImagesDisplay();
+        updateHiddenInput();
+    });
+    
+    // Form submit edilmeden önce kontrol
+    $('#place-form').on('submit', function(e) {
+        const hiddenValue = $('#filemanagersystem_images').val();
+        console.log('Form submit edilirken hidden input değeri:', hiddenValue);
+        
+        if (selectedImages.length > 0 && !hiddenValue) {
+            console.warn('Seçili resimler var ama hidden input boş!');
+            updateHiddenInput();
         }
     });
     
-    // Input'u güncelle
-    input.files = dt.files;
+    // Slug otomatik oluşturma
+    const titleInput = document.getElementById('title');
+    const slugInput = document.getElementById('slug');
     
-    // Önizlemeyi güncelle
-    previewImages(input);
+    if (titleInput && slugInput) {
+        titleInput.addEventListener('input', function() {
+            if (slugInput.value === '') {
+                const title = this.value;
+                const slug = title.toLowerCase()
+                    .replace(/ğ/g, 'g')
+                    .replace(/ü/g, 'u')
+                    .replace(/ş/g, 's')
+                    .replace(/ı/g, 'i')
+                    .replace(/ö/g, 'o')
+                    .replace(/ç/g, 'c')
+                    .replace(/[^a-z0-9\s-]/g, '')
+                    .replace(/\s+/g, '-')
+                    .replace(/-+/g, '-')
+                    .trim('-');
+                slugInput.value = slug;
+            }
+        });
+    }
+});
+
+// Seçilen resim ekleme
+function addSelectedImage(mediaData) {
+    let mediaUrl = '';
+    let mediaId = '';
+    
+    if (mediaData.mediaUrl) {
+        mediaUrl = mediaData.mediaUrl;
+        if (mediaUrl.startsWith('/')) {
+            mediaUrl = window.location.protocol + '//' + window.location.host + mediaUrl;
+        }
+    } else if (mediaData.mediaId) {
+        mediaId = mediaData.mediaId;
+        mediaUrl = '/admin/filemanagersystem/media/preview/' + mediaId;
+    }
+    
+    if (mediaUrl) {
+        // Aynı resmin zaten seçili olup olmadığını kontrol et
+        const exists = selectedImages.some(img => img.url === mediaUrl || img.id === mediaId);
+        if (!exists) {
+            selectedImages.push({
+                id: mediaId,
+                url: mediaUrl,
+                alt: mediaData.mediaAlt || '',
+                title: mediaData.mediaTitle || ''
+            });
+        }
+    }
+}
+
+// Seçilen resimleri görüntüleme
+function updateSelectedImagesDisplay() {
+    const container = $('#selected-images-container');
+    const preview = $('#filemanagersystem_images_preview');
+    
+    container.empty();
+    
+    if (selectedImages.length > 0) {
+        preview.show();
+        
+        selectedImages.forEach((image, index) => {
+            const imageHtml = `
+                <div class="col-md-3">
+                    <div class="selected-image-item">
+                        <img src="${image.url}" alt="${image.alt}" class="img-fluid">
+                        <button type="button" class="remove-selected-image" onclick="removeSelectedImage(${index})">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+            container.append(imageHtml);
+        });
+    } else {
+        preview.hide();
+    }
+}
+
+// Seçilen resmi kaldırma
+function removeSelectedImage(index) {
+    selectedImages.splice(index, 1);
+    updateSelectedImagesDisplay();
+    updateHiddenInput();
+}
+
+// Hidden input güncelleme
+function updateHiddenInput() {
+    const imageUrls = selectedImages.map(img => img.url);
+    const jsonValue = JSON.stringify(imageUrls);
+    $('#filemanagersystem_images').val(jsonValue);
+    console.log('Hidden input güncellendi:', jsonValue);
 }
 
 // Öne çıkan resim toggle
@@ -592,30 +745,21 @@ function deleteImage(imageId) {
     }
 }
 
-// Slug otomatik oluşturma
-$(document).ready(function() {
-    const titleInput = document.getElementById('title');
-    const slugInput = document.getElementById('slug');
-    
-    if (titleInput && slugInput) {
-        titleInput.addEventListener('input', function() {
-            if (slugInput.value === '') {
-                const title = this.value;
-                const slug = title.toLowerCase()
-                    .replace(/ğ/g, 'g')
-                    .replace(/ü/g, 'u')
-                    .replace(/ş/g, 's')
-                    .replace(/ı/g, 'i')
-                    .replace(/ö/g, 'o')
-                    .replace(/ç/g, 'c')
-                    .replace(/[^a-z0-9\s-]/g, '')
-                    .replace(/\s+/g, '-')
-                    .replace(/-+/g, '-')
-                    .trim('-');
-                slugInput.value = slug;
-            }
-        });
-    }
-});
+// Slug otomatik oluşturma - bu kısım ana jQuery ready function'a taşınacak
 </script>
+
+<!-- MediaPicker Modal -->
+<div class="modal fade" id="mediapickerModal" tabindex="-1" role="dialog" aria-labelledby="mediapickerModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="mediapickerModalLabel">Medya Seçici</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+            </div>
+            <div class="modal-body p-0">
+                <iframe id="mediapickerFrame" style="width: 100%; height: 80vh; border: none;"></iframe>
+            </div>
+        </div>
+    </div>
+</div>
 @stop

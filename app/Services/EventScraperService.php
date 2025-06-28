@@ -84,17 +84,26 @@ class EventScraperService
                 $proxyUsername = $connectionOptions['proxy_username'] ?? null;
                 $proxyPassword = $connectionOptions['proxy_password'] ?? null;
                 
-                // Proxy ayarları
-                $httpOptions['proxy'] = $proxyUrl;
-                
-                // Proxy kimlik doğrulaması varsa
+                // Proxy kullanıcı adı ve şifresi varsa kimlik doğrulamalı proxy kullan
                 if ($proxyUsername && $proxyPassword) {
-                    $httpOptions['curl'][CURLOPT_PROXYUSERPWD] = $proxyUsername . ':' . $proxyPassword;
+                    // Proxy URL'inden protokol ve host:port ayır
+                    $parsedUrl = parse_url($proxyUrl);
+                    $proxyHost = $parsedUrl['host'] ?? '';
+                    $proxyPort = $parsedUrl['port'] ?? '';
+                    
+                    if ($proxyHost && $proxyPort) {
+                        // Kimlik doğrulamalı proxy formatı: http://user:pass@host:port
+                        $authenticatedProxy = $parsedUrl['scheme'] . '://' . $proxyUsername . ':' . $proxyPassword . '@' . $proxyHost . ':' . $proxyPort;
+                        $httpOptions['proxy'] = $authenticatedProxy;
+                    }
+                } else {
+                    $httpOptions['proxy'] = $proxyUrl;
                 }
                 
                 Log::info('EventScraperService scrapeAllPages: Proxy bağlantısı aktif', [
                     'proxy_url' => $proxyUrl,
-                    'has_auth' => !empty($proxyUsername)
+                    'has_auth' => !empty($proxyUsername),
+                    'final_proxy' => $httpOptions['proxy']
                 ]);
             }
         }
@@ -205,17 +214,26 @@ class EventScraperService
                     $proxyUsername = $connectionOptions['proxy_username'] ?? null;
                     $proxyPassword = $connectionOptions['proxy_password'] ?? null;
                     
-                    // Proxy ayarları
-                    $httpOptions['proxy'] = $proxyUrl;
-                    
-                    // Proxy kimlik doğrulaması varsa
+                    // Proxy kullanıcı adı ve şifresi varsa kimlik doğrulamalı proxy kullan
                     if ($proxyUsername && $proxyPassword) {
-                        $httpOptions['curl'][CURLOPT_PROXYUSERPWD] = $proxyUsername . ':' . $proxyPassword;
+                        // Proxy URL'inden protokol ve host:port ayır
+                        $parsedUrl = parse_url($proxyUrl);
+                        $proxyHost = $parsedUrl['host'] ?? '';
+                        $proxyPort = $parsedUrl['port'] ?? '';
+                        
+                        if ($proxyHost && $proxyPort) {
+                            // Kimlik doğrulamalı proxy formatı: http://user:pass@host:port
+                            $authenticatedProxy = $parsedUrl['scheme'] . '://' . $proxyUsername . ':' . $proxyPassword . '@' . $proxyHost . ':' . $proxyPort;
+                            $httpOptions['proxy'] = $authenticatedProxy;
+                        }
+                    } else {
+                        $httpOptions['proxy'] = $proxyUrl;
                     }
                     
                     Log::info('EventScraperService: Proxy bağlantısı aktif', [
                         'proxy_url' => $proxyUrl,
                         'has_auth' => !empty($proxyUsername),
+                        'final_proxy' => $httpOptions['proxy'],
                         'url' => $url,
                         'page' => $page
                     ]);
@@ -256,7 +274,7 @@ class EventScraperService
                     
                     if (!$existingEvent) {
                         // Yeni etkinlik oluştur
-                        $event = $this->createEvent($eventData, $category->id);
+                        $event = $this->createEvent($eventData, $category->id, $connectionOptions);
                         $newEvents++;
                     }
                     
@@ -623,7 +641,7 @@ class EventScraperService
     /**
      * Yeni bir etkinlik oluşturur
      */
-    protected function createEvent($eventData, $categoryId)
+    protected function createEvent($eventData, $categoryId, $connectionOptions = null)
     {
         // Görsel URL'sinden görseli indir
         $coverImage = null;
@@ -638,7 +656,7 @@ class EventScraperService
                     $cleanImageUrl = str_replace('https://kultursanat.cankaya.bel.tr/https://', 'https://', $cleanImageUrl);
                 }
                 
-                $coverImage = $this->downloadImage($cleanImageUrl);
+                $coverImage = $this->downloadImage($cleanImageUrl, $connectionOptions);
             }
         }
 
@@ -737,7 +755,7 @@ class EventScraperService
     /**
      * Resim URL'sinden görsel indir ve kaydet
      */
-    protected function downloadImage($imageUrl)
+    protected function downloadImage($imageUrl, $connectionOptions = null)
     {
         // URL boşsa null dön
         if (empty($imageUrl)) {
@@ -761,8 +779,8 @@ class EventScraperService
             // URL encode karakterleri düzelt
             $imageUrl = str_replace(['%2F', '%3A'], ['/', ':'], $imageUrl);
             
-            // HTTP isteği gönder
-            $response = Http::withOptions([
+            // HTTP seçeneklerini hazırla
+            $httpOptions = [
                 'verify' => false,
                 'timeout' => 90,
                 'connect_timeout' => 60,
@@ -771,7 +789,49 @@ class EventScraperService
                     'Cache-Control' => 'no-cache',
                     'Pragma' => 'no-cache'
                 ]
-            ])->get($imageUrl);
+            ];
+            
+            // Bağlantı seçeneklerini uygula (proxy desteği)
+            if ($connectionOptions && is_array($connectionOptions)) {
+                $connectionType = $connectionOptions['type'] ?? 'normal';
+                
+                if ($connectionType === 'ip' && !empty($connectionOptions['target_ip'])) {
+                    $targetIp = $connectionOptions['target_ip'];
+                    $parsedUrl = parse_url($imageUrl);
+                    $domain = $parsedUrl['host'];
+                    $port = $parsedUrl['scheme'] === 'https' ? 443 : 80;
+                    
+                    // CURL resolve seçeneği ekle
+                    $httpOptions['curl'] = [
+                        CURLOPT_RESOLVE => [
+                            "$domain:$port:$targetIp"
+                        ]
+                    ];
+                } elseif ($connectionType === 'proxy' && !empty($connectionOptions['proxy_url'])) {
+                    $proxyUrl = $connectionOptions['proxy_url'];
+                    $proxyUsername = $connectionOptions['proxy_username'] ?? null;
+                    $proxyPassword = $connectionOptions['proxy_password'] ?? null;
+                    
+                    // Proxy kullanıcı adı ve şifresi varsa kimlik doğrulamalı proxy kullan
+                    if ($proxyUsername && $proxyPassword) {
+                        // Proxy URL'inden protokol ve host:port ayır
+                        $parsedUrl = parse_url($proxyUrl);
+                        $proxyHost = $parsedUrl['host'] ?? '';
+                        $proxyPort = $parsedUrl['port'] ?? '';
+                        
+                        if ($proxyHost && $proxyPort) {
+                            // Kimlik doğrulamalı proxy formatı: http://user:pass@host:port
+                            $authenticatedProxy = $parsedUrl['scheme'] . '://' . $proxyUsername . ':' . $proxyPassword . '@' . $proxyHost . ':' . $proxyPort;
+                            $httpOptions['proxy'] = $authenticatedProxy;
+                        }
+                    } else {
+                        $httpOptions['proxy'] = $proxyUrl;
+                    }
+                }
+            }
+            
+            // HTTP isteği gönder
+            $response = Http::withOptions($httpOptions)->get($imageUrl);
             
             if ($response->status() !== 200) {
                 Log::error('Görsel indirilemedi - HTTP hatası', [
@@ -968,7 +1028,7 @@ class EventScraperService
             }
             
             // Etkinlik oluştur
-            $event = $this->createEvent($processedData, $category->id);
+            $event = $this->createEvent($processedData, $category->id, null);
             
             Log::info('Etkinlik başarıyla oluşturuldu', [
                 'event_id' => $event->id,

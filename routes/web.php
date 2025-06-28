@@ -569,6 +569,7 @@ Route::prefix('admin/events')->name('admin.events.')->middleware(['auth', 'role:
     Route::post('/scrape-all', [App\Http\Controllers\Admin\EventScrapeController::class, 'scrapeAll'])->name('scrape-all');
     Route::post('/preview', [App\Http\Controllers\Admin\EventScrapeController::class, 'preview'])->name('preview');
     Route::post('/add-single-event', [App\Http\Controllers\Admin\EventScrapeController::class, 'addSingleEvent'])->name('add-single-event');
+    Route::post('/test-proxy', [App\Http\Controllers\Admin\EventScrapeController::class, 'testProxy'])->name('test-proxy');
 });
 
 // Ön Yüz Etkinlik Rotaları

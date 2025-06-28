@@ -79,7 +79,8 @@ class GuidePlaceController extends Controller
             'is_active' => 'boolean',
             'meta_title' => 'nullable|string|max:255',
             'meta_description' => 'nullable|string|max:500',
-            'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120'
+            'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120',
+            'filemanagersystem_images' => 'nullable|string'
         ]);
 
         try {
@@ -102,7 +103,12 @@ class GuidePlaceController extends Controller
             
             $place = GuidePlace::create($data);
             
-            // Resimleri yükle
+            // FileManagerSystem resimlerini işle
+            if ($request->filled('filemanagersystem_images')) {
+                $this->processFileManagerSystemImages($request->filemanagersystem_images, $place);
+            }
+            
+            // Resimleri yükle (geleneksel yöntem)
             if ($request->hasFile('images')) {
                 $this->uploadImages($request, $place);
             }
@@ -152,6 +158,15 @@ class GuidePlaceController extends Controller
      */
     public function update(Request $request, GuidePlace $guidePlace)
     {
+        // Request debugging
+        Log::info('Guide Place update request başladı:', [
+            'guide_place_id' => $guidePlace->id,
+            'all_request_data' => $request->all(),
+            'filemanagersystem_images_exists' => $request->has('filemanagersystem_images'),
+            'filemanagersystem_images_value' => $request->get('filemanagersystem_images'),
+            'filemanagersystem_images_filled' => $request->filled('filemanagersystem_images')
+        ]);
+        
         $request->validate([
             'guide_category_id' => 'required|exists:guide_categories,id',
             'title' => 'required|string|max:255',
@@ -169,7 +184,8 @@ class GuidePlaceController extends Controller
             'is_active' => 'boolean',
             'meta_title' => 'nullable|string|max:255',
             'meta_description' => 'nullable|string|max:500',
-            'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120'
+            'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120',
+            'filemanagersystem_images' => 'nullable|string'
         ]);
 
         try {
@@ -192,7 +208,22 @@ class GuidePlaceController extends Controller
             
             $guidePlace->update($data);
             
-            // Yeni resimleri yükle
+            // FileManagerSystem resimlerini işle
+            if ($request->filled('filemanagersystem_images')) {
+                Log::info('FileManagerSystem resimleri işleniyor:', [
+                    'guide_place_id' => $guidePlace->id,
+                    'images_data' => $request->filemanagersystem_images
+                ]);
+                $this->processFileManagerSystemImages($request->filemanagersystem_images, $guidePlace);
+            } else {
+                Log::info('FileManagerSystem resimleri boş:', [
+                    'guide_place_id' => $guidePlace->id,
+                    'request_has_field' => $request->has('filemanagersystem_images'),
+                    'field_value' => $request->get('filemanagersystem_images')
+                ]);
+            }
+            
+            // Yeni resimleri yükle (geleneksel yöntem)
             if ($request->hasFile('images')) {
                 $this->uploadImages($request, $guidePlace);
             }
@@ -431,6 +462,125 @@ class GuidePlaceController extends Controller
                 'success' => false,
                 'message' => 'Resim sıralaması güncellenirken bir hata oluştu.'
             ], 500);
+        }
+    }
+
+    /**
+     * Process FileManagerSystem images
+     */
+    private function processFileManagerSystemImages($imageUrls, GuidePlace $place)
+    {
+        try {
+            Log::info('processFileManagerSystemImages başladı:', [
+                'place_id' => $place->id,
+                'raw_data' => $imageUrls
+            ]);
+            
+            $urls = json_decode($imageUrls, true);
+            
+            Log::info('JSON decode sonucu:', [
+                'urls' => $urls,
+                'is_array' => is_array($urls),
+                'count' => is_array($urls) ? count($urls) : 0
+            ]);
+            
+            if (!is_array($urls) || empty($urls)) {
+                Log::warning('URLs dizisi boş veya geçersiz');
+                return;
+            }
+            
+            // Önce mevcut FileManagerSystem resimlerini sil (sadece FileManagerSystem olanları)
+            $existingFMSImages = $place->images()->where('image_path', 'LIKE', 'filemanagersystem/%')->get();
+            foreach ($existingFMSImages as $existingImage) {
+                Log::info('Mevcut FileManagerSystem resmi siliniyor:', [
+                    'image_id' => $existingImage->id,
+                    'image_path' => $existingImage->image_path
+                ]);
+                $existingImage->delete();
+            }
+            
+            $maxSortOrder = $place->images()->max('sort_order') ?? 0;
+            
+            foreach ($urls as $index => $url) {
+                // URL'den medya ID'sini çıkar
+                $mediaId = null;
+                
+                // 1. /uploads/media/123 formatı
+                if (preg_match('#^/uploads/media/(\d+)$#', $url, $matches)) {
+                    $mediaId = $matches[1];
+                }
+                // 2. /admin/filemanagersystem/media/preview/123 formatı
+                elseif (preg_match('#/media/preview/(\d+)#', $url, $matches)) {
+                    $mediaId = $matches[1];
+                }
+                // 3. Tam URL'den dosya adını çıkar ve Media tablosunda ara
+                else {
+                    // URL'den dosya adını çıkar
+                    $fileName = basename($url);
+                    Log::info('Dosya adından medya aranıyor:', ['file_name' => $fileName, 'url' => $url]);
+                    
+                    // Media tablosunda dosya adıyla ara
+                    $media = \App\Models\FileManagerSystem\Media::where('original_name', $fileName)
+                        ->orWhere('name', $fileName)
+                        ->orWhere('path', 'LIKE', '%' . $fileName)
+                        ->first();
+                    
+                    if ($media) {
+                        $mediaId = $media->id;
+                        Log::info('Dosya adından medya bulundu:', ['media_id' => $mediaId, 'file_name' => $fileName]);
+                    } else {
+                        Log::warning('Dosya adından medya bulunamadı:', ['file_name' => $fileName, 'url' => $url]);
+                    }
+                }
+                
+                if ($mediaId) {
+                    // FileManagerSystem medyasından bilgileri al
+                    $media = \App\Models\FileManagerSystem\Media::find($mediaId);
+                    
+                    Log::info('Media bulundu:', [
+                        'media_id' => $mediaId,
+                        'media_found' => $media ? 'yes' : 'no',
+                        'media_title' => $media ? $media->title : null
+                    ]);
+                    
+                    if ($media) {
+                        // Resmi guide place images tablosuna ekle
+                        $newImage = GuidePlaceImage::create([
+                            'guide_place_id' => $place->id,
+                            'image_path' => 'filemanagersystem/' . $media->id, // Özel format
+                            'alt_text' => $media->alt_text ?: $place->title,
+                            'sort_order' => $maxSortOrder + $index + 1,
+                            'is_featured' => $index === 0 && $place->images()->count() === 0
+                        ]);
+                        
+                        Log::info('Yeni resim oluşturuldu:', [
+                            'image_id' => $newImage->id,
+                            'image_path' => $newImage->image_path,
+                            'sort_order' => $newImage->sort_order
+                        ]);
+                        
+                        // MediaRelation oluştur
+                        \App\Models\FileManagerSystem\MediaRelation::updateOrCreate([
+                            'media_id' => $mediaId,
+                            'related_type' => 'guide_place',
+                            'related_id' => $place->id,
+                            'field_name' => 'images'
+                        ], [
+                            'order' => $maxSortOrder + $index + 1
+                        ]);
+                        
+                        Log::info('MediaRelation oluşturuldu/güncellendi');
+                    } else {
+                        Log::warning('Media bulunamadı:', ['media_id' => $mediaId]);
+                    }
+                } else {
+                    Log::warning('Media ID çıkarılamadı:', ['url' => $url]);
+                }
+            }
+            
+        } catch (\Exception $e) {
+            Log::error('FileManagerSystem resim işleme hatası: ' . $e->getMessage());
+            throw $e;
         }
     }
 

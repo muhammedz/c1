@@ -296,6 +296,11 @@ class EventScrapeController extends Controller
             Log::info('Etkinlik önizleme başlatıldı', [
                 'url' => $url,
                 'limit' => $limit,
+                'connection_type' => $connectionType,
+                'target_ip' => $targetIp,
+                'proxy_url' => $proxyUrl,
+                'proxy_username' => $proxyUsername,
+                'has_proxy_password' => !empty($proxyPassword),
                 'timestamp' => now()->toDateTimeString()
             ]);
             
@@ -312,8 +317,8 @@ class EventScrapeController extends Controller
                     
                     $httpOptions = [
                         'verify' => false,       // SSL doğrulamasını atla
-                        'timeout' => 90,         // 90 saniye timeout (daha da artırıldı)
-                        'connect_timeout' => 60, // 60 saniye bağlantı timeout (artırıldı)
+                        'timeout' => 120,        // 120 saniye timeout (daha da artırıldı)
+                        'connect_timeout' => 90, // 90 saniye bağlantı timeout (artırıldı)
                         'allow_redirects' => [
                             'max' => 10,
                             'strict' => false,
@@ -352,17 +357,26 @@ class EventScrapeController extends Controller
                             'resolve_entry' => "$domain:$port:$targetIp"
                         ]);
                     } elseif ($connectionType === 'proxy' && $proxyUrl) {
-                        // Proxy ayarları
-                        $httpOptions['proxy'] = $proxyUrl;
-                        
-                        // Proxy kimlik doğrulaması varsa
+                        // Proxy kullanıcı adı ve şifresi varsa kimlik doğrulamalı proxy kullan
                         if ($proxyUsername && $proxyPassword) {
-                            $httpOptions['curl'][CURLOPT_PROXYUSERPWD] = $proxyUsername . ':' . $proxyPassword;
+                            // Proxy URL'inden protokol ve host:port ayır
+                            $parsedUrl = parse_url($proxyUrl);
+                            $proxyHost = $parsedUrl['host'] ?? '';
+                            $proxyPort = $parsedUrl['port'] ?? '';
+                            
+                            if ($proxyHost && $proxyPort) {
+                                // Kimlik doğrulamalı proxy formatı: http://user:pass@host:port
+                                $authenticatedProxy = $parsedUrl['scheme'] . '://' . $proxyUsername . ':' . $proxyPassword . '@' . $proxyHost . ':' . $proxyPort;
+                                $httpOptions['proxy'] = $authenticatedProxy;
+                            }
+                        } else {
+                            $httpOptions['proxy'] = $proxyUrl;
                         }
                         
-                        Log::info('Proxy bağlantısı aktif', [
+                        Log::info('Preview: Proxy bağlantısı aktif', [
                             'proxy_url' => $proxyUrl,
                             'has_auth' => !empty($proxyUsername),
+                            'final_proxy' => $httpOptions['proxy'],
                             'url' => $url
                         ]);
                     }
@@ -1030,6 +1044,188 @@ class EventScrapeController extends Controller
                 'error_type' => 'general',
                 'error_details' => $errorDetails,
                 'technical_message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Proxy bağlantısını test et
+     */
+    public function testProxy(Request $request)
+    {
+        try {
+            $proxyUrl = $request->input('proxy_url');
+            $proxyUsername = $request->input('proxy_username');
+            $proxyPassword = $request->input('proxy_password');
+            
+            if (!$proxyUrl) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Proxy URL adresi gereklidir'
+                ], 400);
+            }
+            
+            // Proxy URL formatını kontrol et
+            if (!filter_var($proxyUrl, FILTER_VALIDATE_URL)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Geçersiz proxy URL formatı'
+                ], 400);
+            }
+            
+            // Test URL'leri - farklı servisleri deneyeceğiz
+            $testUrls = [
+                'https://api.ipify.org?format=json',
+                'https://httpbin.org/ip',
+                'https://ifconfig.me/ip',
+                'https://api.myip.com'
+            ];
+            
+            $testUrl = $testUrls[0]; // İlk olarak ipify kullan
+            
+            // HTTP client seçeneklerini hazırla
+            $options = [
+                'timeout' => 15,
+                'connect_timeout' => 10,
+                'verify' => false,
+                'allow_redirects' => true,
+                'headers' => [
+                    'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+                ]
+            ];
+            
+            // Proxy kullanıcı adı ve şifresi varsa kimlik doğrulamalı proxy kullan
+            if ($proxyUsername && $proxyPassword) {
+                // Proxy URL'inden protokol ve host:port ayır
+                $parsedUrl = parse_url($proxyUrl);
+                $proxyHost = $parsedUrl['host'] ?? '';
+                $proxyPort = $parsedUrl['port'] ?? '';
+                
+                if ($proxyHost && $proxyPort) {
+                    // Kimlik doğrulamalı proxy formatı: http://user:pass@host:port
+                    $authenticatedProxy = $parsedUrl['scheme'] . '://' . $proxyUsername . ':' . $proxyPassword . '@' . $proxyHost . ':' . $proxyPort;
+                    $options['proxy'] = $authenticatedProxy;
+                }
+            } else {
+                $options['proxy'] = $proxyUrl;
+            }
+            
+            Log::info('Proxy test başlatılıyor', [
+                'proxy_url' => $proxyUrl,
+                'test_url' => $testUrl,
+                'has_auth' => !empty($proxyUsername)
+            ]);
+            
+            $startTime = microtime(true);
+            $response = null;
+            $lastError = '';
+            
+            // Farklı test URL'lerini dene
+            foreach ($testUrls as $currentTestUrl) {
+                try {
+                    Log::info('Proxy test deneniyor', [
+                        'proxy_url' => $proxyUrl,
+                        'test_url' => $currentTestUrl,
+                        'has_auth' => !empty($proxyUsername)
+                    ]);
+                    
+                    $response = Http::withOptions($options)->get($currentTestUrl);
+                    
+                    if ($response->successful()) {
+                        $testUrl = $currentTestUrl; // Başarılı olan URL'i kaydet
+                        break;
+                    } else {
+                        $lastError = 'HTTP ' . $response->status() . ' - ' . $currentTestUrl;
+                        Log::warning('Test URL başarısız, sonrakini deneyeceğiz', [
+                            'url' => $currentTestUrl,
+                            'status' => $response->status()
+                        ]);
+                    }
+                } catch (\Exception $urlException) {
+                    $lastError = $urlException->getMessage() . ' - ' . $currentTestUrl;
+                    Log::warning('Test URL hatası, sonrakini deneyeceğiz', [
+                        'url' => $currentTestUrl,
+                        'error' => $urlException->getMessage()
+                    ]);
+                    continue;
+                }
+            }
+            
+            $endTime = microtime(true);
+            $responseTime = round(($endTime - $startTime) * 1000, 2); // milisaniye
+            
+            if ($response && $response->successful()) {
+                // Farklı API'ların farklı yanıt formatları
+                $responseData = $response->json();
+                $ipInfo = 'Bilinmiyor';
+                
+                if (isset($responseData['ip'])) {
+                    $ipInfo = $responseData['ip']; // ipify formatı
+                } elseif (isset($responseData['origin'])) {
+                    $ipInfo = $responseData['origin']; // httpbin formatı
+                } elseif (is_string($response->body()) && filter_var(trim($response->body()), FILTER_VALIDATE_IP)) {
+                    $ipInfo = trim($response->body()); // ifconfig.me formatı
+                }
+                
+                Log::info('Proxy test başarılı', [
+                    'proxy_url' => $proxyUrl,
+                    'response_time' => $responseTime,
+                    'ip_info' => $ipInfo,
+                    'test_url' => $testUrl
+                ]);
+                
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Premium proxy başarıyla test edildi',
+                    'response_time' => $responseTime,
+                    'test_url' => $testUrl,
+                    'ip_info' => $ipInfo
+                ]);
+            } else {
+                Log::warning('Proxy test başarısız - Tüm URL\'ler denendi', [
+                    'proxy_url' => $proxyUrl,
+                    'response_time' => $responseTime,
+                    'last_error' => $lastError
+                ]);
+                
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Premium proxy bağlantısı başarısız. Son hata: ' . $lastError,
+                    'response_time' => $responseTime
+                ]);
+            }
+            
+        } catch (\Illuminate\Http\Client\ConnectionException $e) {
+            Log::error('Proxy test bağlantı hatası', [
+                'proxy_url' => $proxyUrl ?? 'Bilinmiyor',
+                'error' => $e->getMessage()
+            ]);
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Proxy bağlantı hatası: ' . $e->getMessage()
+            ], 500);
+        } catch (\Illuminate\Http\Client\RequestException $e) {
+            Log::error('Proxy test istek hatası', [
+                'proxy_url' => $proxyUrl ?? 'Bilinmiyor',
+                'error' => $e->getMessage()
+            ]);
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Proxy istek hatası: ' . $e->getMessage()
+            ], 500);
+        } catch (\Exception $e) {
+            Log::error('Proxy test genel hatası', [
+                'proxy_url' => $proxyUrl ?? 'Bilinmiyor',
+                'error' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine()
+            ]);
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Proxy test hatası: ' . $e->getMessage()
             ], 500);
         }
     }
