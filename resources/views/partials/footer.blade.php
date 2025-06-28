@@ -4,11 +4,26 @@
 @endphp
 
 <!-- Footer kısmı -->
-<footer id="footer-section" class="footer-section bg-[#065a28] text-white pb-12 mt-12" style="font-family: 'TT Norms Pro', sans-serif;">
+<footer id="footer-section" class="footer-section bg-[#065a28] text-white pb-12 mt-12 relative" style="font-family: 'TT Norms Pro', sans-serif;">
     <div class="container max-w-7xl mx-auto px-4">
-        <div class="grid grid-cols-1 md:grid-cols-5 gap-8">
+        <!-- Logo - Absolute pozisyon ile en üstte -->
+        <div class="absolute top-0 right-4 md:right-8 lg:right-16">
+            <div class="flex justify-center items-center">
+                @if($footerSettings && $footerSettings->logo)
+                    <img src="{{ $footerSettings->logo_url }}" alt="Logo" class="w-32 h-32 md:w-48 md:h-48 object-contain">
+                @else
+                    <div class="w-32 h-32 md:w-48 md:h-48 bg-white rounded-full flex items-center justify-center">
+                        <svg class="w-24 h-24 md:w-32 md:h-32 text-[#065a28]" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 2L2 7v10c0 5.55 3.84 9.74 9 11 5.16-1.26 9-5.45 9-11V7l-10-5z"/>
+                        </svg>
+                    </div>
+                @endif
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
             @foreach($footerMenus as $menu)
-                <div>
+                <div class="pt-8">
                     <h3 class="text-xl font-bold mb-6 text-white">{{ $menu->title }}</h3>
                     @if($menu->activeLinks->count() > 0)
                         <ul class="space-y-2 text-sm">
@@ -20,23 +35,10 @@
                 </div>
             @endforeach
 
-            <!-- İLETİŞİM VE LOGO -->
-            <div class="text-center pt-0">
-                <!-- Logo -->
-                <div class="flex justify-center items-center">
-                    @if($footerSettings && $footerSettings->logo)
-                        <img src="{{ $footerSettings->logo_url }}" alt="Logo" class="w-48 h-48 object-contain">
-                    @else
-                        <div class="w-48 h-48 bg-white rounded-full flex items-center justify-center">
-                            <svg class="w-32 h-32 text-[#065a28]" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M12 2L2 7v10c0 5.55 3.84 9.74 9 11 5.16-1.26 9-5.45 9-11V7l-10-5z"/>
-                            </svg>
-                        </div>
-                    @endif
-                </div>
-
+            <!-- İLETİŞİM BİLGİLERİ -->
+            <div class="text-center pt-8">
                 <!-- İletişim Bilgileri -->
-                <div class="text-sm space-y-3 mb-6 mt-1">
+                <div class="text-sm space-y-3 mb-6">
                     @if($footerSettings)
                         @if($footerSettings->address_line1 || $footerSettings->address_line2)
                         <div>
