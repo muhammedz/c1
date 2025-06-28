@@ -69,26 +69,7 @@
     </div>
 </div>
 
-<style>
-    /* Modal animasyon efektleri */
-    @keyframes fadeIn {
-        from { opacity: 0; }
-        to { opacity: 1; }
-    }
-    
-    @keyframes slideDown {
-        from { transform: translateY(-10px); opacity: 0; }
-        to { transform: translateY(0); opacity: 1; }
-    }
-    
-    #searchModal:not(.hidden) {
-        animation: fadeIn 0.2s ease-out forwards;
-    }
-    
-    #searchModal:not(.hidden) > div > div {
-        animation: slideDown 0.2s ease-out forwards;
-    }
-</style>
+<!-- CSS kodu W3C uyumluluğu için layout dosyasına taşındı -->
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
