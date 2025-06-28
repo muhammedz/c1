@@ -10,7 +10,7 @@
                                 <a href="{{ route('news.show', $headline->slug) }}" class="absolute inset-0 z-10">
                                     <span class="sr-only">{{ $headline->title }}</span>
                                 </a>
-                                <img src="{{ $headline->image }}" alt="{{ $headline->title }}" class="w-full h-full object-cover opacity-80">
+                                <img src="{{ $headline->image }}" alt="Haber görseli" class="w-full h-full object-cover opacity-80">
                                 <div class="absolute inset-0 bg-gradient-to-t from-black/50 via-black/20 to-transparent"></div>
                                 <div class="absolute bottom-0 left-0 right-0 p-4 md:p-8 z-0">
                                     <div class="inline-block py-1 px-3 bg-black/60 rounded backdrop-blur-sm">
@@ -20,7 +20,7 @@
                             </div>
                         @empty
                             <div class="swiper-slide relative">
-                                <img src="https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=1200&h=800&fit=crop" alt="Varsayılan Görsel" class="w-full h-full object-cover opacity-80">
+                                <img src="https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=1200&h=800&fit=crop" alt="Haber görseli" class="w-full h-full object-cover opacity-80">
                                 <div class="absolute inset-0 bg-gradient-to-t from-black/50 via-black/20 to-transparent"></div>
                                 <div class="absolute bottom-0 left-0 right-0 p-4 md:p-8">
                                     <div class="inline-block py-1 px-3 bg-black/60 rounded backdrop-blur-sm">

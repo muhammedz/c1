@@ -123,47 +123,47 @@
                 <!-- Sosyal Medya -->
                 <div class="flex justify-center gap-3">
                     @if($footerSettings && $footerSettings->facebook_url)
-                        <a href="{{ $footerSettings->facebook_url }}" target="_blank" class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 transition-colors">
+                        <a href="{{ $footerSettings->facebook_url }}" target="_blank" class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 transition-colors" aria-label="Facebook sayfamızı ziyaret edin">
                             <i class="fab fa-facebook-f text-white text-lg"></i>
                         </a>
                     @endif
                     
                     @if($footerSettings && $footerSettings->instagram_url)
-                        <a href="{{ $footerSettings->instagram_url }}" target="_blank" class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 transition-colors">
+                        <a href="{{ $footerSettings->instagram_url }}" target="_blank" class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 transition-colors" aria-label="Instagram sayfamızı ziyaret edin">
                             <i class="fab fa-instagram text-white text-lg"></i>
                         </a>
                     @endif
                     
                     @if($footerSettings && $footerSettings->twitter_url)
-                        <a href="{{ $footerSettings->twitter_url }}" target="_blank" class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 transition-colors">
+                        <a href="{{ $footerSettings->twitter_url }}" target="_blank" class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 transition-colors" aria-label="Twitter sayfamızı ziyaret edin">
                             <i class="fab fa-x-twitter text-white text-lg"></i>
                         </a>
                     @endif
                     
                     @if($footerSettings && $footerSettings->youtube_url)
-                        <a href="{{ $footerSettings->youtube_url }}" target="_blank" class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 transition-colors">
+                        <a href="{{ $footerSettings->youtube_url }}" target="_blank" class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 transition-colors" aria-label="YouTube kanalımızı ziyaret edin">
                             <i class="fab fa-youtube text-white text-lg"></i>
                         </a>
                     @endif
                     
                     @if($footerSettings && $footerSettings->linkedin_url)
-                        <a href="{{ $footerSettings->linkedin_url }}" target="_blank" class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 transition-colors">
+                        <a href="{{ $footerSettings->linkedin_url }}" target="_blank" class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 transition-colors" aria-label="LinkedIn sayfamızı ziyaret edin">
                             <i class="fab fa-linkedin text-white text-lg"></i>
                         </a>
                     @endif
                     
                     {{-- Eğer hiç sosyal medya linki yoksa varsayılan görünüm --}}
                     @if(!$footerSettings || (!$footerSettings->facebook_url && !$footerSettings->instagram_url && !$footerSettings->twitter_url && !$footerSettings->youtube_url && !$footerSettings->linkedin_url))
-                        <a href="#" class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 transition-colors">
+                        <a href="#" class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 transition-colors" aria-label="Facebook sayfamızı ziyaret edin">
                             <i class="fab fa-facebook-f text-white text-lg"></i>
                         </a>
-                        <a href="#" class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 transition-colors">
+                        <a href="#" class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 transition-colors" aria-label="Instagram sayfamızı ziyaret edin">
                             <i class="fab fa-instagram text-white text-lg"></i>
                         </a>
-                        <a href="#" class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 transition-colors">
+                        <a href="#" class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 transition-colors" aria-label="Twitter sayfamızı ziyaret edin">
                             <i class="fab fa-x-twitter text-white text-lg"></i>
                         </a>
-                        <a href="#" class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 transition-colors">
+                        <a href="#" class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 transition-colors" aria-label="YouTube kanalımızı ziyaret edin">
                             <i class="fab fa-youtube text-white text-lg"></i>
                         </a>
                     @endif

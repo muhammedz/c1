@@ -7,12 +7,12 @@
         
         <!-- Desktop Navigation Buttons -->
         <div class="hidden md:flex items-center space-x-2">
-            <button id="services-prev-btn" class="w-10 h-10 rounded-full bg-white border-2 border-gray-200 flex items-center justify-center hover:border-[#004d2e] hover:text-[#004d2e] transition-all duration-300 shadow-sm hover:shadow-md">
+            <button id="services-prev-btn" class="w-10 h-10 rounded-full bg-white border-2 border-gray-200 flex items-center justify-center hover:border-[#004d2e] hover:text-[#004d2e] transition-all duration-300 shadow-sm hover:shadow-md" aria-label="Önceki hizmetleri göster">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
                 </svg>
             </button>
-            <button id="services-next-btn" class="w-10 h-10 rounded-full bg-white border-2 border-gray-200 flex items-center justify-center hover:border-[#004d2e] hover:text-[#004d2e] transition-all duration-300 shadow-sm hover:shadow-md">
+            <button id="services-next-btn" class="w-10 h-10 rounded-full bg-white border-2 border-gray-200 flex items-center justify-center hover:border-[#004d2e] hover:text-[#004d2e] transition-all duration-300 shadow-sm hover:shadow-md" aria-label="Sonraki hizmetleri göster">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
                 </svg>

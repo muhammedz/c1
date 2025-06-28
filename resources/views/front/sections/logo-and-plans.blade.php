@@ -46,9 +46,9 @@
             <a href="{{ $logoPlans->card2_url }}" class="bg-white rounded-2xl w-full h-40 md:h-48 md:w-1/4 shadow-sm p-4 md:p-8 flex items-center justify-center hover:shadow-md transition-shadow duration-200 cursor-pointer">
                 <div class="text-center">
                     @if($logoPlans->card2_image)
-                        <img src="{{ asset($logoPlans->card2_image) }}" alt="{{ $logoPlans->card2_title ?? 'Stratejik Plan' }}" class="w-16 h-16 md:w-32 md:h-32 mx-auto mb-2 md:mb-4 object-contain">
+                        <img src="{{ asset($logoPlans->card2_image) }}" alt="Plan belgesi ikonu" class="w-16 h-16 md:w-32 md:h-32 mx-auto mb-2 md:mb-4 object-contain">
                     @else
-                        <img src="https://cdn-icons-png.flaticon.com/512/1087/1087927.png" alt="{{ $logoPlans->card2_title ?? 'Stratejik Plan' }}" class="w-16 h-16 md:w-32 md:h-32 mx-auto mb-2 md:mb-4 object-contain">
+                        <img src="https://cdn-icons-png.flaticon.com/512/1087/1087927.png" alt="Plan belgesi ikonu" class="w-16 h-16 md:w-32 md:h-32 mx-auto mb-2 md:mb-4 object-contain">
                     @endif
                     <p class="text-gray-800 font-medium text-xs md:text-base leading-tight">
                         {{ $logoPlans->card2_title ?? 'Stratejik Plan' }}
@@ -59,9 +59,9 @@
             <div class="bg-white rounded-2xl w-full h-40 md:h-48 md:w-1/4 shadow-sm p-4 md:p-8 flex items-center justify-center">
                 <div class="text-center">
                     @if($logoPlans->card2_image)
-                        <img src="{{ asset($logoPlans->card2_image) }}" alt="{{ $logoPlans->card2_title ?? 'Stratejik Plan' }}" class="w-16 h-16 md:w-32 md:h-32 mx-auto mb-2 md:mb-4 object-contain">
+                        <img src="{{ asset($logoPlans->card2_image) }}" alt="Plan belgesi ikonu" class="w-16 h-16 md:w-32 md:h-32 mx-auto mb-2 md:mb-4 object-contain">
                     @else
-                        <img src="https://cdn-icons-png.flaticon.com/512/1087/1087927.png" alt="{{ $logoPlans->card2_title ?? 'Stratejik Plan' }}" class="w-16 h-16 md:w-32 md:h-32 mx-auto mb-2 md:mb-4 object-contain">
+                        <img src="https://cdn-icons-png.flaticon.com/512/1087/1087927.png" alt="Plan belgesi ikonu" class="w-16 h-16 md:w-32 md:h-32 mx-auto mb-2 md:mb-4 object-contain">
                     @endif
                     <p class="text-gray-800 font-medium text-xs md:text-base leading-tight">
                         {{ $logoPlans->card2_title ?? 'Stratejik Plan' }}

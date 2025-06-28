@@ -207,12 +207,12 @@
                     <!-- Mobil + Tablet Arama ve Menü Butonları - desktop hariç her yerde görünür -->
                     <div class="mobile-header-controls mobile-header-controls-only flex items-center space-x-3">
                         <!-- Mobil Arama Butonu -->
-                        <button id="mobileSearchButton" class="w-11 h-11 bg-[#007b32] rounded-lg flex items-center justify-center text-white shadow-md hover:bg-[#00352b] hover:scale-105 transition-all">
+                        <button id="mobileSearchButton" class="w-11 h-11 bg-[#007b32] rounded-lg flex items-center justify-center text-white shadow-md hover:bg-[#00352b] hover:scale-105 transition-all" aria-label="Arama modalını aç">
                             <i class="fas fa-search text-white text-xl"></i>
                         </button>
                         
                         <!-- Mobil Menü Butonu -->
-                        <button id="mobileMenuButton">
+                        <button id="mobileMenuButton" aria-label="Mobil menüyü aç">
                             <span style="font-size: 18px; line-height: 1; display: inline-block;">☰</span>
                         </button>
                     </div>
@@ -237,11 +237,11 @@
         <div id="sideMenuContainer" class="fixed top-0 left-0 h-full w-96 bg-white shadow-2xl transform -translate-x-full transition-transform duration-300 ease-out" style="z-index: 999999 !important; position: fixed !important; font-family: 'TT Norms Pro', sans-serif; -webkit-font-feature-settings: 'liga' 1; font-feature-settings: 'liga' 1; text-rendering: optimizeLegibility; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;">
             <!-- Header -->
                           <div class="flex items-center justify-between px-4 bg-[#004d2e] text-white" style="padding-top: 12px !important; padding-bottom: 12px !important; min-height: 48px !important; height: 48px !important;">
-                <button id="sideMenuBack" class="text-white text-lg hidden" style="padding: 4px 6px !important;">
+                <button id="sideMenuBack" class="text-white text-lg hidden" style="padding: 4px 6px !important;" aria-label="Önceki menüye dön">
                     <i class="fas fa-chevron-left" style="font-size: 16px !important;"></i>
                 </button>
                 <h3 id="sideMenuTitle" class="font-medium text-base tracking-wide" style="font-size: 15px !important; line-height: 1.4 !important;">Menü</h3>
-                <button id="sideMenuClose" class="text-white text-lg" style="padding: 4px 6px !important;">
+                <button id="sideMenuClose" class="text-white text-lg" style="padding: 4px 6px !important;" aria-label="Menüyü kapat">
                     <i class="fas fa-times" style="font-size: 16px !important;"></i>
                 </button>
             </div>

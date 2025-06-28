@@ -16,40 +16,40 @@
                                 <!-- Sosyal medya ikonları sağ alt köşede -->
                                 <div class="absolute bottom-2 right-2 flex flex-row gap-1">
                                     @if($profileSettings->facebook_url)
-                                        <a href="{{ $profileSettings->facebook_url }}" target="_blank" class="w-6 h-6 bg-[#007d32] rounded-md flex items-center justify-center hover:bg-[#003d24] transition-colors">
+                                        <a href="{{ $profileSettings->facebook_url }}" target="_blank" class="w-6 h-6 bg-[#007d32] rounded-md flex items-center justify-center hover:bg-[#003d24] transition-colors" aria-label="Facebook sayfamızı ziyaret edin">
                                             <i class="fab fa-facebook-f text-white text-xs"></i>
                                         </a>
                                     @endif
                                     
                                     @if($profileSettings->instagram_url)
-                                        <a href="{{ $profileSettings->instagram_url }}" target="_blank" class="w-6 h-6 bg-[#007d32] rounded-md flex items-center justify-center hover:bg-[#003d24] transition-colors">
+                                        <a href="{{ $profileSettings->instagram_url }}" target="_blank" class="w-6 h-6 bg-[#007d32] rounded-md flex items-center justify-center hover:bg-[#003d24] transition-colors" aria-label="Instagram sayfamızı ziyaret edin">
                                             <i class="fab fa-instagram text-white text-xs"></i>
                                         </a>
                                     @endif
                                     
                                     @if($profileSettings->twitter_url)
-                                        <a href="{{ $profileSettings->twitter_url }}" target="_blank" class="w-6 h-6 bg-[#007d32] rounded-md flex items-center justify-center hover:bg-[#003d24] transition-colors">
+                                        <a href="{{ $profileSettings->twitter_url }}" target="_blank" class="w-6 h-6 bg-[#007d32] rounded-md flex items-center justify-center hover:bg-[#003d24] transition-colors" aria-label="Twitter sayfamızı ziyaret edin">
                                             <i class="fab fa-x-twitter text-white text-xs"></i>
                                         </a>
                                     @endif
                                     
                                     @if($profileSettings->youtube_url)
-                                        <a href="{{ $profileSettings->youtube_url }}" target="_blank" class="w-6 h-6 bg-[#007d32] rounded-md flex items-center justify-center hover:bg-[#003d24] transition-colors">
+                                        <a href="{{ $profileSettings->youtube_url }}" target="_blank" class="w-6 h-6 bg-[#007d32] rounded-md flex items-center justify-center hover:bg-[#003d24] transition-colors" aria-label="YouTube kanalımızı ziyaret edin">
                                             <i class="fab fa-youtube text-white text-xs"></i>
                                         </a>
                                     @endif
                                     
                                     @if(!$profileSettings->facebook_url && !$profileSettings->instagram_url && !$profileSettings->twitter_url && !$profileSettings->youtube_url)
-                                        <a href="#" class="w-6 h-6 bg-[#007d32] rounded-md flex items-center justify-center hover:bg-[#003d24] transition-colors">
+                                        <a href="#" class="w-6 h-6 bg-[#007d32] rounded-md flex items-center justify-center hover:bg-[#003d24] transition-colors" aria-label="Facebook sayfamızı ziyaret edin">
                                             <i class="fab fa-facebook-f text-white text-xs"></i>
                                         </a>
-                                        <a href="#" class="w-6 h-6 bg-[#007d32] rounded-md flex items-center justify-center hover:bg-[#003d24] transition-colors">
+                                        <a href="#" class="w-6 h-6 bg-[#007d32] rounded-md flex items-center justify-center hover:bg-[#003d24] transition-colors" aria-label="Instagram sayfamızı ziyaret edin">
                                             <i class="fab fa-instagram text-white text-xs"></i>
                                         </a>
-                                        <a href="#" class="w-6 h-6 bg-[#007d32] rounded-md flex items-center justify-center hover:bg-[#003d24] transition-colors">
+                                        <a href="#" class="w-6 h-6 bg-[#007d32] rounded-md flex items-center justify-center hover:bg-[#003d24] transition-colors" aria-label="Twitter sayfamızı ziyaret edin">
                                             <i class="fab fa-x-twitter text-white text-xs"></i>
                                         </a>
-                                        <a href="#" class="w-6 h-6 bg-[#007d32] rounded-md flex items-center justify-center hover:bg-[#003d24] transition-colors">
+                                        <a href="#" class="w-6 h-6 bg-[#007d32] rounded-md flex items-center justify-center hover:bg-[#003d24] transition-colors" aria-label="YouTube kanalımızı ziyaret edin">
                                             <i class="fab fa-youtube text-white text-xs"></i>
                                         </a>
                                     @endif
@@ -64,40 +64,40 @@
                                 </div>
                                 <div class="w-1/4 bg-white p-3 flex flex-col justify-center items-center gap-2">
                                     @if($profileSettings->facebook_url)
-                                        <a href="{{ $profileSettings->facebook_url }}" target="_blank" class="w-8 h-8 bg-[#007d32] rounded-lg flex items-center justify-center hover:bg-[#003d24] transition-colors">
+                                        <a href="{{ $profileSettings->facebook_url }}" target="_blank" class="w-8 h-8 bg-[#007d32] rounded-lg flex items-center justify-center hover:bg-[#003d24] transition-colors" aria-label="Facebook sayfamızı ziyaret edin">
                                             <i class="fab fa-facebook-f text-white text-xs"></i>
                                         </a>
                                     @endif
                                     
                                     @if($profileSettings->instagram_url)
-                                        <a href="{{ $profileSettings->instagram_url }}" target="_blank" class="w-8 h-8 bg-[#007d32] rounded-lg flex items-center justify-center hover:bg-[#003d24] transition-colors">
+                                        <a href="{{ $profileSettings->instagram_url }}" target="_blank" class="w-8 h-8 bg-[#007d32] rounded-lg flex items-center justify-center hover:bg-[#003d24] transition-colors" aria-label="Instagram sayfamızı ziyaret edin">
                                             <i class="fab fa-instagram text-white text-xs"></i>
                                         </a>
                                     @endif
                                     
                                     @if($profileSettings->twitter_url)
-                                        <a href="{{ $profileSettings->twitter_url }}" target="_blank" class="w-8 h-8 bg-[#007d32] rounded-lg flex items-center justify-center hover:bg-[#003d24] transition-colors">
+                                        <a href="{{ $profileSettings->twitter_url }}" target="_blank" class="w-8 h-8 bg-[#007d32] rounded-lg flex items-center justify-center hover:bg-[#003d24] transition-colors" aria-label="Twitter sayfamızı ziyaret edin">
                                             <i class="fab fa-x-twitter text-white text-xs"></i>
                                         </a>
                                     @endif
                                     
                                     @if($profileSettings->youtube_url)
-                                        <a href="{{ $profileSettings->youtube_url }}" target="_blank" class="w-8 h-8 bg-[#007d32] rounded-lg flex items-center justify-center hover:bg-[#003d24] transition-colors">
+                                        <a href="{{ $profileSettings->youtube_url }}" target="_blank" class="w-8 h-8 bg-[#007d32] rounded-lg flex items-center justify-center hover:bg-[#003d24] transition-colors" aria-label="YouTube kanalımızı ziyaret edin">
                                             <i class="fab fa-youtube text-white text-xs"></i>
                                         </a>
                                     @endif
                                     
                                     @if(!$profileSettings->facebook_url && !$profileSettings->instagram_url && !$profileSettings->twitter_url && !$profileSettings->youtube_url)
-                                        <a href="#" class="w-8 h-8 bg-[#007d32] rounded-lg flex items-center justify-center hover:bg-[#003d24] transition-colors">
+                                        <a href="#" class="w-8 h-8 bg-[#007d32] rounded-lg flex items-center justify-center hover:bg-[#003d24] transition-colors" aria-label="Facebook sayfamızı ziyaret edin">
                                             <i class="fab fa-facebook-f text-white text-xs"></i>
                                         </a>
-                                        <a href="#" class="w-8 h-8 bg-[#007d32] rounded-lg flex items-center justify-center hover:bg-[#003d24] transition-colors">
+                                        <a href="#" class="w-8 h-8 bg-[#007d32] rounded-lg flex items-center justify-center hover:bg-[#003d24] transition-colors" aria-label="Instagram sayfamızı ziyaret edin">
                                             <i class="fab fa-instagram text-white text-xs"></i>
                                         </a>
-                                        <a href="#" class="w-8 h-8 bg-[#007d32] rounded-lg flex items-center justify-center hover:bg-[#003d24] transition-colors">
+                                        <a href="#" class="w-8 h-8 bg-[#007d32] rounded-lg flex items-center justify-center hover:bg-[#003d24] transition-colors" aria-label="Twitter sayfamızı ziyaret edin">
                                             <i class="fab fa-x-twitter text-white text-xs"></i>
                                         </a>
-                                        <a href="#" class="w-8 h-8 bg-[#007d32] rounded-lg flex items-center justify-center hover:bg-[#003d24] transition-colors">
+                                        <a href="#" class="w-8 h-8 bg-[#007d32] rounded-lg flex items-center justify-center hover:bg-[#003d24] transition-colors" aria-label="YouTube kanalımızı ziyaret edin">
                                             <i class="fab fa-youtube text-white text-xs"></i>
                                         </a>
                                     @endif
@@ -112,40 +112,40 @@
                                 <!-- Sosyal medya ikonları sağ alt köşede -->
                                 <div class="absolute bottom-2 right-2 flex flex-row gap-1">
                                     @if($profileSettings->facebook_url)
-                                        <a href="{{ $profileSettings->facebook_url }}" target="_blank" class="w-6 h-6 bg-[#007d32] rounded-md flex items-center justify-center hover:bg-[#003d24] transition-colors">
+                                        <a href="{{ $profileSettings->facebook_url }}" target="_blank" class="w-6 h-6 bg-[#007d32] rounded-md flex items-center justify-center hover:bg-[#003d24] transition-colors" aria-label="Facebook sayfamızı ziyaret edin">
                                             <i class="fab fa-facebook-f text-white text-xs"></i>
                                         </a>
                                     @endif
                                     
                                     @if($profileSettings->instagram_url)
-                                        <a href="{{ $profileSettings->instagram_url }}" target="_blank" class="w-6 h-6 bg-[#007d32] rounded-md flex items-center justify-center hover:bg-[#003d24] transition-colors">
+                                        <a href="{{ $profileSettings->instagram_url }}" target="_blank" class="w-6 h-6 bg-[#007d32] rounded-md flex items-center justify-center hover:bg-[#003d24] transition-colors" aria-label="Instagram sayfamızı ziyaret edin">
                                             <i class="fab fa-instagram text-white text-xs"></i>
                                         </a>
                                     @endif
                                     
                                     @if($profileSettings->twitter_url)
-                                        <a href="{{ $profileSettings->twitter_url }}" target="_blank" class="w-6 h-6 bg-[#007d32] rounded-md flex items-center justify-center hover:bg-[#003d24] transition-colors">
+                                        <a href="{{ $profileSettings->twitter_url }}" target="_blank" class="w-6 h-6 bg-[#007d32] rounded-md flex items-center justify-center hover:bg-[#003d24] transition-colors" aria-label="Twitter sayfamızı ziyaret edin">
                                             <i class="fab fa-x-twitter text-white text-xs"></i>
                                         </a>
                                     @endif
                                     
                                     @if($profileSettings->youtube_url)
-                                        <a href="{{ $profileSettings->youtube_url }}" target="_blank" class="w-6 h-6 bg-[#007d32] rounded-md flex items-center justify-center hover:bg-[#003d24] transition-colors">
+                                        <a href="{{ $profileSettings->youtube_url }}" target="_blank" class="w-6 h-6 bg-[#007d32] rounded-md flex items-center justify-center hover:bg-[#003d24] transition-colors" aria-label="YouTube kanalımızı ziyaret edin">
                                             <i class="fab fa-youtube text-white text-xs"></i>
                                         </a>
                                     @endif
                                     
                                     @if(!$profileSettings->facebook_url && !$profileSettings->instagram_url && !$profileSettings->twitter_url && !$profileSettings->youtube_url)
-                                        <a href="#" class="w-6 h-6 bg-[#007d32] rounded-md flex items-center justify-center hover:bg-[#003d24] transition-colors">
+                                        <a href="#" class="w-6 h-6 bg-[#007d32] rounded-md flex items-center justify-center hover:bg-[#003d24] transition-colors" aria-label="Facebook sayfamızı ziyaret edin">
                                             <i class="fab fa-facebook-f text-white text-xs"></i>
                                         </a>
-                                        <a href="#" class="w-6 h-6 bg-[#007d32] rounded-md flex items-center justify-center hover:bg-[#003d24] transition-colors">
+                                        <a href="#" class="w-6 h-6 bg-[#007d32] rounded-md flex items-center justify-center hover:bg-[#003d24] transition-colors" aria-label="Instagram sayfamızı ziyaret edin">
                                             <i class="fab fa-instagram text-white text-xs"></i>
                                         </a>
-                                        <a href="#" class="w-6 h-6 bg-[#007d32] rounded-md flex items-center justify-center hover:bg-[#003d24] transition-colors">
+                                        <a href="#" class="w-6 h-6 bg-[#007d32] rounded-md flex items-center justify-center hover:bg-[#003d24] transition-colors" aria-label="Twitter sayfamızı ziyaret edin">
                                             <i class="fab fa-x-twitter text-white text-xs"></i>
                                         </a>
-                                        <a href="#" class="w-6 h-6 bg-[#007d32] rounded-md flex items-center justify-center hover:bg-[#003d24] transition-colors">
+                                        <a href="#" class="w-6 h-6 bg-[#007d32] rounded-md flex items-center justify-center hover:bg-[#003d24] transition-colors" aria-label="YouTube kanalımızı ziyaret edin">
                                             <i class="fab fa-youtube text-white text-xs"></i>
                                         </a>
                                     @endif
@@ -160,40 +160,40 @@
                                 </div>
                                 <div class="w-1/4 bg-white p-3 flex flex-col justify-center items-center gap-2">
                                     @if($profileSettings->facebook_url)
-                                        <a href="{{ $profileSettings->facebook_url }}" target="_blank" class="w-8 h-8 bg-[#007d32] rounded-lg flex items-center justify-center hover:bg-[#003d24] transition-colors">
+                                        <a href="{{ $profileSettings->facebook_url }}" target="_blank" class="w-8 h-8 bg-[#007d32] rounded-lg flex items-center justify-center hover:bg-[#003d24] transition-colors" aria-label="Facebook sayfamızı ziyaret edin">
                                             <i class="fab fa-facebook-f text-white text-xs"></i>
                                         </a>
                                     @endif
                                     
                                     @if($profileSettings->instagram_url)
-                                        <a href="{{ $profileSettings->instagram_url }}" target="_blank" class="w-8 h-8 bg-[#007d32] rounded-lg flex items-center justify-center hover:bg-[#003d24] transition-colors">
+                                        <a href="{{ $profileSettings->instagram_url }}" target="_blank" class="w-8 h-8 bg-[#007d32] rounded-lg flex items-center justify-center hover:bg-[#003d24] transition-colors" aria-label="Instagram sayfamızı ziyaret edin">
                                             <i class="fab fa-instagram text-white text-xs"></i>
                                         </a>
                                     @endif
                                     
                                     @if($profileSettings->twitter_url)
-                                        <a href="{{ $profileSettings->twitter_url }}" target="_blank" class="w-8 h-8 bg-[#007d32] rounded-lg flex items-center justify-center hover:bg-[#003d24] transition-colors">
+                                        <a href="{{ $profileSettings->twitter_url }}" target="_blank" class="w-8 h-8 bg-[#007d32] rounded-lg flex items-center justify-center hover:bg-[#003d24] transition-colors" aria-label="Twitter sayfamızı ziyaret edin">
                                             <i class="fab fa-x-twitter text-white text-xs"></i>
                                         </a>
                                     @endif
                                     
                                     @if($profileSettings->youtube_url)
-                                        <a href="{{ $profileSettings->youtube_url }}" target="_blank" class="w-8 h-8 bg-[#007d32] rounded-lg flex items-center justify-center hover:bg-[#003d24] transition-colors">
+                                        <a href="{{ $profileSettings->youtube_url }}" target="_blank" class="w-8 h-8 bg-[#007d32] rounded-lg flex items-center justify-center hover:bg-[#003d24] transition-colors" aria-label="YouTube kanalımızı ziyaret edin">
                                             <i class="fab fa-youtube text-white text-xs"></i>
                                         </a>
                                     @endif
                                     
                                     @if(!$profileSettings->facebook_url && !$profileSettings->instagram_url && !$profileSettings->twitter_url && !$profileSettings->youtube_url)
-                                        <a href="#" class="w-8 h-8 bg-[#007d32] rounded-lg flex items-center justify-center hover:bg-[#003d24] transition-colors">
+                                        <a href="#" class="w-8 h-8 bg-[#007d32] rounded-lg flex items-center justify-center hover:bg-[#003d24] transition-colors" aria-label="Facebook sayfamızı ziyaret edin">
                                             <i class="fab fa-facebook-f text-white text-xs"></i>
                                         </a>
-                                        <a href="#" class="w-8 h-8 bg-[#007d32] rounded-lg flex items-center justify-center hover:bg-[#003d24] transition-colors">
+                                        <a href="#" class="w-8 h-8 bg-[#007d32] rounded-lg flex items-center justify-center hover:bg-[#003d24] transition-colors" aria-label="Instagram sayfamızı ziyaret edin">
                                             <i class="fab fa-instagram text-white text-xs"></i>
                                         </a>
-                                        <a href="#" class="w-8 h-8 bg-[#007d32] rounded-lg flex items-center justify-center hover:bg-[#003d24] transition-colors">
+                                        <a href="#" class="w-8 h-8 bg-[#007d32] rounded-lg flex items-center justify-center hover:bg-[#003d24] transition-colors" aria-label="Twitter sayfamızı ziyaret edin">
                                             <i class="fab fa-x-twitter text-white text-xs"></i>
                                         </a>
-                                        <a href="#" class="w-8 h-8 bg-[#007d32] rounded-lg flex items-center justify-center hover:bg-[#003d24] transition-colors">
+                                        <a href="#" class="w-8 h-8 bg-[#007d32] rounded-lg flex items-center justify-center hover:bg-[#003d24] transition-colors" aria-label="YouTube kanalımızı ziyaret edin">
                                             <i class="fab fa-youtube text-white text-xs"></i>
                                         </a>
                                     @endif
@@ -208,40 +208,40 @@
                                 <!-- Sosyal medya ikonları sağ alt köşede -->
                                 <div class="absolute bottom-2 right-2 flex flex-row gap-1">
                                     @if($profileSettings->facebook_url)
-                                        <a href="{{ $profileSettings->facebook_url }}" target="_blank" class="w-6 h-6 bg-[#007d32] rounded-md flex items-center justify-center hover:bg-[#003d24] transition-colors">
+                                        <a href="{{ $profileSettings->facebook_url }}" target="_blank" class="w-6 h-6 bg-[#007d32] rounded-md flex items-center justify-center hover:bg-[#003d24] transition-colors" aria-label="Facebook sayfamızı ziyaret edin">
                                             <i class="fab fa-facebook-f text-white text-xs"></i>
                                         </a>
                                     @endif
                                     
                                     @if($profileSettings->instagram_url)
-                                        <a href="{{ $profileSettings->instagram_url }}" target="_blank" class="w-6 h-6 bg-[#007d32] rounded-md flex items-center justify-center hover:bg-[#003d24] transition-colors">
+                                        <a href="{{ $profileSettings->instagram_url }}" target="_blank" class="w-6 h-6 bg-[#007d32] rounded-md flex items-center justify-center hover:bg-[#003d24] transition-colors" aria-label="Instagram sayfamızı ziyaret edin">
                                             <i class="fab fa-instagram text-white text-xs"></i>
                                         </a>
                                     @endif
                                     
                                     @if($profileSettings->twitter_url)
-                                        <a href="{{ $profileSettings->twitter_url }}" target="_blank" class="w-6 h-6 bg-[#007d32] rounded-md flex items-center justify-center hover:bg-[#003d24] transition-colors">
+                                        <a href="{{ $profileSettings->twitter_url }}" target="_blank" class="w-6 h-6 bg-[#007d32] rounded-md flex items-center justify-center hover:bg-[#003d24] transition-colors" aria-label="Twitter sayfamızı ziyaret edin">
                                             <i class="fab fa-x-twitter text-white text-xs"></i>
                                         </a>
                                     @endif
                                     
                                     @if($profileSettings->youtube_url)
-                                        <a href="{{ $profileSettings->youtube_url }}" target="_blank" class="w-6 h-6 bg-[#007d32] rounded-md flex items-center justify-center hover:bg-[#003d24] transition-colors">
+                                        <a href="{{ $profileSettings->youtube_url }}" target="_blank" class="w-6 h-6 bg-[#007d32] rounded-md flex items-center justify-center hover:bg-[#003d24] transition-colors" aria-label="YouTube kanalımızı ziyaret edin">
                                             <i class="fab fa-youtube text-white text-xs"></i>
                                         </a>
                                     @endif
                                     
                                     @if(!$profileSettings->facebook_url && !$profileSettings->instagram_url && !$profileSettings->twitter_url && !$profileSettings->youtube_url)
-                                        <a href="#" class="w-6 h-6 bg-[#007d32] rounded-md flex items-center justify-center hover:bg-[#003d24] transition-colors">
+                                        <a href="#" class="w-6 h-6 bg-[#007d32] rounded-md flex items-center justify-center hover:bg-[#003d24] transition-colors" aria-label="Facebook sayfamızı ziyaret edin">
                                             <i class="fab fa-facebook-f text-white text-xs"></i>
                                         </a>
-                                        <a href="#" class="w-6 h-6 bg-[#007d32] rounded-md flex items-center justify-center hover:bg-[#003d24] transition-colors">
+                                        <a href="#" class="w-6 h-6 bg-[#007d32] rounded-md flex items-center justify-center hover:bg-[#003d24] transition-colors" aria-label="Instagram sayfamızı ziyaret edin">
                                             <i class="fab fa-instagram text-white text-xs"></i>
                                         </a>
-                                        <a href="#" class="w-6 h-6 bg-[#007d32] rounded-md flex items-center justify-center hover:bg-[#003d24] transition-colors">
+                                        <a href="#" class="w-6 h-6 bg-[#007d32] rounded-md flex items-center justify-center hover:bg-[#003d24] transition-colors" aria-label="Twitter sayfamızı ziyaret edin">
                                             <i class="fab fa-x-twitter text-white text-xs"></i>
                                         </a>
-                                        <a href="#" class="w-6 h-6 bg-[#007d32] rounded-md flex items-center justify-center hover:bg-[#003d24] transition-colors">
+                                        <a href="#" class="w-6 h-6 bg-[#007d32] rounded-md flex items-center justify-center hover:bg-[#003d24] transition-colors" aria-label="YouTube kanalımızı ziyaret edin">
                                             <i class="fab fa-youtube text-white text-xs"></i>
                                         </a>
                                     @endif
@@ -256,40 +256,40 @@
                                 </div>
                                 <div class="w-1/4 bg-white p-3 flex flex-col justify-center items-center gap-2">
                                     @if($profileSettings->facebook_url)
-                                        <a href="{{ $profileSettings->facebook_url }}" target="_blank" class="w-8 h-8 bg-[#007d32] rounded-lg flex items-center justify-center hover:bg-[#003d24] transition-colors">
+                                        <a href="{{ $profileSettings->facebook_url }}" target="_blank" class="w-8 h-8 bg-[#007d32] rounded-lg flex items-center justify-center hover:bg-[#003d24] transition-colors" aria-label="Facebook sayfamızı ziyaret edin">
                                             <i class="fab fa-facebook-f text-white text-xs"></i>
                                         </a>
                                     @endif
                                     
                                     @if($profileSettings->instagram_url)
-                                        <a href="{{ $profileSettings->instagram_url }}" target="_blank" class="w-8 h-8 bg-[#007d32] rounded-lg flex items-center justify-center hover:bg-[#003d24] transition-colors">
+                                        <a href="{{ $profileSettings->instagram_url }}" target="_blank" class="w-8 h-8 bg-[#007d32] rounded-lg flex items-center justify-center hover:bg-[#003d24] transition-colors" aria-label="Instagram sayfamızı ziyaret edin">
                                             <i class="fab fa-instagram text-white text-xs"></i>
                                         </a>
                                     @endif
                                     
                                     @if($profileSettings->twitter_url)
-                                        <a href="{{ $profileSettings->twitter_url }}" target="_blank" class="w-8 h-8 bg-[#007d32] rounded-lg flex items-center justify-center hover:bg-[#003d24] transition-colors">
+                                        <a href="{{ $profileSettings->twitter_url }}" target="_blank" class="w-8 h-8 bg-[#007d32] rounded-lg flex items-center justify-center hover:bg-[#003d24] transition-colors" aria-label="Twitter sayfamızı ziyaret edin">
                                             <i class="fab fa-x-twitter text-white text-xs"></i>
                                         </a>
                                     @endif
                                     
                                     @if($profileSettings->youtube_url)
-                                        <a href="{{ $profileSettings->youtube_url }}" target="_blank" class="w-8 h-8 bg-[#007d32] rounded-lg flex items-center justify-center hover:bg-[#003d24] transition-colors">
+                                        <a href="{{ $profileSettings->youtube_url }}" target="_blank" class="w-8 h-8 bg-[#007d32] rounded-lg flex items-center justify-center hover:bg-[#003d24] transition-colors" aria-label="YouTube kanalımızı ziyaret edin">
                                             <i class="fab fa-youtube text-white text-xs"></i>
                                         </a>
                                     @endif
                                     
                                     @if(!$profileSettings->facebook_url && !$profileSettings->instagram_url && !$profileSettings->twitter_url && !$profileSettings->youtube_url)
-                                        <a href="#" class="w-8 h-8 bg-[#007d32] rounded-lg flex items-center justify-center hover:bg-[#003d24] transition-colors">
+                                        <a href="#" class="w-8 h-8 bg-[#007d32] rounded-lg flex items-center justify-center hover:bg-[#003d24] transition-colors" aria-label="Facebook sayfamızı ziyaret edin">
                                             <i class="fab fa-facebook-f text-white text-xs"></i>
                                         </a>
-                                        <a href="#" class="w-8 h-8 bg-[#007d32] rounded-lg flex items-center justify-center hover:bg-[#003d24] transition-colors">
+                                        <a href="#" class="w-8 h-8 bg-[#007d32] rounded-lg flex items-center justify-center hover:bg-[#003d24] transition-colors" aria-label="Instagram sayfamızı ziyaret edin">
                                             <i class="fab fa-instagram text-white text-xs"></i>
                                         </a>
-                                        <a href="#" class="w-8 h-8 bg-[#007d32] rounded-lg flex items-center justify-center hover:bg-[#003d24] transition-colors">
+                                        <a href="#" class="w-8 h-8 bg-[#007d32] rounded-lg flex items-center justify-center hover:bg-[#003d24] transition-colors" aria-label="Twitter sayfamızı ziyaret edin">
                                             <i class="fab fa-x-twitter text-white text-xs"></i>
                                         </a>
-                                        <a href="#" class="w-8 h-8 bg-[#007d32] rounded-lg flex items-center justify-center hover:bg-[#003d24] transition-colors">
+                                        <a href="#" class="w-8 h-8 bg-[#007d32] rounded-lg flex items-center justify-center hover:bg-[#003d24] transition-colors" aria-label="YouTube kanalımızı ziyaret edin">
                                             <i class="fab fa-youtube text-white text-xs"></i>
                                         </a>
                                     @endif
