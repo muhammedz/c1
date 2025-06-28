@@ -255,7 +255,6 @@
 </section>
 
 <!-- CSS kodu W3C uyumluluğu için layout dosyasına taşındı -->
-</section>
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
