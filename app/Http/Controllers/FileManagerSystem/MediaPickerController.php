@@ -438,9 +438,10 @@ class MediaPickerController extends Controller
         try {
             // 1. Dosya varlık kontrolü
             if (!$file || !$file->isValid()) {
-                Log::warning('MediaPicker: Geçersiz dosya yükleme denemesi', [
-                    'ip' => $request->ip(),
-                    'user_agent' => $request->userAgent()
+                Log::warning('MediaPicker: Geçersiz dosya', [
+                    'file_error' => $file ? $file->getError() : 'null',
+                    'file_error_message' => $file ? $file->getErrorMessage() : 'null',
+                    'ip' => $request->ip()
                 ]);
                 return false;
             }
@@ -449,21 +450,62 @@ class MediaPickerController extends Controller
             $extension = strtolower($file->getClientOriginalExtension());
             $mimeType = $file->getMimeType();
             $size = $file->getSize();
+            $filePath = $file->getRealPath();
 
-            // 2. Yasaklı uzantılar kontrolü
-            $blockedExtensions = config('filemanagersystem.security.blocked_extensions', []);
-            if (in_array($extension, $blockedExtensions)) {
-                Log::warning('MediaPicker: Yasaklı dosya uzantısı', [
+            // PNG için özel debug log
+            if ($extension === 'png') {
+                Log::info('PNG Dosya Debug Bilgileri', [
+                    'original_name' => $originalName,
                     'extension' => $extension,
+                    'declared_mime_type' => $mimeType,
+                    'size' => $size,
+                    'size_mb' => round($size / (1024 * 1024), 2),
+                    'file_path' => $filePath,
+                    'file_exists' => file_exists($filePath),
+                    'is_readable' => is_readable($filePath),
+                ]);
+                
+                // Gerçek MIME type'ı kontrol et
+                if (function_exists('mime_content_type')) {
+                    $actualMimeType = mime_content_type($filePath);
+                    Log::info('PNG MIME Type Kontrolü', [
+                        'declared_mime' => $mimeType,
+                        'actual_mime' => $actualMimeType,
+                        'compatible' => $this->isMimeTypeCompatible($actualMimeType, $mimeType)
+                    ]);
+                }
+                
+                // Magic number kontrolü
+                $fileHeader = file_get_contents($filePath, false, null, 0, 10);
+                $pngSignature = "\x89\x50\x4E\x47";
+                $hasValidSignature = strpos($fileHeader, $pngSignature) === 0;
+                Log::info('PNG Magic Number Kontrolü', [
+                    'file_header' => bin2hex($fileHeader),
+                    'expected_signature' => bin2hex($pngSignature),
+                    'has_valid_signature' => $hasValidSignature
+                ]);
+            }
+
+            // 2. Dosya adı güvenlik kontrolü
+            if (strpos($originalName, '../') !== false || strpos($originalName, '..\\') !== false) {
+                Log::warning('MediaPicker: Path traversal denemesi', [
                     'filename' => $originalName,
                     'ip' => $request->ip()
                 ]);
                 return false;
             }
 
-            // 3. Dosya içeriği kontrolü (executable dosya kontrolü)
-            $filePath = $file->getRealPath();
-            $content = file_get_contents($filePath, false, null, 0, 1024); // İlk 1KB
+            // 3. Null byte kontrolü
+            if (strpos($originalName, "\0") !== false) {
+                Log::warning('MediaPicker: Null byte tespit edildi', [
+                    'filename' => $originalName,
+                    'ip' => $request->ip()
+                ]);
+                return false;
+            }
+
+            // 4. Executable dosya içeriği kontrolü
+            $content = file_get_contents($filePath, false, null, 0, 1024); // İlk 1KB'ı kontrol et
 
             $dangerousPatterns = [
                 '/<\?php/i',
@@ -544,13 +586,24 @@ class MediaPickerController extends Controller
 
         // Bilinen uyumlu türler
         $compatibleTypes = [
-            'image/jpeg' => ['image/jpg'],
-            'image/jpg' => ['image/jpeg'],
+            'image/jpeg' => ['image/jpg', 'image/pjpeg'],
+            'image/jpg' => ['image/jpeg', 'image/pjpeg'],
+            'image/png' => ['image/x-png'],
+            'image/x-png' => ['image/png'],
+            'image/gif' => ['image/x-gif'],
+            'image/x-gif' => ['image/gif'],
+            'image/webp' => ['image/x-webp'],
+            'image/x-webp' => ['image/webp'],
             'text/plain' => ['text/csv'],
         ];
 
         if (isset($compatibleTypes[$declared])) {
             return in_array($actual, $compatibleTypes[$declared]);
+        }
+
+        // PNG için özel kontrol - bazen farklı MIME type algılanabiliyor
+        if ($declared === 'image/png' && in_array($actual, ['image/png', 'image/x-png', 'application/octet-stream'])) {
+            return true;
         }
 
         return false;

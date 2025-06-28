@@ -408,13 +408,24 @@ class FilemanagersystemMediaController extends Controller
 
         // Bilinen uyumlu türler
         $compatibleTypes = [
-            'image/jpeg' => ['image/jpg'],
-            'image/jpg' => ['image/jpeg'],
+            'image/jpeg' => ['image/jpg', 'image/pjpeg'],
+            'image/jpg' => ['image/jpeg', 'image/pjpeg'],
+            'image/png' => ['image/x-png'],
+            'image/x-png' => ['image/png'],
+            'image/gif' => ['image/x-gif'],
+            'image/x-gif' => ['image/gif'],
+            'image/webp' => ['image/x-webp'],
+            'image/x-webp' => ['image/webp'],
             'text/plain' => ['text/csv'],
         ];
 
         if (isset($compatibleTypes[$declared])) {
             return in_array($actual, $compatibleTypes[$declared]);
+        }
+
+        // PNG için özel kontrol - bazen farklı MIME type algılanabiliyor
+        if ($declared === 'image/png' && in_array($actual, ['image/png', 'image/x-png', 'application/octet-stream'])) {
+            return true;
         }
 
         return false;
