@@ -45,7 +45,16 @@ class FeaturedService extends Model
         
         // SVG içeriği kontrolü
         if (str_starts_with($this->icon, '<svg')) {
-            return $this->icon;
+            // SVG'deki duplicate ID'leri benzersiz hale getir
+            $svgContent = $this->icon;
+            
+            // katman_1 ID'sini benzersiz yap
+            if (strpos($svgContent, 'id="katman_1"') !== false) {
+                $uniqueId = 'katman_' . $this->id . '_' . uniqid();
+                $svgContent = str_replace('id="katman_1"', 'id="' . $uniqueId . '"', $svgContent);
+            }
+            
+            return $svgContent;
         }
         
         // Font Awesome ikonu (tam sınıf adı ile)

@@ -1,6 +1,7 @@
 <!-- #### Mobile App Section -->
 @if($mobileAppSettings->is_active ?? true)
 <section id="mobile-app-section" class="mobile-app-section bg-white px-4 py-0">
+    <h2 class="sr-only">Mobil Uygulama</h2>
     <div class="container max-w-7xl mx-auto">
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-center">
             <!-- Sol Kısım - Logo ve Store Butonları -->

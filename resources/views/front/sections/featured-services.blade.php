@@ -19,8 +19,9 @@
             </button>
         </div>
     </div>
+</section>
 
-    <style>
+<style>
         .featured-service-card {
             display: flex;
             flex-direction: column;
@@ -385,8 +386,10 @@
             @endforelse
         </div>
     </div>
+</style>
 
-    <script>
+<section id="featured-services-section-script">
+<script>
         document.addEventListener('DOMContentLoaded', function() {
             const track = document.getElementById('services-track');
             const prevBtn = document.getElementById('services-prev-btn');
@@ -479,7 +482,7 @@
             // İlk yükleme
             updateSlider();
         });
-    </script>
+</script>
 </section>
 @endif
 

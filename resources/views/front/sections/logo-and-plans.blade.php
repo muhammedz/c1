@@ -2,6 +2,7 @@
 @if(isset($logoPlans) && $logoPlans->is_active)
 
 <section id="logo-and-plans-section" class="logo-and-plans-section container max-w-7xl mx-auto px-4 py-8 md:py-12">
+    <h2 class="sr-only">Logo ve Planlar</h2>
     <div class="grid grid-cols-2 md:flex md:flex-row gap-3 md:gap-8">
         <!-- 1. Kart -->
         @if($logoPlans->card1_url)
