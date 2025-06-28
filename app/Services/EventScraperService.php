@@ -34,7 +34,7 @@ class EventScraperService
     /**
      * Tüm sayfaları çekerek işler
      */
-    public function scrapeAllPages($targetIp = null)
+    public function scrapeAllPages($connectionOptions = null)
     {
         $baseUrl = 'https://kultursanat.cankaya.bel.tr/etkinlikler';
         $currentPage = 1;
@@ -56,25 +56,47 @@ class EventScraperService
             ]
         ];
         
-        // Eğer hedef IP belirtilmişse, domain'i bu IP'ye yönlendir
-        if ($targetIp) {
-            $parsedUrl = parse_url($baseUrl);
-            $domain = $parsedUrl['host'];
-            $port = $parsedUrl['scheme'] === 'https' ? 443 : 80;
+        // Bağlantı seçeneklerini uygula
+        if ($connectionOptions && is_array($connectionOptions)) {
+            $connectionType = $connectionOptions['type'] ?? 'normal';
             
-            // CURL resolve seçeneği ekle
-            $httpOptions['curl'] = [
-                CURLOPT_RESOLVE => [
-                    "$domain:$port:$targetIp"
-                ]
-            ];
-            
-            Log::info('EventScraperService scrapeAllPages: IP yönlendirmesi aktif', [
-                'domain' => $domain,
-                'port' => $port,
-                'target_ip' => $targetIp,
-                'resolve_entry' => "$domain:$port:$targetIp"
-            ]);
+            if ($connectionType === 'ip' && !empty($connectionOptions['target_ip'])) {
+                $targetIp = $connectionOptions['target_ip'];
+                $parsedUrl = parse_url($baseUrl);
+                $domain = $parsedUrl['host'];
+                $port = $parsedUrl['scheme'] === 'https' ? 443 : 80;
+                
+                // CURL resolve seçeneği ekle
+                $httpOptions['curl'] = [
+                    CURLOPT_RESOLVE => [
+                        "$domain:$port:$targetIp"
+                    ]
+                ];
+                
+                Log::info('EventScraperService scrapeAllPages: IP yönlendirmesi aktif', [
+                    'domain' => $domain,
+                    'port' => $port,
+                    'target_ip' => $targetIp,
+                    'resolve_entry' => "$domain:$port:$targetIp"
+                ]);
+            } elseif ($connectionType === 'proxy' && !empty($connectionOptions['proxy_url'])) {
+                $proxyUrl = $connectionOptions['proxy_url'];
+                $proxyUsername = $connectionOptions['proxy_username'] ?? null;
+                $proxyPassword = $connectionOptions['proxy_password'] ?? null;
+                
+                // Proxy ayarları
+                $httpOptions['proxy'] = $proxyUrl;
+                
+                // Proxy kimlik doğrulaması varsa
+                if ($proxyUsername && $proxyPassword) {
+                    $httpOptions['curl'][CURLOPT_PROXYUSERPWD] = $proxyUsername . ':' . $proxyPassword;
+                }
+                
+                Log::info('EventScraperService scrapeAllPages: Proxy bağlantısı aktif', [
+                    'proxy_url' => $proxyUrl,
+                    'has_auth' => !empty($proxyUsername)
+                ]);
+            }
         }
         
         $content = Http::withOptions($httpOptions)->get($baseUrl)->body();
@@ -94,7 +116,7 @@ class EventScraperService
         
         while ($currentPage <= $totalPages && $hasNextPage) {
             $url = $currentPage === 1 ? $baseUrl : $baseUrl . '?page=' . $currentPage;
-            $pageResult = $this->scrapePage($url, $currentPage, $targetIp);
+            $pageResult = $this->scrapePage($url, $currentPage, $connectionOptions);
             
             // Sayfa sonuçlarını genel sonuçlara ekle
             $totalEvents += $pageResult['totalEvents'];
@@ -127,7 +149,7 @@ class EventScraperService
     /**
      * Belirtilen sayfadaki etkinlikleri çek ve işle
      */
-    public function scrapePage($url, $page = 1, $targetIp = null)
+    public function scrapePage($url, $page = 1, $connectionOptions = null)
     {
         try {
             // HTTP seçeneklerini hazırla
@@ -153,27 +175,51 @@ class EventScraperService
                 ]
             ];
             
-            // Eğer hedef IP belirtilmişse, domain'i bu IP'ye yönlendir
-            if ($targetIp) {
-                $parsedUrl = parse_url($url);
-                $domain = $parsedUrl['host'];
-                $port = $parsedUrl['scheme'] === 'https' ? 443 : 80;
+            // Bağlantı seçeneklerini uygula
+            if ($connectionOptions && is_array($connectionOptions)) {
+                $connectionType = $connectionOptions['type'] ?? 'normal';
                 
-                // CURL resolve seçeneği ekle
-                $httpOptions['curl'] = [
-                    CURLOPT_RESOLVE => [
-                        "$domain:$port:$targetIp"
-                    ]
-                ];
-                
-                Log::info('EventScraperService: IP yönlendirmesi aktif', [
-                    'domain' => $domain,
-                    'port' => $port,
-                    'target_ip' => $targetIp,
-                    'resolve_entry' => "$domain:$port:$targetIp",
-                    'url' => $url,
-                    'page' => $page
-                ]);
+                if ($connectionType === 'ip' && !empty($connectionOptions['target_ip'])) {
+                    $targetIp = $connectionOptions['target_ip'];
+                    $parsedUrl = parse_url($url);
+                    $domain = $parsedUrl['host'];
+                    $port = $parsedUrl['scheme'] === 'https' ? 443 : 80;
+                    
+                    // CURL resolve seçeneği ekle
+                    $httpOptions['curl'] = [
+                        CURLOPT_RESOLVE => [
+                            "$domain:$port:$targetIp"
+                        ]
+                    ];
+                    
+                    Log::info('EventScraperService: IP yönlendirmesi aktif', [
+                        'domain' => $domain,
+                        'port' => $port,
+                        'target_ip' => $targetIp,
+                        'resolve_entry' => "$domain:$port:$targetIp",
+                        'url' => $url,
+                        'page' => $page
+                    ]);
+                } elseif ($connectionType === 'proxy' && !empty($connectionOptions['proxy_url'])) {
+                    $proxyUrl = $connectionOptions['proxy_url'];
+                    $proxyUsername = $connectionOptions['proxy_username'] ?? null;
+                    $proxyPassword = $connectionOptions['proxy_password'] ?? null;
+                    
+                    // Proxy ayarları
+                    $httpOptions['proxy'] = $proxyUrl;
+                    
+                    // Proxy kimlik doğrulaması varsa
+                    if ($proxyUsername && $proxyPassword) {
+                        $httpOptions['curl'][CURLOPT_PROXYUSERPWD] = $proxyUsername . ':' . $proxyPassword;
+                    }
+                    
+                    Log::info('EventScraperService: Proxy bağlantısı aktif', [
+                        'proxy_url' => $proxyUrl,
+                        'has_auth' => !empty($proxyUsername),
+                        'url' => $url,
+                        'page' => $page
+                    ]);
+                }
             }
             
             // Sayfayı HTTP ile çek - SSL doğrulamasını devre dışı bırak

@@ -53,12 +53,17 @@ class EventScrapeController extends Controller
     public function scrape(Request $request)
     {
         $page = $request->input('page', 1);
+        $connectionType = $request->input('connection_type', 'normal');
         $targetIp = $request->input('target_ip');
+        $proxyUrl = $request->input('proxy_url');
+        $proxyUsername = $request->input('proxy_username');
+        $proxyPassword = $request->input('proxy_password');
+        
         $baseUrl = 'https://kultursanat.cankaya.bel.tr/etkinlikler';
         $url = $page > 1 ? $baseUrl . "?page=" . $page : $baseUrl;
         
-        // IP format kontrolü
-        if ($targetIp && !filter_var($targetIp, FILTER_VALIDATE_IP)) {
+        // Bağlantı türüne göre validasyon
+        if ($connectionType === 'ip' && $targetIp && !filter_var($targetIp, FILTER_VALIDATE_IP)) {
             return response()->json([
                 'success' => false,
                 'error' => 'Geçersiz IP adresi formatı',
@@ -69,8 +74,28 @@ class EventScrapeController extends Controller
             ], 400);
         }
         
+        if ($connectionType === 'proxy' && $proxyUrl && !filter_var($proxyUrl, FILTER_VALIDATE_URL)) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Geçersiz proxy URL formatı',
+                'error_details' => [
+                    'Girilen Proxy' => $proxyUrl,
+                    'Beklenen Format' => 'http://ip:port veya https://ip:port'
+                ]
+            ], 400);
+        }
+        
+        // Bağlantı seçeneklerini hazırla
+        $connectionOptions = [
+            'type' => $connectionType,
+            'target_ip' => $targetIp,
+            'proxy_url' => $proxyUrl,
+            'proxy_username' => $proxyUsername,
+            'proxy_password' => $proxyPassword
+        ];
+        
         try {
-            $result = $this->scraperService->scrapePage($url, $page, $targetIp);
+            $result = $this->scraperService->scrapePage($url, $page, $connectionOptions);
             
             // Son çekme zamanını cache'e kaydet
             cache()->put('last_event_scrape', now(), now()->addDays(30));
@@ -230,7 +255,11 @@ class EventScrapeController extends Controller
     public function preview(Request $request)
     {
         $url = $request->input('url');
+        $connectionType = $request->input('connection_type', 'normal');
         $targetIp = $request->input('target_ip');
+        $proxyUrl = $request->input('proxy_url');
+        $proxyUsername = $request->input('proxy_username');
+        $proxyPassword = $request->input('proxy_password');
         $limit = $request->input('limit', 1);
         
         if (empty($url)) {
@@ -240,14 +269,25 @@ class EventScrapeController extends Controller
             ], 400);
         }
         
-        // IP format kontrolü
-        if ($targetIp && !filter_var($targetIp, FILTER_VALIDATE_IP)) {
+        // Bağlantı türüne göre validasyon
+        if ($connectionType === 'ip' && $targetIp && !filter_var($targetIp, FILTER_VALIDATE_IP)) {
             return response()->json([
                 'success' => false,
                 'message' => 'Geçersiz IP adresi formatı',
                 'error_details' => [
                     'Girilen IP' => $targetIp,
                     'Beklenen Format' => 'xxx.xxx.xxx.xxx (örn: 192.168.1.100)'
+                ]
+            ], 400);
+        }
+        
+        if ($connectionType === 'proxy' && $proxyUrl && !filter_var($proxyUrl, FILTER_VALIDATE_URL)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Geçersiz proxy URL formatı',
+                'error_details' => [
+                    'Girilen Proxy' => $proxyUrl,
+                    'Beklenen Format' => 'http://ip:port veya https://ip:port'
                 ]
             ], 400);
         }
@@ -292,8 +332,8 @@ class EventScrapeController extends Controller
                         ]
                     ];
                     
-                    // Eğer hedef IP belirtilmişse, domain'i bu IP'ye yönlendir
-                    if ($targetIp) {
+                    // Bağlantı türüne göre özel ayarlar
+                    if ($connectionType === 'ip' && $targetIp) {
                         $parsedUrl = parse_url($url);
                         $domain = $parsedUrl['host'];
                         $port = $parsedUrl['scheme'] === 'https' ? 443 : 80;
@@ -310,6 +350,20 @@ class EventScrapeController extends Controller
                             'port' => $port,
                             'target_ip' => $targetIp,
                             'resolve_entry' => "$domain:$port:$targetIp"
+                        ]);
+                    } elseif ($connectionType === 'proxy' && $proxyUrl) {
+                        // Proxy ayarları
+                        $httpOptions['proxy'] = $proxyUrl;
+                        
+                        // Proxy kimlik doğrulaması varsa
+                        if ($proxyUsername && $proxyPassword) {
+                            $httpOptions['curl'][CURLOPT_PROXYUSERPWD] = $proxyUsername . ':' . $proxyPassword;
+                        }
+                        
+                        Log::info('Proxy bağlantısı aktif', [
+                            'proxy_url' => $proxyUrl,
+                            'has_auth' => !empty($proxyUsername),
+                            'url' => $url
                         ]);
                     }
                     

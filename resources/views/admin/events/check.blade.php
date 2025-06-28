@@ -141,14 +141,113 @@
                         </div>
                         
                         <div class="form-group">
-                            <label for="target_ip">Hedef IP Adresi (İsteğe Bağlı)</label>
+                            <label>Bağlantı Türü</label>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="custom-control custom-radio">
+                                        <input type="radio" class="custom-control-input" id="connection_normal" name="connection_type" value="normal" checked>
+                                        <label class="custom-control-label" for="connection_normal">
+                                            <i class="fas fa-globe text-success"></i> Normal Bağlantı
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="custom-control custom-radio">
+                                        <input type="radio" class="custom-control-input" id="connection_ip" name="connection_type" value="ip">
+                                        <label class="custom-control-label" for="connection_ip">
+                                            <i class="fas fa-network-wired text-info"></i> IP Yönlendirme
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="custom-control custom-radio">
+                                        <input type="radio" class="custom-control-input" id="connection_proxy" name="connection_type" value="proxy">
+                                        <label class="custom-control-label" for="connection_proxy">
+                                            <i class="fas fa-shield-alt text-warning"></i> Proxy Bağlantı
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- IP Yönlendirme Alanı -->
+                        <div class="form-group" id="ip_section" style="display: none;">
+                            <label for="target_ip">Hedef IP Adresi</label>
                             <input type="text" class="form-control" id="target_ip" name="target_ip" 
                                 placeholder="Örnek: 192.168.1.100" pattern="^(\d{1,3}\.){3}\d{1,3}$">
                             <small class="form-text text-muted">
                                 <i class="fas fa-info-circle text-info"></i> 
-                                Bu IP adresi belirtilirse, domain bu IP'ye yönlendirilecek (hosts dosyası benzeri). 
-                                Boş bırakılırsa normal DNS çözümlemesi yapılır.
+                                Domain bu IP'ye yönlendirilecek (hosts dosyası benzeri).
                             </small>
+                        </div>
+                        
+                        <!-- Proxy Bağlantı Alanı -->
+                        <div class="form-group" id="proxy_section" style="display: none;">
+                            <label for="proxy_url">Proxy Sunucu</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="proxy_url" name="proxy_url" 
+                                    placeholder="Örnek: http://proxy-server:port">
+                                <div class="input-group-append">
+                                    <button class="btn btn-outline-info" type="button" id="fill_free_proxy">
+                                        <i class="fas fa-magic"></i> Ücretsiz Proxy Doldur
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="row mt-2">
+                                <div class="col-md-6">
+                                    <input type="text" class="form-control" id="proxy_username" name="proxy_username" 
+                                        placeholder="Kullanıcı Adı (İsteğe Bağlı)">
+                                </div>
+                                <div class="col-md-6">
+                                    <input type="password" class="form-control" id="proxy_password" name="proxy_password" 
+                                        placeholder="Şifre (İsteğe Bağlı)">
+                                </div>
+                            </div>
+                            
+                            <small class="form-text text-muted">
+                                <i class="fas fa-shield-alt text-warning"></i> 
+                                Proxy sunucu üzerinden bağlantı yapılacak. Format: http://ip:port veya https://ip:port
+                            </small>
+                            
+                            <!-- Ücretsiz Proxy Listesi -->
+                            <div class="card mt-3" id="free_proxy_list">
+                                <div class="card-header bg-info text-white">
+                                    <h6 class="mb-0">
+                                        <i class="fas fa-list mr-2"></i>Ücretsiz Proxy Sunucular
+                                        <small class="float-right">Güncel listeler</small>
+                                    </h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h6 class="text-info">HTTP Proxy'ler:</h6>
+                                            <div class="proxy-list">
+                                                <button type="button" class="btn btn-sm btn-outline-primary mb-1 proxy-btn" data-proxy="http://47.74.152.29:8888">47.74.152.29:8888</button>
+                                                <button type="button" class="btn btn-sm btn-outline-primary mb-1 proxy-btn" data-proxy="http://103.149.162.194:80">103.149.162.194:80</button>
+                                                <button type="button" class="btn btn-sm btn-outline-primary mb-1 proxy-btn" data-proxy="http://185.32.6.129:8090">185.32.6.129:8090</button>
+                                                <button type="button" class="btn btn-sm btn-outline-primary mb-1 proxy-btn" data-proxy="http://103.167.135.110:80">103.167.135.110:80</button>
+                                                <button type="button" class="btn btn-sm btn-outline-primary mb-1 proxy-btn" data-proxy="http://91.107.208.14:8080">91.107.208.14:8080</button>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <h6 class="text-success">HTTPS Proxy'ler:</h6>
+                                            <div class="proxy-list">
+                                                <button type="button" class="btn btn-sm btn-outline-success mb-1 proxy-btn" data-proxy="https://103.149.162.195:80">103.149.162.195:80</button>
+                                                <button type="button" class="btn btn-sm btn-outline-success mb-1 proxy-btn" data-proxy="https://185.32.6.130:8090">185.32.6.130:8090</button>
+                                                <button type="button" class="btn btn-sm btn-outline-success mb-1 proxy-btn" data-proxy="https://47.74.152.30:8888">47.74.152.30:8888</button>
+                                                <button type="button" class="btn btn-sm btn-outline-success mb-1 proxy-btn" data-proxy="https://103.167.135.111:80">103.167.135.111:80</button>
+                                                <button type="button" class="btn btn-sm btn-outline-success mb-1 proxy-btn" data-proxy="https://91.107.208.15:8080">91.107.208.15:8080</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="alert alert-warning mt-3 mb-0">
+                                        <i class="fas fa-exclamation-triangle mr-2"></i>
+                                        <strong>Uyarı:</strong> Ücretsiz proxy'ler yavaş olabilir ve her zaman çalışmayabilir. 
+                                        Güvenlik için hassas verilerde kullanmayın.
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                         
                         <div class="mt-4 mb-4">
@@ -348,7 +447,11 @@
                 data: {
                     _token: $('input[name="_token"]').val(),
                     url: $('#url').val(),
+                    connection_type: $('input[name="connection_type"]:checked').val(),
                     target_ip: $('#target_ip').val(),
+                    proxy_url: $('#proxy_url').val(),
+                    proxy_username: $('#proxy_username').val(),
+                    proxy_password: $('#proxy_password').val(),
                     limit: 1 // Sadece 1 etkinlik getir
                 },
                 dataType: 'json', // JSON yanıt bekliyoruz
@@ -512,7 +615,11 @@
                 data: {
                     _token: $('input[name="_token"]').val(),
                     url: $('#url').val(),
+                    connection_type: $('input[name="connection_type"]:checked').val(),
                     target_ip: $('#target_ip').val(),
+                    proxy_url: $('#proxy_url').val(),
+                    proxy_username: $('#proxy_username').val(),
+                    proxy_password: $('#proxy_password').val(),
                     page: page
                 },
                 success: function(response) {
@@ -883,6 +990,54 @@
                 .replace(/"/g, "&quot;")
                 .replace(/'/g, "&#039;");
         }
+        
+        // Bağlantı türü değişikliği
+        $('input[name="connection_type"]').change(function() {
+            var selectedType = $(this).val();
+            
+            // Tüm bölümleri gizle
+            $('#ip_section, #proxy_section').hide();
+            
+            // Seçilen türe göre ilgili bölümü göster
+            if (selectedType === 'ip') {
+                $('#ip_section').show();
+            } else if (selectedType === 'proxy') {
+                $('#proxy_section').show();
+            }
+        });
+        
+        // Proxy butonlarına tıklama
+        $('.proxy-btn').click(function() {
+            var proxyUrl = $(this).data('proxy');
+            $('#proxy_url').val(proxyUrl);
+            
+            // Butonu vurgula
+            $('.proxy-btn').removeClass('btn-primary btn-success').addClass('btn-outline-primary');
+            $(this).removeClass('btn-outline-primary btn-outline-success').addClass(
+                proxyUrl.startsWith('https') ? 'btn-success' : 'btn-primary'
+            );
+        });
+        
+        // Ücretsiz proxy doldur butonu
+        $('#fill_free_proxy').click(function() {
+            var freeProxies = [
+                'http://47.74.152.29:8888',
+                'http://103.149.162.194:80',
+                'http://185.32.6.129:8090',
+                'https://103.149.162.195:80',
+                'https://185.32.6.130:8090'
+            ];
+            
+            // Rastgele bir proxy seç
+            var randomProxy = freeProxies[Math.floor(Math.random() * freeProxies.length)];
+            $('#proxy_url').val(randomProxy);
+            
+            // Bilgi mesajı göster
+            $(this).html('<i class="fas fa-check text-success"></i> Dolduruldu').prop('disabled', true);
+            setTimeout(function() {
+                $('#fill_free_proxy').html('<i class="fas fa-magic"></i> Ücretsiz Proxy Doldur').prop('disabled', false);
+            }, 2000);
+        });
     });
 </script>
 @stop 
