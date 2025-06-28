@@ -26,9 +26,17 @@
         gtag('js', new Date());
         gtag('config', 'G-80L32HWP74', {
             'anonymize_ip': true,
-            'cookie_flags': 'SameSite=None;Secure',
-            'cookie_expires': 63072000, // 2 yıl
-            'send_page_view': true
+            'allow_google_signals': false,
+            'allow_ad_personalization_signals': false,
+            'cookie_domain': 'auto',
+            'cookie_expires': 7776000, // 90 gün (daha kısa süre)
+            'cookie_flags': 'SameSite=Lax;Secure',
+            'cookie_update': false,
+            'send_page_view': true,
+            'transport_type': 'beacon',
+            'custom_map': {},
+            'page_title': document.title,
+            'page_location': window.location.href
         });
     </script>
     
