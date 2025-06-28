@@ -4,7 +4,7 @@
 @endphp
 
 <!-- Footer kısmı -->
-<footer id="footer-section" class="footer-section bg-[#065a28] text-white py-12 mt-12" style="font-family: 'TT Norms Pro', sans-serif;">
+<footer id="footer-section" class="footer-section bg-[#065a28] text-white pb-12 mt-12" style="font-family: 'TT Norms Pro', sans-serif;">
     <div class="container max-w-7xl mx-auto px-4">
         <div class="grid grid-cols-1 md:grid-cols-5 gap-8">
             @foreach($footerMenus as $menu)
@@ -21,7 +21,7 @@
             @endforeach
 
             <!-- İLETİŞİM VE LOGO -->
-            <div class="text-center -mt-8">
+            <div class="text-center pt-0">
                 <!-- Logo -->
                 <div class="flex justify-center items-center">
                     @if($footerSettings && $footerSettings->logo)
