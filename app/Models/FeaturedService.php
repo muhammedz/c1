@@ -80,8 +80,9 @@ class FeaturedService extends Model
                 
                 // CSS stil ekle - renk ve boyut için
                 if ($hasLargeViewBox) {
-                    // Büyük viewBox'lı SVG'ler için özel CSS
-                    $cssStyle = '<style>.' . $uniqueClass . ' { display: inline-block; vertical-align: middle; overflow: hidden; } .' . $uniqueClass . ' * { fill: ' . $color . ' !important; } .' . $uniqueClass . ' g { transform: scale(0.08) translate(-625px, -625px); transform-origin: center center; }</style>';
+                    // Büyük viewBox'lı SVG'ler için özel CSS - merkezi hizalama
+                    $halfSize = $size / 2;
+                    $cssStyle = '<style>.' . $uniqueClass . ' { display: inline-block; vertical-align: middle; overflow: hidden; } .' . $uniqueClass . ' * { fill: ' . $color . ' !important; } .' . $uniqueClass . ' g { transform: translate(' . $halfSize . 'px, ' . $halfSize . 'px) scale(0.08, 0.08); transform-origin: center center; }</style>';
                 } else {
                     // Normal SVG'ler için standart CSS
                     $cssStyle = '<style>.' . $uniqueClass . ' { display: inline-block; vertical-align: middle; overflow: visible; } .' . $uniqueClass . ' * { fill: ' . $color . ' !important; }</style>';
