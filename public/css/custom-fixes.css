@@ -292,17 +292,42 @@ button.close span[aria-hidden="true"] {
         text-align: center !important;
         margin: 0 !important;
         padding: 0 4px !important;
-        display: -webkit-box !important;
-        -webkit-line-clamp: 2 !important;
-        -webkit-box-orient: vertical !important;
-        overflow: hidden !important;
-        text-overflow: ellipsis !important;
-        word-break: break-word !important;
-        hyphens: auto !important;
         min-height: 32px !important;
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
+        word-break: break-word !important;
+        hyphens: auto !important;
+        overflow-wrap: break-word !important;
+        white-space: normal !important;
+    }
+    
+    /* Uzun başlıklar için özel düzenleme */
+    .featured-service-title {
+        max-height: 32px !important;
+        overflow: hidden !important;
+        position: relative !important;
+    }
+    
+    /* Ultra güçlü başlık ortalama - tüm başlıklar için */
+    .mobile-services-grid .featured-service-title,
+    .featured-services-section .mobile-services-grid .service-item .featured-service-card .featured-service-title {
+        text-align: center !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        width: 100% !important;
+        height: 32px !important;
+        min-height: 32px !important;
+        max-height: 32px !important;
+        font-size: 12px !important;
+        line-height: 1.2 !important;
+        padding: 0 4px !important;
+        margin: 0 !important;
+        overflow: hidden !important;
+        word-break: break-word !important;
+        hyphens: auto !important;
+        white-space: normal !important;
     }
     
     /* Link durumları */
@@ -315,6 +340,17 @@ button.close span[aria-hidden="true"] {
         justify-content: center !important;
         width: 100% !important;
         height: 100% !important;
+    }
+    
+    /* Link içindeki başlıklar için özel ortalama */
+    .featured-service-card a .featured-service-title,
+    .featured-service-card .featured-service-title {
+        text-align: center !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        width: 100% !important;
+        text-decoration: none !important;
     }
     
     /* Desktop slider'ı mobilde gizle */
