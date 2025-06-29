@@ -269,10 +269,9 @@
        }
        
        .featured-service-icon svg {
-           width: auto !important;
-           height: auto !important;
-           max-width: none !important;
-           max-height: none !important;
+           /* SVG boyutları model tarafından ayarlanır, CSS ile ezilmez */
+           max-width: 60px !important;
+           max-height: 60px !important;
        }
        
        .featured-service-title {
@@ -1228,6 +1227,7 @@
            }
            
            .featured-service-icon svg {
+               /* Mobilde SVG boyutları model tarafından ayarlanır, maksimum sınır */
                max-width: 32px !important;
                max-height: 32px !important;
            }

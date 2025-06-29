@@ -91,7 +91,7 @@ class FeaturedService extends Model
             
             // Ana SVG elementine CSS class ve stil ekle
             $uniqueClass = 'svg-icon-' . $this->id . '-' . uniqid();
-            $style = "width: {$size}px; height: {$size}px;";
+            $style = "width: {$size}px !important; height: {$size}px !important;";
             
             if (strpos($svgContent, '<svg') !== false) {
                 // SVG'yi normalize et - width ve height'ı kaldır
