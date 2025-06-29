@@ -73,7 +73,15 @@
                                                                 <!-- Modern Kategori Buton Tasarımı -->
                                                                 <a href="{{ $item->url ?? '#' }}" class="category-button-modern group relative overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100 hover:from-gray-100 hover:to-gray-150 border-gray-200 flex items-center p-3 rounded-lg border-2 shadow-sm hover:shadow-md transition-all duration-300 transform hover:scale-102 hover:-translate-y-0.5">
                                                                     <div class="icon-container w-10 h-10 flex items-center justify-center rounded-full mr-3 flex-shrink-0 bg-white/70 group-hover:bg-white/90 transition-all duration-300 group-hover:rotate-3 group-hover:scale-105">
-                                                                        <i class="{{ $item->icon ?? 'fas fa-file-alt' }} text-[#007b32] text-lg group-hover:text-[#00352b] transition-colors duration-300"></i>
+                                                                        @if($item->icon && str_starts_with($item->icon, 'data:image/'))
+                                                                            <img src="{{ $item->icon }}" alt="İkon" style="width: 24px; height: 24px; object-fit: contain;">
+                                                                        @elseif($item->icon && str_starts_with($item->icon, 'fas '))
+                                                                            <i class="{{ $item->icon }} text-[#007b32] text-lg group-hover:text-[#00352b] transition-colors duration-300"></i>
+                                                                        @elseif($item->icon)
+                                                                            <span class="material-icons text-[#007b32] text-lg group-hover:text-[#00352b] transition-colors duration-300">{{ $item->icon }}</span>
+                                                                        @else
+                                                                            <i class="fas fa-file-alt text-[#007b32] text-lg group-hover:text-[#00352b] transition-colors duration-300"></i>
+                                                                        @endif
                                                                     </div>
                                                                     <div class="flex flex-col flex-1 min-w-0">
                                                                         <span class="font-semibold text-[#00352b] text-sm group-hover:text-[#007b32] transition-colors duration-300 leading-tight">{{ $item->title }}</span>
