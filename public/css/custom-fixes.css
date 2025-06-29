@@ -111,4 +111,133 @@ button.close span[aria-hidden="true"] {
 /* Renk uyumluluğu */
 .text-white .fa-x-twitter.fa-x-svg:after {
     filter: invert(1);
+}
+
+/* Öne Çıkan Hizmetler - Mobil düzeltmeleri */
+@media (max-width: 767px) {
+    /* Mobil grid düzeni iyileştirmeleri */
+    .mobile-services-grid {
+        display: grid !important;
+        grid-template-columns: repeat(3, 1fr) !important;
+        gap: 10px !important;
+        padding: 0 !important;
+    }
+    
+    /* Service card genel düzenlemeler */
+    .featured-service-card {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+        text-align: center !important;
+        height: 110px !important;
+        padding: 8px !important;
+        border-radius: 12px !important;
+        background: white !important;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
+        border: 1px solid #e5e7eb !important;
+        transition: all 0.2s ease !important;
+    }
+    
+    .featured-service-card:hover {
+        transform: translateY(-2px) !important;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.15) !important;
+    }
+    
+    /* İkon konteyner düzeltmeleri */
+    .featured-service-icon {
+        width: 40px !important;
+        height: 40px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        margin-bottom: 6px !important;
+        flex-shrink: 0 !important;
+        background: #f8fafc !important;
+        border-radius: 8px !important;
+        border: 1px solid #e2e8f0 !important;
+    }
+    
+    /* FontAwesome ikonları için boyut standardizasyonu */
+    .featured-service-icon i {
+        font-size: 20px !important;
+        line-height: 1 !important;
+        color: #00352b !important;
+        width: 20px !important;
+        height: 20px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+    
+    /* SVG ikonları için boyut standardizasyonu */
+    .featured-service-icon svg {
+        width: 20px !important;
+        height: 20px !important;
+        max-width: 20px !important;
+        max-height: 20px !important;
+        fill: #00352b !important;
+        color: #00352b !important;
+    }
+    
+    /* IMG ikonları için boyut standardizasyonu */
+    .featured-service-icon img {
+        width: 20px !important;
+        height: 20px !important;
+        max-width: 20px !important;
+        max-height: 20px !important;
+        object-fit: contain !important;
+    }
+    
+    /* Material Icons için boyut standardizasyonu */
+    .featured-service-icon .material-icons {
+        font-size: 20px !important;
+        line-height: 1 !important;
+        color: #00352b !important;
+        width: 20px !important;
+        height: 20px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+    
+    /* Başlık düzeltmeleri */
+    .featured-service-title {
+        font-size: 11px !important;
+        line-height: 1.2 !important;
+        font-weight: 600 !important;
+        color: #374151 !important;
+        text-align: center !important;
+        margin: 0 !important;
+        padding: 0 2px !important;
+        display: -webkit-box !important;
+        -webkit-line-clamp: 2 !important;
+        -webkit-box-orient: vertical !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        word-break: break-word !important;
+        hyphens: auto !important;
+    }
+    
+    /* Link durumları */
+    .featured-service-card a {
+        text-decoration: none !important;
+        color: inherit !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+        width: 100% !important;
+        height: 100% !important;
+    }
+    
+    /* Desktop slider'ı mobilde gizle */
+    .desktop-services-slider {
+        display: none !important;
+    }
+    
+    /* Mobil grid'i sadece mobilde göster */
+    .mobile-services-only {
+        display: grid !important;
+    }
 } 
