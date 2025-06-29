@@ -306,6 +306,7 @@ html {
     src: url('fonts/TT Norms Pro Regular.otf') format('opentype');
     font-weight: 400;
     font-style: normal;
+    font-display: swap;
 }
 
 @font-face {
@@ -313,6 +314,7 @@ html {
     src: url('fonts/TT Norms Pro Medium.otf') format('opentype');
     font-weight: 500;
     font-style: normal;
+    font-display: swap;
 }
 
 @font-face {
@@ -320,6 +322,7 @@ html {
     src: url('fonts/TT Norms Pro Bold.otf') format('opentype');
     font-weight: 700;
     font-style: normal;
+    font-display: swap;
 }
 
 /* Montserrat Font */
@@ -328,6 +331,7 @@ html {
     src: url('fonts/Montserrat-Regular.ttf') format('truetype');
     font-weight: 400;
     font-style: normal;
+    font-display: swap;
 }
 
 @font-face {
@@ -335,6 +339,7 @@ html {
     src: url('fonts/Montserrat-Medium.ttf') format('truetype');
     font-weight: 500;
     font-style: normal;
+    font-display: swap;
 }
 
 /* Poppins Font */
@@ -343,6 +348,7 @@ html {
     src: url('fonts/Poppins-Medium.ttf') format('truetype');
     font-weight: 500;
     font-style: normal;
+    font-display: swap;
 }
 
 @font-face {
@@ -350,6 +356,7 @@ html {
     src: url('fonts/Poppins-SemiBold.ttf') format('truetype');
     font-weight: 600;
     font-style: normal;
+    font-display: swap;
 }
 
 /* Gotham Font */
@@ -358,6 +365,7 @@ html {
     src: url('fonts/Gotham-Medium.otf') format('opentype');
     font-weight: 500;
     font-style: normal;
+    font-display: swap;
 }
 
 /* Ana başlıklar ve logo için */
