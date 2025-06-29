@@ -138,15 +138,7 @@
                                                         @endif
                                                     </div>
                                                 </div>
-                                                <div class="mt-2 pt-2 border-t border-gray-200">
-                                                    <div class="flex justify-between items-center">
-                                                        <p class="text-xs text-gray-500">{{ $menu->description ?? $menu->footer_text ?? 'Açıklama Yazısı' }}</p>
-                                                        <a href="{{ $menu->footer_link ?? '#' }}" class="text-[#00352b] hover:text-[#007b32] text-sm font-medium flex items-center gap-1 transition-all hover:gap-2">
-                                                            {{ $menu->name }} 
-                                                            <i class="fas fa-arrow-right text-sm"></i>
-                                                        </a>
-                                                    </div>
-                                                </div>
+
                                             </div>
                                         </div>
                                     </div>

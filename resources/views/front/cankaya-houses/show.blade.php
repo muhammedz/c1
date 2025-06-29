@@ -153,36 +153,17 @@
         width: 300px;
         min-width: 300px;
         max-width: 300px;
-        position: relative;
+        position: sticky;
+        top: 120px;
         background: white;
         border-radius: 8px;
         box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
         transition: all 0.2s ease-out;
-        max-height: calc(100vh - 120px);
+        max-height: calc(100vh - 140px);
         overflow-y: auto;
         padding: 30px;
         box-sizing: border-box;
-    }
-
-    #sidebar.scrolledDown .sticky-container {
-        position: fixed;
-        top: 96px;
-        width: 300px !important;
-        min-width: 300px !important;
-        max-width: 300px !important;
-        z-index: 40;
-        transition: all 0.2s ease-out;
-    }
-
-    #sidebar.bottom-fixed .sticky-container {
-        position: fixed;
-        bottom: 20px;
-        top: auto !important;
-        width: 300px !important;
-        min-width: 300px !important;
-        max-width: 300px !important;
-        z-index: 40;
-        transition: all 0.2s ease-out;
+        z-index: 10;
     }
 
     #sidebar .sticky-container::-webkit-scrollbar {
@@ -502,134 +483,7 @@ document.getElementById('imageModal').addEventListener('click', function(e) {
     }
 });
 
-// Sidebar sticky functionality
-document.addEventListener('DOMContentLoaded', function() {
-    const sidebar = document.getElementById('sidebar');
-    const stickyContainer = sidebar.querySelector('.sticky-container');
-    const headerHeight = 96;
-    const footerMargin = 20; // Footer'dan olan minimum mesafe
-    
-    // Sidebar'ın orijinal boyutlarını ve pozisyonunu sakla
-    let originalDimensions = null;
-    let isSticky = false;
-    
-    function getOriginalDimensions() {
-        // Sayfa yüklendiğinde ve sticky olmadığında orijinal boyutları al
-        if (!isSticky) {
-            const rect = sidebar.getBoundingClientRect();
-            const computedStyle = window.getComputedStyle(sidebar);
-            
-            originalDimensions = {
-                width: 300, // CSS'te tanımlanan sabit genişlik
-                left: rect.left,
-                marginLeft: parseFloat(computedStyle.marginLeft) || 0,
-                marginRight: parseFloat(computedStyle.marginRight) || 0
-            };
-        }
-        return originalDimensions;
-    }
-    
-    function updateSidebarPosition() {
-        // Orijinal boyutları al (sadece ilk kez)
-        if (!originalDimensions) {
-            getOriginalDimensions();
-        }
-        
-        const rect = sidebar.getBoundingClientRect();
-        const stickyTop = rect.top;
-        
-        // Footer elementini bul
-        const footer = document.querySelector('footer');
-        const footerRect = footer ? footer.getBoundingClientRect() : null;
-        
-        // Sidebar'ın yüksekliği
-        const sidebarHeight = stickyContainer.offsetHeight;
-        
-        // Sayfa yüksekliği ve scroll pozisyonu
-        const windowHeight = window.innerHeight;
-        
-        // Footer'a olan mesafe (footer'ın üst kısmına kadar)
-        const footerTop = footerRect ? footerRect.top : windowHeight;
-        
-        // Sidebar'ın sticky olması gereken durumlar
-        const shouldBeSticky = stickyTop <= headerHeight;
-        
-        // Footer'a çok yakın mı kontrol et
-        const availableSpace = footerTop - headerHeight - footerMargin;
-        const sidebarFitsInAvailableSpace = sidebarHeight <= availableSpace;
-        
-        if (shouldBeSticky && sidebarFitsInAvailableSpace) {
-            // Normal sticky pozisyon - üstten sabitle
-            if (!isSticky) {
-                isSticky = true;
-                sidebar.classList.add('scrolledDown');
-                sidebar.classList.remove('bottom-fixed');
-                
-                // Sabit değerleri kullan
-                stickyContainer.style.width = originalDimensions.width + 'px';
-                stickyContainer.style.left = originalDimensions.left + 'px';
-                stickyContainer.style.position = 'fixed';
-                stickyContainer.style.top = headerHeight + 'px';
-                stickyContainer.style.bottom = 'auto';
-            }
-        } else if (shouldBeSticky && !sidebarFitsInAvailableSpace && footerRect) {
-            // Footer'a yakın - alttan sabitle
-            if (!isSticky || !sidebar.classList.contains('bottom-fixed')) {
-                isSticky = true;
-                sidebar.classList.add('scrolledDown');
-                sidebar.classList.add('bottom-fixed');
-                
-                // Sabit değerleri kullan
-                stickyContainer.style.width = originalDimensions.width + 'px';
-                stickyContainer.style.left = originalDimensions.left + 'px';
-                stickyContainer.style.position = 'fixed';
-                stickyContainer.style.top = 'auto';
-                stickyContainer.style.bottom = Math.max(footerMargin, windowHeight - footerTop + footerMargin) + 'px';
-            }
-        } else {
-            // Normal pozisyon - sticky değil
-            if (isSticky) {
-                isSticky = false;
-                sidebar.classList.remove('scrolledDown');
-                sidebar.classList.remove('bottom-fixed');
-                
-                // Tüm stilleri temizle
-                stickyContainer.style.width = '';
-                stickyContainer.style.left = '';
-                stickyContainer.style.position = '';
-                stickyContainer.style.top = '';
-                stickyContainer.style.bottom = '';
-            }
-        }
-    }
-    
-    // Throttle scroll events for better performance
-    let ticking = false;
-    function requestTick() {
-        if (!ticking) {
-            requestAnimationFrame(updateSidebarPosition);
-            ticking = true;
-            setTimeout(() => { ticking = false; }, 16); // ~60fps
-        }
-    }
-    
-    // Resize olduğunda orijinal boyutları yeniden hesapla
-    function handleResize() {
-        if (!isSticky) {
-            originalDimensions = null;
-            getOriginalDimensions();
-        }
-        updateSidebarPosition();
-    }
-    
-    window.addEventListener('scroll', requestTick);
-    window.addEventListener('resize', handleResize);
-    
-    // İlk yükleme
-    setTimeout(() => {
-        updateSidebarPosition();
-    }, 100);
-});
+// Sidebar artık CSS sticky ile sabit kalıyor, JavaScript kodu gerekli değil
 </script>
 @endsection
 

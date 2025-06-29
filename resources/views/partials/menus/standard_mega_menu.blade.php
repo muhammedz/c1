@@ -30,19 +30,7 @@
                 </div>
             </div>
             
-            @if(isset($menuItem->layout_settings['show_bottom_section']) && $menuItem->layout_settings['show_bottom_section'])
-                <div class="mt-2 pt-2 border-t border-gray-200">
-                    <div class="flex justify-between items-center">
-                        <p class="text-xs text-gray-500">{{ $menuItem->layout_settings['bottom_text'] ?? 'Daha fazla bilgi için iletişime geçin.' }}</p>
-                        @if(isset($menuItem->layout_settings['action_link']) && isset($menuItem->layout_settings['action_text']))
-                            <a href="{{ $menuItem->layout_settings['action_link'] }}" class="text-[#00352b] hover:text-[#007b32] text-sm font-medium flex items-center gap-1 transition-all hover:gap-2">
-                                {{ $menuItem->layout_settings['action_text'] }}
-                                <span class="material-icons text-sm">arrow_forward</span>
-                            </a>
-                        @endif
-                    </div>
-                </div>
-            @endif
+
         </div>
     </div>
 </div> 

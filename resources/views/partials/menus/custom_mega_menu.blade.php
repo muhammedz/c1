@@ -51,23 +51,7 @@
                     @endif
                 </div>
 
-                {{-- Alt bölüm --}}
-                @if(isset($menuItem->layout_settings['footer_text']) || isset($menuItem->layout_settings['footer_link']))
-                    <div class="mt-3 pt-2 border-t border-gray-200">
-                        <div class="flex justify-between items-center">
-                            @if(isset($menuItem->layout_settings['footer_text']))
-                                <p class="text-xs text-gray-500">{{ $menuItem->layout_settings['footer_text'] }}</p>
-                            @endif
-                            
-                            @if(isset($menuItem->layout_settings['footer_link']) && isset($menuItem->layout_settings['footer_link_text']))
-                                <a href="{{ $menuItem->layout_settings['footer_link'] }}" class="text-[#00352b] hover:text-[#007b32] text-sm font-medium flex items-center gap-1 transition-all hover:gap-2">
-                                    {{ $menuItem->layout_settings['footer_link_text'] }}
-                                    <span class="material-icons text-sm">{{ $menuItem->layout_settings['footer_link_icon'] ?? 'arrow_forward' }}</span>
-                                </a>
-                            @endif
-                        </div>
-                    </div>
-                @endif
+
             @else
                 <div class="text-center py-4">
                     <p class="text-gray-500">Bu menü için özel ayarlar yapılandırılmamış.</p>

@@ -355,21 +355,32 @@
 </div>
 
 <script>
-    // Hikaye verileri
-    const hikayeler = [
-        @foreach($stories as $story)
-        {
-            baslik: "{{ $story->title }}",
-            metin: "{{ $story->description }}",
-            resim: "{{ $story->image_url ?? 'https://cankaya.epoxsoft.net.tr/images/huseyincanguner/huseyincanguner1.jpeg' }}"
-        }@if(!$loop->last),@endif
-        @endforeach
-    ];
-    
-    let aktifHikayeIndex = 0;
-    
-    // Lightbox fonksiyonları
-    function acLightbox(index) {
+// Global değişkenler
+let aktifHikayeIndex = 0;
+let aktifFotoIndex = 0;
+
+// Hikaye verileri
+const hikayeler = [
+    @foreach($stories as $story)
+    {
+        baslik: "{{ $story->title }}",
+        metin: "{{ $story->description }}",
+        resim: "{{ $story->image_url ?? 'https://cankaya.epoxsoft.net.tr/images/huseyincanguner/huseyincanguner1.jpeg' }}"
+    }@if(!$loop->last),@endif
+    @endforeach
+];
+
+// Fotoğraf verileri
+const fotograflar = [
+    @foreach($gallery as $photo)
+    {
+        url: "{{ $photo->image_url ?? 'https://cankaya.epoxsoft.net.tr/images/huseyincanguner/huseyincanguner5.jpeg' }}",
+        baslik: "{{ $photo->title }}"
+    }@if(!$loop->last),@endif
+    @endforeach
+];
+// Lightbox fonksiyonları
+function acLightbox(index) {
         aktifHikayeIndex = index;
         hikayeGoster(index);
         
@@ -434,18 +445,24 @@
     
 
     
-    // Dokunmatik kaydırma desteği
-    let touchStartX = 0;
-    let touchEndX = 0;
-    
-    document.getElementById('lightbox').addEventListener('touchstart', function(e) {
-        touchStartX = e.changedTouches[0].screenX;
-    }, false);
-    
-    document.getElementById('lightbox').addEventListener('touchend', function(e) {
-        touchEndX = e.changedTouches[0].screenX;
-        handleSwipe();
-    }, false);
+// Dokunmatik kaydırma desteği
+let touchStartX = 0;
+let touchEndX = 0;
+
+// DOM yüklendikten sonra event listener'ları ekle
+document.addEventListener('DOMContentLoaded', function() {
+    const lightboxElement = document.getElementById('lightbox');
+    if (lightboxElement) {
+        lightboxElement.addEventListener('touchstart', function(e) {
+            touchStartX = e.changedTouches[0].screenX;
+        }, false);
+        
+        lightboxElement.addEventListener('touchend', function(e) {
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+        }, false);
+    }
+});
     
     function handleSwipe() {
         if (touchEndX < touchStartX) {
@@ -457,20 +474,9 @@
         }
     }
     
-    // Fotoğraf verileri
-    const fotograflar = [
-        @foreach($gallery as $photo)
-        {
-            url: "{{ $photo->image_url ?? 'https://cankaya.epoxsoft.net.tr/images/huseyincanguner/huseyincanguner5.jpeg' }}",
-            baslik: "{{ $photo->title }}"
-        }@if(!$loop->last),@endif
-        @endforeach
-    ];
-    
-    let aktifFotoIndex = 0;
-    
     // Fotoğraf Lightbox fonksiyonları
     function acFotoLightbox(index) {
+        console.log('acFotoLightbox çağrıldı, index:', index);
         aktifFotoIndex = index;
         fotografGoster(index);
         document.getElementById('fotoLightbox').style.display = 'flex';
@@ -482,12 +488,31 @@
     }
     
     function fotografGoster(index) {
-        if (fotograflar.length === 0) return;
+        console.log('fotografGoster çağrıldı, index:', index, 'fotograflar.length:', fotograflar.length);
+        
+        if (fotograflar.length === 0) {
+            console.log('Fotoğraf bulunamadı');
+            return;
+        }
+        
+        if (index < 0 || index >= fotograflar.length) {
+            console.log('Geçersiz index:', index);
+            return;
+        }
         
         const foto = fotograflar[index];
-        document.getElementById('lightboxFoto').src = foto.url;
-        document.getElementById('lightboxFotoBaslik').textContent = foto.baslik;
-        document.getElementById('lightboxFotoSayac').textContent = `${index + 1} / ${fotograflar.length}`;
+        const lightboxFoto = document.getElementById('lightboxFoto');
+        const lightboxFotoBaslik = document.getElementById('lightboxFotoBaslik');
+        const lightboxFotoSayac = document.getElementById('lightboxFotoSayac');
+        
+        if (lightboxFoto && lightboxFotoBaslik && lightboxFotoSayac) {
+            lightboxFoto.src = foto.url;
+            lightboxFotoBaslik.textContent = foto.baslik;
+            lightboxFotoSayac.textContent = `${index + 1} / ${fotograflar.length}`;
+            console.log('Fotoğraf güncellendi:', foto.url);
+        } else {
+            console.error('Lightbox elementleri bulunamadı');
+        }
     }
     
     function sonrakiFoto(event) {
@@ -507,28 +532,27 @@
         document.body.style.overflow = '';
     }
     
-    // Klavye navigasyonu
-    document.addEventListener('keydown', function(event) {
-        if (event.key === 'Escape') {
-            if (document.getElementById('fotoLightbox').style.display === 'flex') {
-                kapatFotoLightbox();
-            } else if (!document.getElementById('lightbox').classList.contains('hidden')) {
-                kapatLightbox();
-            }
-        } else if (event.key === 'ArrowRight') {
-            if (document.getElementById('fotoLightbox').style.display === 'flex') {
-                sonrakiFoto(event);
-            } else if (!document.getElementById('lightbox').classList.contains('hidden')) {
-                sonrakiHikaye(event);
-            }
-        } else if (event.key === 'ArrowLeft') {
-            if (document.getElementById('fotoLightbox').style.display === 'flex') {
-                oncekiFoto(event);
-            } else if (!document.getElementById('lightbox').classList.contains('hidden')) {
-                oncekiHikaye(event);
-            }
+// Klavye navigasyonu
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+        if (document.getElementById('fotoLightbox').style.display === 'flex') {
+            kapatFotoLightbox();
+        } else if (!document.getElementById('lightbox').classList.contains('hidden')) {
+            kapatLightbox();
         }
-    });
-    
+    } else if (event.key === 'ArrowRight') {
+        if (document.getElementById('fotoLightbox').style.display === 'flex') {
+            sonrakiFoto(event);
+        } else if (!document.getElementById('lightbox').classList.contains('hidden')) {
+            sonrakiHikaye(event);
+        }
+    } else if (event.key === 'ArrowLeft') {
+        if (document.getElementById('fotoLightbox').style.display === 'flex') {
+            oncekiFoto(event);
+        } else if (!document.getElementById('lightbox').classList.contains('hidden')) {
+            oncekiHikaye(event);
+        }
+    }
+});
 
 </script> 
