@@ -787,12 +787,24 @@
                         '<p>' + (event.location || 'Belirtilmemiş') + '</p>' +
                     '</div>';
                     
-                // Detay URL bilgisi
-                if (event.detailUrl) {
+                // Detay URL bilgisi - hem detailUrl hem de detail_url kontrolü
+                var detailUrl = event.detailUrl || event.detail_url;
+                console.log('Event detailUrl kontrolü:', {
+                    detailUrl: event.detailUrl,
+                    detail_url: event.detail_url,
+                    final: detailUrl,
+                    title: event.title
+                });
+                if (detailUrl) {
                     previewContent += '<div class="mb-3">' +
                         '<h6><i class="fas fa-link mr-2"></i> Detay URL:</h6>' +
-                        '<p><a href="' + event.detailUrl + '" target="_blank" class="btn btn-sm btn-outline-primary">' +
+                        '<p><a href="' + detailUrl + '" target="_blank" class="btn btn-sm btn-outline-primary">' +
                         '<i class="fas fa-external-link-alt mr-1"></i> Etkinlik Detayını Görüntüle</a></p>' +
+                    '</div>';
+                } else {
+                    previewContent += '<div class="mb-3">' +
+                        '<h6><i class="fas fa-exclamation-triangle mr-2 text-warning"></i> Detay URL:</h6>' +
+                        '<p class="text-muted">URL bulunamadı veya oluşturulamadı</p>' +
                     '</div>';
                 }
                 

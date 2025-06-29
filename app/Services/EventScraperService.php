@@ -1012,6 +1012,8 @@ class EventScraperService
                 'end_date' => isset($eventData['end_date']) ? Carbon::parse($eventData['end_date']) : (clone $startDate)->addHours(2),
                 'location' => $eventData['location'] ?? 'Belirtilmemiş',
                 'image_url' => $eventData['image_url'] ?? $eventData['imageUrl'] ?? null,
+                'detail_url' => $eventData['detailUrl'] ?? null,
+                'external_id' => $this->generateExternalId($eventData['title'] ?? 'etkinlik', $startDate, $eventData['location'] ?? ''),
                 'slug' => $uniqueSlug,
                 'category' => $categoryName
             ];
