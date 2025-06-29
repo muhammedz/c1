@@ -28,6 +28,15 @@
         max-height: 300px;
         overflow-y: auto;
     }
+    
+    /* PNG yükleme için stil */
+    .icon-preview img {
+        max-width: 24px;
+        max-height: 24px;
+        object-fit: contain;
+        border-radius: 4px;
+        background-color: #fff;
+    }
 </style>
 @stop
 
@@ -317,15 +326,21 @@
                                 <label for="icon">İkon</label>
                                 <div class="input-group">
                                     <div class="input-group-prepend">
-                                        <span class="input-group-text"><i id="selected-icon" class="material-icons">home</i></span>
+                                        <span class="input-group-text icon-preview" id="icon-preview">
+                                            <i id="selected-icon" class="material-icons">home</i>
+                                        </span>
                                     </div>
                                     <input type="text" class="form-control" id="icon" name="icon">
                                     <div class="input-group-append">
                                         <button type="button" class="btn btn-outline-secondary" id="test-icon-btn">
                                             <i class="material-icons">format_paint</i> İKON
                                         </button>
+                                        <button type="button" class="btn btn-outline-info" id="upload-png-btn">
+                                            <i class="fas fa-image"></i> PNG
+                                        </button>
                                     </div>
                                 </div>
+                                <input type="file" id="png-upload" accept="image/png,image/jpg,image/jpeg" style="display: none;">
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -654,7 +669,50 @@
         $('#icon').on('input', function() {
             var iconValue = $(this).val();
             if (iconValue) {
-                $('#selected-icon').attr('class', 'material-icons').text(iconValue);
+                // PNG/JPG data URL kontrolü
+                if (iconValue.startsWith('data:image/')) {
+                    $('#icon-preview').html('<img src="' + iconValue + '" alt="İkon">');
+                } else {
+                    // Material icons
+                    $('#icon-preview').html('<i id="selected-icon" class="material-icons">' + iconValue + '</i>');
+                }
+            }
+        });
+        
+        // PNG yükleme butonu
+        $('#upload-png-btn').click(function() {
+            $('#png-upload').click();
+        });
+        
+        // PNG dosya seçimi
+        $('#png-upload').change(function() {
+            var file = this.files[0];
+            if (file) {
+                // Dosya türü kontrolü
+                if (!file.type.match('image.*')) {
+                    alert('Lütfen sadece resim dosyası seçin!');
+                    return;
+                }
+                
+                // Dosya boyutu kontrolü (2MB)
+                if (file.size > 2 * 1024 * 1024) {
+                    alert('Dosya boyutu 2MB\'dan küçük olmalıdır!');
+                    return;
+                }
+                
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    var dataURL = e.target.result;
+                    
+                    // İkon alanına data URL'i yaz
+                    $('#icon').val(dataURL);
+                    
+                    // Önizlemeyi güncelle
+                    $('#icon-preview').html('<img src="' + dataURL + '" alt="İkon">');
+                    
+                    console.log('PNG yüklendi, boyut:', dataURL.length, 'karakter');
+                };
+                reader.readAsDataURL(file);
             }
         });
         
@@ -667,6 +725,9 @@
                 $('#item_id').val('');
                 $('#parent_id').val('');
                 
+                // İkon önizlemesini sıfırla
+                $('#icon-preview').html('<i id="selected-icon" class="material-icons">home</i>');
+                
                 // Parent seçeneklerini yeniden yükle
                 refreshParentOptions();
                 
@@ -678,6 +739,9 @@
                 $('#menuItemModalLabel').text('Alt Menü Ekle');
                 $('#menu-item-form')[0].reset();
                 $('#item_id').val('');
+                
+                // İkon önizlemesini sıfırla
+                $('#icon-preview').html('<i id="selected-icon" class="material-icons">home</i>');
                 
                 // Üst menü id'sini ayarla
                 var parentId = $(this).data('parent-id');
@@ -736,7 +800,16 @@
                 $('#order').val(order);
                 $('#status').prop('checked', status == 1);
                 $('#icon').val(icon);
-                $('#selected-icon').attr('class', 'fas ' + icon);
+                
+                // İkon önizlemesini güncelle
+                if (icon && icon.startsWith('data:image/')) {
+                    // PNG/JPG resim
+                    $('#icon-preview').html('<img src="' + icon + '" alt="İkon">');
+                } else {
+                    // Material icons
+                    $('#icon-preview').html('<i id="selected-icon" class="material-icons">' + (icon || 'home') + '</i>');
+                }
+                
                 $('#parent_id').val(parentId);
                 
                 $('#menu-item-modal').modal('show');
