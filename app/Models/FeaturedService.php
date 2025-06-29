@@ -94,9 +94,10 @@ class FeaturedService extends Model
             $style = "width: {$size}px !important; height: {$size}px !important;";
             
             if (strpos($svgContent, '<svg') !== false) {
-                // SVG'yi normalize et - width ve height'ı kaldır
+                // SVG'yi normalize et - width, height ve style'ı kaldır
                 $svgContent = preg_replace('/width="[^"]*"/', '', $svgContent);
                 $svgContent = preg_replace('/height="[^"]*"/', '', $svgContent);
+                $svgContent = preg_replace('/style="[^"]*"/', '', $svgContent);
                 
                 // Büyük viewBox'lı SVG'leri standart boyuta çevir
                 if (strpos($svgContent, 'viewBox="0 0 1250') !== false) {
