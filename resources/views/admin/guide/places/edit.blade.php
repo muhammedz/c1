@@ -304,39 +304,7 @@
             </div>
         </div>
 
-        <!-- Mevcut Resimler -->
-        @if($guidePlace->images->count() > 0)
-        <div class="card">
-            <div class="card-header">
-                <h3 class="card-title">Mevcut Resimler</h3>
-            </div>
-            <div class="card-body">
-                <div class="row" id="existing-images">
-                    @foreach($guidePlace->images as $image)
-                        <div class="col-6 mb-3" id="image-{{ $image->id }}">
-                            <div class="card">
-                                <img src="{{ $image->image_url }}" class="card-img-top" style="height: 100px; object-fit: cover;">
-                                <div class="card-body p-2">
-                                    <div class="btn-group btn-group-sm w-100">
-                                        <button type="button" 
-                                                class="btn btn-outline-primary btn-sm {{ $image->is_featured ? 'active' : '' }}"
-                                                onclick="toggleFeatured({{ $image->id }})">
-                                            <i class="fas fa-star"></i>
-                                        </button>
-                                        <button type="button" 
-                                                class="btn btn-outline-danger btn-sm"
-                                                onclick="deleteImage({{ $image->id }})">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    @endforeach
-                </div>
-            </div>
-        </div>
-        @endif
+        {{-- Mevcut Resimler bölümü gizlendi - alt kısımda FileManagerSystem ile resim yönetimi mevcut --}}
 
         <!-- Yeni Resim Yükleme -->
         <div class="card">

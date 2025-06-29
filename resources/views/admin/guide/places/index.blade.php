@@ -153,7 +153,7 @@
                             </td>
                             <td>
                                 <div class="btn-group" role="group">
-                                    <a href="{{ route('admin.guide-places.show', $place) }}" class="btn btn-info btn-sm" title="Görüntüle">
+                                    <a href="{{ route('guide.place', [$place->category->slug, $place->slug]) }}" target="_blank" class="btn btn-info btn-sm" title="Frontend'de Görüntüle">
                                         <i class="fas fa-eye"></i>
                                     </a>
                                     <a href="{{ route('admin.guide-places.edit', $place) }}" class="btn btn-primary btn-sm" title="Düzenle">
