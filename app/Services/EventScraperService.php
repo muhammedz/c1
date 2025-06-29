@@ -460,15 +460,68 @@ class EventScraperService
             }
         }
         
-        // Detay linki
-        $linkNode = $xpath->query('.//a[contains(@class, "event-link")]', $eventNode)->item(0);
-        if (!$linkNode) {
-            $linkNodes = $xpath->query('.//a', $eventNode);
-            if ($linkNodes->length > 0) {
-                $linkNode = $linkNodes->item(0);
+        // Detay linki - Next.js yapısına uygun strateji
+        $detailUrl = null;
+        
+        // Strateji 1: Eğer eventNode kendisi bir <a> etiketiyse
+        if ($eventNode->nodeName === 'a') {
+            $detailUrl = $eventNode->getAttribute('href');
+            Log::info('EventNode kendisi bir a etiketi', [
+                'title' => $title,
+                'href' => $detailUrl
+            ]);
+        }
+        
+        // Strateji 2: Parent a etiketini ara (Next.js yapısı)
+        if (empty($detailUrl)) {
+            $parentLink = $xpath->query('./ancestor::a[1]', $eventNode);
+            if ($parentLink->length > 0) {
+                $detailUrl = $parentLink->item(0)->getAttribute('href');
+                Log::info('Parent a etiketi bulundu', [
+                    'title' => $title,
+                    'href' => $detailUrl
+                ]);
             }
         }
-        $detailUrl = $linkNode ? $linkNode->getAttribute('href') : null;
+        
+        // Strateji 3: İçindeki a etiketlerini ara
+        if (empty($detailUrl)) {
+            $linkNodes = $xpath->query('.//a', $eventNode);
+            
+            Log::info('İçindeki a etiketleri aranıyor', [
+                'title' => $title,
+                'linkNodes_count' => $linkNodes->length
+            ]);
+            
+            if ($linkNodes->length > 0) {
+                $detailUrl = $linkNodes->item(0)->getAttribute('href');
+                Log::info('İçindeki a etiketi bulundu', [
+                    'title' => $title,
+                    'href' => $detailUrl
+                ]);
+            }
+        }
+        
+        // Strateji 4: Eğer a etiketi bulunamadıysa, başlıktan URL oluştur
+        if (empty($detailUrl) && !empty($title)) {
+            // Türkçe karakterleri İngilizce karşılıklarına çevir
+            $slug = $this->turkishToEnglish($title);
+            
+            // URL-friendly slug oluştur
+            $slug = strtolower($slug);
+            $slug = preg_replace('/[^a-z0-9\s-]/', '', $slug);
+            $slug = preg_replace('/[\s-]+/', '-', $slug);
+            $slug = trim($slug, '-');
+            
+            // Detay URL'sini oluştur
+            $detailUrl = 'https://kultursanat.cankaya.bel.tr/etkinlikler/' . $slug;
+            
+            Log::info('Başlıktan detay URL oluşturuldu', [
+                'title' => $title,
+                'slug' => $slug,
+                'detailUrl' => $detailUrl
+            ]);
+        }
         
         // URL'in tam olduğunu kontrol et
         if ($imageUrl && !Str::startsWith($imageUrl, ['http://', 'https://'])) {
@@ -518,7 +571,7 @@ class EventScraperService
             'end_date' => $endDate,
             'location' => $location,
             'image_url' => $imageUrl,
-            'detail_url' => $detailUrl,
+            'detail_url' => $detailUrl, // createEvent metodunda external_url olarak kaydedilecek
             'external_id' => $this->generateExternalId($title, $startDate, $location),
             'dateText' => $dateText,
             'timeText' => $timeText
@@ -896,6 +949,22 @@ class EventScraperService
             ]);
             return null;
         }
+    }
+
+    /**
+     * Türkçe karakterleri İngilizce karşılıklarına çevirir
+     */
+    private function turkishToEnglish($text)
+    {
+        $turkishChars = [
+            'ç', 'Ç', 'ğ', 'Ğ', 'ı', 'İ', 'ö', 'Ö', 'ş', 'Ş', 'ü', 'Ü'
+        ];
+        
+        $englishChars = [
+            'c', 'C', 'g', 'G', 'i', 'I', 'o', 'O', 's', 'S', 'u', 'U'
+        ];
+        
+        return str_replace($turkishChars, $englishChars, $text);
     }
 
     /**
