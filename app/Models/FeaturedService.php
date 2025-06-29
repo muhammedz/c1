@@ -68,10 +68,27 @@ class FeaturedService extends Model
                 $svgContent = preg_replace('/width="[^"]*"/', '', $svgContent);
                 $svgContent = preg_replace('/height="[^"]*"/', '', $svgContent);
                 
-                // Büyük viewBox'lı SVG'ler için özel düzeltme
+                // Büyük viewBox'lı SVG'leri standart boyuta çevir
                 if (strpos($svgContent, 'viewBox="0 0 1250') !== false) {
-                    // Sadece CSS ile düzeltme yap - SVG içeriğine dokunma
-                    $hasLargeViewBox = true;
+                    // ViewBox'ı standart boyuta çevir
+                    $svgContent = str_replace('viewBox="0 0 1250.000000 1250.000000"', 'viewBox="0 0 24 24"', $svgContent);
+                    
+                    // Orijinal transform'u kaldır
+                    $svgContent = preg_replace('/<g transform="[^"]*"([^>]*)>/', '<g$1>', $svgContent);
+                    
+                    // Path koordinatlarını ölçeklendir (1250 -> 24 oranında)
+                    $svgContent = preg_replace_callback('/d="([^"]*)"/', function($matches) {
+                        $path = $matches[1];
+                        // Koordinatları ölçeklendir
+                        $path = preg_replace_callback('/(-?\d+\.?\d*)/', function($numMatch) {
+                            $num = floatval($numMatch[1]);
+                            $scaled = $num * 24 / 1250;
+                            return number_format($scaled, 3, '.', '');
+                        }, $path);
+                        return 'd="' . $path . '"';
+                    }, $svgContent);
+                    
+                    $hasLargeViewBox = false; // Artık standart SVG gibi davran
                 } else {
                     $hasLargeViewBox = false;
                 }
