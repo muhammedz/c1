@@ -17,6 +17,8 @@ class FeaturedService extends Model
     protected $fillable = [
         'title',
         'icon',
+        'svg_color',
+        'svg_size',
         'url',
         'order',
         'is_active',
@@ -30,6 +32,7 @@ class FeaturedService extends Model
     protected $casts = [
         'is_active' => 'boolean',
         'order' => 'integer',
+        'svg_size' => 'integer',
     ];
     
     /**
@@ -58,9 +61,18 @@ class FeaturedService extends Model
                 return 'id="' . $matches[1] . '_' . $this->id . '_' . uniqid() . '"';
             }, $svgContent);
             
-            // SVG'ye stil ekle
-            if (strpos($svgContent, 'style=') === false && strpos($svgContent, '<svg') !== false) {
-                $svgContent = str_replace('<svg', '<svg style="width: 48px; height: 48px;"', $svgContent);
+            // SVG boyutu ve rengi ayarla
+            $size = $this->svg_size ?? 48;
+            $color = $this->svg_color ?? '#004d2e';
+            
+            // Mevcut style attribute'unu kaldır
+            $svgContent = preg_replace('/style="[^"]*"/', '', $svgContent);
+            
+            // Yeni style ekle
+            $style = "width: {$size}px; height: {$size}px; color: {$color}; fill: {$color};";
+            
+            if (strpos($svgContent, '<svg') !== false) {
+                $svgContent = str_replace('<svg', '<svg style="' . $style . '"', $svgContent);
             }
             
             return $svgContent;

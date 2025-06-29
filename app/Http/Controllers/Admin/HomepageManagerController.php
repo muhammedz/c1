@@ -387,6 +387,8 @@ class HomepageManagerController extends Controller
         $validator = Validator::make($request->all(), [
             'title' => 'required|string|max:255',
             'icon' => 'required|string',
+            'svg_color' => 'nullable|string|max:7',
+            'svg_size' => 'nullable|integer|min:16|max:128',
             'url' => 'nullable|string|max:255',
         ]);
 
@@ -403,11 +405,15 @@ class HomepageManagerController extends Controller
                 'title' => $request->title,
                 'icon_is_svg' => $isSvg,
                 'icon_length' => strlen($icon),
+                'svg_color' => $request->svg_color,
+                'svg_size' => $request->svg_size,
             ]);
 
             FeaturedService::create([
                 'title' => $request->title,
                 'icon' => $icon,
+                'svg_color' => $isSvg ? $request->svg_color : null,
+                'svg_size' => $isSvg ? $request->svg_size : null,
                 'url' => $request->url,
                 'is_active' => 1,
                 'order' => FeaturedService::max('order') + 1
@@ -436,6 +442,8 @@ class HomepageManagerController extends Controller
         $validator = Validator::make($request->all(), [
             'title' => 'required|string|max:255',
             'icon' => 'required|string',
+            'svg_color' => 'nullable|string|max:7',
+            'svg_size' => 'nullable|integer|min:16|max:128',
             'url' => 'nullable|string|max:255',
         ]);
 
@@ -455,11 +463,15 @@ class HomepageManagerController extends Controller
                 'title' => $request->title,
                 'icon_is_svg' => $isSvg,
                 'icon_length' => strlen($icon),
+                'svg_color' => $request->svg_color,
+                'svg_size' => $request->svg_size,
             ]);
 
             $service->update([
                 'title' => $request->title,
                 'icon' => $icon,
+                'svg_color' => $isSvg ? $request->svg_color : null,
+                'svg_size' => $isSvg ? $request->svg_size : null,
                 'url' => $request->url,
                 'is_active' => $request->has('is_active') ? 1 : $service->is_active,
             ]);

@@ -86,7 +86,9 @@
                                                 data-id="{{ $service->id }}" 
                                                 data-title="{{ $service->title }}"
                                                 data-icon="{{ $service->icon }}" 
-                                                data-url="{{ $service->url }}">
+                                                data-url="{{ $service->url }}"
+                                                data-svg-color="{{ $service->svg_color }}"
+                                                data-svg-size="{{ $service->svg_size }}">
                                             <i class="fas fa-edit"></i> Düzenle
                                         </button>
                                         <button type="button" class="btn btn-danger btn-sm delete-service-btn" data-id="{{ $service->id }}">
@@ -177,6 +179,22 @@
                             <small class="form-text text-muted">Font Awesome ikonu, SVG kodu veya resim dosyası (PNG, JPG) yükleyebilirsiniz.</small>
                         </div>
                         
+                        <!-- SVG Ayarları -->
+                        <div id="svg-settings" class="form-group" style="display: none;">
+                            <label>SVG İkon Ayarları</label>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label for="service_svg_color">İkon Rengi</label>
+                                    <input type="color" class="form-control" id="service_svg_color" name="svg_color" value="#004d2e">
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="service_svg_size">İkon Boyutu (px)</label>
+                                    <input type="number" class="form-control" id="service_svg_size" name="svg_size" value="48" min="16" max="128">
+                                </div>
+                            </div>
+                            <small class="form-text text-muted">Bu ayarlar sadece SVG ikonları için geçerlidir.</small>
+                        </div>
+                        
                         <div class="form-group">
                             <label for="service_url">URL (İsteğe Bağlı)</label>
                             <input type="text" class="form-control" id="service_url" name="url">
@@ -229,6 +247,22 @@
                                 </div>
                             </div>
                             <small class="form-text text-muted">Font Awesome ikonu, SVG kodu veya resim dosyası (PNG, JPG) yükleyebilirsiniz.</small>
+                        </div>
+                        
+                        <!-- SVG Ayarları -->
+                        <div id="edit-svg-settings" class="form-group" style="display: none;">
+                            <label>SVG İkon Ayarları</label>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label for="edit_service_svg_color">İkon Rengi</label>
+                                    <input type="color" class="form-control" id="edit_service_svg_color" name="svg_color" value="#004d2e">
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="edit_service_svg_size">İkon Boyutu (px)</label>
+                                    <input type="number" class="form-control" id="edit_service_svg_size" name="svg_size" value="48" min="16" max="128">
+                                </div>
+                            </div>
+                            <small class="form-text text-muted">Bu ayarlar sadece SVG ikonları için geçerlidir.</small>
                         </div>
                         
                         <div class="form-group">
@@ -394,13 +428,21 @@
                 var title = $(this).data('title');
                 var icon = $(this).data('icon');
                 var url = $(this).data('url');
+                var svgColor = $(this).data('svg-color') || '#004d2e';
+                var svgSize = $(this).data('svg-size') || 48;
                 
                 $('#edit_service_title').val(title);
                 $('#edit_service_icon').val(icon);
                 $('#edit_service_url').val(url);
+                $('#edit_service_svg_color').val(svgColor);
+                $('#edit_service_svg_size').val(svgSize);
+                
+                // SVG ayarlarını göster/gizle
+                var isSvg = icon.startsWith('<svg');
+                $('#edit-svg-settings').toggle(isSvg);
                 
                 // İkon önizleme
-                $('#editServiceModal .icon-preview span').html(icon.startsWith('<svg') ? icon : '<i class="' + icon + ' fa-2x"></i>');
+                $('#editServiceModal .icon-preview span').html(isSvg ? icon : '<i class="' + icon + ' fa-2x"></i>');
                 
                 // Form action URL'sini güncelle
                 $('#editServiceForm').attr('action', '{{ url("admin/homepage/featured-services") }}/' + id);
@@ -449,8 +491,17 @@
             $('.icon-picker').on('change', function() {
                 var iconValue = $(this).val();
                 var previewElement = $(this).closest('.icon-picker-wrapper').find('.icon-preview span');
+                var isSvg = iconValue.startsWith('<svg');
                 
-                if (iconValue.startsWith('<svg')) {
+                // SVG ayarlarını göster/gizle
+                var modalId = $(this).closest('.modal').attr('id');
+                if (modalId === 'addServiceModal') {
+                    $('#svg-settings').toggle(isSvg);
+                } else if (modalId === 'editServiceModal') {
+                    $('#edit-svg-settings').toggle(isSvg);
+                }
+                
+                if (isSvg) {
                     // SVG içeriği
                     previewElement.html(iconValue);
                 } else {
@@ -490,6 +541,42 @@
                             console.log('Eski format ikon güncellendi:', iconValue, '->', 'fas fa-' + iconValue);
                         }
                     }
+                }
+            });
+            
+            // SVG renk ve boyut değişikliklerini canlı önizleme
+            $('#service_svg_color, #service_svg_size, #edit_service_svg_color, #edit_service_svg_size').on('input', function() {
+                var modalId = $(this).closest('.modal').attr('id');
+                var iconInput, colorInput, sizeInput, previewElement;
+                
+                if (modalId === 'addServiceModal') {
+                    iconInput = $('#service_icon');
+                    colorInput = $('#service_svg_color');
+                    sizeInput = $('#service_svg_size');
+                    previewElement = $('#addServiceModal .icon-preview span');
+                } else if (modalId === 'editServiceModal') {
+                    iconInput = $('#edit_service_icon');
+                    colorInput = $('#edit_service_svg_color');
+                    sizeInput = $('#edit_service_svg_size');
+                    previewElement = $('#editServiceModal .icon-preview span');
+                }
+                
+                var iconValue = iconInput.val();
+                if (iconValue.startsWith('<svg')) {
+                    var color = colorInput.val();
+                    var size = sizeInput.val();
+                    
+                    // SVG içeriğini güncelle
+                    var svgContent = iconValue;
+                    
+                    // Mevcut style'ı kaldır
+                    svgContent = svgContent.replace(/style="[^"]*"/g, '');
+                    
+                    // Yeni style ekle
+                    var style = 'width: ' + size + 'px; height: ' + size + 'px; color: ' + color + '; fill: ' + color + ';';
+                    svgContent = svgContent.replace('<svg', '<svg style="' + style + '"');
+                    
+                    previewElement.html(svgContent);
                 }
             });
         });
