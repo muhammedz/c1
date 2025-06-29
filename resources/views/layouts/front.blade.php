@@ -269,11 +269,10 @@
        }
        
        .featured-service-icon svg {
-           width: 100%;
-           height: 100%;
-           max-width: 40px;
-           max-height: 40px;
-           color: #004d2e;
+           width: auto !important;
+           height: auto !important;
+           max-width: none !important;
+           max-height: none !important;
        }
        
        .featured-service-title {

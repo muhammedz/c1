@@ -185,7 +185,11 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <label for="service_svg_color">İkon Rengi</label>
-                                    <input type="color" class="form-control" id="service_svg_color" name="svg_color" value="#004d2e">
+                                    <div class="input-group">
+                                        <input type="color" class="form-control" id="service_svg_color" name="svg_color" value="#004d2e" style="width: 60px;">
+                                        <input type="text" class="form-control" id="service_svg_color_text" placeholder="#004d2e" maxlength="7" pattern="^#[0-9A-Fa-f]{6}$">
+                                    </div>
+                                    <small class="form-text text-muted">Renk seçici kullanın veya hex kod yazın (örn: #357a3b)</small>
                                 </div>
                                 <div class="col-md-6">
                                     <label for="service_svg_size">İkon Boyutu (px)</label>
@@ -255,7 +259,11 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <label for="edit_service_svg_color">İkon Rengi</label>
-                                    <input type="color" class="form-control" id="edit_service_svg_color" name="svg_color" value="#004d2e">
+                                    <div class="input-group">
+                                        <input type="color" class="form-control" id="edit_service_svg_color" name="svg_color" value="#004d2e" style="width: 60px;">
+                                        <input type="text" class="form-control" id="edit_service_svg_color_text" placeholder="#004d2e" maxlength="7" pattern="^#[0-9A-Fa-f]{6}$">
+                                    </div>
+                                    <small class="form-text text-muted">Renk seçici kullanın veya hex kod yazın (örn: #357a3b)</small>
                                 </div>
                                 <div class="col-md-6">
                                     <label for="edit_service_svg_size">İkon Boyutu (px)</label>
@@ -435,6 +443,7 @@
                 $('#edit_service_icon').val(icon);
                 $('#edit_service_url').val(url);
                 $('#edit_service_svg_color').val(svgColor);
+                $('#edit_service_svg_color_text').val(svgColor);
                 $('#edit_service_svg_size').val(svgSize);
                 
                 // SVG ayarlarını göster/gizle
@@ -544,9 +553,29 @@
                 }
             });
             
-            // SVG renk ve boyut değişikliklerini canlı önizleme
-            $('#service_svg_color, #service_svg_size, #edit_service_svg_color, #edit_service_svg_size').on('input', function() {
-                var modalId = $(this).closest('.modal').attr('id');
+            // Hex kod ve renk seçici senkronizasyonu
+            function syncColorInputs(colorInput, textInput) {
+                colorInput.on('input', function() {
+                    textInput.val($(this).val());
+                    updateSvgPreview($(this));
+                });
+                
+                textInput.on('input', function() {
+                    var hexValue = $(this).val();
+                    if (/^#[0-9A-Fa-f]{6}$/.test(hexValue)) {
+                        colorInput.val(hexValue);
+                        updateSvgPreview($(this));
+                    }
+                });
+            }
+            
+            // Renk inputları senkronizasyonu
+            syncColorInputs($('#service_svg_color'), $('#service_svg_color_text'));
+            syncColorInputs($('#edit_service_svg_color'), $('#edit_service_svg_color_text'));
+            
+            // SVG önizleme güncelleme fonksiyonu
+            function updateSvgPreview(triggerElement) {
+                var modalId = triggerElement.closest('.modal').attr('id');
                 var iconInput, colorInput, sizeInput, previewElement;
                 
                 if (modalId === 'addServiceModal') {
@@ -578,6 +607,11 @@
                     
                     previewElement.html(svgContent);
                 }
+            }
+            
+            // SVG renk ve boyut değişikliklerini canlı önizleme
+            $('#service_svg_color, #service_svg_size, #edit_service_svg_color, #edit_service_svg_size').on('input', function() {
+                updateSvgPreview($(this));
             });
         });
     </script>
