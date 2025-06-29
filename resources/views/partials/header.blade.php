@@ -99,9 +99,9 @@
                                                                 <!-- BELEDİYE MAKAMLARI -->
                                                                 <div class="mega-menu-category">
                                                                     <h3 class="flex items-center">
-                                                                        @if($item->icon && Str::startsWith($item->icon, 'data:image/'))
-                                                                            <img src="{{ $item->icon }}" alt="İkon" class="mr-2" style="width: 20px; height: 20px; object-fit: contain;">
-                                                                        @elseif($item->icon && Str::startsWith($item->icon, 'fas '))
+                                                                        @if($item->icon && str_starts_with($item->icon, 'data:image/'))
+                                                                            <img src="{{ $item->icon }}" alt="İkon" class="mr-2" style="width: 20px; height: 20px; object-fit: contain; display: inline-block; vertical-align: middle;">
+                                                                        @elseif($item->icon && str_starts_with($item->icon, 'fas '))
                                                                             <i class="{{ $item->icon }} mr-2"></i>
                                                                         @elseif($item->icon)
                                                                             <span class="material-icons mr-2 text-sm">{{ $item->icon }}</span>
@@ -113,7 +113,7 @@
                                                                             @foreach($item->children as $subItem)
                                                                                 <li>
                                                                                     <a href="{{ $subItem->url ?? '#' }}" class="mega-menu-link" {{ $subItem->new_tab ? 'target="_blank"' : '' }}>
-                                                                                        @if($subItem->icon && Str::startsWith($subItem->icon, 'data:image/'))
+                                                                                        @if($subItem->icon && str_starts_with($subItem->icon, 'data:image/'))
                                                                                             <img src="{{ $subItem->icon }}" alt="İkon" class="mega-menu-link-icon" style="width: 16px; height: 16px; object-fit: contain;">
                                                                                         @else
                                                                                             <i class="{{ $subItem->icon ?? 'fas fa-user' }} mega-menu-link-icon"></i>
