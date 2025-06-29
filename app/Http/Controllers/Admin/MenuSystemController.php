@@ -280,7 +280,7 @@ class MenuSystemController extends Controller
             'url' => 'required|string|max:255',
             'item_type' => 'nullable|integer',
             'button_style' => 'nullable|string|max:50',
-            'icon' => 'nullable|string|max:100',
+            'icon' => 'nullable|string|max:65535',
             'order' => 'nullable|integer|min:0',
             'status' => 'nullable|boolean',
         ]);
@@ -366,7 +366,7 @@ class MenuSystemController extends Controller
             'url' => 'required|string|max:255',
             'item_type' => 'nullable|integer',
             'button_style' => 'nullable|string|max:50',
-            'icon' => 'nullable|string|max:100',
+            'icon' => 'nullable|string|max:65535',
             'order' => 'nullable|integer|min:0',
         ]);
 
