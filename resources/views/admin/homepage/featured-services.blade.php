@@ -513,6 +513,9 @@
                 if (isSvg) {
                     // SVG içeriği
                     previewElement.html(iconValue);
+                } else if (iconValue.startsWith('data:image/')) {
+                    // PNG/JPG resim ikonu
+                    previewElement.html('<img src="' + iconValue + '" alt="İkon" style="width: 48px; height: 48px; object-fit: contain;">');
                 } else {
                     // Font Awesome ikonu - eski "fas fa-XXX" formatından veya tam "fas fa-XXX" formatından
                     if (iconValue.includes('fa-')) {
@@ -537,6 +540,9 @@
                     if (iconValue.startsWith('<svg')) {
                         // SVG içeriği
                         previewElement.html(iconValue);
+                    } else if (iconValue.startsWith('data:image/')) {
+                        // PNG/JPG resim ikonu
+                        previewElement.html('<img src="' + iconValue + '" alt="İkon" style="width: 48px; height: 48px; object-fit: contain;">');
                     } else {
                         // Font Awesome ikonu - eski "fas fa-XXX" formatından veya tam "fas fa-XXX" formatından
                         if (iconValue.includes('fa-')) {
