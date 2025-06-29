@@ -115,6 +115,10 @@ button.close span[aria-hidden="true"] {
 
 /* Öne Çıkan Hizmetler - Mobil düzeltmeleri */
 @media (max-width: 767px) {
+    /* Cache busting ve güçlü override */
+    .featured-services-section * {
+        box-sizing: border-box !important;
+    }
     /* Mobil grid düzeni iyileştirmeleri */
     .mobile-services-grid {
         display: grid !important;
@@ -156,6 +160,20 @@ button.close span[aria-hidden="true"] {
         background: #f8fafc !important;
         border-radius: 8px !important;
         border: 1px solid #e2e8f0 !important;
+        overflow: hidden !important;
+        position: relative !important;
+    }
+    
+    /* Tüm ikon türleri için genel boyut zorlama */
+    .featured-service-icon * {
+        width: 20px !important;
+        height: 20px !important;
+        max-width: 20px !important;
+        max-height: 20px !important;
+        min-width: 20px !important;
+        min-height: 20px !important;
+        font-size: 20px !important;
+        line-height: 20px !important;
     }
     
     /* FontAwesome ikonları için boyut standardizasyonu */
@@ -222,6 +240,37 @@ button.close span[aria-hidden="true"] {
         background: transparent !important;
     }
     
+    /* Çok güçlü ikon boyut zorlama - tüm elementler için */
+    .mobile-services-grid .featured-service-icon,
+    .mobile-services-grid .featured-service-icon i,
+    .mobile-services-grid .featured-service-icon svg,
+    .mobile-services-grid .featured-service-icon img,
+    .mobile-services-grid .featured-service-icon span,
+    .mobile-services-grid .featured-service-icon .material-icons {
+        width: 20px !important;
+        height: 20px !important;
+        max-width: 20px !important;
+        max-height: 20px !important;
+        min-width: 20px !important;
+        min-height: 20px !important;
+        font-size: 20px !important;
+        line-height: 1 !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        flex-shrink: 0 !important;
+    }
+    
+    /* İkon konteyner için özel boyut */
+    .mobile-services-grid .featured-service-icon {
+        width: 40px !important;
+        height: 40px !important;
+        max-width: 40px !important;
+        max-height: 40px !important;
+        min-width: 40px !important;
+        min-height: 40px !important;
+    }
+    
     /* Material Icons için boyut standardizasyonu */
     .featured-service-icon .material-icons {
         font-size: 20px !important;
@@ -272,5 +321,37 @@ button.close span[aria-hidden="true"] {
     /* Mobil grid'i sadece mobilde göster */
     .mobile-services-only {
         display: grid !important;
+    }
+    
+    /* Ultra güçlü ikon boyut zorlama - son çare */
+    .featured-services-section .mobile-services-grid .service-item .featured-service-card .featured-service-icon i,
+    .featured-services-section .mobile-services-grid .service-item .featured-service-card .featured-service-icon svg,
+    .featured-services-section .mobile-services-grid .service-item .featured-service-card .featured-service-icon img,
+    .featured-services-section .mobile-services-grid .service-item .featured-service-card .featured-service-icon span,
+    .featured-services-section .mobile-services-grid .service-item .featured-service-card .featured-service-icon .material-icons {
+        width: 20px !important;
+        height: 20px !important;
+        max-width: 20px !important;
+        max-height: 20px !important;
+        min-width: 20px !important;
+        min-height: 20px !important;
+        font-size: 20px !important;
+        line-height: 20px !important;
+        transform: scale(1) !important;
+    }
+    
+    /* İkon konteyner ultra güçlü boyut */
+    .featured-services-section .mobile-services-grid .service-item .featured-service-card .featured-service-icon {
+        width: 40px !important;
+        height: 40px !important;
+        max-width: 40px !important;
+        max-height: 40px !important;
+        min-width: 40px !important;
+        min-height: 40px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        overflow: hidden !important;
+        flex-shrink: 0 !important;
     }
 } 
