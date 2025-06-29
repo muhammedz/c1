@@ -53,38 +53,25 @@ class FeaturedService extends Model
         
         // SVG içeriği kontrolü
         if (str_starts_with($this->icon, '<svg')) {
-            // SVG'deki duplicate ID'leri benzersiz hale getir
             $svgContent = $this->icon;
-            
-            // Tüm ID'leri benzersiz yap
-            $svgContent = preg_replace_callback('/id="([^"]+)"/', function($matches) {
-                return 'id="' . $matches[1] . '_' . $this->id . '_' . uniqid() . '"';
-            }, $svgContent);
             
             // SVG boyutu ve rengi ayarla
             $size = $this->svg_size ?? 48;
             $color = $this->svg_color ?? '#004d2e';
             
-            // Mevcut style ve fill attribute'larını kaldır
-            $svgContent = preg_replace('/style="[^"]*"/', '', $svgContent);
-            $svgContent = preg_replace('/fill="[^"]*"/', '', $svgContent);
-            
-            // SVG içindeki tüm path, circle, rect gibi elementlere fill ekle
-            $svgContent = preg_replace('/<(path|circle|rect|ellipse|polygon|polyline)([^>]*?)>/i', 
-                '<$1$2 fill="' . $color . '">', $svgContent);
-            
-            // g elementlerine de fill ekle
-            $svgContent = preg_replace('/<g([^>]*?)>/i', '<g$1 fill="' . $color . '">', $svgContent);
-            
-            // Ana SVG elementine CSS class ekle
+            // Ana SVG elementine CSS class ve stil ekle
             $uniqueClass = 'svg-icon-' . $this->id . '-' . uniqid();
             $style = "width: {$size}px; height: {$size}px;";
             
             if (strpos($svgContent, '<svg') !== false) {
+                // SVG'yi normalize et - sadece width ve height'ı kaldır
+                $svgContent = preg_replace('/width="[^"]*"/', '', $svgContent);
+                $svgContent = preg_replace('/height="[^"]*"/', '', $svgContent);
+                
                 $svgContent = str_replace('<svg', '<svg class="' . $uniqueClass . '" style="' . $style . '"', $svgContent);
                 
-                // CSS stil ekle
-                $cssStyle = '<style>.' . $uniqueClass . ' * { fill: ' . $color . ' !important; }</style>';
+                // CSS stil ekle - renk ve boyut için
+                $cssStyle = '<style>.' . $uniqueClass . ' { display: inline-block; vertical-align: middle; overflow: visible; } .' . $uniqueClass . ' * { fill: ' . $color . ' !important; } .' . $uniqueClass . ' g { transform-origin: center center; }</style>';
                 $svgContent = $cssStyle . $svgContent;
             }
             
