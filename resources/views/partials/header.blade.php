@@ -98,7 +98,16 @@
                                                             @foreach($menuItems as $item)
                                                                 <!-- BELEDİYE MAKAMLARI -->
                                                                 <div class="mega-menu-category">
-                                                                    <h3>{{ $item->title }}</h3>
+                                                                    <h3 class="flex items-center">
+                                                                        @if($item->icon && Str::startsWith($item->icon, 'data:image/'))
+                                                                            <img src="{{ $item->icon }}" alt="İkon" class="mr-2" style="width: 20px; height: 20px; object-fit: contain;">
+                                                                        @elseif($item->icon && Str::startsWith($item->icon, 'fas '))
+                                                                            <i class="{{ $item->icon }} mr-2"></i>
+                                                                        @elseif($item->icon)
+                                                                            <span class="material-icons mr-2 text-sm">{{ $item->icon }}</span>
+                                                                        @endif
+                                                                        {{ $item->title }}
+                                                                    </h3>
                                                                     @if($item->children && $item->children->count() > 0)
                                                                         <ul class="space-y-0.5">
                                                                             @foreach($item->children as $subItem)
