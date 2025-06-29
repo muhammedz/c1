@@ -77,7 +77,8 @@ class FeaturedService extends Model
         // Data URL (base64 encoded image) kontrolü
         if (str_starts_with($this->icon, 'data:image/')) {
             $size = $this->getIconSize();
-            return '<img src="' . $this->icon . '" alt="İkon" style="width: ' . $size . 'px; height: ' . $size . 'px; object-fit: contain;">';
+            $uniqueClass = 'image-icon-' . $this->id . '-' . uniqid();
+            return '<img src="' . $this->icon . '" alt="İkon" class="' . $uniqueClass . '" style="width: ' . $size . 'px; height: ' . $size . 'px; object-fit: contain; display: inline-block; vertical-align: middle;">';
         }
         
         // SVG içeriği kontrolü

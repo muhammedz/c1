@@ -633,6 +633,8 @@
             max-width: 48px;
             max-height: 48px;
             object-fit: contain;
+            border-radius: 4px;
+            background-color: #fff;
         }
         
         .icon-preview svg {
@@ -692,6 +694,16 @@
         #service-items td [class*="svg-icon"] svg {
             width: 24px !important;
             height: 24px !important;
+        }
+        
+        /* PNG/JPG resim ikonlarını da küçült */
+        #service-items td img,
+        #service-items td [class*="image-icon"] {
+            max-width: 24px !important;
+            max-height: 24px !important;
+            width: 24px !important;
+            height: 24px !important;
+            object-fit: contain !important;
         }
     </style>
 @stop 
