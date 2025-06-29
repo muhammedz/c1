@@ -467,32 +467,34 @@ class EventScrapeController extends Controller
             
             $xpath = new \DOMXPath($dom);
             
-            // Etkinlik elementlerini bul - farklı class isimleri için alternatif sorgular dene
+            // Etkinlik elementlerini bul - Next.js yapısına uygun sorgular
             Log::info('Etkinlik düğümleri aranıyor');
-            $eventNodes = $xpath->query('//div[contains(@class, "event-card")]');
             
-            // Eğer birincil sorgu sonuç vermediyse alternatif sorgular dene
+            // 1. Önce Next.js yapısını dene: upcomming-event-wrapper
+            $eventNodes = $xpath->query('//div[contains(@class, "upcomming-event-wrapper")]');
+            
+            // 2. Alternatif: event-card class'ı
             if ($eventNodes->length === 0) {
-                Log::info('Birincil sorgu sonuç vermedi, alternatif sorgu deneniyor');
-                $eventNodes = $xpath->query('//div[contains(@class, "upcomming-event-wrapper")]');
+                Log::info('upcomming-event-wrapper bulunamadı, event-card deneniyor');
+                $eventNodes = $xpath->query('//div[contains(@class, "event-card")]');
             }
             
-            // Yine sonuç yoksa daha genel bir sorgu dene
+            // 3. Alternatif: col-md-6 içindeki a etiketleri
             if ($eventNodes->length === 0) {
-                Log::info('İkincil sorgu sonuç vermedi, daha genel sorgu deneniyor');
-                $eventNodes = $xpath->query('//div[contains(@class, "col-md-6")]/div');
+                Log::info('event-card bulunamadı, col-md-6 içindeki a etiketleri deneniyor');
+                $eventNodes = $xpath->query('//div[contains(@class, "col-md-6")]//a');
             }
             
-            // Farklı HTML yapıları için ek sorgu dene
+            // 4. Genel etkinlik kartları
             if ($eventNodes->length === 0) {
-                Log::info('Üçüncü sorgu sonuç vermedi, ekstra sorgular deneniyor');
-                $eventNodes = $xpath->query('//div[contains(@class, "card")]');
+                Log::info('col-md-6 bulunamadı, genel div.box deneniyor');
+                $eventNodes = $xpath->query('//div[contains(@class, "box")]');
             }
             
-            // Farklı HTML yapıları için ek sorgu dene 2
+            // 5. Son çare: herhangi bir etkinlik içeriği
             if ($eventNodes->length === 0) {
-                Log::info('Dördüncü sorgu sonuç vermedi, ekstra sorgular 2 deneniyor');
-                $eventNodes = $xpath->query('//div[contains(@class, "etkinlik")]');
+                Log::info('box bulunamadı, etkinlik-adi içeren elementler deneniyor');
+                $eventNodes = $xpath->query('//h2[contains(@class, "etkinlik-adi")]/ancestor::div[1]');
             }
             
             // Hala bulunamadıysa etkinlik kartları yok
@@ -896,25 +898,78 @@ class EventScrapeController extends Controller
             ]);
         }
         
-        // Detay linki - ana a etiketi
+        // Detay linki - Next.js yapısına uygun strateji
         $detailUrl = null;
-        $linkNodes = $xpath->query('.//a', $eventNode);
         
-        if ($linkNodes->length > 0) {
-            $detailUrl = $linkNodes->item(0)->getAttribute('href');
-            
-            // Tam URL değilse başına domain ekle
-            if ($detailUrl && !filter_var($detailUrl, FILTER_VALIDATE_URL)) {
-                $baseUrl = 'https://kultursanat.cankaya.bel.tr';
-                
-                // / ile başlıyorsa doğrudan ekle
-                if (strpos($detailUrl, '/') === 0) {
-                    $detailUrl = $baseUrl . $detailUrl;
-                } else {
-                    // Değilse / ile birleştir
-                    $detailUrl = $baseUrl . '/' . $detailUrl;
-                }
+        // Strateji 1: Eğer eventNode kendisi bir <a> etiketiyse
+        if ($eventNode->nodeName === 'a') {
+            $detailUrl = $eventNode->getAttribute('href');
+            Log::info('EventNode kendisi bir a etiketi', [
+                'title' => $title,
+                'href' => $detailUrl
+            ]);
+        }
+        
+        // Strateji 2: Parent a etiketini ara (Next.js yapısı)
+        if (empty($detailUrl)) {
+            $parentLink = $xpath->query('./ancestor::a[1]', $eventNode);
+            if ($parentLink->length > 0) {
+                $detailUrl = $parentLink->item(0)->getAttribute('href');
+                Log::info('Parent a etiketi bulundu', [
+                    'title' => $title,
+                    'href' => $detailUrl
+                ]);
             }
+        }
+        
+        // Strateji 3: İçindeki a etiketlerini ara
+        if (empty($detailUrl)) {
+            $linkNodes = $xpath->query('.//a', $eventNode);
+            
+            Log::info('İçindeki a etiketleri aranıyor', [
+                'title' => $title,
+                'linkNodes_count' => $linkNodes->length
+            ]);
+            
+            if ($linkNodes->length > 0) {
+                $detailUrl = $linkNodes->item(0)->getAttribute('href');
+                Log::info('İçindeki a etiketi bulundu', [
+                    'title' => $title,
+                    'href' => $detailUrl
+                ]);
+            }
+        }
+        
+        // URL'i tam hale getir
+        if ($detailUrl && !filter_var($detailUrl, FILTER_VALIDATE_URL)) {
+            $baseUrl = 'https://kultursanat.cankaya.bel.tr';
+            
+            if (strpos($detailUrl, '/') === 0) {
+                $detailUrl = $baseUrl . $detailUrl;
+            } else {
+                $detailUrl = $baseUrl . '/' . $detailUrl;
+            }
+        }
+        
+        // Eğer a etiketi bulunamadıysa, başlıktan URL oluştur
+        if (empty($detailUrl) && !empty($title)) {
+            // Türkçe karakterleri İngilizce karşılıklarına çevir
+            $slug = $this->turkishToEnglish($title);
+            
+            // URL-friendly slug oluştur
+            $slug = strtolower($slug);
+            $slug = preg_replace('/[^a-z0-9\s-]/', '', $slug);
+            $slug = preg_replace('/[\s-]+/', '-', $slug);
+            $slug = trim($slug, '-');
+            
+            // Detay URL'sini oluştur
+            $detailUrl = 'https://kultursanat.cankaya.bel.tr/etkinlikler/' . $slug;
+            
+            Log::info('Başlıktan detay URL oluşturuldu', [
+                'title' => $title,
+                'slug' => $slug,
+                'detailUrl' => $detailUrl
+            ]);
         }
         
         // Debug için log
@@ -1228,5 +1283,16 @@ class EventScrapeController extends Controller
                 'message' => 'Proxy test hatası: ' . $e->getMessage()
             ], 500);
         }
+    }
+
+    /**
+     * Türkçe karakterleri İngilizce karşılıklarına çevirir
+     */
+    private function turkishToEnglish($text)
+    {
+        $turkishChars = ['ç', 'ğ', 'ı', 'İ', 'ö', 'ş', 'ü', 'Ç', 'Ğ', 'Ö', 'Ş', 'Ü'];
+        $englishChars = ['c', 'g', 'i', 'i', 'o', 's', 'u', 'c', 'g', 'o', 's', 'u'];
+        
+        return str_replace($turkishChars, $englishChars, $text);
     }
 } 

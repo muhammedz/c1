@@ -676,6 +676,10 @@ class EventScraperService
             // İndirilen görsel varsa kaydet, yoksa URL'yi direkt kaydet
             $event->cover_image = $coverImage ?? $eventData['image_url'] ?? null;
             
+            // External alanları kaydet
+            $event->external_id = $eventData['external_id'] ?? null;
+            $event->external_url = $eventData['detail_url'] ?? null;
+            
             $event->order = 0;
             $event->is_active = true;
             $event->show_on_homepage = true;

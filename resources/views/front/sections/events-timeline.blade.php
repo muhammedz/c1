@@ -24,7 +24,7 @@ function titleCase($string) {
     <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">
         @foreach($upcomingEvents->take(4) as $event)
         <div>
-            <a href="https://kultursanat.cankaya.bel.tr/" target="_blank" class="event-featured-card">
+            <a href="{{ $event->external_url ?? 'https://kultursanat.cankaya.bel.tr/' }}" target="_blank" class="event-featured-card">
                 <!-- Etkinlik Görseli -->
                 <div class="event-featured-image">
                     @if($event->cover_image)

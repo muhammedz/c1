@@ -791,7 +791,8 @@
                 if (event.detailUrl) {
                     previewContent += '<div class="mb-3">' +
                         '<h6><i class="fas fa-link mr-2"></i> Detay URL:</h6>' +
-                        '<p><a href="' + event.detailUrl + '" target="_blank">' + event.detailUrl + '</a></p>' +
+                        '<p><a href="' + event.detailUrl + '" target="_blank" class="btn btn-sm btn-outline-primary">' +
+                        '<i class="fas fa-external-link-alt mr-1"></i> Etkinlik Detayını Görüntüle</a></p>' +
                     '</div>';
                 }
                 

@@ -34,6 +34,8 @@ class Event extends Model
         'register_required',
         'register_url',
         'max_participants',
+        'external_id',
+        'external_url',
     ];
 
     /**
