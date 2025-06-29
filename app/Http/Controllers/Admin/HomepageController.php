@@ -817,14 +817,35 @@ class HomepageController extends Controller
         $urlFields = ['logo_path', 'secondary_logo_path', 'slogan_path', 'mobile_logo_path'];
         foreach ($urlFields as $field) {
             if (!empty($data[$field])) {
-                // URL'den storage kısmını çıkararak sadece dosya yolunu al
-                if (strpos($data[$field], '/storage/') !== false) {
-                    $data[$field] = str_replace('/storage/', '', $data[$field]);
+                $url = $data[$field];
+                
+                // Tam URL'den sadece dosya yolunu çıkar
+                if (strpos($url, 'http') === 0) {
+                    // URL'den domain kısmını çıkar ve sadece path'i al
+                    $parsedUrl = parse_url($url);
+                    if (isset($parsedUrl['path'])) {
+                        $path = $parsedUrl['path'];
+                        // /storage/ kısmını çıkar
+                        if (strpos($path, '/storage/') !== false) {
+                            $data[$field] = str_replace('/storage/', '', $path);
+                        } else {
+                            $data[$field] = ltrim($path, '/');
+                        }
+                    }
+                } else {
+                    // Yerel path ise
+                    if (strpos($url, '/storage/') !== false) {
+                        $data[$field] = str_replace('/storage/', '', $url);
+                    } elseif (strpos($url, 'storage/') === 0) {
+                        $data[$field] = substr($url, 8); // "storage/" kısmını çıkar
+                    }
                 }
-                // Eğer tam URL geliyorsa, sadece storage sonrası kısmı al
-                if (strpos($data[$field], 'storage/') === 0) {
-                    $data[$field] = substr($data[$field], 8); // "storage/" kısmını çıkar
-                }
+                
+                \Log::info('Header URL işleme', [
+                    'field' => $field,
+                    'original' => $url,
+                    'processed' => $data[$field]
+                ]);
             }
         }
         

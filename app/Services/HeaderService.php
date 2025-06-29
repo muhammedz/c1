@@ -17,9 +17,9 @@ class HeaderService
         $headerSettings = \App\Models\HeaderSetting::getSettings();
         
         return (object) [
-            'logo_path' => $headerSettings->logo_path ? asset('storage/' . $headerSettings->logo_path) : asset('images/logo-cankaya.png'),
-            'secondary_logo_path' => $headerSettings->secondary_logo_path ? asset('storage/' . $headerSettings->secondary_logo_path) : null,
-            'slogan_path' => $headerSettings->slogan_path ? asset('storage/' . $headerSettings->slogan_path) : asset('images/slogan.png'),
+            'logo_path' => $headerSettings->logo_path ? asset('storage/' . ltrim($headerSettings->logo_path, '/')) : asset('images/logo-cankaya.png'),
+            'secondary_logo_path' => $headerSettings->secondary_logo_path ? asset('storage/' . ltrim($headerSettings->secondary_logo_path, '/')) : asset('images/simge.png'),
+            'slogan_path' => $headerSettings->slogan_path ? asset('storage/' . ltrim($headerSettings->slogan_path, '/')) : asset('images/slogan.png'),
             'show_search_button' => $headerSettings->show_search_button,
             'header_bg_color' => $headerSettings->header_bg_color ?: '#ffffff',
             'header_text_color' => $headerSettings->header_text_color ?: '#00352b',
@@ -28,7 +28,7 @@ class HeaderService
             'custom_css' => $headerSettings->custom_css,
             'additional_scripts' => $headerSettings->additional_scripts,
             'custom_header_html' => $headerSettings->custom_header_html,
-            'mobile_logo_path' => $headerSettings->mobile_logo_path ? asset('storage/' . $headerSettings->mobile_logo_path) : null,
+            'mobile_logo_path' => $headerSettings->mobile_logo_path ? asset('storage/' . ltrim($headerSettings->mobile_logo_path, '/')) : null,
         ];
     }
 
