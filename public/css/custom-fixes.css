@@ -340,6 +340,40 @@ button.close span[aria-hidden="true"] {
         transform: scale(1) !important;
     }
     
+    /* SVG ikonları için özel ve çok güçlü boyut zorlaması */
+    .featured-services-section .mobile-services-grid .service-item .featured-service-card .featured-service-icon svg,
+    .featured-services-section .mobile-services-grid .service-item .featured-service-card .featured-service-icon svg *,
+    .featured-services-section .mobile-services-grid .service-item .featured-service-card .featured-service-icon [class*="svg-icon"],
+    .featured-services-section .mobile-services-grid .service-item .featured-service-card .featured-service-icon [class*="svg-icon"] *,
+    .featured-services-section .mobile-services-grid .service-item .featured-service-card .featured-service-icon [class*="svg-icon"] svg,
+    .featured-services-section .mobile-services-grid .service-item .featured-service-card .featured-service-icon [class*="svg-icon"] svg * {
+        width: 20px !important;
+        height: 20px !important;
+        max-width: 20px !important;
+        max-height: 20px !important;
+        min-width: 20px !important;
+        min-height: 20px !important;
+        font-size: 20px !important;
+        line-height: 1 !important;
+        transform: none !important;
+        transform-origin: center center !important;
+    }
+    
+    /* PNG ve resim ikonları için özel boyut zorlaması */
+    .featured-services-section .mobile-services-grid .service-item .featured-service-card .featured-service-icon img,
+    .featured-services-section .mobile-services-grid .service-item .featured-service-card .featured-service-icon [class*="image-icon"] {
+        width: 20px !important;
+        height: 20px !important;
+        max-width: 20px !important;
+        max-height: 20px !important;
+        min-width: 20px !important;
+        min-height: 20px !important;
+        object-fit: contain !important;
+        object-position: center !important;
+        display: block !important;
+        margin: 0 auto !important;
+    }
+    
     /* İkon konteyner ultra güçlü boyut */
     .featured-services-section .mobile-services-grid .service-item .featured-service-card .featured-service-icon {
         width: 40px !important;
@@ -353,5 +387,26 @@ button.close span[aria-hidden="true"] {
         justify-content: center !important;
         overflow: hidden !important;
         flex-shrink: 0 !important;
+    }
+    
+    /* Inline style'ları geçersiz kılmak için ultra güçlü CSS */
+    .featured-services-section .mobile-services-grid .service-item .featured-service-card .featured-service-icon *[style] {
+        width: 20px !important;
+        height: 20px !important;
+        max-width: 20px !important;
+        max-height: 20px !important;
+        min-width: 20px !important;
+        min-height: 20px !important;
+    }
+    
+    /* Style attribute'u olan SVG'ler için özel kural */
+    .featured-services-section .mobile-services-grid .service-item .featured-service-card .featured-service-icon svg[style],
+    .featured-services-section .mobile-services-grid .service-item .featured-service-card .featured-service-icon img[style] {
+        width: 20px !important;
+        height: 20px !important;
+        max-width: 20px !important;
+        max-height: 20px !important;
+        min-width: 20px !important;
+        min-height: 20px !important;
     }
 } 
