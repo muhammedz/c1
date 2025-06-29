@@ -189,6 +189,39 @@ button.close span[aria-hidden="true"] {
         object-fit: contain !important;
     }
     
+    /* PNG ve diğer resim ikonları için özel boyut standardizasyonu */
+    .featured-service-icon img[src$=".png"],
+    .featured-service-icon img[src*=".png"],
+    .featured-service-icon img[src$=".jpg"],
+    .featured-service-icon img[src*=".jpg"],
+    .featured-service-icon img[src$=".jpeg"],
+    .featured-service-icon img[src*=".jpeg"],
+    .featured-service-icon img[src$=".gif"],
+    .featured-service-icon img[src*=".gif"],
+    .featured-service-icon img[src$=".webp"],
+    .featured-service-icon img[src*=".webp"] {
+        width: 20px !important;
+        height: 20px !important;
+        max-width: 20px !important;
+        max-height: 20px !important;
+        object-fit: contain !important;
+        object-position: center !important;
+        border-radius: 2px !important;
+        background: transparent !important;
+    }
+    
+    /* Base64 encoded ikonlar için */
+    .featured-service-icon img[src*="data:image/"] {
+        width: 20px !important;
+        height: 20px !important;
+        max-width: 20px !important;
+        max-height: 20px !important;
+        object-fit: contain !important;
+        object-position: center !important;
+        border-radius: 2px !important;
+        background: transparent !important;
+    }
+    
     /* Material Icons için boyut standardizasyonu */
     .featured-service-icon .material-icons {
         font-size: 20px !important;
