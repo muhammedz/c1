@@ -275,9 +275,24 @@
        }
        
        .featured-service-title {
-           font-size: 0.75rem;
-           font-weight: 600;
-           color: #333;
+           font-size: 14px !important;
+           font-weight: 600 !important;
+           color: #333 !important;
+           text-align: center !important;
+           display: grid !important;
+           place-items: center !important;
+           place-content: center !important;
+           word-break: break-word !important;
+           hyphens: auto !important;
+           white-space: normal !important;
+           line-height: 1.1 !important;
+           overflow-wrap: anywhere !important;
+           max-height: 40px !important;
+           height: 40px !important;
+           padding: 2px !important;
+           width: 100% !important;
+           grid-template-rows: 1fr !important;
+           overflow: hidden !important;
        }
        
        /* Events Featured Card Styles */
@@ -1238,7 +1253,19 @@
            }
            
            .featured-service-title {
-               font-size: 0.7rem;
+               font-size: 12px !important;
+               text-align: center !important;
+               display: grid !important;
+               place-items: center !important;
+               place-content: center !important;
+               word-break: break-word !important;
+               overflow-wrap: anywhere !important;
+               height: 36px !important;
+               max-height: 36px !important;
+               line-height: 1.1 !important;
+               padding: 2px !important;
+               grid-template-rows: 1fr !important;
+               overflow: hidden !important;
            }
        }
        
@@ -1281,7 +1308,19 @@
            }
            
            .featured-service-title {
-               font-size: 0.9rem;
+               font-size: 14px !important;
+               text-align: center !important;
+               display: grid !important;
+               place-items: center !important;
+               place-content: center !important;
+               word-break: break-word !important;
+               overflow-wrap: anywhere !important;
+               height: 40px !important;
+               max-height: 40px !important;
+               line-height: 1.1 !important;
+               padding: 2px !important;
+               grid-template-rows: 1fr !important;
+               overflow: hidden !important;
            }
        }
        
@@ -1302,7 +1341,19 @@
            }
            
            .featured-service-title {
-               font-size: 1rem;
+               font-size: 14px !important;
+               text-align: center !important;
+               display: grid !important;
+               place-items: center !important;
+               place-content: center !important;
+               word-break: break-word !important;
+               overflow-wrap: anywhere !important;
+               height: 40px !important;
+               max-height: 40px !important;
+               line-height: 1.1 !important;
+               padding: 2px !important;
+               grid-template-rows: 1fr !important;
+               overflow: hidden !important;
            }
        }
        
