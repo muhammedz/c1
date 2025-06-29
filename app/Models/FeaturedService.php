@@ -64,14 +64,28 @@ class FeaturedService extends Model
             $style = "width: {$size}px; height: {$size}px;";
             
             if (strpos($svgContent, '<svg') !== false) {
-                // SVG'yi normalize et - sadece width ve height'ı kaldır
+                // SVG'yi normalize et - width ve height'ı kaldır
                 $svgContent = preg_replace('/width="[^"]*"/', '', $svgContent);
                 $svgContent = preg_replace('/height="[^"]*"/', '', $svgContent);
+                
+                // Büyük viewBox'lı SVG'ler için özel düzeltme
+                if (strpos($svgContent, 'viewBox="0 0 1250') !== false) {
+                    // Sadece CSS ile düzeltme yap - SVG içeriğine dokunma
+                    $hasLargeViewBox = true;
+                } else {
+                    $hasLargeViewBox = false;
+                }
                 
                 $svgContent = str_replace('<svg', '<svg class="' . $uniqueClass . '" style="' . $style . '"', $svgContent);
                 
                 // CSS stil ekle - renk ve boyut için
-                $cssStyle = '<style>.' . $uniqueClass . ' { display: inline-block; vertical-align: middle; overflow: visible; } .' . $uniqueClass . ' * { fill: ' . $color . ' !important; } .' . $uniqueClass . ' g { transform-origin: center center; }</style>';
+                if ($hasLargeViewBox) {
+                    // Büyük viewBox'lı SVG'ler için özel CSS
+                    $cssStyle = '<style>.' . $uniqueClass . ' { display: inline-block; vertical-align: middle; overflow: hidden; } .' . $uniqueClass . ' * { fill: ' . $color . ' !important; } .' . $uniqueClass . ' g { transform: scale(0.08) translate(-625px, -625px); transform-origin: center center; }</style>';
+                } else {
+                    // Normal SVG'ler için standart CSS
+                    $cssStyle = '<style>.' . $uniqueClass . ' { display: inline-block; vertical-align: middle; overflow: visible; } .' . $uniqueClass . ' * { fill: ' . $color . ' !important; }</style>';
+                }
                 $svgContent = $cssStyle . $svgContent;
             }
             
