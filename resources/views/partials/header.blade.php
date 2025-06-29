@@ -232,7 +232,7 @@
                     
                     <!-- Atatürk simgesi - her zaman görünür, mobilde menünün sağında -->
                     <div class="text-xl font-bold relative flex items-end pb-1 z-10">
-                        <img src="{{ $headerSettings->secondary_logo_path }}" alt="İkincil Logo (Atatürk Simgesi)" class="md:h-24 h-20">
+                        <img src="{{ $headerSettings->secondary_logo_path }}" alt="Atatürk" class="md:h-24 h-20">
                     </div>
                 </div>
             </div>

@@ -813,7 +813,7 @@ class HomepageController extends Controller
         $data['show_search_button'] = $request->has('show_search_button') ? 1 : 0;
         $data['sticky_header'] = $request->has('sticky_header') ? 1 : 0;
         
-        // URL'leri storage path'e çevir
+        // URL'leri doğru path'e çevir (storage kullanmıyoruz)
         $urlFields = ['logo_path', 'secondary_logo_path', 'slogan_path', 'mobile_logo_path'];
         foreach ($urlFields as $field) {
             if (!empty($data[$field])) {
@@ -825,20 +825,12 @@ class HomepageController extends Controller
                     $parsedUrl = parse_url($url);
                     if (isset($parsedUrl['path'])) {
                         $path = $parsedUrl['path'];
-                        // /storage/ kısmını çıkar
-                        if (strpos($path, '/storage/') !== false) {
-                            $data[$field] = str_replace('/storage/', '', $path);
-                        } else {
-                            $data[$field] = ltrim($path, '/');
-                        }
+                        // Path'den başındaki slash'i temizle
+                        $data[$field] = ltrim($path, '/');
                     }
                 } else {
-                    // Yerel path ise
-                    if (strpos($url, '/storage/') !== false) {
-                        $data[$field] = str_replace('/storage/', '', $url);
-                    } elseif (strpos($url, 'storage/') === 0) {
-                        $data[$field] = substr($url, 8); // "storage/" kısmını çıkar
-                    }
+                    // Yerel path ise başındaki slash'leri temizle
+                    $data[$field] = ltrim($url, '/');
                 }
                 
                 \Log::info('Header URL işleme', [
