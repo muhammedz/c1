@@ -309,7 +309,7 @@ button.close span[aria-hidden="true"] {
         position: relative !important;
     }
     
-    /* Ultra güçlü başlık ortalama - tüm başlıklar için */
+    /* Ultra güçlü başlık ortalama - çok satırlı başlıklar için flex çözümü */
     .mobile-services-grid .featured-service-title,
     .featured-services-section .mobile-services-grid .service-item .featured-service-card .featured-service-title {
         text-align: center !important;
@@ -322,12 +322,22 @@ button.close span[aria-hidden="true"] {
         max-height: 32px !important;
         font-size: 12px !important;
         line-height: 1.2 !important;
-        padding: 0 4px !important;
+        padding: 2px 4px !important;
         margin: 0 !important;
         overflow: hidden !important;
         word-break: break-word !important;
         hyphens: auto !important;
         white-space: normal !important;
+        flex-wrap: wrap !important;
+        align-content: center !important;
+    }
+    
+    /* Çok satırlı başlıklar için özel span wrapper */
+    .mobile-services-grid .featured-service-title span,
+    .featured-services-section .mobile-services-grid .service-item .featured-service-card .featured-service-title span {
+        text-align: center !important;
+        width: 100% !important;
+        display: block !important;
     }
     
     /* Link durumları */
@@ -449,4 +459,53 @@ button.close span[aria-hidden="true"] {
         min-width: 28px !important;
         min-height: 28px !important;
     }
+}
+
+/* Desktop ve mobil için genel başlık ortalama düzeltmesi */
+@media (min-width: 768px) {
+    /* Desktop'da da aynı başlık ortalama sorunu */
+    .featured-service-title {
+        text-align: center !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        word-break: break-word !important;
+        hyphens: auto !important;
+        white-space: normal !important;
+        flex-wrap: wrap !important;
+        align-content: center !important;
+    }
+    
+    .featured-service-title span {
+        text-align: center !important;
+        width: 100% !important;
+        display: block !important;
+    }
+}
+
+/* Tüm ekran boyutları için başlık ortalama - ULTRA GÜÇLÜ */
+.featured-service-title,
+.service-slide .featured-service-title,
+.service-item .featured-service-title,
+.featured-service-card .featured-service-title,
+a .featured-service-title {
+    text-align: center !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    word-break: break-word !important;
+    hyphens: auto !important;
+    white-space: normal !important;
+    flex-wrap: wrap !important;
+    align-content: center !important;
+}
+
+.featured-service-title span,
+.service-slide .featured-service-title span,
+.service-item .featured-service-title span,
+.featured-service-card .featured-service-title span,
+a .featured-service-title span {
+    text-align: center !important;
+    width: 100% !important;
+    display: block !important;
 } 
