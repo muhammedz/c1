@@ -611,7 +611,7 @@ class MenuSystemController extends Controller
                 $formattedItem = [
                     'id' => $item->id,
                     'name' => $item->title ?? $item->name,
-                    'icon' => $this->getIconForItem($item->title ?? $item->name),
+                    'icon' => $item->icon ?? $this->getIconForItem($item->title ?? $item->name),
                     'url' => $item->url ?? '#',
                     'hasChildren' => $hasChildren,
                     'level' => 2
@@ -627,7 +627,7 @@ class MenuSystemController extends Controller
                             return [
                                 'id' => $child->id,
                                 'name' => $child->title ?? $child->name,
-                                'icon' => $this->getIconForItem($child->title ?? $child->name),
+                                'icon' => $child->icon ?? $this->getIconForItem($child->title ?? $child->name),
                                 'url' => $child->url ?? '#',
                                 'hasChildren' => $childHasChildren,
                                 'level' => 3
@@ -648,7 +648,7 @@ class MenuSystemController extends Controller
                             return [
                                 'id' => $child->id,
                                 'name' => $child->title,
-                                'icon' => $this->getIconForItem($child->title),
+                                'icon' => $child->icon ?? $this->getIconForItem($child->title),
                                 'url' => $child->url ?? '#',
                                 'hasChildren' => $childHasChildren,
                                 'level' => 3

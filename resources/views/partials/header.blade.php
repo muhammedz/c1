@@ -590,6 +590,36 @@
                 const contentDiv = document.createElement('div');
                 contentDiv.className = 'flex items-center flex-1';
                 
+                // İkon ekleme
+                if (item.icon) {
+                    const iconContainer = document.createElement('div');
+                    iconContainer.className = 'mr-3';
+                    
+                    if (item.icon.startsWith('data:image/')) {
+                        // PNG ikon
+                        const iconImg = document.createElement('img');
+                        iconImg.src = item.icon;
+                        iconImg.alt = 'İkon';
+                        iconImg.style.width = '20px';
+                        iconImg.style.height = '20px';
+                        iconImg.style.objectFit = 'contain';
+                        iconContainer.appendChild(iconImg);
+                    } else if (item.icon.startsWith('fas ') || item.icon.startsWith('far ') || item.icon.startsWith('fab ')) {
+                        // FontAwesome ikon
+                        const iconElement = document.createElement('i');
+                        iconElement.className = item.icon + ' text-gray-600';
+                        iconContainer.appendChild(iconElement);
+                    } else {
+                        // Material Icon
+                        const iconElement = document.createElement('span');
+                        iconElement.className = 'material-icons text-gray-600';
+                        iconElement.textContent = item.icon;
+                        iconContainer.appendChild(iconElement);
+                    }
+                    
+                    contentDiv.appendChild(iconContainer);
+                }
+                
                 const textSpan = document.createElement('span');
                 textSpan.className = 'text-gray-800 font-medium text-base tracking-wide';
                 textSpan.textContent = item.name; // textContent Türkçe karakterleri düzgün handle eder
