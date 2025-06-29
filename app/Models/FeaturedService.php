@@ -65,14 +65,27 @@ class FeaturedService extends Model
             $size = $this->svg_size ?? 48;
             $color = $this->svg_color ?? '#004d2e';
             
-            // Mevcut style attribute'unu kaldır
+            // Mevcut style ve fill attribute'larını kaldır
             $svgContent = preg_replace('/style="[^"]*"/', '', $svgContent);
+            $svgContent = preg_replace('/fill="[^"]*"/', '', $svgContent);
             
-            // Yeni style ekle
-            $style = "width: {$size}px; height: {$size}px; color: {$color}; fill: {$color};";
+            // SVG içindeki tüm path, circle, rect gibi elementlere fill ekle
+            $svgContent = preg_replace('/<(path|circle|rect|ellipse|polygon|polyline)([^>]*?)>/i', 
+                '<$1$2 fill="' . $color . '">', $svgContent);
+            
+            // g elementlerine de fill ekle
+            $svgContent = preg_replace('/<g([^>]*?)>/i', '<g$1 fill="' . $color . '">', $svgContent);
+            
+            // Ana SVG elementine CSS class ekle
+            $uniqueClass = 'svg-icon-' . $this->id . '-' . uniqid();
+            $style = "width: {$size}px; height: {$size}px;";
             
             if (strpos($svgContent, '<svg') !== false) {
-                $svgContent = str_replace('<svg', '<svg style="' . $style . '"', $svgContent);
+                $svgContent = str_replace('<svg', '<svg class="' . $uniqueClass . '" style="' . $style . '"', $svgContent);
+                
+                // CSS stil ekle
+                $cssStyle = '<style>.' . $uniqueClass . ' * { fill: ' . $color . ' !important; }</style>';
+                $svgContent = $cssStyle . $svgContent;
             }
             
             return $svgContent;
