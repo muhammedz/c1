@@ -55,6 +55,100 @@
 <div class="container-fluid">
     <div class="row">
         <div class="col-12">
+            <!-- Son Çekme Bilgisi -->
+            @if($lastScrapeData)
+            <div class="card card-info">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-clock"></i> Son Etkinlik Çekme Bilgileri
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="info-box bg-success">
+                                <span class="info-box-icon"><i class="fas fa-calendar"></i></span>
+                                <div class="info-box-content">
+                                    <span class="info-box-text">Son Çekme Tarihi</span>
+                                    <span class="info-box-number">{{ $lastScrapeData['datetime']->format('d.m.Y H:i') }}</span>
+                                    <div class="progress">
+                                        <div class="progress-bar" style="width: 100%"></div>
+                                    </div>
+                                    <span class="progress-description">{{ $lastScrapeData['datetime']->diffForHumans() }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="info-box bg-info">
+                                <span class="info-box-icon"><i class="fas fa-user"></i></span>
+                                <div class="info-box-content">
+                                    <span class="info-box-text">Çeken Kullanıcı</span>
+                                    <span class="info-box-number">{{ $lastScrapeData['user_name'] }}</span>
+                                    <div class="progress">
+                                        <div class="progress-bar" style="width: 100%"></div>
+                                    </div>
+                                    <span class="progress-description">Kullanıcı ID: {{ $lastScrapeData['user_id'] }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    @if(isset($lastScrapeData['result']) && $lastScrapeData['result']['success'])
+                    <div class="row mt-3">
+                        <div class="col-md-3">
+                            <div class="info-box bg-primary">
+                                <span class="info-box-icon"><i class="fas fa-list"></i></span>
+                                <div class="info-box-content">
+                                    <span class="info-box-text">Toplam Etkinlik</span>
+                                    <span class="info-box-number">{{ $lastScrapeData['result']['totalEvents'] ?? 0 }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="info-box bg-success">
+                                <span class="info-box-icon"><i class="fas fa-plus"></i></span>
+                                <div class="info-box-content">
+                                    <span class="info-box-text">Yeni Eklenen</span>
+                                    <span class="info-box-number">{{ $lastScrapeData['result']['newEvents'] ?? 0 }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="info-box bg-warning">
+                                <span class="info-box-icon"><i class="fas fa-tags"></i></span>
+                                <div class="info-box-content">
+                                    <span class="info-box-text">Yeni Kategori</span>
+                                    <span class="info-box-number">{{ $lastScrapeData['result']['newCategories'] ?? 0 }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="info-box bg-secondary">
+                                <span class="info-box-icon"><i class="fas fa-cog"></i></span>
+                                <div class="info-box-content">
+                                    <span class="info-box-text">İşlem Türü</span>
+                                    <span class="info-box-number" style="font-size: 12px;">
+                                        {{ isset($lastScrapeData['scrape_type']) && $lastScrapeData['scrape_type'] === 'all_pages' ? 'Toplu Çekme' : 'Tekli Çekme' }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    @endif
+                </div>
+            </div>
+            @elseif($lastScrape)
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle"></i> 
+                Son etkinlik çekme: {{ $lastScrape->format('d.m.Y H:i') }} ({{ $lastScrape->diffForHumans() }})
+            </div>
+            @else
+            <div class="alert alert-warning">
+                <i class="fas fa-exclamation-triangle"></i> 
+                Henüz hiç etkinlik çekme işlemi yapılmamış.
+            </div>
+            @endif
+            
             <div class="card card-primary">
                 <div class="card-header">
                     <h3 class="card-title">Etkinlik Verileri Çekme</h3>

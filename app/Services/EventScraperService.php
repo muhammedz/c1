@@ -685,10 +685,73 @@ class EventScraperService
      */
     protected function checkExistingEvent($eventData)
     {
-        // Benzersiz bir external_id ile kontrol et
-        return Event::where('slug', $eventData['slug'])
+        // Çoklu kontrol stratejisi - aynı etkinliğin farklı şekillerde eklenmesini engelle
+        
+        // 1. External ID ile kontrol (en güvenilir)
+        if (!empty($eventData['external_id'])) {
+            $existingByExternalId = Event::where('external_id', $eventData['external_id'])->first();
+            if ($existingByExternalId) {
+                Log::info('Mevcut etkinlik bulundu (external_id)', [
+                    'title' => $eventData['title'],
+                    'external_id' => $eventData['external_id'],
+                    'existing_id' => $existingByExternalId->id
+                ]);
+                return $existingByExternalId;
+            }
+        }
+        
+        // 2. External URL ile kontrol
+        if (!empty($eventData['detail_url'])) {
+            $existingByUrl = Event::where('external_url', $eventData['detail_url'])->first();
+            if ($existingByUrl) {
+                Log::info('Mevcut etkinlik bulundu (external_url)', [
+                    'title' => $eventData['title'],
+                    'external_url' => $eventData['detail_url'],
+                    'existing_id' => $existingByUrl->id
+                ]);
+                return $existingByUrl;
+            }
+        }
+        
+        // 3. Başlık ve tarih kombinasyonu ile kontrol
+        $titleSlug = Str::slug($eventData['title']);
+        $existingByTitleAndDate = Event::where('title', $eventData['title'])
             ->where('start_date', $eventData['start_date'])
             ->first();
+            
+        if ($existingByTitleAndDate) {
+            Log::info('Mevcut etkinlik bulundu (title + date)', [
+                'title' => $eventData['title'],
+                'start_date' => $eventData['start_date'],
+                'existing_id' => $existingByTitleAndDate->id
+            ]);
+            return $existingByTitleAndDate;
+        }
+        
+        // 4. Benzer başlık kontrolü (Türkçe karakter farklılıkları için)
+        $normalizedTitle = $this->normalizeTitle($eventData['title']);
+        $existingBySimilarTitle = Event::whereRaw('LOWER(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(title, "ç", "c"), "ğ", "g"), "ı", "i"), "ö", "o"), "ş", "s"), "ü", "u")) = ?', [
+            strtolower($normalizedTitle)
+        ])->where('start_date', $eventData['start_date'])->first();
+        
+        if ($existingBySimilarTitle) {
+            Log::info('Mevcut etkinlik bulundu (normalized title + date)', [
+                'title' => $eventData['title'],
+                'normalized_title' => $normalizedTitle,
+                'start_date' => $eventData['start_date'],
+                'existing_id' => $existingBySimilarTitle->id
+            ]);
+            return $existingBySimilarTitle;
+        }
+        
+        // Hiçbir eşleşme bulunamadı
+        Log::info('Yeni etkinlik - duplicate bulunamadı', [
+            'title' => $eventData['title'],
+            'external_id' => $eventData['external_id'] ?? 'yok',
+            'external_url' => $eventData['detail_url'] ?? 'yok'
+        ]);
+        
+        return null;
     }
 
     /**
@@ -949,6 +1012,27 @@ class EventScraperService
             ]);
             return null;
         }
+    }
+
+    /**
+     * Başlığı normalize eder (duplicate kontrolü için)
+     */
+    private function normalizeTitle($title)
+    {
+        // Türkçe karakterleri İngilizce karşılıklarına çevir
+        $normalized = $this->turkishToEnglish($title);
+        
+        // Küçük harfe çevir
+        $normalized = strtolower($normalized);
+        
+        // Gereksiz karakterleri temizle
+        $normalized = preg_replace('/[^a-z0-9\s]/', '', $normalized);
+        
+        // Çoklu boşlukları tek boşluğa çevir
+        $normalized = preg_replace('/\s+/', ' ', $normalized);
+        
+        // Başındaki ve sonundaki boşlukları temizle
+        return trim($normalized);
     }
 
     /**

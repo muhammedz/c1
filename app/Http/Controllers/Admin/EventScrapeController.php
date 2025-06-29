@@ -24,7 +24,8 @@ class EventScrapeController extends Controller
     {
         try {
             $lastScrape = cache()->get('last_event_scrape');
-            return view('admin.events.check', compact('lastScrape'));
+            $lastScrapeData = cache()->get('last_event_scrape_data');
+            return view('admin.events.check', compact('lastScrape', 'lastScrapeData'));
         } catch (\Exception $e) {
             // Hata detaylarını log'a yaz
             Log::error('EventScrapeController check metodu hatası: ' . $e->getMessage(), [
@@ -97,8 +98,37 @@ class EventScrapeController extends Controller
         try {
             $result = $this->scraperService->scrapePage($url, $page, $connectionOptions);
             
-            // Son çekme zamanını cache'e kaydet
-            cache()->put('last_event_scrape', now(), now()->addDays(30));
+            // Son çekme zamanını ve kullanıcı bilgisini cache'e kaydet
+            $lastScrapeData = [
+                'datetime' => now(),
+                'user_id' => auth()->id(),
+                'user_name' => auth()->user()->name ?? 'Bilinmeyen Kullanıcı',
+                'result' => $result
+            ];
+            cache()->put('last_event_scrape_data', $lastScrapeData, now()->addDays(30));
+            cache()->put('last_event_scrape', now(), now()->addDays(30)); // Geriye uyumluluk için
+            
+            // Activity log kaydı
+            if ($result['success']) {
+                \App\Models\ActivityLog::create([
+                    'user_id' => auth()->id(),
+                    'user_name' => auth()->user()->name ?? 'Bilinmeyen Kullanıcı',
+                    'action' => 'etkinlik_cekme',
+                    'description' => 'Etkinlik çekme işlemi tamamlandı: ' . ($result['newEvents'] ?? 0) . ' yeni etkinlik eklendi',
+                    'new_values' => [
+                        'sayfa' => $page,
+                        'toplam_etkinlik' => $result['totalEvents'] ?? 0,
+                        'yeni_etkinlik' => $result['newEvents'] ?? 0,
+                        'islem_edilen' => $result['processedEvents'] ?? 0,
+                        'yeni_kategori' => $result['newCategories'] ?? 0,
+                        'baglanti_turu' => $connectionType,
+                        'hedef_url' => $url
+                    ],
+                    'ip_address' => request()->ip(),
+                    'user_agent' => request()->userAgent(),
+                    'url' => request()->fullUrl()
+                ]);
+            }
             
             return response()->json($result);
         } catch (\Illuminate\Http\Client\ConnectionException $e) {
@@ -178,6 +208,38 @@ class EventScrapeController extends Controller
     {
         try {
             $result = $this->scraperService->scrapeAllPages();
+            
+            // Son çekme zamanını ve kullanıcı bilgisini cache'e kaydet
+            $lastScrapeData = [
+                'datetime' => now(),
+                'user_id' => auth()->id(),
+                'user_name' => auth()->user()->name ?? 'Bilinmeyen Kullanıcı',
+                'result' => $result,
+                'scrape_type' => 'all_pages'
+            ];
+            cache()->put('last_event_scrape_data', $lastScrapeData, now()->addDays(30));
+            cache()->put('last_event_scrape', now(), now()->addDays(30)); // Geriye uyumluluk için
+            
+            // Activity log kaydı
+            if ($result['success']) {
+                \App\Models\ActivityLog::create([
+                    'user_id' => auth()->id(),
+                    'user_name' => auth()->user()->name ?? 'Bilinmeyen Kullanıcı',
+                    'action' => 'etkinlik_cekme_toplu',
+                    'description' => 'Toplu etkinlik çekme işlemi tamamlandı: ' . ($result['newEvents'] ?? 0) . ' yeni etkinlik eklendi',
+                    'new_values' => [
+                        'taranan_sayfa' => $result['totalPages'] ?? 0,
+                        'toplam_etkinlik' => $result['totalEvents'] ?? 0,
+                        'yeni_etkinlik' => $result['newEvents'] ?? 0,
+                        'islem_edilen' => $result['processedEvents'] ?? 0,
+                        'yeni_kategori' => $result['newCategories'] ?? 0,
+                        'islem_turu' => 'toplu_cekme'
+                    ],
+                    'ip_address' => request()->ip(),
+                    'user_agent' => request()->userAgent(),
+                    'url' => request()->fullUrl()
+                ]);
+            }
             
             return response()->json($result);
         } catch (\Illuminate\Http\Client\ConnectionException $e) {
