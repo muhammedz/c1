@@ -555,8 +555,8 @@ Route::prefix('admin/events')->name('admin.events.')->middleware(['auth', 'role:
     Route::post('/categories/store', [App\Http\Controllers\Admin\EventManagerController::class, 'storeCategory'])->name('categories.store');
     Route::post('/categories/update/{id}', [App\Http\Controllers\Admin\EventManagerController::class, 'updateCategory'])->name('categories.update');
     Route::delete('/categories/delete/{id}', [App\Http\Controllers\Admin\EventManagerController::class, 'deleteCategory'])->name('categories.delete');
-    Route::post('/categories/{id}/toggle', [App\Http\Controllers\Admin\EventManagerController::class, 'toggleCategoryVisibility'])->name('categories.toggle');
-    Route::post('/categories/order', [App\Http\Controllers\Admin\EventManagerController::class, 'updateCategoryOrder'])->name('categories.order');
+    Route::post('/categories/{id}/toggle-visibility', [App\Http\Controllers\Admin\EventManagerController::class, 'toggleCategoryVisibility'])->name('categories.toggle-visibility');
+    Route::post('/categories/update-order', [App\Http\Controllers\Admin\EventManagerController::class, 'updateCategoryOrder'])->name('categories.update-order');
     
     // Ayarlar
     Route::get('/settings', [App\Http\Controllers\Admin\EventManagerController::class, 'settings'])->name('settings');

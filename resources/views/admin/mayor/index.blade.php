@@ -260,7 +260,7 @@
                                 <!-- Twitter -->
                                 <div class="form-group">
                                                     <label for="social_twitter" class="font-weight-bold">
-                    <i class="fab fa-x-twitter text-info mr-1"></i>
+                    <span class="text-white font-bold" style="font-family: serif; font-size: 14px;">𝕏</span>
                     Twitter
                 </label>
                                     <input type="url" class="form-control @error('social_twitter') is-invalid @enderror" 

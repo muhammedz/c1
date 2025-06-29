@@ -76,7 +76,7 @@
                     
                     @if($member->twitter)
                     <a href="{{ $member->twitter }}" target="_blank" class="bg-slate-100 hover:bg-slate-200 text-gray-700 p-2 rounded-full transition-colors">
-                        <i class="fab fa-x-twitter text-lg"></i>
+                        <span class="text-white font-bold" style="font-family: serif; font-size: 14px;">𝕏</span>
                     </a>
                     @endif
                     

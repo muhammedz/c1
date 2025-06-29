@@ -39,7 +39,7 @@
                 <div class="flex gap-2">
                     @if($mayor->social_twitter)
                     <a href="{{ $mayor->social_twitter }}" target="_blank" class="bg-white/10 hover:bg-white/20 text-white p-1.5 rounded-full transition-colors flex items-center justify-center w-8 h-8">
-                        <i class="fab fa-x-twitter text-base"></i>
+                        <span class="text-white font-bold" style="font-family: serif; font-size: 14px;">𝕏</span>
                     </a>
                     @endif
                     @if($mayor->social_instagram)

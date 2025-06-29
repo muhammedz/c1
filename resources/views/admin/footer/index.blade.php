@@ -241,7 +241,7 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="twitter_url"><i class="fab fa-x-twitter mr-1"></i>Twitter/X URL</label>
+                                    <label for="twitter_url"><span class="text-white font-bold" style="font-family: serif; font-size: 14px;">𝕏</span>Twitter/X URL</label>
                                     <input type="url" class="form-control @error('twitter_url') is-invalid @enderror" 
                                            id="twitter_url" name="twitter_url" 
                                            value="{{ old('twitter_url', $settings->twitter_url) }}"

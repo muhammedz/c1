@@ -136,7 +136,7 @@
                     
                     @if($footerSettings && $footerSettings->twitter_url)
                         <a href="{{ $footerSettings->twitter_url }}" target="_blank" class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 transition-colors" aria-label="Twitter sayfamızı ziyaret edin">
-                            <i class="fab fa-x-twitter text-white text-lg"></i>
+                            <span class="text-white font-bold" style="font-family: serif; font-size: 14px;">𝕏</span>
                         </a>
                     @endif
                     
@@ -161,7 +161,7 @@
                             <i class="fab fa-instagram text-white text-lg"></i>
                         </a>
                         <a href="#" class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 transition-colors" aria-label="Twitter sayfamızı ziyaret edin">
-                            <i class="fab fa-x-twitter text-white text-lg"></i>
+                            <span class="text-white font-bold" style="font-family: serif; font-size: 14px;">𝕏</span>
                         </a>
                         <a href="#" class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 transition-colors" aria-label="YouTube kanalımızı ziyaret edin">
                             <i class="fab fa-youtube text-white text-lg"></i>
