@@ -661,5 +661,37 @@
             opacity: 0.5;
             background: #f0f0f0;
         }
+        
+        /* Admin panelde SVG ikonlarını küçült - güçlü CSS */
+        #service-items td {
+            width: 80px;
+            text-align: center;
+        }
+        
+        #service-items td svg,
+        #service-items td svg * {
+            max-width: 24px !important;
+            max-height: 24px !important;
+            width: 24px !important;
+            height: 24px !important;
+        }
+        
+        #service-items td .featured-service-icon,
+        #service-items td i {
+            width: 24px !important;
+            height: 24px !important;
+            font-size: 24px !important;
+        }
+        
+        /* SVG'lerin CSS stillerini ezmek için */
+        #service-items td [class*="svg-icon"] {
+            width: 24px !important;
+            height: 24px !important;
+        }
+        
+        #service-items td [class*="svg-icon"] svg {
+            width: 24px !important;
+            height: 24px !important;
+        }
     </style>
 @stop 

@@ -1219,12 +1219,22 @@
            }
            
            .featured-service-icon {
-               width: 40px;
-               height: 40px;
+               width: 32px;
+               height: 32px;
            }
            
            .featured-service-icon i {
-               font-size: 20px !important;
+               font-size: 18px !important;
+           }
+           
+           .featured-service-icon svg {
+               max-width: 32px !important;
+               max-height: 32px !important;
+           }
+           
+           .featured-service-icon img {
+               max-width: 32px !important;
+               max-height: 32px !important;
            }
            
            .featured-service-title {
