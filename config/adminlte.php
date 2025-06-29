@@ -315,11 +315,10 @@ return [
         ],
         [
             'text'         => 'Etkinlikleri Çek',
-            'url'          => '#',
+            'url'          => 'admin/events/check',
             'icon'         => 'fas fa-fw fa-download',
             'topnav_right' => true,
             'classes'      => 'btn btn-primary btn-sm mr-2',
-            'id'           => 'quick-scrape-btn',
         ],
         [
             'type'         => 'fullscreen-widget',

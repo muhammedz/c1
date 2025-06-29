@@ -113,6 +113,7 @@ class EventScrapeController extends Controller
                 \App\Models\ActivityLog::create([
                     'user_id' => auth()->id(),
                     'user_name' => auth()->user()->name ?? 'Bilinmeyen Kullanıcı',
+                    'model_type' => 'System', // Sistem işlemi olduğunu belirtmek için
                     'action' => 'etkinlik_cekme',
                     'description' => 'Etkinlik çekme işlemi tamamlandı: ' . ($result['newEvents'] ?? 0) . ' yeni etkinlik eklendi',
                     'new_values' => [
@@ -225,6 +226,7 @@ class EventScrapeController extends Controller
                 \App\Models\ActivityLog::create([
                     'user_id' => auth()->id(),
                     'user_name' => auth()->user()->name ?? 'Bilinmeyen Kullanıcı',
+                    'model_type' => 'System', // Sistem işlemi olduğunu belirtmek için
                     'action' => 'etkinlik_cekme_toplu',
                     'description' => 'Toplu etkinlik çekme işlemi tamamlandı: ' . ($result['newEvents'] ?? 0) . ' yeni etkinlik eklendi',
                     'new_values' => [
