@@ -104,7 +104,11 @@
                                                                             @foreach($item->children as $subItem)
                                                                                 <li>
                                                                                     <a href="{{ $subItem->url ?? '#' }}" class="mega-menu-link" {{ $subItem->new_tab ? 'target="_blank"' : '' }}>
-                                                                                        <i class="{{ $subItem->icon ?? 'fas fa-user' }} mega-menu-link-icon"></i>
+                                                                                        @if($subItem->icon && Str::startsWith($subItem->icon, 'data:image/'))
+                                                                                            <img src="{{ $subItem->icon }}" alt="İkon" class="mega-menu-link-icon" style="width: 16px; height: 16px; object-fit: contain;">
+                                                                                        @else
+                                                                                            <i class="{{ $subItem->icon ?? 'fas fa-user' }} mega-menu-link-icon"></i>
+                                                                                        @endif
                                                                                         <span>{{ $subItem->title }}</span>
                                                                                     </a>
                                                                                 </li>

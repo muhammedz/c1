@@ -15,13 +15,13 @@
                 @if($category->activeItems->count() > 0)
                 <div class="group relative {{ $widthClass }} {{ $index < $categoryCount - 1 ? 'border-r border-white/20' : '' }}" style="padding: 0 5px;">
                     <a href="#" class="group flex items-center h-full px-6 py-4 space-x-3 transition-colors duration-300">
-                        <span class="material-icons text-2xl">
-                            @if(Str::startsWith($category->icon, 'fas ') || Str::startsWith($category->icon, 'far ') || Str::startsWith($category->icon, 'fab '))
-                                menu
-                            @else
-                                {{ $category->icon ?? 'menu' }}
-                            @endif
-                        </span>
+                        @if($category->icon && Str::startsWith($category->icon, 'data:image/'))
+                            <img src="{{ $category->icon }}" alt="İkon" style="width: 32px; height: 32px; object-fit: contain;">
+                        @elseif(Str::startsWith($category->icon, 'fas ') || Str::startsWith($category->icon, 'far ') || Str::startsWith($category->icon, 'fab '))
+                            <i class="{{ $category->icon }} text-2xl"></i>
+                        @else
+                            <span class="material-icons text-2xl">{{ $category->icon ?? 'menu' }}</span>
+                        @endif
                         <div class="flex flex-col">
                             <span class="text-base font-semibold">{{ strtoupper($category->name) }}</span>
                             <span class="group-hover:text-black text-xs text-white/60">{{ $category->description ?? 'Hızlı Menü' }}</span>
@@ -177,13 +177,13 @@
                     @if($category->activeItems->count() > 0)
                     <div class="group relative">
                         <a href="#" class="flex items-center p-4 space-x-3">
-                            <span class="material-icons text-2xl">
-                                @if(Str::startsWith($category->icon, 'fas ') || Str::startsWith($category->icon, 'far ') || Str::startsWith($category->icon, 'fab '))
-                                    menu
-                                @else
-                                    {{ $category->icon ?? 'menu' }}
-                                @endif
-                            </span>
+                            @if($category->icon && Str::startsWith($category->icon, 'data:image/'))
+                                <img src="{{ $category->icon }}" alt="İkon" style="width: 32px; height: 32px; object-fit: contain;">
+                            @elseif(Str::startsWith($category->icon, 'fas ') || Str::startsWith($category->icon, 'far ') || Str::startsWith($category->icon, 'fab '))
+                                <i class="{{ $category->icon }} text-2xl"></i>
+                            @else
+                                <span class="material-icons text-2xl">{{ $category->icon ?? 'menu' }}</span>
+                            @endif
                             <div class="flex flex-col flex-1">
                                 <span class="text-base font-semibold">{{ strtoupper($category->name) }}</span>
                                 <span class="text-xs text-white/60">{{ $category->description ?? 'Hızlı Menü' }}</span>

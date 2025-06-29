@@ -362,7 +362,11 @@
                                     <div class="card h-100 border-{{ $item->button_style ?? 'primary' }}">
                                         <div class="card-header bg-{{ $item->button_style ?? 'primary' }} text-white d-flex justify-content-between align-items-center">
                                             <h5 class="mb-0">
-                                                <i class="fas {{ $item->icon ?? 'fa-link' }} mr-2"></i>
+                                                @if($item->icon && Str::startsWith($item->icon, 'data:image/'))
+                                                    <img src="{{ $item->icon }}" alt="İkon" class="mr-2" style="width: 16px; height: 16px; object-fit: contain;">
+                                                @else
+                                                    <i class="fas {{ $item->icon ?? 'fa-link' }} mr-2"></i>
+                                                @endif
                                                 {{ $item->title }}
                                             </h5>
                                             <div class="dropdown">
@@ -418,7 +422,13 @@
                                                         <label>İkon</label>
                                                         <div class="input-group">
                                                             <div class="input-group-prepend">
-                                                                <span class="input-group-text"><i class="fas {{ $item->icon ?? 'fa-link' }}"></i></span>
+                                                                <span class="input-group-text">
+                                                                    @if($item->icon && Str::startsWith($item->icon, 'data:image/'))
+                                                                        <img src="{{ $item->icon }}" alt="İkon" style="width: 16px; height: 16px; object-fit: contain;">
+                                                                    @else
+                                                                        <i class="fas {{ $item->icon ?? 'fa-link' }}"></i>
+                                                                    @endif
+                                                                </span>
                                                             </div>
                                                             <input type="text" class="form-control" name="icon" value="{{ $item->icon }}">
                                                         </div>

@@ -40,7 +40,13 @@
                         <li>
                             <a href="{{ $item->url }}" class="flex items-center py-1 px-2 text-sm text-gray-600 hover:bg-gray-50 rounded" {{ $item->target_attribute }}>
                                 @if($item->icon)
-                                <span class="material-icons mr-2 text-xs">{{ $item->icon }}</span>
+                                    @if(Str::startsWith($item->icon, 'data:image/'))
+                                        <img src="{{ $item->icon }}" alt="İkon" class="mr-2" style="width: 16px; height: 16px; object-fit: contain;">
+                                    @elseif(Str::startsWith($item->icon, 'fas '))
+                                        <i class="{{ $item->icon }} mr-2 text-xs"></i>
+                                    @else
+                                        <span class="material-icons mr-2 text-xs">{{ $item->icon }}</span>
+                                    @endif
                                 @endif
                                 <span>{{ $item->name }}</span>
                             </a>

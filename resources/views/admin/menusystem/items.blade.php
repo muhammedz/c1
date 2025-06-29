@@ -159,7 +159,18 @@
                                 <tr data-id="{{ $item->id }}" class="parent-item">
                                     <td>{{ $item->id }}</td>
                                     <td>{{ $item->title }}</td>
-                                    <td><i class="fas {{ $item->icon ?? 'fa-home' }}"></i> {{ $item->icon ?? 'fa-home' }}</td>
+                                    <td>
+                                        @if($item->icon && Str::startsWith($item->icon, 'data:image/'))
+                                            <img src="{{ $item->icon }}" alt="İkon" style="width: 20px; height: 20px; object-fit: contain;">
+                                        @elseif($item->icon && Str::startsWith($item->icon, 'fas '))
+                                            <i class="{{ $item->icon }}"></i>
+                                        @elseif($item->icon)
+                                            <i class="material-icons">{{ $item->icon }}</i>
+                                        @else
+                                            <i class="material-icons">home</i>
+                                        @endif
+                                        {{ Str::limit($item->icon ?? 'home', 20) }}
+                                    </td>
                                     <td>{{ $item->url }}</td>
                                     <td>{{ $item->order }}</td>
                                     <td>
@@ -201,7 +212,18 @@
                                 <tr data-id="{{ $childItem->id }}" class="child-item">
                                     <td>{{ $childItem->id }}</td>
                                     <td><span class="ml-4">└ {{ $childItem->title }}</span></td>
-                                    <td><i class="fas {{ $childItem->icon ?? 'fa-home' }}"></i> {{ $childItem->icon ?? 'fa-home' }}</td>
+                                    <td>
+                                        @if($childItem->icon && Str::startsWith($childItem->icon, 'data:image/'))
+                                            <img src="{{ $childItem->icon }}" alt="İkon" style="width: 20px; height: 20px; object-fit: contain;">
+                                        @elseif($childItem->icon && Str::startsWith($childItem->icon, 'fas '))
+                                            <i class="{{ $childItem->icon }}"></i>
+                                        @elseif($childItem->icon)
+                                            <i class="material-icons">{{ $childItem->icon }}</i>
+                                        @else
+                                            <i class="material-icons">home</i>
+                                        @endif
+                                        {{ Str::limit($childItem->icon ?? 'home', 20) }}
+                                    </td>
                                     <td>{{ $childItem->url }}</td>
                                     <td>{{ $childItem->order }}</td>
                                     <td>
@@ -243,7 +265,18 @@
                                 <tr data-id="{{ $subChildItem->id }}" class="sub-child-item">
                                     <td>{{ $subChildItem->id }}</td>
                                     <td><span class="ml-5">└─ {{ $subChildItem->title }}</span></td>
-                                    <td><i class="fas {{ $subChildItem->icon ?? 'fa-home' }}"></i> {{ $subChildItem->icon ?? 'fa-home' }}</td>
+                                    <td>
+                                        @if($subChildItem->icon && Str::startsWith($subChildItem->icon, 'data:image/'))
+                                            <img src="{{ $subChildItem->icon }}" alt="İkon" style="width: 20px; height: 20px; object-fit: contain;">
+                                        @elseif($subChildItem->icon && Str::startsWith($subChildItem->icon, 'fas '))
+                                            <i class="{{ $subChildItem->icon }}"></i>
+                                        @elseif($subChildItem->icon)
+                                            <i class="material-icons">{{ $subChildItem->icon }}</i>
+                                        @else
+                                            <i class="material-icons">home</i>
+                                        @endif
+                                        {{ Str::limit($subChildItem->icon ?? 'home', 20) }}
+                                    </td>
                                     <td>{{ $subChildItem->url }}</td>
                                     <td>{{ $subChildItem->order }}</td>
                                     <td>
