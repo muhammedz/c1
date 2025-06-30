@@ -389,7 +389,7 @@
             @if($relatedServices->count() > 0)
             <section id="ilgili-hizmetler" class="service-content-section">
                 <h2>İlgili Hizmetler</h2>
-                <p class="mb-5">{{ $mudurluk->name }} müdürlüğümüzün sunduğu hizmetler ve vatandaşlarımıza sağladığı imkanlar:</p>
+                <p class="mb-5">{{ $mudurluk->name }} sunduğu hizmetler ve vatandaşlarımıza sağladığı imkanlar:</p>
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     @foreach($relatedServices as $service)

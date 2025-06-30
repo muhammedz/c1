@@ -62,7 +62,7 @@ class MudurlukController extends Controller
         // İlgili hizmetleri getir (seçilen kategorilerdeki hizmetler)
         $relatedServices = collect();
         if ($mudurluk->serviceCategories->count() > 0) {
-            $relatedServices = $mudurluk->relatedServices()->limit(8)->get();
+            $relatedServices = $mudurluk->relatedServices()->get();
         }
 
         // Diğer müdürlükleri getir (rastgele 6 tane)
