@@ -7,10 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
+use Laravel\Scout\Searchable;
 
 class Archive extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, Searchable;
 
     /**
      * The attributes that are mass assignable.
@@ -225,5 +226,27 @@ class Archive extends Model
     public function isFeatured()
     {
         return $this->is_featured;
+    }
+
+    /**
+     * Get the indexable data array for the model.
+     */
+    public function toSearchableArray()
+    {
+        return [
+            'id' => $this->id,
+            'title' => $this->title,
+            'excerpt' => $this->excerpt,
+            'content' => strip_tags($this->content ?? ''),
+            'status' => $this->status,
+        ];
+    }
+
+    /**
+     * Determine if the model should be searchable.
+     */
+    public function shouldBeSearchable()
+    {
+        return $this->status === 'published';
     }
 }

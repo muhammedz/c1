@@ -8,6 +8,7 @@ use App\Models\Project;
 use App\Models\GuidePlace;
 use App\Models\CankayaHouse;
 use App\Models\Mudurluk;
+use App\Models\Archive;
 use App\Models\SearchPriorityLink;
 use Illuminate\Support\Collection;
 
@@ -30,6 +31,7 @@ class SearchService
                 'guides' => collect(),
                 'cankaya_houses' => collect(),
                 'mudurlukler' => collect(),
+                'archives' => collect(),
                 'total' => 0
             ];
         }
@@ -47,9 +49,10 @@ class SearchService
         $guides = $this->searchGuides($normalizedQuery, $query);
         $cankayaHouses = $this->searchCankayaHouses($normalizedQuery, $query);
         $mudurlukler = $this->searchMudurlukler($normalizedQuery, $query);
+        $archives = $this->searchArchives($normalizedQuery, $query);
         
         $totalCount = $priorityLinks->count() + $services->count() + $news->count() + $projects->count() + 
-                     $guides->count() + $cankayaHouses->count() + $mudurlukler->count();
+                     $guides->count() + $cankayaHouses->count() + $mudurlukler->count() + $archives->count();
         
         return [
             'priority_links' => $priorityLinks,
@@ -59,6 +62,7 @@ class SearchService
             'guides' => $guides,
             'cankaya_houses' => $cankayaHouses,
             'mudurlukler' => $mudurlukler,
+            'archives' => $archives,
             'total' => $totalCount
         ];
     }
@@ -478,6 +482,87 @@ class SearchService
                     $results = $results->merge($additionalResults);
                 }
             }
+        }
+        
+        return $results;
+    }
+
+    private function searchArchives(string $normalizedQuery, string $originalQuery): Collection
+    {
+        $results = collect();
+        
+        // 1. Scout ile tam arama
+        try {
+            $scoutResults = Archive::search($normalizedQuery)
+                ->where('status', 'published')
+                ->get();
+            $results = $results->merge($scoutResults);
+        } catch (\Exception $e) {
+            // Scout hatası durumunda devam et
+        }
+        
+        // 2. Veritabanında LIKE ile arama (sadece başlık)
+        $likeResults = Archive::where('status', 'published')
+            ->where(function($q) use ($originalQuery, $normalizedQuery) {
+                $q->where('title', 'LIKE', "%{$originalQuery}%")
+                  ->orWhere('title', 'LIKE', "%{$normalizedQuery}%");
+            })
+            ->get();
+        
+        $existingIds = $results->pluck('id')->toArray();
+        $additionalResults = $likeResults->whereNotIn('id', $existingIds);
+        $results = $results->merge($additionalResults);
+        
+        // 3. Kelime kelime arama (sadece başlık)
+        $words = explode(' ', $normalizedQuery);
+        if (count($words) > 1) {
+            foreach ($words as $word) {
+                if (strlen($word) > 2) {
+                    $wordResults = Archive::where('status', 'published')
+                        ->where('title', 'LIKE', "%{$word}%")
+                        ->get();
+                    
+                    $existingIds = $results->pluck('id')->toArray();
+                    $additionalResults = $wordResults->whereNotIn('id', $existingIds);
+                    $results = $results->merge($additionalResults);
+                }
+            }
+        }
+        
+        // 4. Fuzzy matching - sadece çok az sonuç varsa
+        if ($results->count() < 2) {
+            $fuzzyResults = $this->fuzzySearchArchives($normalizedQuery);
+            $existingIds = $results->pluck('id')->toArray();
+            $additionalResults = $fuzzyResults->whereNotIn('id', $existingIds);
+            $results = $results->merge($additionalResults);
+        }
+        
+        return $results;
+    }
+    
+    /**
+     * Arşivler için fuzzy search
+     * 
+     * @param string $query
+     * @return Collection
+     */
+    private function fuzzySearchArchives(string $query): Collection
+    {
+        $results = collect();
+        
+        $variations = $this->generateQueryVariations($query);
+        
+        foreach ($variations as $variation) {
+            $variationResults = Archive::where('status', 'published')
+                ->where('title', 'LIKE', "%{$variation}%")
+                ->limit(5)
+                ->get();
+            
+            $existingIds = $results->pluck('id')->toArray();
+            $additionalResults = $variationResults->whereNotIn('id', $existingIds);
+            $results = $results->merge($additionalResults);
+            
+            if ($results->count() >= 10) break;
         }
         
         return $results;

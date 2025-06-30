@@ -114,10 +114,19 @@ Arama - Çankaya Belediyesi
                         @endif
                         
                         @if(isset($results['mudurlukler']) && $results['mudurlukler']->count() > 0)
-                        <div class="bg-white p-3 md:p-4">
+                        <div class="bg-white p-3 md:p-4 border-b border-gray-200">
                             <a href="#mudurlukler" class="text-[#004d2e] hover:underline flex justify-between text-sm md:text-base">
                                 <span>Müdürlükler</span>
                                 <span>{{ $results['mudurlukler']->count() }}</span>
+                            </a>
+                        </div>
+                        @endif
+                        
+                        @if(isset($results['archives']) && $results['archives']->count() > 0)
+                        <div class="bg-white p-3 md:p-4">
+                            <a href="#archives" class="text-[#004d2e] hover:underline flex justify-between text-sm md:text-base">
+                                <span>Arşivler</span>
+                                <span>{{ $results['archives']->count() }}</span>
                             </a>
                         </div>
                         @endif
@@ -354,6 +363,35 @@ Arama - Çankaya Belediyesi
                                                         <p class="text-xs text-gray-600 mt-1">{{ Str::limit($mudurluk->summary, 80) }}</p>
                                                     @endif
                                                     <span class="inline-block bg-orange-100 text-orange-800 text-xs px-2 py-1 rounded-full mt-1">Müdürlük</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                        @endif
+                        
+                        <!-- Arşivler Sonuçları -->
+                        @if(isset($results['archives']) && $results['archives']->count() > 0)
+                            <div id="archives" class="mb-4 md:mb-6">
+                                <h2 class="text-lg md:text-xl font-bold text-gray-900 mb-2 md:mb-3 border-b border-gray-200 pb-2">Arşivler ({{ $results['archives']->count() }})</h2>
+                                <div class="space-y-2">
+                                    @foreach($results['archives'] as $archive)
+                                        <div class="bg-white border border-gray-200 rounded-lg overflow-hidden transition-all hover:shadow-md">
+                                            <div class="p-3 md:p-2">
+                                                <div class="flex-1">
+                                                    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-1 sm:gap-2">
+                                                        <a href="{{ route('archives.show', $archive->slug) }}" class="text-sm md:text-base font-medium text-[#004d2e] hover:underline block">{{ $archive->title }}</a>
+                                                        <div class="flex items-center text-gray-500 text-xs whitespace-nowrap">
+                                                            <span class="material-icons text-xs mr-1">calendar_today</span>
+                                                            <span>{{ $archive->published_at ? $archive->published_at->format('d.m.Y') : $archive->created_at->format('d.m.Y') }}</span>
+                                                        </div>
+                                                    </div>
+                                                    <span class="text-xs text-gray-400 block italic hidden md:block">{{ route('archives.show', $archive->slug) }}</span>
+                                                    @if($archive->excerpt)
+                                                        <p class="text-xs text-gray-600 mt-1">{{ Str::limit($archive->excerpt, 80) }}</p>
+                                                    @endif
+                                                    <span class="inline-block bg-indigo-100 text-indigo-800 text-xs px-2 py-1 rounded-full mt-1">Arşiv</span>
                                                 </div>
                                             </div>
                                         </div>
