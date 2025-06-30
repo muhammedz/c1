@@ -22,7 +22,7 @@ class SearchService
      */
     public function search(string $query): array
     {
-        if (empty($query)) {
+        if (empty($query) || strlen(trim($query)) < 3) {
             return [
                 'priority_links' => collect(),
                 'services' => collect(),
@@ -32,7 +32,8 @@ class SearchService
                 'cankaya_houses' => collect(),
                 'mudurlukler' => collect(),
                 'archives' => collect(),
-                'total' => 0
+                'total' => 0,
+                'min_length_error' => strlen(trim($query)) > 0 && strlen(trim($query)) < 3
             ];
         }
 
@@ -63,7 +64,8 @@ class SearchService
             'cankaya_houses' => $cankayaHouses,
             'mudurlukler' => $mudurlukler,
             'archives' => $archives,
-            'total' => $totalCount
+            'total' => $totalCount,
+            'min_length_error' => false
         ];
     }
     

@@ -166,11 +166,19 @@ Arama - Çankaya Belediyesi
                     </div>
                     
                     @if(!isset($query) || (isset($query) && empty($results['total'])))
+                        <!-- Minimum karakter uyarısı -->
+                        @if(isset($results['min_length_error']) && $results['min_length_error'])
+                        <div class="bg-red-50 border border-red-200 rounded-lg p-4 md:p-5 mb-4 md:mb-6 flex items-center">
+                            <span class="material-icons text-red-400 mr-2 md:mr-3 text-xl md:text-2xl">error</span>
+                            <p class="text-red-800 text-sm md:text-base">Arama yapmak için en az 3 karakter girmelisiniz.</p>
+                        </div>
+                        @else
                         <!-- Boş sonuç veya arama başlangıcı -->
                         <div class="bg-amber-50 border border-amber-200 rounded-lg p-4 md:p-5 mb-4 md:mb-6 flex items-center">
                             <span class="material-icons text-amber-400 mr-2 md:mr-3 text-xl md:text-2xl">warning</span>
                             <p class="text-amber-800 text-sm md:text-base">Lütfen arama yapmak istediğiniz kelimeyi/kelimeleri giriniz.</p>
                         </div>
+                        @endif
                         
                         <div class="bg-white border border-gray-200 p-4 md:p-6 rounded-lg">
                             <h3 class="text-base md:text-lg font-medium text-gray-700 mb-2">Toplam <span class="font-bold">0</span> kayıt bulunmuştur.</h3>
