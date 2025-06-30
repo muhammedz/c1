@@ -388,13 +388,7 @@ Arama - Çankaya Belediyesi
                                         <div class="bg-white border border-gray-200 rounded-lg overflow-hidden transition-all hover:shadow-md">
                                             <div class="p-3 md:p-2">
                                                 <div class="flex-1">
-                                                    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-1 sm:gap-2">
-                                                        <a href="{{ route('archives.show', $archive->slug) }}" class="text-sm md:text-base font-medium text-[#004d2e] hover:underline block">{{ $archive->title }}</a>
-                                                        <div class="flex items-center text-gray-500 text-xs whitespace-nowrap">
-                                                            <span class="material-icons text-xs mr-1">calendar_today</span>
-                                                            <span>{{ $archive->published_at ? $archive->published_at->format('d.m.Y') : $archive->created_at->format('d.m.Y') }}</span>
-                                                        </div>
-                                                    </div>
+                                                    <a href="{{ route('archives.show', $archive->slug) }}" class="text-sm md:text-base font-medium text-[#004d2e] hover:underline block">{{ $archive->title }}</a>
                                                     <span class="text-xs text-gray-400 block italic hidden md:block">{{ route('archives.show', $archive->slug) }}</span>
                                                     @if($archive->excerpt)
                                                         <p class="text-xs text-gray-600 mt-1">{{ Str::limit($archive->excerpt, 80) }}</p>
