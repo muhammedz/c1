@@ -228,19 +228,18 @@ $(document).ready(function () {
         }
     };
 
-    // DataTables
+    // DataTables - Sadece arama ve filtreleme için kullan, pagination Laravel'de
     var newsTable = $('#news-table').DataTable({
         language: turkishLanguage,
         responsive: true,
         ordering: false, // Sıralamayı kapat, backend sıralamasını kullan
-        pageLength: 30, // Varsayılan sayfa boyutu
+        paging: false, // DataTables pagination'ını kapat
+        info: false, // Info yazısını kapat
         columnDefs: [
             { orderable: false, targets: [0, 1, 7] } // Bu sütunları sıralanamaz yap
         ],
-        // Sayfalandırma alanı düzenlendi, sorunlu alan düzeltildi
-        dom: "<'row'<'col-sm-12'tr>>" +
-             "<'row mt-2'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7 d-flex justify-content-end align-items-center'lp>>",
-        lengthMenu: [[10, 30, 50, 100, -1], [10, 30, 50, 100, "Tümü"]]
+        // Sadece table göster, pagination Laravel'de olacak
+        dom: "<'row'<'col-sm-12'tr>>"
     });
     
     // DataTables özel arama kutusu
@@ -1335,6 +1334,11 @@ $(document).ready(function () {
                         @endforeach
                     </tbody>
                 </table>
+            </div>
+            
+            <!-- Laravel Pagination Linkleri -->
+            <div class="d-flex justify-content-center mt-3">
+                {{ $news->links() }}
             </div>
         </div>
     </div>
