@@ -5,6 +5,119 @@
 @section('adminlte_css_pre')
 <meta name="csrf-token" content="{{ csrf_token() }}">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+<style>
+    /* Pagination Stilleri */
+    .pagination {
+        gap: 5px;
+        margin: 0;
+    }
+    
+    .pagination .page-item .page-link {
+        border: 1px solid #dee2e6;
+        color: #495057;
+        font-size: 0.875rem;
+        padding: 8px 12px;
+        border-radius: 6px;
+        transition: all 0.2s ease;
+        background-color: #fff;
+        margin: 0 2px;
+    }
+    
+    .pagination .page-item .page-link:hover {
+        background-color: #e9ecef;
+        border-color: #adb5bd;
+        color: #495057;
+    }
+    
+    .pagination .page-item.active .page-link {
+        background-color: #007bff;
+        border-color: #007bff;
+        color: #fff;
+        font-weight: 500;
+    }
+    
+    .pagination .page-item.disabled .page-link {
+        color: #6c757d;
+        background-color: #fff;
+        border-color: #dee2e6;
+        cursor: not-allowed;
+    }
+    
+    /* Pagination container */
+    .pagination-wrapper {
+        background-color: #f8f9fa;
+        padding: 15px;
+        border-radius: 8px;
+        border-top: 1px solid #dee2e6;
+        margin-top: 20px;
+    }
+    
+    /* Gallery kartları için stiller */
+    .gallery-item-card {
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        overflow: hidden;
+        transition: all 0.3s ease;
+        height: 100%;
+    }
+    
+    .gallery-item-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    }
+    
+    .gallery-image-container {
+        position: relative;
+        height: 200px;
+        overflow: hidden;
+    }
+    
+    .gallery-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .delete-image-btn {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(220, 53, 69, 0.9);
+        border: none;
+        color: white;
+        font-size: 12px;
+        transition: all 0.2s ease;
+    }
+    
+    .delete-image-btn:hover {
+        background: #dc3545;
+        transform: scale(1.1);
+    }
+    
+    .gallery-info {
+        padding: 15px;
+    }
+    
+    .gallery-title {
+        font-size: 14px;
+        font-weight: 600;
+        margin-bottom: 8px;
+        color: #333;
+    }
+    
+    .gallery-description {
+        font-size: 13px;
+        color: #666;
+        margin-bottom: 8px;
+    }
+</style>
 @endsection
 
 @section('content')
@@ -228,8 +341,10 @@
                     
                     <!-- Gallery Pagination -->
                     @if($contents->hasPages())
-                    <div class="d-flex justify-content-center mt-4">
-                        {{ $contents->appends(['type' => $type])->links() }}
+                    <div class="pagination-wrapper">
+                        <div class="d-flex justify-content-center">
+                            {{ $contents->appends(['type' => $type])->links() }}
+                        </div>
                     </div>
                     @endif
 
@@ -537,16 +652,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 if ($bulkButton.length === 0) {
                     console.error('❌ BULK_FILEMANAGER_BUTTON BULUNAMADI!');
-                    alert('❌ Bulk FileManager button bulunamadı!');
                 } else {
                     console.log('✅ Bulk FileManager button bulundu!', $bulkButton[0]);
-                    alert('✅ Bulk FileManager button bulundu!');
                     
                     // jQuery click event
                     $bulkButton.on('click', function(e) {
                         e.preventDefault();
                         console.log('🎯 Bulk filemanager button clicked!');
-                        alert('🎯 Button clicked! Modal açılıyor...');
                         
                         // Modal'ı aç
                         $('#bulkMediapickerModal').modal('show');
