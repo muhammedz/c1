@@ -605,10 +605,22 @@ document.addEventListener('DOMContentLoaded', function() {
 </div>
 
 <script>
-console.log('Script loaded!');
+// En başta test
+console.log('=== SCRIPT YÜKLENDI ===');
+alert('Script loaded!');
+
+// jQuery kontrolü
+if (typeof jQuery === 'undefined') {
+    console.error('jQuery YÜKLENMEMİŞ!');
+    alert('jQuery yüklenmemiş!');
+} else {
+    console.log('jQuery mevcut, version:', jQuery.fn.jquery);
+}
 
 $(document).ready(function() {
-    console.log('Document ready!');
+    console.log('=== DOCUMENT READY ===');
+    alert('Document ready!');
+    
     console.log('jQuery version:', $.fn.jquery);
     console.log('Looking for delete buttons...');
     console.log('Delete buttons found:', $('.delete-image-btn').length);
@@ -618,6 +630,15 @@ $(document).ready(function() {
 
     // Debug için buton kontrolü
     console.log('Bulk filemanager button count:', $('#bulk_filemanager_button').length);
+    
+    // Buton var mı?
+    if ($('#bulk_filemanager_button').length === 0) {
+        console.error('BULK_FILEMANAGER_BUTTON BULUNAMADI!');
+        alert('Button bulunamadı!');
+    } else {
+        console.log('Button bulundu:', $('#bulk_filemanager_button')[0]);
+        alert('Button bulundu!');
+    }
     
     // Test butonu
     $('#bulk_filemanager_button').on('click', function(e) {
