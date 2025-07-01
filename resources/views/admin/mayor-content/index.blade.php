@@ -383,10 +383,17 @@
                 <h5 class="modal-title" id="bulkMediapickerModalLabel">
                     <i class="fas fa-images me-2"></i>
                     Fotoğrafları Seç
+                    <span class="badge badge-primary ml-2" id="selected-media-count">0</span>
                 </h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+                <div class="ml-auto">
+                    <button type="button" class="btn btn-success btn-sm mr-2" id="finish-selection-btn" style="display: none;">
+                        <i class="fas fa-check mr-1"></i>
+                        Seçimi Bitir
+                    </button>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
             </div>
             <div class="modal-body p-0">
                 <iframe id="bulkMediapickerFrame" src="" style="width: 100%; height: 600px; border: none;"></iframe>
@@ -546,28 +553,67 @@ document.addEventListener('DOMContentLoaded', function() {
                 // FileManagerSystem'den gelen mesajları dinle
                 window.addEventListener('message', function(event) {
                     console.log('FileManager mesaj alındı:', event.data);
+                    console.log('Mesaj tipi:', event.data?.type);
                     
                     if (event.data && typeof event.data === 'object') {
+                        // Çoklu seçim
                         if (event.data.type === 'multiple-media-selected' && event.data.mediaList) {
                             selectedBulkImages = event.data.mediaList;
-                            console.log('Seçilen medyalar:', selectedBulkImages);
+                            console.log('Çoklu medya seçildi:', selectedBulkImages);
                             
-                            // UI'yi güncelle
                             updateBulkImageDisplay();
-                            
-                            // Modal'ı kapat
                             $('#bulkMediapickerModal').modal('hide');
                             
-                        } else if (event.data.type === 'media-selected' && event.data.media) {
-                            // Tek medya seçimi (geriye dönük uyumluluk)
+                        } 
+                        // Tek medya seçimi - eski format
+                        else if (event.data.type === 'media-selected' && event.data.media) {
                             const media = event.data.media;
                             selectedBulkImages = [media];
-                            console.log('Tek medya seçildi:', media);
+                            console.log('Tek medya seçildi (eski format):', media);
                             
                             updateBulkImageDisplay();
                             $('#bulkMediapickerModal').modal('hide');
                             
-                        } else if (event.data.type === 'close-modal') {
+                        }
+                        // Tek medya seçimi - yeni format (mediaSelected)
+                        else if (event.data.type === 'mediaSelected') {
+                            console.log('MediaSelected mesajı yakalandı!');
+                            
+                            // Medya objesini oluştur
+                            const media = {
+                                id: event.data.mediaId,
+                                url: event.data.mediaUrl,
+                                title: event.data.mediaTitle || event.data.mediaAlt || '',
+                                alt: event.data.mediaAlt || '',
+                                path: event.data.mediaPath || ''
+                            };
+                            
+                            // Eğer aynı medya zaten seçilmişse ekleme
+                            const existingIndex = selectedBulkImages.findIndex(img => img.id === media.id);
+                            if (existingIndex === -1) {
+                                selectedBulkImages.push(media);
+                                console.log('Yeni medya eklendi:', media);
+                                console.log('Toplam seçili medya:', selectedBulkImages.length);
+                                
+                                // Modal header'daki sayacı güncelle
+                                $('#selected-media-count').text(selectedBulkImages.length);
+                                $('#finish-selection-btn').show();
+                                
+                                updateBulkImageDisplay();
+                            } else {
+                                console.log('Bu medya zaten seçili, tekrar eklenmedi');
+                            }
+                            
+                            // Modal'ı kapatma - kullanıcı birden fazla seçim yapabilsin
+                            // $('#bulkMediapickerModal').modal('hide');
+                            
+                        }
+                        // Modal kapama
+                        else if (event.data.type === 'close-modal') {
+                            $('#bulkMediapickerModal').modal('hide');
+                        }
+                        // Bitti mesajı - modal'ı kapat
+                        else if (event.data.type === 'selection-finished' || event.data.type === 'done') {
                             $('#bulkMediapickerModal').modal('hide');
                         }
                     }
@@ -665,6 +711,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Modal kapandığında iframe'i temizle
                 $('#bulkMediapickerModal').on('hidden.bs.modal', function () {
                     $('#bulkMediapickerFrame').attr('src', '');
+                    $('#selected-media-count').text('0');
+                    $('#finish-selection-btn').hide();
+                });
+
+                // Seçimi bitir butonu
+                $('#finish-selection-btn').on('click', function() {
+                    $('#bulkMediapickerModal').modal('hide');
                 });
                 
                 console.log('FileManagerSystem script yüklendi!');
