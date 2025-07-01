@@ -24,7 +24,7 @@ class MayorContentController extends Controller
         $type = $request->get('type', 'story');
         $contents = MayorContent::where('mayor_id', $mayor->id)
             ->where('type', $type)
-            ->orderBy('sort_order')
+            ->orderBy('created_at', 'desc')
             ->paginate(20);
 
         // Debug için log ekle
