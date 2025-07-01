@@ -1087,16 +1087,17 @@ $(document).ready(function () {
         cursor: not-allowed;
     }
     
-    /* Ok işaretlerini tamamen gizle */
-    .pagination .page-item:first-child,
-    .pagination .page-item:last-child {
+    /* Sadece SVG ok işaretlerini gizle, yazıları koru */
+    .pagination .page-link svg {
         display: none !important;
     }
     
-    /* Previous/Next yazılarını da gizle */
-    .pagination .page-item .page-link[rel="prev"],
-    .pagination .page-item .page-link[rel="next"] {
-        display: none !important;
+    /* Previous/Next butonlarını küçük ve şık yap */
+    .pagination .page-item:first-child .page-link,
+    .pagination .page-item:last-child .page-link {
+        font-size: 0.875rem;
+        padding: 8px 12px;
+        font-weight: 500;
     }
     
     /* Pagination container */
