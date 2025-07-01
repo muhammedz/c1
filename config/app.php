@@ -128,6 +128,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Cache Clear Secret
+    |--------------------------------------------------------------------------
+    |
+    | This secret key is used for the secure cache clearing endpoint.
+    | It should be a random string that is not easily guessable.
+    |
+    */
+
+    'cache_clear_secret' => env('CACHE_CLEAR_SECRET', 'pharmacy-cache-clear-2025'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Maintenance Mode Driver
     |--------------------------------------------------------------------------
     |

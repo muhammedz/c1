@@ -155,11 +155,47 @@ Route::prefix('rehber')->name('guide.')->group(function () {
 // Nöbetçi Eczaneler Sayfası
 Route::get('/nobetci-eczaneler', [PharmacyController::class, 'index'])->name('pharmacy.index');
 
-// Geçici cache temizleme route'u
-Route::get('/nobetci-eczaneler/cache-temizle-gizli', function() {
-    Cache::flush(); // Tüm cache'i temizle
-    return "Cache temizlendi! Artık /nobetci-eczaneler sayfasına gidebilirsin.";
-});
+// Güvenli cache temizleme route'u - sadece cron job için
+Route::get('/system/cache-clear/{secret}', function($secret) {
+    // Güvenlik kontrolü
+    if ($secret !== config('app.cache_clear_secret', 'pharmacy-cache-clear-2025')) {
+        abort(404);
+    }
+    
+    // Sadece pharmacy cache'ini temizle
+    $clearedCount = 0;
+    $plateCode = '06'; // Ankara
+    $districts = ['ÇANKAYA', 'KEÇİÖREN', 'YENIMAHALLE', 'MAMAK', 'ALTINDAĞ', 'ETİMESGUT', 'SİNCAN', 'PURSAKLAR'];
+    
+    // Son 7 günün cache'lerini temizle
+    for ($i = 0; $i <= 7; $i++) {
+        $date = date('d/m/Y', strtotime("-{$i} days"));
+        
+        // Global cache
+        $globalKey = "pharmacy_global_{$plateCode}_{$date}";
+        if (Cache::has($globalKey)) {
+            Cache::forget($globalKey);
+            $clearedCount++;
+        }
+        
+        // İlçe bazlı cache'ler
+        foreach ($districts as $district) {
+            $cacheKey = "pharmacy_data_{$plateCode}_{$date}_{$district}";
+            if (Cache::has($cacheKey)) {
+                Cache::forget($cacheKey);
+                $clearedCount++;
+            }
+        }
+    }
+    
+    return response()->json([
+        'status' => 'success',
+        'message' => 'Pharmacy cache cleared successfully',
+        'cleared_count' => $clearedCount,
+        'timestamp' => now()->format('Y-m-d H:i:s'),
+        'districts_checked' => $districts
+    ]);
+})->name('system.cache.clear');
 
 // Side Menu API - Mobil menü için
 Route::get('/api/menu-items/{menuId}', [App\Http\Controllers\Admin\MenuSystemController::class, 'getMenuItemsForSideMenu'])->name('api.menu-items');
