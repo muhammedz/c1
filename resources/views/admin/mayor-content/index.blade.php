@@ -103,13 +103,6 @@
             </div>
 
             @if($type == 'gallery')
-            
-            <!-- TEST YAZISI - DOĞRU YER KONTROLÜ -->
-            <div class="alert alert-warning text-center mb-3">
-                <h4><i class="fas fa-exclamation-triangle mr-2"></i>TEST YAZISI</h4>
-                <p class="mb-0">Bu yazı toplu fotoğraf yükleme bölümünün hemen üstünde görünüyor mu? Eğer görünüyorsa doğru yerdeyiz!</p>
-            </div>
-            
             <!-- Toplu Fotoğraf Yükleme -->
             <div class="card card-outline card-info">
                 <div class="card-header">
@@ -579,10 +572,18 @@ document.addEventListener('DOMContentLoaded', function() {
                         else if (event.data.type === 'mediaSelected') {
                             console.log('MediaSelected mesajı yakalandı!');
                             
+                            // URL'i düzelt - yanlış domain'i kaldır
+                            let mediaUrl = event.data.mediaUrl;
+                            if (mediaUrl && mediaUrl.includes('cankaya.epoxsoft.net.tr')) {
+                                // Yanlış domain'i kaldır ve mevcut site domain'i ile değiştir
+                                mediaUrl = mediaUrl.replace('https://cankaya.epoxsoft.net.tr', window.location.origin);
+                                console.log('URL düzeltildi:', event.data.mediaUrl, '->', mediaUrl);
+                            }
+                            
                             // Medya objesini oluştur
                             const media = {
                                 id: event.data.mediaId,
-                                url: event.data.mediaUrl,
+                                url: mediaUrl,
                                 title: event.data.mediaTitle || event.data.mediaAlt || '',
                                 alt: event.data.mediaAlt || '',
                                 path: event.data.mediaPath || ''
