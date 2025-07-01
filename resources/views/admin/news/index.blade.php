@@ -1091,8 +1091,19 @@ $(document).ready(function () {
     .pagination .page-item:first-child .page-link,
     .pagination .page-item:last-child .page-link {
         font-size: 0.75rem;
-        padding: 8px 10px;
+        padding: 6px 8px;
         font-weight: 600;
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    /* SVG ikonları küçült */
+    .pagination .page-link svg {
+        width: 12px !important;
+        height: 12px !important;
     }
     
     /* Pagination container */
