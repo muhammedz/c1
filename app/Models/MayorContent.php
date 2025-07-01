@@ -17,6 +17,9 @@ class MayorContent extends Model
         'title',
         'description',
         'image',
+        'filemanagersystem_image',
+        'filemanagersystem_image_alt',
+        'filemanagersystem_image_title',
         'extra_data',
         'sort_order',
         'is_active'
@@ -106,6 +109,62 @@ class MayorContent extends Model
     public function scopeGallery($query)
     {
         return $query->ofType(self::TYPE_GALLERY);
+    }
+
+    /**
+     * FileManagerSystem medya ilişkileri
+     */
+    public function media()
+    {
+        return $this->hasManyThrough(
+            \App\Models\FileManagerSystem\Media::class,
+            \App\Models\FileManagerSystem\MediaRelation::class,
+            'related_id',
+            'id',
+            'id',
+            'media_id'
+        )->where('related_type', 'mayor_content');
+    }
+
+    /**
+     * Ana görsel için medya ilişkisi
+     */
+    public function featuredImage()
+    {
+        return $this->media()->where('field_name', 'featured_image')->first();
+    }
+
+    /**
+     * FileManagerSystem görselinin tam URL'ini döndürür
+     */
+    public function getFilemanagersystemImageUrlAttribute(): ?string
+    {
+        if (empty($this->filemanagersystem_image)) {
+            return null;
+        }
+        
+        // Eğer URL zaten tam bir URL ise direkt döndür
+        if (strpos($this->filemanagersystem_image, 'http://') === 0 || strpos($this->filemanagersystem_image, 'https://') === 0) {
+            return $this->filemanagersystem_image;
+        }
+        
+        // Media ID kontrolü - /uploads/media/ID formatı
+        if (preg_match('#^/uploads/media/(\d+)$#', $this->filemanagersystem_image, $matches)) {
+            $mediaId = $matches[1];
+            $media = \App\Models\FileManagerSystem\Media::find($mediaId);
+            
+            if ($media) {
+                return asset($media->url);
+            }
+            
+            // Medya bulunamadı, ilişkili medyaları kontrol et
+            $relatedMedia = $this->featuredImage();
+            if ($relatedMedia) {
+                return asset($relatedMedia->url);
+            }
+        }
+        
+        return asset($this->filemanagersystem_image);
     }
 
     /**

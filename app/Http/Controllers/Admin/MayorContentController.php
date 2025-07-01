@@ -61,6 +61,9 @@ class MayorContentController extends Controller
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'filemanagersystem_image' => 'nullable|string',
+            'filemanagersystem_image_alt' => 'nullable|string',
+            'filemanagersystem_image_title' => 'nullable|string',
             'extra_data' => 'nullable|array',
             'sort_order' => 'nullable|integer',
         ]);
@@ -73,6 +76,13 @@ class MayorContentController extends Controller
             $data['image'] = $request->file('image')->store('mayor/content', 'uploads');
         }
 
+        // FileManagerSystem görsel kontrolü
+        if ($request->filled('filemanagersystem_image')) {
+            $data['filemanagersystem_image'] = $request->filemanagersystem_image;
+            $data['filemanagersystem_image_alt'] = $request->filemanagersystem_image_alt;
+            $data['filemanagersystem_image_title'] = $request->filemanagersystem_image_title;
+        }
+
         // Sort order belirleme
         if (!$data['sort_order']) {
             $maxOrder = MayorContent::where('mayor_id', $mayor->id)
@@ -81,7 +91,12 @@ class MayorContentController extends Controller
             $data['sort_order'] = $maxOrder + 1;
         }
 
-        MayorContent::create($data);
+        $mayorContent = MayorContent::create($data);
+
+        // FileManagerSystem medya ilişkisini oluştur
+        if ($request->filled('filemanagersystem_image')) {
+            $this->createMediaRelation($mayorContent, $request->filemanagersystem_image);
+        }
 
         return redirect()->route('admin.mayor-content.index', ['type' => $request->type])
             ->with('success', 'İçerik başarıyla oluşturuldu.');
@@ -112,6 +127,9 @@ class MayorContentController extends Controller
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'filemanagersystem_image' => 'nullable|string',
+            'filemanagersystem_image_alt' => 'nullable|string',
+            'filemanagersystem_image_title' => 'nullable|string',
             'extra_data' => 'nullable|array',
             'sort_order' => 'nullable|integer',
         ]);
@@ -128,7 +146,19 @@ class MayorContentController extends Controller
             $data['image'] = $request->file('image')->store('mayor/content', 'uploads');
         }
 
+        // FileManagerSystem görsel kontrolü
+        if ($request->filled('filemanagersystem_image')) {
+            $data['filemanagersystem_image'] = $request->filemanagersystem_image;
+            $data['filemanagersystem_image_alt'] = $request->filemanagersystem_image_alt;
+            $data['filemanagersystem_image_title'] = $request->filemanagersystem_image_title;
+        }
+
         $mayorContent->update($data);
+
+        // FileManagerSystem medya ilişkisini güncelle
+        if ($request->filled('filemanagersystem_image')) {
+            $this->createMediaRelation($mayorContent, $request->filemanagersystem_image);
+        }
 
         return redirect()->route('admin.mayor-content.index', ['type' => $mayorContent->type])
             ->with('success', 'İçerik başarıyla güncellendi.');
@@ -250,6 +280,52 @@ class MayorContentController extends Controller
             'success' => true,
             'message' => $message
         ]);
+    }
+
+    /**
+     * FileManagerSystem medya ilişkisi oluşturur
+     */
+    private function createMediaRelation(MayorContent $mayorContent, string $filemanagersystemImage)
+    {
+        try {
+            // Medya ID'sini bul
+            $mediaId = null;
+            
+            // 1. /uploads/media/123 formatı
+            if (preg_match('#^/uploads/media/(\d+)$#', $filemanagersystemImage, $matches)) {
+                $mediaId = $matches[1];
+            }
+            // 2. /admin/filemanagersystem/media/preview/123 formatı
+            elseif (preg_match('#/media/preview/(\d+)#', $filemanagersystemImage, $matches)) {
+                $mediaId = $matches[1];
+            }
+            
+            if ($mediaId) {
+                // Mevcut ilişkiyi kontrol et
+                $existingRelation = \App\Models\FileManagerSystem\MediaRelation::where('media_id', $mediaId)
+                    ->where('related_type', 'mayor_content')
+                    ->where('related_id', $mayorContent->id)
+                    ->where('field_name', 'featured_image')
+                    ->first();
+                
+                // İlişki yoksa oluştur
+                if (!$existingRelation) {
+                    $mediaRelation = new \App\Models\FileManagerSystem\MediaRelation();
+                    $mediaRelation->media_id = $mediaId;
+                    $mediaRelation->related_type = 'mayor_content';
+                    $mediaRelation->related_id = $mayorContent->id;
+                    $mediaRelation->field_name = 'featured_image';
+                    $mediaRelation->order = 0;
+                    $mediaRelation->save();
+                }
+            }
+        } catch (\Exception $e) {
+            \Log::error('Mayor content medya ilişkisi oluşturma hatası: ' . $e->getMessage(), [
+                'mayor_content_id' => $mayorContent->id,
+                'filemanagersystem_image' => $filemanagersystemImage,
+                'trace' => $e->getTraceAsString()
+            ]);
+        }
     }
 
     /**

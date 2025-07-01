@@ -184,8 +184,9 @@
                         <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6 mb-4">
                             <div class="gallery-item-card">
                                 <div class="gallery-image-container">
-                                    <img src="{{ asset('uploads/' . $content->image) }}" 
-                                         alt="{{ $content->title }}" 
+                                    <img src="{{ $content->filemanagersystem_image_url ?: asset('uploads/' . $content->image) }}" 
+                                         alt="{{ $content->filemanagersystem_image_alt ?: $content->title }}" 
+                                         title="{{ $content->filemanagersystem_image_title ?: $content->title }}"
                                          class="gallery-image">
                                     
                                     <!-- Basit silme butonu -->

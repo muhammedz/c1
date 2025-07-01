@@ -179,9 +179,9 @@
                             </div>
 
                             <div class="col-md-4">
-                                <!-- Görsel -->
+                                <!-- FileManagerSystem Görsel -->
                                 <div class="form-group">
-                                    <label for="image">
+                                    <label for="filemanagersystem_image">
                                         @switch($type)
                                             @case('story')
                                                 Hikaye Görseli
@@ -189,26 +189,52 @@
                                             @case('agenda')
                                                 Etkinlik Görseli
                                                 @break
-                                            
                                             @case('gallery')
                                                 Fotoğraf <span class="text-danger">*</span>
                                                 @break
                                         @endswitch
                                     </label>
                                     <div class="input-group">
-                                        <div class="custom-file">
-                                            <input type="file" class="custom-file-input @error('image') is-invalid @enderror" 
-                                                   id="image" name="image" accept="image/*" 
-                                                   {{ $type == 'gallery' ? 'required' : '' }}>
-                                            <label class="custom-file-label" for="image">Dosya seçin</label>
-                                        </div>
+                                        <input type="text" class="form-control @error('filemanagersystem_image') is-invalid @enderror" 
+                                               id="filemanagersystem_image" name="filemanagersystem_image" 
+                                               value="{{ old('filemanagersystem_image') }}" readonly>
+                                        <button type="button" class="btn btn-primary" id="filemanagersystem_image_button">
+                                            <i class="fas fa-image"></i> Görsel Seç
+                                        </button>
                                     </div>
-                                    @error('image')
-                                        <span class="invalid-feedback d-block">{{ $message }}</span>
+                                    @error('filemanagersystem_image')
+                                        <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
+                                    <div id="filemanagersystem_image_preview" class="mt-2" style="display: none;">
+                                        <img src="" alt="Önizleme" class="img-thumbnail" style="max-width: 200px;">
+                                    </div>
                                     <small class="form-text text-muted">
-                                        Desteklenen formatlar: JPEG, PNG, JPG, GIF, WebP (Max: 2MB)
+                                        FileManagerSystem üzerinden görsel seçin
                                     </small>
+                                </div>
+
+                                <!-- Görsel Alt Metni -->
+                                <div class="form-group">
+                                    <label for="filemanagersystem_image_alt">Görsel Alt Metni</label>
+                                    <input type="text" class="form-control @error('filemanagersystem_image_alt') is-invalid @enderror" 
+                                           id="filemanagersystem_image_alt" name="filemanagersystem_image_alt" 
+                                           value="{{ old('filemanagersystem_image_alt') }}">
+                                    @error('filemanagersystem_image_alt')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                    <small class="text-muted">Görselin HTML alt özelliği için kullanılır (SEO ve erişilebilirlik için önemlidir)</small>
+                                </div>
+
+                                <!-- Görsel Başlığı -->
+                                <div class="form-group">
+                                    <label for="filemanagersystem_image_title">Görsel Başlığı</label>
+                                    <input type="text" class="form-control @error('filemanagersystem_image_title') is-invalid @enderror" 
+                                           id="filemanagersystem_image_title" name="filemanagersystem_image_title" 
+                                           value="{{ old('filemanagersystem_image_title') }}">
+                                    @error('filemanagersystem_image_title')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                    <small class="text-muted">Görselin HTML title özelliği için kullanılır</small>
                                 </div>
 
                                 <!-- Sıra -->
@@ -255,6 +281,26 @@
 </div>
 
 @push('scripts')
+<!-- FileManagerSystem Modal -->
+<div class="modal fade" id="mediapickerModal" tabindex="-1" role="dialog" aria-labelledby="mediapickerModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="mediapickerModalLabel">
+                    <i class="fas fa-image me-2"></i>
+                    Medya Seç
+                </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body p-0">
+                <iframe id="mediapickerFrame" src="" style="width: 100%; height: 600px; border: none;"></iframe>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
 $(document).ready(function() {
     // TinyMCE for description
@@ -268,11 +314,78 @@ $(document).ready(function() {
         });
     }
 
-    // File input labels
-    $('.custom-file-input').on('change', function() {
-        let fileName = $(this).val().split('\\').pop();
-        $(this).next('.custom-file-label').addClass("selected").html(fileName);
+    // FileManagerSystem entegrasyonu
+    $('#filemanagersystem_image_button').on('click', function() {
+        const input = $('#filemanagersystem_image');
+        const preview = $('#filemanagersystem_image_preview');
+        const previewImg = preview.find('img');
+        
+        // Geçici bir ID oluştur
+        const tempId = Date.now();
+        const relatedType = 'mayor_content';
+        
+        // MediaPicker URL
+        const mediapickerUrl = '/admin/filemanagersystem/mediapicker?type=image&filter=all&related_type=' + relatedType + '&related_id=' + tempId;
+        
+        console.log('FileManagerSystem açılıyor:', mediapickerUrl);
+        
+        // iFrame'i güncelle
+        $('#mediapickerFrame').attr('src', mediapickerUrl);
+        
+        // Modal'ı göster
+        $('#mediapickerModal').modal('show');
+        
+        // iframe'den mesaj dinleme
+        window.addEventListener('message', function(event) {
+            console.log('Mesaj alındı:', event.data);
+            
+            if (event.data && typeof event.data === 'object') {
+                if (event.data.type === 'media-selected' && event.data.media) {
+                    const media = event.data.media;
+                    console.log('Seçilen medya:', media);
+                    
+                    // Input'a URL'yi yaz
+                    let imageUrl = media.url;
+                    if (!imageUrl.startsWith('http')) {
+                        imageUrl = '/uploads/media/' + media.id;
+                    }
+                    
+                    input.val(imageUrl);
+                    
+                    // Önizlemeyi göster
+                    previewImg.attr('src', media.url);
+                    preview.show();
+                    
+                    // Alt text ve title alanlarını doldur
+                    if (media.alt_text) {
+                        $('#filemanagersystem_image_alt').val(media.alt_text);
+                    }
+                    if (media.title) {
+                        $('#filemanagersystem_image_title').val(media.title);
+                    }
+                    
+                    // Modal'ı kapat
+                    $('#mediapickerModal').modal('hide');
+                    
+                    console.log('Görsel seçimi tamamlandı');
+                } else if (event.data.type === 'close-modal') {
+                    $('#mediapickerModal').modal('hide');
+                }
+            }
+        });
     });
+
+    // Modal kapandığında iframe'i temizle
+    $('#mediapickerModal').on('hidden.bs.modal', function () {
+        $('#mediapickerFrame').attr('src', '');
+    });
+
+    // Sayfa yüklendiğinde mevcut görsel varsa önizlemeyi göster
+    const initialImageValue = $('#filemanagersystem_image').val();
+    if (initialImageValue) {
+        $('#filemanagersystem_image_preview img').attr('src', initialImageValue);
+        $('#filemanagersystem_image_preview').show();
+    }
 });
 </script>
 @endpush
