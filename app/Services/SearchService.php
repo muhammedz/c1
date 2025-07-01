@@ -609,17 +609,18 @@ class SearchService
                     $extension = strtoupper(pathinfo($file->file_name, PATHINFO_EXTENSION));
                     $extensionText = $extension ? " ({$extension})" : '';
                     
-                    // Başlığı oluştur: "Müdürlük Adı - Dosya Adı (PDF)"
+                    // Başlığı oluştur: "Müdürlük Adı - Dosya Adı"
                     $fileItem = (object)[
                         'id' => 'mudurluk_file_' . $file->id,
                         'type' => 'mudurluk_file',
-                        'title' => $file->mudurluk->name . ' - ' . $file->title . $extensionText,
+                        'title' => $file->mudurluk->name . ' - ' . $file->title,
                         'url' => '/mudurlukler/' . $file->mudurluk->slug,
                         'description' => 'Müdürlük Dosyası: ' . $file->title,
                         'mudurluk_name' => $file->mudurluk->name,
                         'file_title' => $file->title,
                         'file_name' => $file->file_name,
                         'file_extension' => $extension,
+                        'file_path' => $file->file_path,
                         'original_file' => $file
                     ];
                     
@@ -650,18 +651,18 @@ class SearchService
                                 
                                 if (!in_array($fileId, $existingIds)) {
                                     $extension = strtoupper(pathinfo($file->file_name, PATHINFO_EXTENSION));
-                                    $extensionText = $extension ? " ({$extension})" : '';
                                     
                                     $fileItem = (object)[
                                         'id' => $fileId,
                                         'type' => 'mudurluk_file',
-                                        'title' => $file->mudurluk->name . ' - ' . $file->title . $extensionText,
+                                        'title' => $file->mudurluk->name . ' - ' . $file->title,
                                         'url' => '/mudurlukler/' . $file->mudurluk->slug,
                                         'description' => 'Müdürlük Dosyası: ' . $file->title,
                                         'mudurluk_name' => $file->mudurluk->name,
                                         'file_title' => $file->title,
                                         'file_name' => $file->file_name,
                                         'file_extension' => $extension,
+                                        'file_path' => $file->file_path,
                                         'original_file' => $file
                                     ];
                                     

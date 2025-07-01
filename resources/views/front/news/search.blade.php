@@ -223,13 +223,6 @@
         flex-direction: column;
     }
 
-    .news-card-tags {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.5rem;
-        margin-bottom: 0.75rem;
-    }
-
     .news-card-category {
         background-color: rgba(0, 53, 43, 0.1);
         color: #00352b;
@@ -238,18 +231,7 @@
         padding: 0.25rem 0.75rem;
         border-radius: 9999px;
         width: fit-content;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-    }
-
-    .news-card-target-audience {
-        background-color: rgba(230, 162, 60, 0.1);
-        color: #b45309;
-        font-size: 0.75rem;
-        font-weight: 600;
-        padding: 0.25rem 0.75rem;
-        border-radius: 9999px;
-        width: fit-content;
+        margin-bottom: 0.75rem;
         text-transform: uppercase;
         letter-spacing: 0.05em;
     }
@@ -272,19 +254,14 @@
         color: #00352b;
     }
 
-    .news-card-excerpt {
-        color: #6b7280;
-        font-size: 0.875rem;
-        line-height: 1.6;
-        margin-bottom: 1rem;
-        flex: 1;
-    }
+
 
     .news-card-meta {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-top: auto;
+        margin-top: 1.5rem;
+        gap: 1rem;
     }
 
     .news-card-date {
@@ -298,15 +275,15 @@
     .news-card-button {
         background-color: #00352b;
         color: white;
-        padding: 0.5rem 1rem;
-        border-radius: 0.375rem;
-        font-size: 0.875rem;
+        padding: 0.375rem 0.75rem;
+        border-radius: 0.25rem;
+        font-size: 0.75rem;
         font-weight: 500;
         text-decoration: none;
         transition: all 0.2s ease;
         display: inline-flex;
         align-items: center;
-        gap: 0.5rem;
+        gap: 0.25rem;
     }
 
     .news-card-button:hover {
@@ -459,24 +436,15 @@
                         </div>
                         
                         <div class="news-card-content">
-                            <div class="news-card-tags">
-                                @if($item->categories->isNotEmpty())
-                                    <span class="news-card-category">{{ $item->categories->first()->name }}</span>
-                                @endif
-                                @if($item->hedefKitleler->isNotEmpty())
-                                    <span class="news-card-target-audience">{{ $item->hedefKitleler->first()->name }}</span>
-                                @endif
-                            </div>
+                            @if($item->categories->isNotEmpty())
+                                <span class="news-card-category">{{ $item->categories->first()->name }}</span>
+                            @endif
                             
                             <h3 class="news-card-title">
                                 <a href="{{ route('news.show', $item->slug) }}">
                                     {!! html_entity_decode($item->title) !!}
                                 </a>
                             </h3>
-                            
-                            <p class="news-card-excerpt">
-                                {!! Str::limit(html_entity_decode(strip_tags($item->content)), 120) !!}
-                            </p>
                             
                             <div class="news-card-meta">
                                 <div class="news-card-date">

@@ -397,15 +397,13 @@ Arama - Çankaya Belediyesi
                                         <div class="bg-white border border-gray-200 rounded-lg overflow-hidden transition-all hover:shadow-md">
                                             <div class="p-3 md:p-2">
                                                 <div class="flex-1">
-                                                    <a href="{{ $file->url }}" class="text-sm md:text-base font-medium text-[#004d2e] hover:underline block">{{ $file->title }}</a>
+                                                    <a href="#" onclick="window.open('{{ $file->original_file->file_url ?? '#' }}', '_blank')" class="text-sm md:text-base font-medium text-[#004d2e] hover:underline block cursor-pointer">{{ $file->title }}</a>
                                                     <span class="text-xs text-gray-400 block italic hidden md:block">{{ $file->url }}</span>
-                                                    <p class="text-xs text-gray-600 mt-1">{{ $file->description }}</p>
                                                     <div class="flex items-center gap-2 mt-2">
                                                         <span class="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">{{ $file->mudurluk_name }}</span>
                                                         @if($file->file_extension)
-                                                            <span class="inline-block bg-red-100 text-red-800 text-xs px-2 py-1 rounded-full">{{ $file->file_extension }}</span>
+                                                            <span class="inline-block bg-red-100 text-red-800 text-xs px-2 py-1 rounded-full font-medium">{{ ucfirst(strtolower($file->file_extension)) }}</span>
                                                         @endif
-                                                        <span class="inline-block bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded-full">Dosya</span>
                                                     </div>
                                                 </div>
                                             </div>
