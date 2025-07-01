@@ -27,7 +27,7 @@
         <div class="flex flex-col md:flex-row items-center gap-6">
             <!-- Başkan Fotoğrafı -->
             <div class="w-36 h-36 md:w-44 md:h-44 rounded-full overflow-hidden border-4 border-white shadow-xl flex-shrink-0">
-                <img src="{{ $mayor->profile_image_url ?? 'https://cankaya.epoxsoft.net.tr/uploads/images/iyu1AIj1YVxWUezQXpVwYyco4PDjuOkHYVmtkPmH.webp' }}" alt="Başkanımız {{ $mayor->name }}" class="w-full h-full object-cover">
+                <img src="{{ $mayor->profile_image_url ?? asset('images/mayor/default-profile.jpg') }}" alt="Başkanımız {{ $mayor->name }}" class="w-full h-full object-cover">
             </div>
             
             <div>
@@ -79,7 +79,7 @@
             <div class="hikaye-item flex-shrink-0 text-center" onclick="acLightbox({{ $index }})">
                 <div class="w-20 h-20 rounded-full p-1 bg-gradient-to-r {{ $story->getExtraValue('gradient', 'from-blue-500 to-cyan-400') }} mx-auto cursor-pointer">
                     <div class="w-full h-full rounded-full overflow-hidden border-2 border-white">
-                        <img src="{{ $story->image_url ?? 'https://cankaya.epoxsoft.net.tr/images/huseyincanguner/huseyincanguner' . ($index + 1) . '.jpeg' }}" alt="{{ $story->title }}" class="w-full h-full object-cover">
+                        <img src="{{ $story->image_url ?? asset('images/mayor/story-' . ($index + 1) . '.jpg') }}" alt="{{ $story->title }}" class="w-full h-full object-cover">
                     </div>
                 </div>
                 <p class="text-xs font-medium mt-2 text-gray-700">{{ $story->title }}</p>
@@ -306,7 +306,7 @@
                 @foreach($gallery as $index => $photo)
                 <!-- Fotoğraf -->
                 <div class="relative overflow-hidden rounded-lg group h-48 md:h-64 cursor-pointer" onclick="acFotoLightbox({{ $index }})">
-                    <img src="{{ $photo->image_url ?? 'https://cankaya.epoxsoft.net.tr/images/huseyincanguner/huseyincanguner5.jpeg' }}" alt="{{ $photo->title }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                    <img src="{{ $photo->image_url ?? asset('images/mayor/gallery-default.jpg') }}" alt="{{ $photo->title }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
                     <div class="absolute inset-0 bg-black opacity-0 group-hover:opacity-50 transition-opacity"></div>
                     <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                         <span class="material-icons text-white text-3xl">zoom_in</span>
@@ -365,7 +365,7 @@ const hikayeler = [
     {
         baslik: "{{ $story->title }}",
         metin: "{{ $story->description }}",
-        resim: "{{ $story->image_url ?? 'https://cankaya.epoxsoft.net.tr/images/huseyincanguner/huseyincanguner1.jpeg' }}"
+        resim: "{{ $story->image_url ?? asset('images/mayor/story-1.jpg') }}"
     }@if(!$loop->last),@endif
     @endforeach
 ];
@@ -374,7 +374,7 @@ const hikayeler = [
 const fotograflar = [
     @foreach($gallery as $photo)
     {
-        url: "{{ $photo->image_url ?? 'https://cankaya.epoxsoft.net.tr/images/huseyincanguner/huseyincanguner5.jpeg' }}",
+        url: "{{ $photo->image_url ?? asset('images/mayor/gallery-default.jpg') }}",
         baslik: "{{ $photo->title }}"
     }@if(!$loop->last),@endif
     @endforeach

@@ -46,10 +46,16 @@ class MayorContent extends Model
     }
 
     /**
-     * Görsel URL'ini getir
+     * Görsel URL'ini getir (FileManagerSystem öncelikli)
      */
     public function getImageUrlAttribute()
     {
+        // Önce FileManagerSystem görselini kontrol et
+        if ($this->filemanagersystem_image_url) {
+            return $this->filemanagersystem_image_url;
+        }
+        
+        // Sonra eski image field'ını kontrol et
         if (!$this->image) {
             return null;
         }
