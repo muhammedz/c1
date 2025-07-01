@@ -339,14 +339,12 @@
                         @endforeach
                     </div>
                     
-                    <!-- Gallery Pagination -->
-                    @if($contents->hasPages())
+                    <!-- Laravel Pagination Linkleri -->
                     <div class="pagination-wrapper">
                         <div class="d-flex justify-content-center">
-                            {{ $contents->appends(['type' => $type])->links() }}
+                            {{ $contents->appends(['type' => $type])->links('custom.pagination') }}
                         </div>
                     </div>
-                    @endif
 
                 </div>
             </div>
