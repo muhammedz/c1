@@ -125,7 +125,7 @@ Arama - Çankaya Belediyesi
                         @if(isset($results['mudurlukler']) && $results['mudurlukler']->where('type', 'mudurluk_file')->count() > 0)
                         <div class="bg-white p-3 md:p-4 border-b border-gray-200">
                             <a href="#mudurluk-files" class="text-[#004d2e] hover:underline flex justify-between text-sm md:text-base">
-                                <span>Müdürlük Dosyaları</span>
+                                <span>Dosyalar</span>
                                 <span>{{ $results['mudurlukler']->where('type', 'mudurluk_file')->count() }}</span>
                             </a>
                         </div>
@@ -388,23 +388,20 @@ Arama - Çankaya Belediyesi
                             </div>
                         @endif
                         
-                        <!-- Müdürlük Dosyaları Sonuçları -->
+                        <!-- Dosyalar Sonuçları -->
                         @if(isset($results['mudurlukler']) && $results['mudurlukler']->where('type', 'mudurluk_file')->count() > 0)
                             <div id="mudurluk-files" class="mb-4 md:mb-6">
-                                <h2 class="text-lg md:text-xl font-bold text-gray-900 mb-2 md:mb-3 border-b border-gray-200 pb-2">Müdürlük Dosyaları ({{ $results['mudurlukler']->where('type', 'mudurluk_file')->count() }})</h2>
+                                <h2 class="text-lg md:text-xl font-bold text-gray-900 mb-2 md:mb-3 border-b border-gray-200 pb-2">Dosyalar ({{ $results['mudurlukler']->where('type', 'mudurluk_file')->count() }})</h2>
                                 <div class="space-y-2">
                                     @foreach($results['mudurlukler']->where('type', 'mudurluk_file') as $file)
                                         <div class="bg-white border border-gray-200 rounded-lg overflow-hidden transition-all hover:shadow-md">
                                             <div class="p-3 md:p-2">
                                                 <div class="flex-1">
-                                                    <div class="flex items-center gap-2 mb-2">
+                                                    <div class="flex items-center gap-2">
                                                         <a href="{{ route('mudurlukler.view-file', [$file->original_file->mudurluk->slug, $file->original_file->id]) }}" target="_blank" class="text-sm md:text-base font-medium text-[#004d2e] hover:underline">{{ $file->title }}</a>
                                                         @if($file->file_extension)
                                                             <span class="inline-block bg-red-100 text-red-800 text-xs px-2 py-1 rounded-full font-medium">{{ ucfirst(strtolower($file->file_extension)) }}</span>
                                                         @endif
-                                                    </div>
-                                                    <div class="flex items-center gap-2">
-                                                        <span class="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">{{ $file->mudurluk_name }}</span>
                                                     </div>
                                                 </div>
                                             </div>
