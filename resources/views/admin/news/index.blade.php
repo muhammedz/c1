@@ -1049,6 +1049,59 @@ $(document).ready(function () {
     .dataTables_filter {
         display: none !important;
     }
+    
+    /* Pagination Stilleri */
+    .pagination {
+        gap: 5px;
+        margin: 0;
+    }
+    
+    .pagination .page-item .page-link {
+        border: 1px solid #dee2e6;
+        color: #495057;
+        font-size: 0.875rem;
+        padding: 8px 12px;
+        border-radius: 6px;
+        transition: all 0.2s ease;
+        background-color: #fff;
+        margin: 0 2px;
+    }
+    
+    .pagination .page-item .page-link:hover {
+        background-color: #e9ecef;
+        border-color: #adb5bd;
+        color: #495057;
+    }
+    
+    .pagination .page-item.active .page-link {
+        background-color: #007bff;
+        border-color: #007bff;
+        color: #fff;
+        font-weight: 500;
+    }
+    
+    .pagination .page-item.disabled .page-link {
+        color: #6c757d;
+        background-color: #fff;
+        border-color: #dee2e6;
+        cursor: not-allowed;
+    }
+    
+    /* Ok işaretlerini daha küçük ve şık yap */
+    .pagination .page-item:first-child .page-link,
+    .pagination .page-item:last-child .page-link {
+        font-size: 0.75rem;
+        padding: 8px 10px;
+        font-weight: 600;
+    }
+    
+    /* Pagination container */
+    .pagination-wrapper {
+        background-color: #f8f9fa;
+        padding: 15px;
+        border-radius: 8px;
+        border-top: 1px solid #dee2e6;
+    }
 </style>
 @endpush
 
@@ -1337,8 +1390,10 @@ $(document).ready(function () {
             </div>
             
             <!-- Laravel Pagination Linkleri -->
-            <div class="d-flex justify-content-center mt-3">
-                {{ $news->links() }}
+            <div class="pagination-wrapper">
+                <div class="d-flex justify-content-center">
+                    {{ $news->links() }}
+                </div>
             </div>
         </div>
     </div>
