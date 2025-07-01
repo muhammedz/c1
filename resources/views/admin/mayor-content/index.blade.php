@@ -5,6 +5,7 @@
 @section('adminlte_css_pre')
 <meta name="csrf-token" content="{{ csrf_token() }}">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
 <style>
     /* Pagination Stilleri */
     .pagination {
@@ -60,6 +61,7 @@
         overflow: hidden;
         transition: all 0.3s ease;
         height: 100%;
+        position: relative;
     }
     
     .gallery-item-card:hover {
@@ -71,6 +73,53 @@
         position: relative;
         height: 200px;
         overflow: hidden;
+    }
+    
+    /* Sıralama için özel stiller */
+    .gallery-order-badge {
+        position: absolute;
+        top: 8px;
+        left: 8px;
+        z-index: 10;
+    }
+    
+    .gallery-drag-handle {
+        position: absolute;
+        top: 8px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(0,0,0,0.7);
+        color: white;
+        padding: 5px 8px;
+        border-radius: 4px;
+        cursor: move;
+        z-index: 10;
+        display: none;
+        font-size: 12px;
+    }
+    
+    .sort-mode .gallery-drag-handle {
+        display: block;
+    }
+    
+    .sort-mode .gallery-item-card {
+        cursor: move;
+    }
+    
+    .sort-mode .delete-image-btn {
+        display: none;
+    }
+    
+    .ui-sortable-helper {
+        transform: rotate(5deg) !important;
+        box-shadow: 0 8px 16px rgba(0,0,0,0.3) !important;
+    }
+    
+    .ui-sortable-placeholder {
+        background: #f8f9fa;
+        border: 2px dashed #dee2e6;
+        border-radius: 8px;
+        margin: 1rem 0;
     }
     
     .gallery-image {
@@ -300,13 +349,33 @@
                     </h3>
                     <div class="card-tools">
                         <span class="badge badge-purple">{{ $contents->total() }} fotoğraf</span>
+                        <button type="button" class="btn btn-sm btn-info ml-2" id="sort-mode-toggle">
+                            <i class="fas fa-sort mr-1"></i>
+                            Sıralama Modu
+                        </button>
                     </div>
                 </div>
                 <div class="card-body">
-                    <div class="row">
+                    <!-- Sıralama Bilgisi -->
+                    <div class="alert alert-info sort-info" style="display: none;">
+                        <i class="fas fa-info-circle mr-2"></i>
+                        <strong>Sıralama Modu Aktif:</strong> Fotoğrafları sürükleyip bırakarak sıralarını değiştirebilirsiniz. Frontend'de bu sıraya göre gösterilecektir.
+                    </div>
+                    
+                    <div class="row" id="sortable-gallery">
                         @foreach($contents as $content)
-                        <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6 mb-4">
+                        <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6 mb-4 gallery-item" data-id="{{ $content->id }}" data-sort="{{ $content->sort_order }}">
                             <div class="gallery-item-card">
+                                <!-- Sıra Numarası -->
+                                <div class="gallery-order-badge">
+                                    <span class="badge badge-primary">{{ $content->sort_order }}</span>
+                                </div>
+                                
+                                <!-- Sürükleme Handle -->
+                                <div class="gallery-drag-handle">
+                                    <i class="fas fa-grip-vertical"></i>
+                                </div>
+                                
                                 <div class="gallery-image-container">
                                     <img src="{{ $content->image_url ?: asset('images/mayor/gallery-default.jpg') }}?v={{ time() }}" 
                                          alt="{{ $content->filemanagersystem_image_alt ?: $content->title }}" 
@@ -851,6 +920,111 @@ document.addEventListener('DOMContentLoaded', function() {
                 $('#finish-selection-btn').on('click', function() {
                     $('#bulkMediapickerModal').modal('hide');
                 });
+                
+                // =========================
+                // GALLERY SORTING FUNCTIONALITY
+                // =========================
+                
+                // Sıralama modu toggle
+                let sortMode = false;
+                let sortable = null;
+                
+                $('#sort-mode-toggle').on('click', function() {
+                    sortMode = !sortMode;
+                    
+                    if (sortMode) {
+                        // Sıralama modunu aç
+                        $('body').addClass('sort-mode');
+                        $('.sort-info').slideDown();
+                        $(this).html('<i class="fas fa-times mr-1"></i> Sıralama Modunu Kapat');
+                        $(this).removeClass('btn-info').addClass('btn-warning');
+                        
+                        // Sortable'ı etkinleştir
+                        initSortable();
+                    } else {
+                        // Sıralama modunu kapat
+                        $('body').removeClass('sort-mode');
+                        $('.sort-info').slideUp();
+                        $(this).html('<i class="fas fa-sort mr-1"></i> Sıralama Modu');
+                        $(this).removeClass('btn-warning').addClass('btn-info');
+                        
+                        // Sortable'ı devre dışı bırak
+                        if (sortable) {
+                            sortable.destroy();
+                            sortable = null;
+                        }
+                    }
+                });
+                
+                function initSortable() {
+                    const galleryContainer = document.getElementById('sortable-gallery');
+                    if (!galleryContainer) return;
+                    
+                    sortable = new Sortable(galleryContainer, {
+                        animation: 200,
+                        ghostClass: 'ui-sortable-placeholder',
+                        chosenClass: 'ui-sortable-helper',
+                        handle: '.gallery-drag-handle',
+                        onEnd: function(evt) {
+                            // Sıralama değiştiğinde API'ye gönder
+                            updateSortOrder();
+                        }
+                    });
+                }
+                
+                function updateSortOrder() {
+                    const items = [];
+                    $('.gallery-item').each(function(index) {
+                        items.push({
+                            id: $(this).data('id'),
+                            sort_order: index + 1
+                        });
+                    });
+                    
+                    console.log('Yeni sıralama:', items);
+                    
+                    // AJAX ile sıralamayı güncelle
+                    $.ajax({
+                        url: '/admin/mayor-content/update-order',
+                        type: 'POST',
+                        data: {
+                            _token: $('meta[name="csrf-token"]').attr('content'),
+                            items: items
+                        },
+                        success: function(response) {
+                            if (response.success) {
+                                // Sıra numaralarını güncelle
+                                $('.gallery-item').each(function(index) {
+                                    $(this).find('.gallery-order-badge .badge').text(index + 1);
+                                    $(this).data('sort', index + 1);
+                                });
+                                
+                                Swal.fire({
+                                    title: 'Başarılı!',
+                                    text: 'Sıralama güncellendi.',
+                                    icon: 'success',
+                                    timer: 1500,
+                                    showConfirmButton: false
+                                });
+                            } else {
+                                Swal.fire({
+                                    title: 'Hata!',
+                                    text: 'Sıralama güncellenirken bir hata oluştu.',
+                                    icon: 'error',
+                                    confirmButtonText: 'Tamam'
+                                });
+                            }
+                        },
+                        error: function() {
+                            Swal.fire({
+                                title: 'Hata!',
+                                text: 'Sıralama güncellenirken bir hata oluştu.',
+                                icon: 'error',
+                                confirmButtonText: 'Tamam'
+                            });
+                        }
+                    });
+                }
                 
                 console.log('FileManagerSystem script yüklendi!');
                 
