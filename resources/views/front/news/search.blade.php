@@ -172,7 +172,7 @@
     /* Haber Grid Düzeni */
     .news-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        grid-template-columns: repeat(4, 1fr);
         gap: 1.5rem;
     }
 
@@ -223,6 +223,13 @@
         flex-direction: column;
     }
 
+    .news-card-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-bottom: 0.75rem;
+    }
+
     .news-card-category {
         background-color: rgba(0, 53, 43, 0.1);
         color: #00352b;
@@ -231,7 +238,18 @@
         padding: 0.25rem 0.75rem;
         border-radius: 9999px;
         width: fit-content;
-        margin-bottom: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .news-card-target-audience {
+        background-color: rgba(230, 162, 60, 0.1);
+        color: #b45309;
+        font-size: 0.75rem;
+        font-weight: 600;
+        padding: 0.25rem 0.75rem;
+        border-radius: 9999px;
+        width: fit-content;
         text-transform: uppercase;
         letter-spacing: 0.05em;
     }
@@ -347,6 +365,18 @@
     }
 
     /* Responsive */
+    @media (max-width: 1200px) {
+        .news-grid {
+            grid-template-columns: repeat(3, 1fr);
+        }
+    }
+
+    @media (max-width: 992px) {
+        .news-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
     @media (max-width: 768px) {
         .search-title {
             font-size: 1.75rem;
@@ -360,6 +390,12 @@
             flex-direction: column;
         }
 
+        .news-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @media (max-width: 480px) {
         .news-grid {
             grid-template-columns: 1fr;
         }
@@ -423,9 +459,14 @@
                         </div>
                         
                         <div class="news-card-content">
-                            @if($item->categories->isNotEmpty())
-                                <span class="news-card-category">{{ $item->categories->first()->name }}</span>
-                            @endif
+                            <div class="news-card-tags">
+                                @if($item->categories->isNotEmpty())
+                                    <span class="news-card-category">{{ $item->categories->first()->name }}</span>
+                                @endif
+                                @if($item->hedefKitleler->isNotEmpty())
+                                    <span class="news-card-target-audience">{{ $item->hedefKitleler->first()->name }}</span>
+                                @endif
+                            </div>
                             
                             <h3 class="news-card-title">
                                 <a href="{{ route('news.show', $item->slug) }}">

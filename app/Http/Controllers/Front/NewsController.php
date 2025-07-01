@@ -22,12 +22,16 @@ class NewsController extends Controller
         if ($request->filled('search')) {
             $searchTerm = $request->search;
             
-            $news = News::with(['category', 'categories'])
+            $news = News::with(['category', 'categories', 'hedefKitleler'])
                 ->where('status', true)
                 ->where(function($query) use ($searchTerm) {
                     $query->where('title', 'like', '%' . $searchTerm . '%')
                         ->orWhere('content', 'like', '%' . $searchTerm . '%')
-                        ->orWhere('summary', 'like', '%' . $searchTerm . '%');
+                        ->orWhere('summary', 'like', '%' . $searchTerm . '%')
+                        // Hedef kitle adına göre arama
+                        ->orWhereHas('hedefKitleler', function($q) use ($searchTerm) {
+                            $q->where('name', 'like', '%' . $searchTerm . '%');
+                        });
                 })
                 ->when($request->category, function($query) use ($request) {
                     $query->whereHas('categories', function($q) use ($request) {
