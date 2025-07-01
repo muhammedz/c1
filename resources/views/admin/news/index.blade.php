@@ -1087,23 +1087,16 @@ $(document).ready(function () {
         cursor: not-allowed;
     }
     
-    /* Ok işaretlerini daha küçük ve şık yap */
-    .pagination .page-item:first-child .page-link,
-    .pagination .page-item:last-child .page-link {
-        font-size: 0.75rem;
-        padding: 6px 8px;
-        font-weight: 600;
-        width: 32px;
-        height: 32px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+    /* Ok işaretlerini tamamen gizle */
+    .pagination .page-item:first-child,
+    .pagination .page-item:last-child {
+        display: none !important;
     }
     
-    /* SVG ikonları küçült */
-    .pagination .page-link svg {
-        width: 12px !important;
-        height: 12px !important;
+    /* Previous/Next yazılarını da gizle */
+    .pagination .page-item .page-link[rel="prev"],
+    .pagination .page-item .page-link[rel="next"] {
+        display: none !important;
     }
     
     /* Pagination container */
