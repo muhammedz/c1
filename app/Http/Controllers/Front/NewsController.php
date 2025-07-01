@@ -18,16 +18,36 @@ class NewsController extends Controller
             $query->where('status', true);
         })->get();
 
+        // Arama varsa, sadece arama sonuçlarını göster
+        if ($request->filled('search')) {
+            $searchTerm = $request->search;
+            
+            $news = News::with(['category', 'categories'])
+                ->where('status', true)
+                ->where(function($query) use ($searchTerm) {
+                    $query->where('title', 'like', '%' . $searchTerm . '%')
+                        ->orWhere('content', 'like', '%' . $searchTerm . '%')
+                        ->orWhere('summary', 'like', '%' . $searchTerm . '%');
+                })
+                ->when($request->category, function($query) use ($request) {
+                    $query->whereHas('categories', function($q) use ($request) {
+                        $q->where('news_categories.id', $request->category);
+                    });
+                })
+                ->orderBy('published_at', 'desc')
+                ->paginate(20);
+
+            // Arama sonuçları için özel view
+            return view('front.news.search', compact('news', 'categories', 'searchTerm'));
+        }
+
+        // Normal haber listesi (kategori bazlı)
         $news = News::with(['category', 'categories'])
             ->where('status', true)
             ->when($request->category, function($query) use ($request) {
                 $query->whereHas('categories', function($q) use ($request) {
                     $q->where('news_categories.id', $request->category);
                 });
-            })
-            ->when($request->search, function($query) use ($request) {
-                $query->where('title', 'like', '%' . $request->search . '%')
-                    ->orWhere('content', 'like', '%' . $request->search . '%');
             })
             ->orderBy('published_at', 'desc')
             ->paginate(20);

@@ -68,6 +68,23 @@
                             </div>
                         </div>
                         
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <div class="custom-control custom-switch">
+                                        <input type="checkbox" class="custom-control-input" id="searchInMudurlukFiles" name="search_in_mudurluk_files" {{ $settings->search_in_mudurluk_files ? 'checked' : '' }}>
+                                        <label class="custom-control-label" for="searchInMudurlukFiles">
+                                            <i class="fas fa-file-alt mr-1"></i>
+                                            Müdürlük Dosyalarında Arama Yapmayı Etkinleştir
+                                        </label>
+                                    </div>
+                                    <small class="form-text text-muted">
+                                        Bu seçenek aktif edildiğinde, arama sonuçlarında müdürlüklerin dosya ve dokümanları da görüntülenir.
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                        
                         <div class="text-right">
                             <button type="submit" class="btn btn-primary">Ayarları Kaydet</button>
                         </div>

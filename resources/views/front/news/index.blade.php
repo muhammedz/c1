@@ -382,10 +382,10 @@
             </h2>
             
             @php
-                // Son 12 haberi al
+                // Son 8 haberi al
                 $recentNews = \App\Models\News::published()
                     ->orderBy('published_at', 'desc')
-                    ->take(12)
+                    ->take(8)
                     ->get();
             @endphp
             

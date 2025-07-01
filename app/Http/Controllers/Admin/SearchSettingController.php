@@ -65,6 +65,7 @@ class SearchSettingController extends Controller
             'max_popular_queries' => 'required|integer|min:0|max:10',
             'show_quick_links' => 'boolean',
             'show_popular_queries' => 'boolean',
+            'search_in_mudurluk_files' => 'boolean',
         ]);
         
         $settings = SearchSetting::getSettings();
@@ -76,6 +77,7 @@ class SearchSettingController extends Controller
             'max_popular_queries' => $request->max_popular_queries,
             'show_quick_links' => $request->has('show_quick_links'),
             'show_popular_queries' => $request->has('show_popular_queries'),
+            'search_in_mudurluk_files' => $request->has('search_in_mudurluk_files'),
         ]);
         
         return redirect()->route('admin.search-settings.index')

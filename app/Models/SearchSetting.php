@@ -21,6 +21,7 @@ class SearchSetting extends Model
         'max_popular_queries',
         'show_quick_links',
         'show_popular_queries',
+        'search_in_mudurluk_files',
     ];
     
     /**
@@ -31,6 +32,7 @@ class SearchSetting extends Model
     protected $casts = [
         'show_quick_links' => 'boolean',
         'show_popular_queries' => 'boolean',
+        'search_in_mudurluk_files' => 'boolean',
         'max_quick_links' => 'integer',
         'max_popular_queries' => 'integer',
     ];
@@ -50,6 +52,7 @@ class SearchSetting extends Model
                 'max_popular_queries' => 4,
                 'show_quick_links' => true,
                 'show_popular_queries' => true,
+                'search_in_mudurluk_files' => false,
             ]);
         }
         

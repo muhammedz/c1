@@ -486,6 +486,13 @@ class SearchService
             }
         }
         
+        // Search settings kontrolü - müdürlük dosyalarında arama aktif mi?
+        $searchSettings = \App\Models\SearchSetting::getSettings();
+        if ($searchSettings->search_in_mudurluk_files) {
+            $fileResults = $this->searchMudurlukFiles($normalizedQuery, $originalQuery);
+            $results = $results->merge($fileResults);
+        }
+        
         return $results;
     }
 
@@ -565,6 +572,111 @@ class SearchService
             $results = $results->merge($additionalResults);
             
             if ($results->count() >= 10) break;
+        }
+        
+        return $results;
+    }
+    
+    /**
+     * Müdürlük dosyalarında arama yap
+     * 
+     * @param string $normalizedQuery
+     * @param string $originalQuery
+     * @return Collection
+     */
+    private function searchMudurlukFiles(string $normalizedQuery, string $originalQuery): Collection
+    {
+        $results = collect();
+        
+        try {
+            // MudurlukFile tablosunda arama yap
+            $fileResults = \App\Models\MudurlukFile::with('mudurluk')
+                ->whereHas('mudurluk', function($q) {
+                    $q->where('is_active', true);
+                })
+                ->where(function($q) use ($originalQuery, $normalizedQuery) {
+                    $q->where('title', 'LIKE', "%{$originalQuery}%")
+                      ->orWhere('title', 'LIKE', "%{$normalizedQuery}%")
+                      ->orWhere('file_name', 'LIKE', "%{$originalQuery}%")
+                      ->orWhere('file_name', 'LIKE', "%{$normalizedQuery}%");
+                })
+                ->get();
+            
+            // Dosya sonuçlarını özel format ile hazırla
+            foreach ($fileResults as $file) {
+                if ($file->mudurluk) {
+                    // Dosya uzantısını al
+                    $extension = strtoupper(pathinfo($file->file_name, PATHINFO_EXTENSION));
+                    $extensionText = $extension ? " ({$extension})" : '';
+                    
+                    // Başlığı oluştur: "Müdürlük Adı - Dosya Adı (PDF)"
+                    $fileItem = (object)[
+                        'id' => 'mudurluk_file_' . $file->id,
+                        'type' => 'mudurluk_file',
+                        'title' => $file->mudurluk->name . ' - ' . $file->title . $extensionText,
+                        'url' => '/mudurlukler/' . $file->mudurluk->slug,
+                        'description' => 'Müdürlük Dosyası: ' . $file->title,
+                        'mudurluk_name' => $file->mudurluk->name,
+                        'file_title' => $file->title,
+                        'file_name' => $file->file_name,
+                        'file_extension' => $extension,
+                        'original_file' => $file
+                    ];
+                    
+                    $results->push($fileItem);
+                }
+            }
+            
+            // Kelime kelime arama
+            $words = explode(' ', $normalizedQuery);
+            if (count($words) > 1) {
+                foreach ($words as $word) {
+                    if (strlen($word) > 2) {
+                        $wordResults = \App\Models\MudurlukFile::with('mudurluk')
+                            ->whereHas('mudurluk', function($q) {
+                                $q->where('is_active', true);
+                            })
+                            ->where(function($q) use ($word) {
+                                $q->where('title', 'LIKE', "%{$word}%")
+                                  ->orWhere('file_name', 'LIKE', "%{$word}%");
+                            })
+                            ->get();
+                        
+                        $existingIds = $results->pluck('id')->toArray();
+                        
+                        foreach ($wordResults as $file) {
+                            if ($file->mudurluk) {
+                                $fileId = 'mudurluk_file_' . $file->id;
+                                
+                                if (!in_array($fileId, $existingIds)) {
+                                    $extension = strtoupper(pathinfo($file->file_name, PATHINFO_EXTENSION));
+                                    $extensionText = $extension ? " ({$extension})" : '';
+                                    
+                                    $fileItem = (object)[
+                                        'id' => $fileId,
+                                        'type' => 'mudurluk_file',
+                                        'title' => $file->mudurluk->name . ' - ' . $file->title . $extensionText,
+                                        'url' => '/mudurlukler/' . $file->mudurluk->slug,
+                                        'description' => 'Müdürlük Dosyası: ' . $file->title,
+                                        'mudurluk_name' => $file->mudurluk->name,
+                                        'file_title' => $file->title,
+                                        'file_name' => $file->file_name,
+                                        'file_extension' => $extension,
+                                        'original_file' => $file
+                                    ];
+                                    
+                                    $results->push($fileItem);
+                                    $existingIds[] = $fileId;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            
+        } catch (\Exception $e) {
+            // Hata durumunda log'la ama aramaya devam et
+            \Log::error('Müdürlük dosyalarında arama hatası: ' . $e->getMessage());
         }
         
         return $results;
