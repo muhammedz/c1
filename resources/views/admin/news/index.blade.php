@@ -1088,8 +1088,13 @@ $(document).ready(function () {
     }
     
     /* Sadece SVG ok işaretlerini gizle, yazıları koru */
-    .pagination .page-link svg {
+    .pagination .page-link svg,
+    .pagination .page-link path,
+    .pagination .page-item .page-link svg,
+    .pagination .page-item .page-link path {
         display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
     }
     
     /* Previous/Next butonlarını küçük ve şık yap */
@@ -1098,6 +1103,30 @@ $(document).ready(function () {
         font-size: 0.875rem;
         padding: 8px 12px;
         font-weight: 500;
+    }
+    
+    /* Previous/Next butonlarının içeriğini sadece text yap */
+    .pagination .page-item:first-child .page-link::before {
+        content: "Previous";
+        font-size: 0.875rem;
+    }
+    
+    .pagination .page-item:last-child .page-link::before {
+        content: "Next";
+        font-size: 0.875rem;
+    }
+    
+    /* Orijinal içeriği tamamen gizle */
+    .pagination .page-item:first-child .page-link,
+    .pagination .page-item:last-child .page-link {
+        font-size: 0 !important;
+        color: transparent !important;
+    }
+    
+    .pagination .page-item:first-child .page-link::before,
+    .pagination .page-item:last-child .page-link::before {
+        color: #495057 !important;
+        font-size: 0.875rem !important;
     }
     
     /* Pagination container */
