@@ -103,6 +103,13 @@
             </div>
 
             @if($type == 'gallery')
+            
+            <!-- TEST YAZISI - DOĞRU YER KONTROLÜ -->
+            <div class="alert alert-warning text-center mb-3">
+                <h4><i class="fas fa-exclamation-triangle mr-2"></i>TEST YAZISI</h4>
+                <p class="mb-0">Bu yazı toplu fotoğraf yükleme bölümünün hemen üstünde görünüyor mu? Eğer görünüyorsa doğru yerdeyiz!</p>
+            </div>
+            
             <!-- Toplu Fotoğraf Yükleme -->
             <div class="card card-outline card-info">
                 <div class="card-header">
@@ -368,6 +375,26 @@
 <!-- SweetAlert2 -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+<!-- FileManagerSystem Modal -->
+<div class="modal fade" id="bulkMediapickerModal" tabindex="-1" role="dialog" aria-labelledby="bulkMediapickerModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="bulkMediapickerModalLabel">
+                    <i class="fas fa-images me-2"></i>
+                    Fotoğrafları Seç
+                </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body p-0">
+                <iframe id="bulkMediapickerFrame" src="" style="width: 100%; height: 600px; border: none;"></iframe>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Delete Script -->
 <script>
 console.log('Inline script loaded!');
@@ -467,6 +494,184 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                 });
             });
+
+            // =========================
+            // FILEMANAGERSYSTEM - BULK UPLOAD
+            // =========================
+            
+            // Sayfa türünü kontrol et
+            const urlParams = new URLSearchParams(window.location.search);
+            const pageType = urlParams.get('type');
+            console.log('Page type:', pageType);
+            
+            if (pageType === 'gallery') {
+                console.log('Gallery sayfasında - FileManagerSystem script yükleniyor...');
+                
+                // FileManagerSystem - Toplu fotoğraf seçimi
+                let selectedBulkImages = [];
+
+                // Button kontrolü
+                const $bulkButton = $('#bulk_filemanager_button');
+                console.log('Bulk filemanager button count:', $bulkButton.length);
+                
+                if ($bulkButton.length === 0) {
+                    console.error('❌ BULK_FILEMANAGER_BUTTON BULUNAMADI!');
+                    alert('❌ Bulk FileManager button bulunamadı!');
+                } else {
+                    console.log('✅ Bulk FileManager button bulundu!', $bulkButton[0]);
+                    alert('✅ Bulk FileManager button bulundu!');
+                    
+                    // jQuery click event
+                    $bulkButton.on('click', function(e) {
+                        e.preventDefault();
+                        console.log('🎯 Bulk filemanager button clicked!');
+                        alert('🎯 Button clicked! Modal açılıyor...');
+                        
+                        // Modal'ı aç
+                        $('#bulkMediapickerModal').modal('show');
+                        console.log('Modal show komutu verildi');
+                        
+                        // URL'i sadece modal açıldıktan sonra yükleyelim
+                        setTimeout(function() {
+                            const tempId = Date.now();
+                            const relatedType = 'mayor_content_bulk';
+                            const mediapickerUrl = '/admin/filemanagersystem/mediapicker?type=image&filter=all&related_type=' + relatedType + '&related_id=' + tempId + '&multiple=true';
+                            
+                            console.log('Loading URL:', mediapickerUrl);
+                            $('#bulkMediapickerFrame').attr('src', mediapickerUrl);
+                        }, 500);
+                    });
+                }
+
+                // FileManagerSystem'den gelen mesajları dinle
+                window.addEventListener('message', function(event) {
+                    console.log('FileManager mesaj alındı:', event.data);
+                    
+                    if (event.data && typeof event.data === 'object') {
+                        if (event.data.type === 'multiple-media-selected' && event.data.mediaList) {
+                            selectedBulkImages = event.data.mediaList;
+                            console.log('Seçilen medyalar:', selectedBulkImages);
+                            
+                            // UI'yi güncelle
+                            updateBulkImageDisplay();
+                            
+                            // Modal'ı kapat
+                            $('#bulkMediapickerModal').modal('hide');
+                            
+                        } else if (event.data.type === 'media-selected' && event.data.media) {
+                            // Tek medya seçimi (geriye dönük uyumluluk)
+                            const media = event.data.media;
+                            selectedBulkImages = [media];
+                            console.log('Tek medya seçildi:', media);
+                            
+                            updateBulkImageDisplay();
+                            $('#bulkMediapickerModal').modal('hide');
+                            
+                        } else if (event.data.type === 'close-modal') {
+                            $('#bulkMediapickerModal').modal('hide');
+                        }
+                    }
+                });
+
+                function updateBulkImageDisplay() {
+                    const count = selectedBulkImages.length;
+                    
+                    if (count > 0) {
+                        $('#bulk_images_display').val(count + ' fotoğraf seçildi');
+                        $('#selected_bulk_images').val(JSON.stringify(selectedBulkImages));
+                        $('#bulk_save_button').prop('disabled', false);
+                        $('#bulk-image-preview').show();
+                        $('#selected-count').text(count);
+                        
+                        // Önizleme container'ını güncelle
+                        const container = $('#bulk-preview-container');
+                        container.empty();
+                        
+                        selectedBulkImages.forEach(function(media, index) {
+                            const col = $('<div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-6 mb-3"></div>');
+                            const imageCard = $(`
+                                <div class="position-relative">
+                                    <img src="${media.url}" class="img-thumbnail" style="width: 100%; height: 100px; object-fit: cover;">
+                                    <button type="button" class="btn btn-danger btn-sm position-absolute" 
+                                            style="top: 2px; right: 2px; width: 25px; height: 25px; padding: 0; border-radius: 50%;"
+                                            onclick="removeBulkImage(${index})">
+                                        <i class="fas fa-times" style="font-size: 10px;"></i>
+                                    </button>
+                                    <div class="text-center mt-1">
+                                        <small class="text-muted">${media.title || 'Fotoğraf ' + (index + 1)}</small>
+                                    </div>
+                                </div>
+                            `);
+                            col.append(imageCard);
+                            container.append(col);
+                        });
+                    } else {
+                        $('#bulk_images_display').val('');
+                        $('#selected_bulk_images').val('');
+                        $('#bulk_save_button').prop('disabled', true);
+                        $('#bulk-image-preview').hide();
+                    }
+                }
+
+                // Global function for removing images
+                window.removeBulkImage = function(index) {
+                    selectedBulkImages.splice(index, 1);
+                    updateBulkImageDisplay();
+                };
+
+                // Seçimi temizle
+                $('#clear-bulk-selection').on('click', function() {
+                    selectedBulkImages = [];
+                    updateBulkImageDisplay();
+                });
+
+                // Toplu kaydetme
+                $('#bulk_save_button').on('click', function() {
+                    if (selectedBulkImages.length === 0) {
+                        alert('Lütfen en az bir fotoğraf seçin.');
+                        return;
+                    }
+
+                    const button = $(this);
+                    button.prop('disabled', true);
+                    button.html('<i class="fas fa-spinner fa-spin mr-2"></i> Kaydediliyor...');
+
+                    // Seçilen medyaları JSON string olarak hazırla
+                    const imageDataArray = selectedBulkImages.map(media => JSON.stringify(media));
+
+                    $.ajax({
+                        url: '{{ route("admin.mayor-content.bulk-save-filemanager") }}',
+                        type: 'POST',
+                        data: {
+                            _token: '{{ csrf_token() }}',
+                            selected_images: imageDataArray
+                        },
+                        success: function(response) {
+                            console.log('Bulk save success:', response);
+                            alert(response.message);
+                            location.reload(); // Sayfayı yenile
+                        },
+                        error: function(xhr, status, error) {
+                            console.error('Bulk save error:', xhr.responseText);
+                            alert('Kaydetme işlemi başarısız oldu: ' + (xhr.responseJSON?.message || error));
+                            
+                            // Button'u eski haline getir
+                            button.prop('disabled', false);
+                            button.html('<i class="fas fa-save mr-2"></i> Seçilen Fotoğrafları Kaydet');
+                        }
+                    });
+                });
+
+                // Modal kapandığında iframe'i temizle
+                $('#bulkMediapickerModal').on('hidden.bs.modal', function () {
+                    $('#bulkMediapickerFrame').attr('src', '');
+                });
+                
+                console.log('FileManagerSystem script yüklendi!');
+                
+            } else {
+                console.log('Gallery sayfası değil, FileManagerSystem script yüklenmedi');
+            }
         });
     } else {
         console.log('jQuery not available');
@@ -583,402 +788,5 @@ document.addEventListener('DOMContentLoaded', function() {
 </style>
 @endpush
 
-@push('scripts')
-<!-- FileManagerSystem Modal -->
-<div class="modal fade" id="bulkMediapickerModal" tabindex="-1" role="dialog" aria-labelledby="bulkMediapickerModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="bulkMediapickerModalLabel">
-                    <i class="fas fa-images me-2"></i>
-                    Fotoğrafları Seç
-                </h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body p-0">
-                <iframe id="bulkMediapickerFrame" src="" style="width: 100%; height: 600px; border: none;"></iframe>
-            </div>
-        </div>
-    </div>
-</div>
 
-<script>
-// GLOBAL SCOPE TEST
-console.log('=== SCRIPT BAŞLADI (GLOBAL SCOPE) ===');
-console.log('Document state:', document.readyState);
-console.log('Window location:', window.location.href);
-
-// jQuery kontrolü - En temel seviyede
-if (typeof jQuery === 'undefined') {
-    console.error('❌ jQuery YÜKLENMEMİŞ!');
-    document.addEventListener('DOMContentLoaded', function() {
-        alert('HATA: jQuery yüklenmemiş! Sayfa düzgün çalışmayacak.');
-    });
-} else {
-    console.log('✅ jQuery mevcut, version:', jQuery.fn.jquery);
-}
-
-// Immediate DOM check
-if (document.readyState === 'loading') {
-    console.log('⏳ DOM hala yükleniyor...');
-} else {
-    console.log('✅ DOM yüklenmiş');
-}
-
-// Hemen test edelim
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('=== DOM CONTENT LOADED ===');
-    
-    // Sayfa türünü kontrol et
-    const urlParams = new URLSearchParams(window.location.search);
-    const pageType = urlParams.get('type');
-    console.log('Page type:', pageType);
-    
-    // Gallery sayfasında mıyız?
-    if (pageType !== 'gallery') {
-        console.log('Bu gallery sayfası değil, script durduruluyor');
-        return;
-    }
-    
-    // Button'u ara
-    const button = document.getElementById('bulk_filemanager_button');
-    console.log('Button element:', button);
-    
-    if (!button) {
-        console.error('❌ BUTTON BULUNAMADI!');
-        alert('HATA: bulk_filemanager_button bulunamadı!');
-        
-        // Sayfadaki tüm butonları listele
-        const allButtons = document.querySelectorAll('button');
-        console.log('Sayfadaki tüm butonlar:', allButtons.length);
-        allButtons.forEach((btn, index) => {
-            console.log(`Button ${index}:`, {
-                id: btn.id,
-                class: btn.className,
-                text: btn.textContent.trim().substring(0, 50)
-            });
-        });
-        
-        return;
-    }
-    
-    console.log('✅ Button bulundu!');
-    alert('✅ Button bulundu! Test için tıklayın.');
-    
-    // Native event listener ekle
-    button.addEventListener('click', function(e) {
-        e.preventDefault();
-        console.log('🎯 BUTTON NATIVE CLICK EVENT!');
-        alert('🎯 Native click event çalıştı!');
-    });
-});
-
-// jQuery ready
-if (typeof jQuery !== 'undefined') {
-    jQuery(document).ready(function($) {
-        console.log('=== JQUERY DOCUMENT READY ===');
-        
-        // Tekrar page type kontrolü
-        const urlParams = new URLSearchParams(window.location.search);
-        const pageType = urlParams.get('type');
-        
-        if (pageType !== 'gallery') {
-            console.log('jQuery: Bu gallery sayfası değil');
-            return;
-        }
-        
-        console.log('jQuery version:', $.fn.jquery);
-        
-        // FileManagerSystem - Toplu fotoğraf seçimi
-        let selectedBulkImages = [];
-
-        // jQuery ile buton kontrolü
-        const $bulkButton = $('#bulk_filemanager_button');
-        console.log('jQuery bulk button count:', $bulkButton.length);
-        
-        if ($bulkButton.length === 0) {
-            console.error('❌ jQuery: BULK_FILEMANAGER_BUTTON BULUNAMADI!');
-            alert('❌ jQuery: Button bulunamadı!');
-            return;
-        }
-        
-        console.log('✅ jQuery: Button bulundu!', $bulkButton[0]);
-        alert('✅ jQuery: Button bulundu!');
-        
-        // jQuery click event
-        $bulkButton.on('click', function(e) {
-        e.preventDefault();
-        console.log('Bulk filemanager button clicked!');
-        alert('Button clicked! Opening modal...');
-        
-        // Önce modal'ı test edelim
-        $('#bulkMediapickerModal').modal('show');
-        console.log('Modal show komutu verildi');
-        
-        // URL'i sadece modal açıldıktan sonra yükleyelim
-        setTimeout(function() {
-            const tempId = Date.now();
-            const relatedType = 'mayor_content_bulk';
-            const mediapickerUrl = '/admin/filemanagersystem/mediapicker?type=image&filter=all&related_type=' + relatedType + '&related_id=' + tempId + '&multiple=true';
-            
-            console.log('Loading URL:', mediapickerUrl);
-            $('#bulkMediapickerFrame').attr('src', mediapickerUrl);
-        }, 500);
-    });
-
-    // FileManagerSystem'den gelen mesajları dinle
-    window.addEventListener('message', function(event) {
-        console.log('Mesaj alındı:', event.data);
-        
-        if (event.data && typeof event.data === 'object') {
-            if (event.data.type === 'multiple-media-selected' && event.data.mediaList) {
-                selectedBulkImages = event.data.mediaList;
-                console.log('Seçilen medyalar:', selectedBulkImages);
-                
-                // UI'yi güncelle
-                updateBulkImageDisplay();
-                
-                // Modal'ı kapat
-                $('#bulkMediapickerModal').modal('hide');
-                
-            } else if (event.data.type === 'media-selected' && event.data.media) {
-                // Tek medya seçimi (geriye dönük uyumluluk)
-                const media = event.data.media;
-                selectedBulkImages = [media];
-                console.log('Tek medya seçildi:', media);
-                
-                updateBulkImageDisplay();
-                $('#bulkMediapickerModal').modal('hide');
-                
-            } else if (event.data.type === 'close-modal') {
-                $('#bulkMediapickerModal').modal('hide');
-            }
-        }
-    });
-
-    function updateBulkImageDisplay() {
-        const count = selectedBulkImages.length;
-        
-        if (count > 0) {
-            $('#bulk_images_display').val(count + ' fotoğraf seçildi');
-            $('#selected_bulk_images').val(JSON.stringify(selectedBulkImages));
-            $('#bulk_save_button').prop('disabled', false);
-            $('#bulk-image-preview').show();
-            $('#selected-count').text(count);
-            
-            // Önizleme container'ını güncelle
-            const container = $('#bulk-preview-container');
-            container.empty();
-            
-            selectedBulkImages.forEach(function(media, index) {
-                const col = $('<div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-6 mb-3"></div>');
-                const imageCard = $(`
-                    <div class="position-relative">
-                        <img src="${media.url}" class="img-thumbnail" style="width: 100%; height: 100px; object-fit: cover;">
-                        <button type="button" class="btn btn-danger btn-sm position-absolute" 
-                                style="top: 2px; right: 2px; width: 25px; height: 25px; padding: 0; border-radius: 50%;"
-                                onclick="removeBulkImage(${index})">
-                            <i class="fas fa-times" style="font-size: 10px;"></i>
-                        </button>
-                        <div class="text-center mt-1">
-                            <small class="text-muted">${media.title || 'Fotoğraf ' + (index + 1)}</small>
-                        </div>
-                    </div>
-                `);
-                col.append(imageCard);
-                container.append(col);
-            });
-        } else {
-            $('#bulk_images_display').val('');
-            $('#selected_bulk_images').val('');
-            $('#bulk_save_button').prop('disabled', true);
-            $('#bulk-image-preview').hide();
-        }
-    }
-
-    // Global function for removing images
-    window.removeBulkImage = function(index) {
-        selectedBulkImages.splice(index, 1);
-        updateBulkImageDisplay();
-    };
-
-    // Seçimi temizle
-    $('#clear-bulk-selection').on('click', function() {
-        selectedBulkImages = [];
-        updateBulkImageDisplay();
-    });
-
-    // Toplu kaydetme
-    $('#bulk_save_button').on('click', function() {
-        if (selectedBulkImages.length === 0) {
-            alert('Lütfen en az bir fotoğraf seçin.');
-            return;
-        }
-
-        const button = $(this);
-        button.prop('disabled', true);
-        button.html('<i class="fas fa-spinner fa-spin mr-2"></i> Kaydediliyor...');
-
-        // Seçilen medyaları JSON string olarak hazırla
-        const imageDataArray = selectedBulkImages.map(media => JSON.stringify(media));
-
-        $.ajax({
-            url: '{{ route("admin.mayor-content.bulk-save-filemanager") }}',
-            type: 'POST',
-            data: {
-                _token: '{{ csrf_token() }}',
-                selected_images: imageDataArray
-            },
-            success: function(response) {
-                console.log('Bulk save success:', response);
-                alert(response.message);
-                location.reload(); // Sayfayı yenile
-            },
-            error: function(xhr, status, error) {
-                console.error('Bulk save error:', xhr.responseText);
-                alert('Kaydetme işlemi başarısız oldu: ' + (xhr.responseJSON?.message || error));
-                
-                // Button'u eski haline getir
-                button.prop('disabled', false);
-                button.html('<i class="fas fa-save mr-2"></i> Seçilen Fotoğrafları Kaydet');
-            }
-        });
-    });
-
-    // Modal kapandığında iframe'i temizle
-    $('#bulkMediapickerModal').on('hidden.bs.modal', function () {
-        $('#bulkMediapickerFrame').attr('src', '');
-    });
-    
-    // Test butonu ekle
-    if ($('.delete-image-btn').length > 0) {
-        console.log('First button data-id:', $('.delete-image-btn').first().data('id'));
-        console.log('First button HTML:', $('.delete-image-btn').first()[0].outerHTML);
-    }
-    
-    // Basit test
-    $('.delete-image-btn').each(function(index) {
-        console.log('Button ' + index + ' ID:', $(this).data('id'));
-    });
-    
-    // Test click event
-    $('.delete-image-btn').on('click', function() {
-        alert('Button clicked! ID: ' + $(this).data('id'));
-        console.log('Direct click event triggered!');
-    });
-    
-    // Basit resim silme
-    $(document).on('click', '.delete-image-btn', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        
-        console.log('Delete button clicked!');
-        alert('Delete button clicked!');
-        
-        var button = $(this);
-        var contentId = button.data('id');
-        
-        console.log('Content ID:', contentId);
-        console.log('Button element:', button);
-        
-        if (!contentId) {
-            alert('Content ID bulunamadı!');
-            console.error('Content ID is missing');
-            return;
-        }
-        
-        if (confirm('Bu resmi silmek istediğiniz emin misiniz?')) {
-            console.log('User confirmed deletion');
-            
-            // Button'u disable et
-            button.prop('disabled', true);
-            button.html('<i class="fas fa-spinner fa-spin"></i>');
-            
-            $.ajax({
-                url: '/admin/mayor-content/' + contentId,
-                type: 'DELETE',
-                data: {
-                    _token: '{{ csrf_token() }}'
-                },
-                beforeSend: function() {
-                    console.log('AJAX request starting...');
-                },
-                success: function(response) {
-                    console.log('Delete success:', response);
-                    location.reload();
-                },
-                error: function(xhr, status, error) {
-                    console.error('Delete error:', xhr.responseText);
-                    console.error('Status:', status);
-                    console.error('Error:', error);
-                    alert('Silme işlemi başarısız oldu: ' + error);
-                    
-                    // Button'u eski haline getir
-                    button.prop('disabled', false);
-                    button.html('<i class="fas fa-times"></i>');
-                }
-            });
-        } else {
-            console.log('User cancelled deletion');
-        }
-    });
-
-    // Toplu fotoğraf yükleme önizleme
-    $('#bulk_images').on('change', function() {
-        var files = this.files;
-        var preview = $('#image-preview');
-        var container = $('#preview-container');
-        
-        container.empty();
-        
-        if (files.length > 0) {
-            preview.show();
-            
-            for (var i = 0; i < files.length; i++) {
-                var file = files[i];
-                var reader = new FileReader();
-                
-                reader.onload = function(e) {
-                    var col = $('<div class="col-md-3 col-sm-4 col-6 mb-3"></div>');
-                    var img = $('<img class="img-thumbnail" style="width: 100%; height: 120px; object-fit: cover; border-radius: 8px;">');
-                    img.attr('src', e.target.result);
-                    col.append(img);
-                    container.append(col);
-                };
-                
-                reader.readAsDataURL(file);
-            }
-            
-            // Dosya label'ını güncelle
-            var fileCount = files.length;
-            $('.custom-file-label').text(fileCount + ' fotoğraf seçildi');
-        } else {
-            preview.hide();
-            $('.custom-file-label').text('Birden fazla fotoğraf seçin...');
-        }
-    });
-
-    // Form submit
-    $('#bulk-upload-form').on('submit', function(e) {
-        var files = $('#bulk_images')[0].files;
-        if (files.length === 0) {
-            e.preventDefault();
-            alert('Lütfen en az bir fotoğraf seçin.');
-            return false;
-        }
-        
-        // Loading göster
-        var submitBtn = $(this).find('button[type="submit"]');
-        submitBtn.prop('disabled', true);
-        submitBtn.html('<i class="fas fa-spinner fa-spin mr-2"></i> Yükleniyor...');
-    });
-});
-
-
-
-
-</script>
-@endpush
 @endsection 
