@@ -226,6 +226,12 @@
                         @endforeach
                     </div>
                     
+                    <!-- Gallery Pagination -->
+                    @if($contents->hasPages())
+                    <div class="d-flex justify-content-center mt-4">
+                        {{ $contents->appends(['type' => $type])->links() }}
+                    </div>
+                    @endif
 
                 </div>
             </div>
