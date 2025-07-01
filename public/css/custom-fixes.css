@@ -523,29 +523,4 @@ a .featured-service-title span {
         font-size: 14px !important;
         line-height: 1.1 !important;
     }
-}
-
-/* Pagination SVG ok işaretlerini gizle */
-.pagination .page-link svg,
-.pagination .page-link path,
-.pagination .page-item .page-link svg,
-.pagination .page-item .page-link path {
-    display: none !important;
-    visibility: hidden !important;
-    opacity: 0 !important;
-}
-
-/* Tailwind pagination SVG'lerini de gizle */
-.relative .flex svg,
-.relative .flex path,
-nav[role="navigation"] svg,
-nav[role="navigation"] path {
-    display: none !important;
-    visibility: hidden !important;
-    opacity: 0 !important;
-}
-
-/* Breadcrumb ok işaretlerini de gizle */
-.breadcrumb-item + .breadcrumb-item::before {
-    content: "" !important;
 } 

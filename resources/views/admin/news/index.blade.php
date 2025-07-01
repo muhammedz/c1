@@ -666,7 +666,7 @@ $(document).ready(function () {
     }
     
     .breadcrumb-modern .breadcrumb-item+.breadcrumb-item::before {
-        content: "";
+        content: "›";
         font-size: 1.1rem;
         line-height: 1;
         vertical-align: middle;
@@ -1426,7 +1426,7 @@ $(document).ready(function () {
             <!-- Laravel Pagination Linkleri -->
             <div class="pagination-wrapper">
                 <div class="d-flex justify-content-center">
-                    {{ $news->links() }}
+                    {{ $news->links('custom.pagination') }}
                 </div>
             </div>
         </div>
