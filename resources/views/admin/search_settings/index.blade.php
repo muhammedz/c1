@@ -53,7 +53,8 @@
                             <div class="col-md-3">
                                 <div class="form-group mt-4">
                                     <div class="custom-control custom-switch">
-                                        <input type="checkbox" class="custom-control-input" id="showQuickLinks" name="show_quick_links" {{ $settings->show_quick_links ? 'checked' : '' }}>
+                                        <input type="hidden" name="show_quick_links" value="0">
+                                        <input type="checkbox" class="custom-control-input" id="showQuickLinks" name="show_quick_links" value="1" {{ $settings->show_quick_links ? 'checked' : '' }}>
                                         <label class="custom-control-label" for="showQuickLinks">Hızlı Aramaları Göster</label>
                                     </div>
                                 </div>
@@ -61,7 +62,8 @@
                             <div class="col-md-3">
                                 <div class="form-group mt-4">
                                     <div class="custom-control custom-switch">
-                                        <input type="checkbox" class="custom-control-input" id="showPopularQueries" name="show_popular_queries" {{ $settings->show_popular_queries ? 'checked' : '' }}>
+                                        <input type="hidden" name="show_popular_queries" value="0">
+                                        <input type="checkbox" class="custom-control-input" id="showPopularQueries" name="show_popular_queries" value="1" {{ $settings->show_popular_queries ? 'checked' : '' }}>
                                         <label class="custom-control-label" for="showPopularQueries">Popüler Aramaları Göster</label>
                                     </div>
                                 </div>
@@ -72,7 +74,8 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <div class="custom-control custom-switch">
-                                        <input type="checkbox" class="custom-control-input" id="searchInMudurlukFiles" name="search_in_mudurluk_files" {{ $settings->search_in_mudurluk_files ? 'checked' : '' }}>
+                                        <input type="hidden" name="search_in_mudurluk_files" value="0">
+                                        <input type="checkbox" class="custom-control-input" id="searchInMudurlukFiles" name="search_in_mudurluk_files" value="1" {{ $settings->search_in_mudurluk_files ? 'checked' : '' }}>
                                         <label class="custom-control-label" for="searchInMudurlukFiles">
                                             <i class="fas fa-file-alt mr-1"></i>
                                             Müdürlük Dosyalarında Arama Yapmayı Etkinleştir

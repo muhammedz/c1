@@ -63,9 +63,9 @@ class SearchSettingController extends Controller
             'placeholder' => 'required|string|max:255',
             'max_quick_links' => 'required|integer|min:0|max:10',
             'max_popular_queries' => 'required|integer|min:0|max:10',
-            'show_quick_links' => 'boolean',
-            'show_popular_queries' => 'boolean',
-            'search_in_mudurluk_files' => 'boolean',
+            'show_quick_links' => 'nullable',
+            'show_popular_queries' => 'nullable',
+            'search_in_mudurluk_files' => 'nullable',
         ]);
         
         $settings = SearchSetting::getSettings();
@@ -75,9 +75,9 @@ class SearchSettingController extends Controller
             'placeholder' => $request->placeholder,
             'max_quick_links' => $request->max_quick_links,
             'max_popular_queries' => $request->max_popular_queries,
-            'show_quick_links' => $request->has('show_quick_links'),
-            'show_popular_queries' => $request->has('show_popular_queries'),
-            'search_in_mudurluk_files' => $request->has('search_in_mudurluk_files'),
+            'show_quick_links' => $request->input('show_quick_links') == '1',
+            'show_popular_queries' => $request->input('show_popular_queries') == '1',
+            'search_in_mudurluk_files' => $request->input('search_in_mudurluk_files') == '1',
         ]);
         
         return redirect()->route('admin.search-settings.index')
