@@ -128,7 +128,8 @@ class News extends Model
     {
         return self::published()
             ->where('is_headline', true)
-            ->orderBy('headline_order', 'asc')
+            ->orderBy('published_at', 'desc')
+            ->orderBy('created_at', 'desc')
             ->take(4)
             ->get();
     }
@@ -137,7 +138,8 @@ class News extends Model
     public static function getAllHeadlines()
     {
         return self::where('is_headline', true)
-            ->orderBy('headline_order', 'asc')
+            ->orderBy('published_at', 'desc')
+            ->orderBy('created_at', 'desc')
             ->take(4)
             ->get();
     }

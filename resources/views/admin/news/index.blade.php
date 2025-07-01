@@ -233,14 +233,14 @@ $(document).ready(function () {
         language: turkishLanguage,
         responsive: true,
         ordering: false, // Sıralamayı kapat, backend sıralamasını kullan
-        pageLength: 40, // Varsayılan sayfa boyutu
+        pageLength: 30, // Varsayılan sayfa boyutu
         columnDefs: [
             { orderable: false, targets: [0, 1, 7] } // Bu sütunları sıralanamaz yap
         ],
         // Sayfalandırma alanı düzenlendi, sorunlu alan düzeltildi
         dom: "<'row'<'col-sm-12'tr>>" +
              "<'row mt-2'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7 d-flex justify-content-end align-items-center'lp>>",
-        lengthMenu: [[10, 25, 40, 50, 100, -1], [10, 25, 40, 50, 100, "Tümü"]]
+        lengthMenu: [[10, 30, 50, 100, -1], [10, 30, 50, 100, "Tümü"]]
     });
     
     // DataTables özel arama kutusu
@@ -1285,7 +1285,6 @@ $(document).ready(function () {
                             <td>
                                 <div class="small">
                                     <div><i class="far fa-calendar-alt me-1"></i> {{ $item->published_at ? $item->published_at->format('d.m.Y') : $item->created_at->format('d.m.Y') }}</div>
-                                    <div class="text-muted">{{ $item->published_at ? $item->published_at->format('H:i') : $item->created_at->format('H:i') }}</div>
                                 </div>
                             </td>
                             <td>

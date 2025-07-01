@@ -680,7 +680,7 @@
                     <div class="news-meta">
                         <div class="news-meta-item">
                             <i class="fas fa-calendar-alt"></i>
-                            <span>{{ \Carbon\Carbon::parse($news->published_at)->format('d.m.Y H:i') }}</span>
+                                                            <span>{{ \Carbon\Carbon::parse($news->published_at)->format('d.m.Y') }}</span>
                         </div>
                         
                         @if($news->category)

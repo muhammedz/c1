@@ -89,7 +89,7 @@ class NewsRepository extends BaseRepository
                   ->orderBy('created_at', 'desc');
         }
         
-        return $query->paginate(100)->appends($filters);
+        return $query->paginate(30)->appends($filters);
     }
     
     /**
@@ -216,7 +216,8 @@ class NewsRepository extends BaseRepository
     public function getHeadlines()
     {
         return $this->model->where('is_headline', true)
-                           ->orderBy('headline_order', 'asc')
+                           ->orderBy('published_at', 'desc')
+                           ->orderBy('created_at', 'desc')
                            ->get();
     }
     
