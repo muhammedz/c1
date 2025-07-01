@@ -616,20 +616,28 @@ $(document).ready(function() {
     // FileManagerSystem - Toplu fotoğraf seçimi
     let selectedBulkImages = [];
 
-    $('#bulk_filemanager_button').on('click', function() {
-        const tempId = Date.now();
-        const relatedType = 'mayor_content_bulk';
+    // Debug için buton kontrolü
+    console.log('Bulk filemanager button count:', $('#bulk_filemanager_button').length);
+    
+    // Test butonu
+    $('#bulk_filemanager_button').on('click', function(e) {
+        e.preventDefault();
+        console.log('Bulk filemanager button clicked!');
+        alert('Button clicked! Opening modal...');
         
-        // MediaPicker URL - çoklu seçim için
-        const mediapickerUrl = '/admin/filemanagersystem/mediapicker?type=image&filter=all&related_type=' + relatedType + '&related_id=' + tempId + '&multiple=true';
-        
-        console.log('Bulk FileManagerSystem açılıyor:', mediapickerUrl);
-        
-        // iFrame'i güncelle
-        $('#bulkMediapickerFrame').attr('src', mediapickerUrl);
-        
-        // Modal'ı göster
+        // Önce modal'ı test edelim
         $('#bulkMediapickerModal').modal('show');
+        console.log('Modal show komutu verildi');
+        
+        // URL'i sadece modal açıldıktan sonra yükleyelim
+        setTimeout(function() {
+            const tempId = Date.now();
+            const relatedType = 'mayor_content_bulk';
+            const mediapickerUrl = '/admin/filemanagersystem/mediapicker?type=image&filter=all&related_type=' + relatedType + '&related_id=' + tempId + '&multiple=true';
+            
+            console.log('Loading URL:', mediapickerUrl);
+            $('#bulkMediapickerFrame').attr('src', mediapickerUrl);
+        }, 500);
     });
 
     // FileManagerSystem'den gelen mesajları dinle
