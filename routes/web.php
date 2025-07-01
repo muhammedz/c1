@@ -435,6 +435,7 @@ Route::middleware(['auth', 'role:admin'])->name('admin.')->prefix('admin')->grou
         Route::get('/create', [App\Http\Controllers\Admin\MayorContentController::class, 'create'])->name('create');
         Route::post('/', [App\Http\Controllers\Admin\MayorContentController::class, 'store'])->name('store');
         Route::post('/bulk-upload', [App\Http\Controllers\Admin\MayorContentController::class, 'bulkUpload'])->name('bulk-upload');
+        Route::post('/bulk-save-filemanager', [App\Http\Controllers\Admin\MayorContentController::class, 'bulkSaveFromFileManager'])->name('bulk-save-filemanager');
         Route::get('/{mayorContent}', [App\Http\Controllers\Admin\MayorContentController::class, 'show'])->name('show');
         Route::get('/{mayorContent}/edit', [App\Http\Controllers\Admin\MayorContentController::class, 'edit'])->name('edit');
         Route::put('/{mayorContent}', [App\Http\Controllers\Admin\MayorContentController::class, 'update'])->name('update');

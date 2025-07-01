@@ -329,6 +329,81 @@ class MayorContentController extends Controller
     }
 
     /**
+     * FileManagerSystem'den seçilen fotoğrafları toplu kaydetme
+     */
+    public function bulkSaveFromFileManager(Request $request)
+    {
+        $mayor = Mayor::first();
+        if (!$mayor) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Önce başkan bilgilerini oluşturun.'
+            ], 400);
+        }
+
+        $request->validate([
+            'selected_images' => 'required|array|min:1',
+            'selected_images.*' => 'string',
+        ]);
+
+        $savedCount = 0;
+        $maxOrder = MayorContent::where('mayor_id', $mayor->id)
+            ->where('type', 'gallery')
+            ->max('sort_order') ?? 0;
+
+        foreach ($request->selected_images as $index => $imageData) {
+            try {
+                // JSON string'i decode et
+                $media = json_decode($imageData, true);
+                
+                if (!$media || !isset($media['id'])) {
+                    continue;
+                }
+
+                // URL formatını oluştur
+                $imageUrl = '/uploads/media/' . $media['id'];
+                
+                // Veritabanına kaydet
+                $mayorContent = MayorContent::create([
+                    'mayor_id' => $mayor->id,
+                    'type' => 'gallery',
+                    'title' => $media['title'] ?? 'Galeri Fotoğrafı ' . ($index + 1),
+                    'description' => $media['description'] ?? null,
+                    'filemanagersystem_image' => $imageUrl,
+                    'filemanagersystem_image_alt' => $media['alt_text'] ?? null,
+                    'filemanagersystem_image_title' => $media['title'] ?? null,
+                    'sort_order' => $maxOrder + $index + 1,
+                    'is_active' => true,
+                ]);
+
+                // MediaRelation oluştur
+                $this->createMediaRelation($mayorContent, $imageUrl);
+                
+                $savedCount++;
+            } catch (\Exception $e) {
+                \Log::error('Toplu fotoğraf kaydetme hatası: ' . $e->getMessage(), [
+                    'media_data' => $imageData,
+                    'trace' => $e->getTraceAsString()
+                ]);
+                continue;
+            }
+        }
+
+        if ($savedCount > 0) {
+            return response()->json([
+                'success' => true,
+                'message' => $savedCount . ' fotoğraf başarıyla kaydedildi.',
+                'saved_count' => $savedCount
+            ]);
+        } else {
+            return response()->json([
+                'success' => false,
+                'message' => 'Fotoğraflar kaydedilirken bir hata oluştu.'
+            ], 500);
+        }
+    }
+
+    /**
      * Toplu fotoğraf yükleme
      */
     public function bulkUpload(Request $request)

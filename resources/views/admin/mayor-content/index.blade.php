@@ -124,17 +124,21 @@
                         <div class="row">
                             <div class="col-md-8">
                                 <div class="form-group">
-                                    <label for="bulk_images" class="font-weight-bold">
+                                    <label class="font-weight-bold">
                                         <i class="fas fa-images mr-1"></i>
                                         Fotoğrafları Seçin
                                     </label>
-                                    <div class="custom-file">
-                                        <input type="file" class="custom-file-input" id="bulk_images" name="images[]" multiple accept="image/*" required>
-                                        <label class="custom-file-label" for="bulk_images">Birden fazla fotoğraf seçin...</label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" id="bulk_images_display" readonly placeholder="FileManagerSystem'den fotoğraf seçin...">
+                                        <button type="button" class="btn btn-primary" id="bulk_filemanager_button">
+                                            <i class="fas fa-images mr-1"></i>
+                                            Fotoğraf Seç
+                                        </button>
                                     </div>
+                                    <input type="hidden" id="selected_bulk_images" name="selected_images" value="">
                                     <small class="form-text text-muted">
                                         <i class="fas fa-info-circle mr-1"></i>
-                                        Birden fazla fotoğraf seçebilirsiniz. Desteklenen formatlar: JPEG, PNG, JPG, GIF, WebP (Her biri max: 2MB)
+                                        FileManagerSystem'den birden fazla fotoğraf seçebilirsiniz
                                     </small>
                                 </div>
                             </div>
@@ -142,22 +146,29 @@
                                 <div class="form-group">
                                     <label class="font-weight-bold">&nbsp;</label>
                                     <div>
-                                        <button type="submit" class="btn btn-info btn-lg btn-block">
-                                            <i class="fas fa-upload mr-2"></i>
-                                            Fotoğrafları Yükle
+                                        <button type="button" id="bulk_save_button" class="btn btn-info btn-lg btn-block" disabled>
+                                            <i class="fas fa-save mr-2"></i>
+                                            Seçilen Fotoğrafları Kaydet
                                         </button>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         
-                        <div id="image-preview" class="mt-3" style="display: none;">
+                        <div id="bulk-image-preview" class="mt-3" style="display: none;">
                             <div class="alert alert-info">
                                 <h5 class="alert-heading">
                                     <i class="fas fa-eye mr-2"></i>
                                     Seçilen Fotoğraflar:
+                                    <span class="badge badge-primary ml-2" id="selected-count">0</span>
                                 </h5>
-                                <div id="preview-container" class="row mt-3"></div>
+                                <div id="bulk-preview-container" class="row mt-3"></div>
+                                <div class="mt-3">
+                                    <button type="button" class="btn btn-outline-secondary btn-sm" id="clear-bulk-selection">
+                                        <i class="fas fa-trash mr-1"></i>
+                                        Seçimi Temizle
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </form>
@@ -573,6 +584,26 @@ document.addEventListener('DOMContentLoaded', function() {
 @endpush
 
 @push('scripts')
+<!-- FileManagerSystem Modal -->
+<div class="modal fade" id="bulkMediapickerModal" tabindex="-1" role="dialog" aria-labelledby="bulkMediapickerModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="bulkMediapickerModalLabel">
+                    <i class="fas fa-images me-2"></i>
+                    Fotoğrafları Seç
+                </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body p-0">
+                <iframe id="bulkMediapickerFrame" src="" style="width: 100%; height: 600px; border: none;"></iframe>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
 console.log('Script loaded!');
 
@@ -581,6 +612,149 @@ $(document).ready(function() {
     console.log('jQuery version:', $.fn.jquery);
     console.log('Looking for delete buttons...');
     console.log('Delete buttons found:', $('.delete-image-btn').length);
+
+    // FileManagerSystem - Toplu fotoğraf seçimi
+    let selectedBulkImages = [];
+
+    $('#bulk_filemanager_button').on('click', function() {
+        const tempId = Date.now();
+        const relatedType = 'mayor_content_bulk';
+        
+        // MediaPicker URL - çoklu seçim için
+        const mediapickerUrl = '/admin/filemanagersystem/mediapicker?type=image&filter=all&related_type=' + relatedType + '&related_id=' + tempId + '&multiple=true';
+        
+        console.log('Bulk FileManagerSystem açılıyor:', mediapickerUrl);
+        
+        // iFrame'i güncelle
+        $('#bulkMediapickerFrame').attr('src', mediapickerUrl);
+        
+        // Modal'ı göster
+        $('#bulkMediapickerModal').modal('show');
+    });
+
+    // FileManagerSystem'den gelen mesajları dinle
+    window.addEventListener('message', function(event) {
+        console.log('Mesaj alındı:', event.data);
+        
+        if (event.data && typeof event.data === 'object') {
+            if (event.data.type === 'multiple-media-selected' && event.data.mediaList) {
+                selectedBulkImages = event.data.mediaList;
+                console.log('Seçilen medyalar:', selectedBulkImages);
+                
+                // UI'yi güncelle
+                updateBulkImageDisplay();
+                
+                // Modal'ı kapat
+                $('#bulkMediapickerModal').modal('hide');
+                
+            } else if (event.data.type === 'media-selected' && event.data.media) {
+                // Tek medya seçimi (geriye dönük uyumluluk)
+                const media = event.data.media;
+                selectedBulkImages = [media];
+                console.log('Tek medya seçildi:', media);
+                
+                updateBulkImageDisplay();
+                $('#bulkMediapickerModal').modal('hide');
+                
+            } else if (event.data.type === 'close-modal') {
+                $('#bulkMediapickerModal').modal('hide');
+            }
+        }
+    });
+
+    function updateBulkImageDisplay() {
+        const count = selectedBulkImages.length;
+        
+        if (count > 0) {
+            $('#bulk_images_display').val(count + ' fotoğraf seçildi');
+            $('#selected_bulk_images').val(JSON.stringify(selectedBulkImages));
+            $('#bulk_save_button').prop('disabled', false);
+            $('#bulk-image-preview').show();
+            $('#selected-count').text(count);
+            
+            // Önizleme container'ını güncelle
+            const container = $('#bulk-preview-container');
+            container.empty();
+            
+            selectedBulkImages.forEach(function(media, index) {
+                const col = $('<div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-6 mb-3"></div>');
+                const imageCard = $(`
+                    <div class="position-relative">
+                        <img src="${media.url}" class="img-thumbnail" style="width: 100%; height: 100px; object-fit: cover;">
+                        <button type="button" class="btn btn-danger btn-sm position-absolute" 
+                                style="top: 2px; right: 2px; width: 25px; height: 25px; padding: 0; border-radius: 50%;"
+                                onclick="removeBulkImage(${index})">
+                            <i class="fas fa-times" style="font-size: 10px;"></i>
+                        </button>
+                        <div class="text-center mt-1">
+                            <small class="text-muted">${media.title || 'Fotoğraf ' + (index + 1)}</small>
+                        </div>
+                    </div>
+                `);
+                col.append(imageCard);
+                container.append(col);
+            });
+        } else {
+            $('#bulk_images_display').val('');
+            $('#selected_bulk_images').val('');
+            $('#bulk_save_button').prop('disabled', true);
+            $('#bulk-image-preview').hide();
+        }
+    }
+
+    // Global function for removing images
+    window.removeBulkImage = function(index) {
+        selectedBulkImages.splice(index, 1);
+        updateBulkImageDisplay();
+    };
+
+    // Seçimi temizle
+    $('#clear-bulk-selection').on('click', function() {
+        selectedBulkImages = [];
+        updateBulkImageDisplay();
+    });
+
+    // Toplu kaydetme
+    $('#bulk_save_button').on('click', function() {
+        if (selectedBulkImages.length === 0) {
+            alert('Lütfen en az bir fotoğraf seçin.');
+            return;
+        }
+
+        const button = $(this);
+        button.prop('disabled', true);
+        button.html('<i class="fas fa-spinner fa-spin mr-2"></i> Kaydediliyor...');
+
+        // Seçilen medyaları JSON string olarak hazırla
+        const imageDataArray = selectedBulkImages.map(media => JSON.stringify(media));
+
+        $.ajax({
+            url: '{{ route("admin.mayor-content.bulk-save-filemanager") }}',
+            type: 'POST',
+            data: {
+                _token: '{{ csrf_token() }}',
+                selected_images: imageDataArray
+            },
+            success: function(response) {
+                console.log('Bulk save success:', response);
+                alert(response.message);
+                location.reload(); // Sayfayı yenile
+            },
+            error: function(xhr, status, error) {
+                console.error('Bulk save error:', xhr.responseText);
+                alert('Kaydetme işlemi başarısız oldu: ' + (xhr.responseJSON?.message || error));
+                
+                // Button'u eski haline getir
+                button.prop('disabled', false);
+                button.html('<i class="fas fa-save mr-2"></i> Seçilen Fotoğrafları Kaydet');
+            }
+        });
+    });
+
+    // Modal kapandığında iframe'i temizle
+    $('#bulkMediapickerModal').on('hidden.bs.modal', function () {
+        $('#bulkMediapickerFrame').attr('src', '');
+    });
     
     // Test butonu ekle
     if ($('.delete-image-btn').length > 0) {
