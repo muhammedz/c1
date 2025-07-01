@@ -27,6 +27,17 @@ class MayorContentController extends Controller
             ->orderBy('sort_order')
             ->paginate(20);
 
+        // Debug için log ekle
+        if ($type === 'gallery') {
+            \Log::info('Gallery index sayfası yüklendi', [
+                'mayor_id' => $mayor->id,
+                'type' => $type,
+                'total_contents' => $contents->total(),
+                'current_page_count' => $contents->count(),
+                'content_ids' => $contents->pluck('id')->toArray()
+            ]);
+        }
+
         return view('admin.mayor-content.index', compact('contents', 'type', 'mayor'));
     }
 
@@ -390,10 +401,24 @@ class MayorContentController extends Controller
         }
 
         if ($savedCount > 0) {
+            // Debug için kayıtların oluşturulduğunu kontrol et
+            $latestContents = MayorContent::where('mayor_id', $mayor->id)
+                ->where('type', 'gallery')
+                ->orderBy('created_at', 'desc')
+                ->take($savedCount)
+                ->get();
+            
+            \Log::info('Toplu kaydetme başarılı', [
+                'saved_count' => $savedCount,
+                'latest_contents' => $latestContents->pluck('id')->toArray(),
+                'latest_titles' => $latestContents->pluck('title')->toArray()
+            ]);
+            
             return response()->json([
                 'success' => true,
                 'message' => $savedCount . ' fotoğraf başarıyla kaydedildi.',
-                'saved_count' => $savedCount
+                'saved_count' => $savedCount,
+                'debug_latest_ids' => $latestContents->pluck('id')->toArray()
             ]);
         } else {
             return response()->json([

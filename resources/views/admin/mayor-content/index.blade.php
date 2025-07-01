@@ -195,10 +195,12 @@
                         <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6 mb-4">
                             <div class="gallery-item-card">
                                 <div class="gallery-image-container">
-                                    <img src="{{ $content->image_url ?: asset('images/mayor/gallery-default.jpg') }}" 
+                                    <img src="{{ $content->image_url ?: asset('images/mayor/gallery-default.jpg') }}?v={{ time() }}" 
                                          alt="{{ $content->filemanagersystem_image_alt ?: $content->title }}" 
                                          title="{{ $content->filemanagersystem_image_title ?: $content->title }}"
-                                         class="gallery-image">
+                                         class="gallery-image"
+                                         data-content-id="{{ $content->id }}"
+                                         data-debug-url="{{ $content->image_url }}">
                                     
                                     <!-- Basit silme butonu -->
                                     <button type="button" 
@@ -506,6 +508,19 @@ document.addEventListener('DOMContentLoaded', function() {
             
             if (pageType === 'gallery') {
                 console.log('Gallery sayfasında - FileManagerSystem script yükleniyor...');
+                
+                // Debug: Sayfa içeriğini konsola logla
+                console.log('=== GALLERY DEBUG INFO ===');
+                const galleryImages = document.querySelectorAll('.gallery-image');
+                console.log('Gallery images found:', galleryImages.length);
+                galleryImages.forEach((img, index) => {
+                    console.log(`Image ${index + 1}:`, {
+                        contentId: img.dataset.contentId,
+                        src: img.src,
+                        debugUrl: img.dataset.debugUrl,
+                        alt: img.alt
+                    });
+                });
                 
                 // FileManagerSystem - Toplu fotoğraf seçimi
                 let selectedBulkImages = [];
