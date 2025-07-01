@@ -605,43 +605,110 @@ document.addEventListener('DOMContentLoaded', function() {
 </div>
 
 <script>
-// En başta test
-console.log('=== SCRIPT YÜKLENDI ===');
-alert('Script loaded!');
+// GLOBAL SCOPE TEST
+console.log('=== SCRIPT BAŞLADI (GLOBAL SCOPE) ===');
+console.log('Document state:', document.readyState);
+console.log('Window location:', window.location.href);
 
-// jQuery kontrolü
+// jQuery kontrolü - En temel seviyede
 if (typeof jQuery === 'undefined') {
-    console.error('jQuery YÜKLENMEMİŞ!');
-    alert('jQuery yüklenmemiş!');
+    console.error('❌ jQuery YÜKLENMEMİŞ!');
+    document.addEventListener('DOMContentLoaded', function() {
+        alert('HATA: jQuery yüklenmemiş! Sayfa düzgün çalışmayacak.');
+    });
 } else {
-    console.log('jQuery mevcut, version:', jQuery.fn.jquery);
+    console.log('✅ jQuery mevcut, version:', jQuery.fn.jquery);
 }
 
-$(document).ready(function() {
-    console.log('=== DOCUMENT READY ===');
-    alert('Document ready!');
-    
-    console.log('jQuery version:', $.fn.jquery);
-    console.log('Looking for delete buttons...');
-    console.log('Delete buttons found:', $('.delete-image-btn').length);
+// Immediate DOM check
+if (document.readyState === 'loading') {
+    console.log('⏳ DOM hala yükleniyor...');
+} else {
+    console.log('✅ DOM yüklenmiş');
+}
 
-    // FileManagerSystem - Toplu fotoğraf seçimi
-    let selectedBulkImages = [];
-
-    // Debug için buton kontrolü
-    console.log('Bulk filemanager button count:', $('#bulk_filemanager_button').length);
+// Hemen test edelim
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('=== DOM CONTENT LOADED ===');
     
-    // Buton var mı?
-    if ($('#bulk_filemanager_button').length === 0) {
-        console.error('BULK_FILEMANAGER_BUTTON BULUNAMADI!');
-        alert('Button bulunamadı!');
-    } else {
-        console.log('Button bulundu:', $('#bulk_filemanager_button')[0]);
-        alert('Button bulundu!');
+    // Sayfa türünü kontrol et
+    const urlParams = new URLSearchParams(window.location.search);
+    const pageType = urlParams.get('type');
+    console.log('Page type:', pageType);
+    
+    // Gallery sayfasında mıyız?
+    if (pageType !== 'gallery') {
+        console.log('Bu gallery sayfası değil, script durduruluyor');
+        return;
     }
     
-    // Test butonu
-    $('#bulk_filemanager_button').on('click', function(e) {
+    // Button'u ara
+    const button = document.getElementById('bulk_filemanager_button');
+    console.log('Button element:', button);
+    
+    if (!button) {
+        console.error('❌ BUTTON BULUNAMADI!');
+        alert('HATA: bulk_filemanager_button bulunamadı!');
+        
+        // Sayfadaki tüm butonları listele
+        const allButtons = document.querySelectorAll('button');
+        console.log('Sayfadaki tüm butonlar:', allButtons.length);
+        allButtons.forEach((btn, index) => {
+            console.log(`Button ${index}:`, {
+                id: btn.id,
+                class: btn.className,
+                text: btn.textContent.trim().substring(0, 50)
+            });
+        });
+        
+        return;
+    }
+    
+    console.log('✅ Button bulundu!');
+    alert('✅ Button bulundu! Test için tıklayın.');
+    
+    // Native event listener ekle
+    button.addEventListener('click', function(e) {
+        e.preventDefault();
+        console.log('🎯 BUTTON NATIVE CLICK EVENT!');
+        alert('🎯 Native click event çalıştı!');
+    });
+});
+
+// jQuery ready
+if (typeof jQuery !== 'undefined') {
+    jQuery(document).ready(function($) {
+        console.log('=== JQUERY DOCUMENT READY ===');
+        
+        // Tekrar page type kontrolü
+        const urlParams = new URLSearchParams(window.location.search);
+        const pageType = urlParams.get('type');
+        
+        if (pageType !== 'gallery') {
+            console.log('jQuery: Bu gallery sayfası değil');
+            return;
+        }
+        
+        console.log('jQuery version:', $.fn.jquery);
+        
+        // FileManagerSystem - Toplu fotoğraf seçimi
+        let selectedBulkImages = [];
+
+        // jQuery ile buton kontrolü
+        const $bulkButton = $('#bulk_filemanager_button');
+        console.log('jQuery bulk button count:', $bulkButton.length);
+        
+        if ($bulkButton.length === 0) {
+            console.error('❌ jQuery: BULK_FILEMANAGER_BUTTON BULUNAMADI!');
+            alert('❌ jQuery: Button bulunamadı!');
+            return;
+        }
+        
+        console.log('✅ jQuery: Button bulundu!', $bulkButton[0]);
+        alert('✅ jQuery: Button bulundu!');
+        
+        // jQuery click event
+        $bulkButton.on('click', function(e) {
         e.preventDefault();
         console.log('Bulk filemanager button clicked!');
         alert('Button clicked! Opening modal...');
