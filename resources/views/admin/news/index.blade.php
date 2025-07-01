@@ -666,7 +666,7 @@ $(document).ready(function () {
     }
     
     .breadcrumb-modern .breadcrumb-item+.breadcrumb-item::before {
-        content: "›";
+        content: "";
         font-size: 1.1rem;
         line-height: 1;
         vertical-align: middle;
