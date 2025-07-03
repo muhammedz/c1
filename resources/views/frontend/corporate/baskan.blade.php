@@ -166,9 +166,9 @@
                     <!-- Sağ Resim -->
                     <div class="relative rounded-lg overflow-hidden shadow-lg">
                         <div class="aspect-video">
-                            <a href="https://cankaya.bel.tr/uploads/documents/dijital_1749997259_JMPX5Xpn.pdf" target="_blank" class="block w-full h-full">
+                            <a href="https://www.cankaya.bel.tr/uploads/documents/dijital_1749997259_JMPX5Xpn.pdf" target="_blank" class="block w-full h-full">
                                 <img 
-                                    src="https://cankaya.bel.tr/uploads/images/neleryaptik_1749920348_uHQvvq4j.webp" 
+                                    src="https://www.cankaya.bel.tr/uploads/images/neleryaptik_1749920348_uHQvvq4j.webp" 
                                     alt="Neler Yaptık - Projelerimiz" 
                                     class="w-full h-full object-cover rounded-lg hover:scale-105 transition-transform duration-500"
                                 >

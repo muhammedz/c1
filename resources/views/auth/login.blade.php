@@ -362,7 +362,7 @@
 
             <!-- Image Section -->
             <div class="image-section">
-                <img src="https://cankaya.bel.tr/uploads/images/cankaya-slider_1749928131_vr83Vbun.jpg" 
+                <img src="https://www.cankaya.bel.tr/uploads/images/cankaya-slider_1749928131_vr83Vbun.jpg" 
                      alt="Çankaya Belediyesi" 
                      class="background-image">
                 

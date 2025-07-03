@@ -5,7 +5,7 @@
     <div class="mobile-slider-section block mobile-slider-only w-full bg-white" style="margin-top: 0;">
         <div class="w-full">
             <a href="/baskan" class="block w-full">
-                <img src="https://cankaya.bel.tr/uploads/images/cankayamobil_1749978637_aJd14YaH.jpg" 
+                <img src="https://www.cankaya.bel.tr/uploads/images/cankayamobil_1749978637_aJd14YaH.jpg" 
                      alt="Çankaya Belediyesi Mobil" 
                      class="w-full aspect-square object-cover cursor-pointer">
             </a>
