@@ -43,21 +43,84 @@ class UpdateDomainUrls extends Command
 
         // Güncellenecek tablolar ve sütunlar
         $updates = [
-            ['table' => 'pages', 'columns' => ['content', 'image', 'filemanagersystem_image']],
-            ['table' => 'news', 'columns' => ['content', 'image', 'filemanagersystem_image']],
-            ['table' => 'sliders', 'columns' => ['filemanagersystem_image']],
+            // Ana content alanları ve resimler
+            ['table' => 'pages', 'columns' => ['content', 'image', 'filemanagersystem_image', 'filemanagersystem_image_alt', 'filemanagersystem_image_title', 'filemanagersystem_gallery', 'gallery']],
+            ['table' => 'news', 'columns' => ['content', 'image', 'filemanagersystem_image', 'filemanagersystem_image_alt', 'filemanagersystem_image_title', 'filemanagersystem_gallery', 'gallery']],
+            ['table' => 'sliders', 'columns' => ['image', 'filemanagersystem_image']],
             ['table' => 'events', 'columns' => ['description', 'cover_image']],
             ['table' => 'projects', 'columns' => ['description', 'cover_image']],
-            ['table' => 'mayor_content', 'columns' => ['description', 'filemanagersystem_image']],
-            ['table' => 'corporate_categories', 'columns' => ['description', 'filemanagersystem_image']],
+            ['table' => 'mayor_content', 'columns' => ['description', 'image', 'filemanagersystem_image']],
+            ['table' => 'corporate_categories', 'columns' => ['description', 'image', 'filemanagersystem_image']],
             ['table' => 'corporate_members', 'columns' => ['description', 'filemanagersystem_image']],
-            ['table' => 'services', 'columns' => ['content']],
+            ['table' => 'services', 'columns' => ['content', 'image', 'gallery']],
             ['table' => 'announcements', 'columns' => ['content']],
             ['table' => 'tenders', 'columns' => ['description', 'content']],
             ['table' => 'archives', 'columns' => ['content']],
             ['table' => 'guide_places', 'columns' => ['content']],
             ['table' => 'mudurlukler', 'columns' => ['content']],
             ['table' => 'filemanagersystem_medias', 'columns' => ['url', 'path']],
+            
+            // Menü tabloları
+            ['table' => 'menus', 'columns' => ['url']],
+            ['table' => 'menu_items', 'columns' => ['url']],
+            ['table' => 'menu_system_items', 'columns' => ['url']],
+            ['table' => 'menu_categories', 'columns' => ['url']],
+            ['table' => 'menusystem', 'columns' => ['url']],
+            ['table' => 'header_menu_items', 'columns' => ['url']],
+            ['table' => 'header_mega_menu_items', 'columns' => ['url']],
+            ['table' => 'footer_menu_links', 'columns' => ['url']],
+            ['table' => 'quick_menu_items', 'columns' => ['url']],
+            ['table' => 'menu_tags', 'columns' => ['url']],
+            ['table' => 'menu_cards', 'columns' => ['url']],
+            ['table' => 'menu_descriptions', 'columns' => ['link_url']],
+            
+            // Öne çıkan hizmetler ve diğer URL alanları
+            ['table' => 'featured_services', 'columns' => ['url']],
+            ['table' => 'services', 'columns' => ['content', 'image', 'cta_url']],
+            ['table' => 'search_quick_links', 'columns' => ['url']],
+            ['table' => 'search_priority_links', 'columns' => ['url']],
+            ['table' => 'service_settings', 'columns' => ['hero_image']],
+            
+            // Slider ve buton URL'leri
+            ['table' => 'sliders', 'columns' => ['button_url', 'filemanagersystem_image']],
+            ['table' => 'announcements', 'columns' => ['content', 'button_url']],
+            
+            // Event ve project alanları
+            ['table' => 'events', 'columns' => ['description', 'cover_image', 'external_url', 'register_url']],
+            ['table' => 'project_settings', 'columns' => ['view_all_url']],
+            
+            // Dosya yolları ve galeri
+            ['table' => 'galleries', 'columns' => ['file_path']],
+            ['table' => 'guide_place_images', 'columns' => ['image_path']],
+            ['table' => 'event_images', 'columns' => ['image_path']],
+            ['table' => 'project_images', 'columns' => ['image_path']],
+            ['table' => 'project_gallery', 'columns' => ['image_path']],
+            ['table' => 'news_documents', 'columns' => ['file_path']],
+            ['table' => 'archive_documents', 'columns' => ['file_path']],
+            ['table' => 'mudurluk_files', 'columns' => ['file_path']],
+            ['table' => 'media_relations', 'columns' => ['file_path']],
+            ['table' => 'media', 'columns' => ['file_path']],
+            
+            // Sosyal medya ve profil URL'leri
+            ['table' => 'profile_settings', 'columns' => ['facebook_url', 'instagram_url', 'twitter_url', 'youtube_url']],
+            ['table' => 'footer_settings', 'columns' => ['facebook_url', 'instagram_url', 'twitter_url', 'youtube_url', 'linkedin_url']],
+            
+            // Mobil app ve logo plan URL'leri
+            ['table' => 'mobile_app_settings', 'columns' => ['link_card_1_url', 'link_card_2_url', 'link_card_3_url']],
+            ['table' => 'logo_plan_settings', 'columns' => ['card1_url', 'card2_url', 'logo_url']],
+            
+            // Tender ve arşiv
+            ['table' => 'tenders', 'columns' => ['description', 'content', 'document_url']],
+            ['table' => 'archives', 'columns' => ['content', 'download_button_url']],
+            
+            // FileManager System
+            ['table' => 'filemanagersystem_medias', 'columns' => ['url', 'path', 'webp_url']],
+            
+            // Activity logs
+            ['table' => 'activity_logs', 'columns' => ['url']],
+            
+            // Çankaya Evleri
+            ['table' => 'cankaya_houses', 'columns' => ['description', 'images', 'location_link']],
         ];
 
         $totalUpdated = 0;

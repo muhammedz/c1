@@ -29,16 +29,7 @@ class CankayaHouseController extends Controller
                                    ->ordered()
                                    ->get();
 
-        // Son eklenen kurslar (sadece tarih bilgisi olanlar)
-        $recentCourses = CankayaHouseCourse::with('cankayaHouse')
-                                         ->active()
-                                         ->whereNotNull('start_date')
-                                         ->whereNotNull('end_date')
-                                         ->recent()
-                                         ->take(6)
-                                         ->get();
-
-        return view('front.cankaya-houses.index', compact('cankayaHouses', 'recentCourses'));
+        return view('front.cankaya-houses.index', compact('cankayaHouses'));
     }
 
     /**

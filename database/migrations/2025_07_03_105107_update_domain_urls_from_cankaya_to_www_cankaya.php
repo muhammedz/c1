@@ -31,6 +31,23 @@ return new class extends Migration
             ['table' => 'mudurlukler', 'columns' => ['content']],
             // FileManagerSystem
             ['table' => 'filemanagersystem_medias', 'columns' => ['url', 'path']],
+            
+            // Menü tabloları
+            ['table' => 'menus', 'columns' => ['url']],
+            ['table' => 'menu_items', 'columns' => ['url']],
+            ['table' => 'menu_system_items', 'columns' => ['url']],
+            ['table' => 'menu_categories', 'columns' => ['url']],
+            ['table' => 'menusystem', 'columns' => ['url']],
+            ['table' => 'header_menu_items', 'columns' => ['url']],
+            ['table' => 'header_mega_menu_items', 'columns' => ['url']],
+            ['table' => 'footer_menu_links', 'columns' => ['url']],
+            ['table' => 'quick_menu_items', 'columns' => ['url']],
+            ['table' => 'menu_tags', 'columns' => ['url']],
+            ['table' => 'menu_cards', 'columns' => ['url']],
+            ['table' => 'menu_descriptions', 'columns' => ['link_url']],
+            
+            // Çankaya Evleri
+            ['table' => 'cankaya_houses', 'columns' => ['description', 'images', 'location_link']],
         ];
 
         echo "🚀 Domain URL güncellemesi başlatılıyor...\n";
@@ -120,6 +137,23 @@ return new class extends Migration
             ['table' => 'guide_places', 'columns' => ['content']],
             ['table' => 'mudurlukler', 'columns' => ['content']],
             ['table' => 'filemanagersystem_medias', 'columns' => ['url', 'path']],
+            
+            // Menü tabloları
+            ['table' => 'menus', 'columns' => ['url']],
+            ['table' => 'menu_items', 'columns' => ['url']],
+            ['table' => 'menu_system_items', 'columns' => ['url']],
+            ['table' => 'menu_categories', 'columns' => ['url']],
+            ['table' => 'menusystem', 'columns' => ['url']],
+            ['table' => 'header_menu_items', 'columns' => ['url']],
+            ['table' => 'header_mega_menu_items', 'columns' => ['url']],
+            ['table' => 'footer_menu_links', 'columns' => ['url']],
+            ['table' => 'quick_menu_items', 'columns' => ['url']],
+            ['table' => 'menu_tags', 'columns' => ['url']],
+            ['table' => 'menu_cards', 'columns' => ['url']],
+            ['table' => 'menu_descriptions', 'columns' => ['link_url']],
+            
+            // Çankaya Evleri
+            ['table' => 'cankaya_houses', 'columns' => ['description', 'images', 'location_link']],
         ];
 
         echo "↩️  Domain URL geri alma işlemi başlatılıyor...\n";

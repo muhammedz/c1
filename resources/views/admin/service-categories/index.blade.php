@@ -64,10 +64,10 @@
                         </td>
                         <td>
                             <div class="d-flex">
-                                <a href="{{ route('admin.service-categories.edit', $serviceCategory->id) }}" class="btn btn-primary btn-sm me-2">
+                                <a href="{{ route('admin.service-categories.edit', $serviceCategory) }}" class="btn btn-primary btn-sm me-2">
                                     <i class="fas fa-edit"></i>
                                 </a>
-                                <form action="{{ route('admin.service-categories.destroy', $serviceCategory->id) }}" method="POST" class="delete-form">
+                                <form action="{{ route('admin.service-categories.destroy', $serviceCategory) }}" method="POST" class="delete-form">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Bu hizmet kategorisini silmek istediğinize emin misiniz?')">

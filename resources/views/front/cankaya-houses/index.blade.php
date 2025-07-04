@@ -308,142 +308,12 @@
         transform: translateX(3px);
     }
 
-    /* Son Eklenen Kurslar Bölümü */
-    .recent-courses-section {
-        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-        padding: 4rem 0;
-        border-top: 1px solid #e5e7eb;
-        position: relative;
-    }
 
-    .recent-courses-section::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 1px;
-        background: linear-gradient(90deg, transparent, #00352b, transparent);
-    }
-
-    .section-title {
-        font-size: 2.25rem;
-        font-weight: 800;
-        color: #00352b;
-        margin: 0 0 3rem 0;
-        text-align: center;
-        position: relative;
-        letter-spacing: -0.025em;
-    }
-
-    .section-title::after {
-        content: '';
-        position: absolute;
-        bottom: -0.75rem;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 5rem;
-        height: 4px;
-        background: linear-gradient(90deg, #00352b, #20846c, #e6a23c);
-        border-radius: 2px;
-    }
-
-    .courses-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-        gap: 2rem;
-    }
-
-    .course-card {
-        background-color: white;
-        border: 1px solid rgba(0, 53, 43, 0.08);
-        border-radius: 1rem;
-        padding: 2rem;
-        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        position: relative;
-        overflow: hidden;
-    }
-
-    .course-card::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 3px;
-        background: linear-gradient(90deg, #00352b, #20846c, #e6a23c);
-        transform: scaleX(0);
-        transition: transform 0.3s ease;
-    }
-
-    .course-card:hover {
-        border-color: rgba(0, 53, 43, 0.2);
-        box-shadow: 0 12px 35px rgba(0, 53, 43, 0.12);
-        transform: translateY(-4px);
-    }
-
-    .course-card:hover::before {
-        transform: scaleX(1);
-    }
-
-    .course-card-header {
-        display: flex;
-        justify-content: between;
-        align-items: flex-start;
-        margin-bottom: 1rem;
-    }
-
-    .course-house-badge {
-        background: linear-gradient(135deg, #e6f3ff 0%, #cce7ff 100%);
-        color: #0369a1;
-        padding: 0.375rem 1rem;
-        border-radius: 9999px;
-        font-size: 0.8rem;
-        font-weight: 600;
-        margin-left: auto;
-        border: 1px solid rgba(3, 105, 161, 0.1);
-        box-shadow: 0 2px 4px rgba(3, 105, 161, 0.1);
-    }
-
-    .course-card-title {
-        font-size: 1.25rem;
-        font-weight: 700;
-        color: #00352b;
-        margin: 0 0 0.75rem 0;
-        flex: 1;
-        line-height: 1.3;
-        letter-spacing: -0.025em;
-    }
-
-    .course-card-dates {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        color: #6b7280;
-        font-size: 0.875rem;
-        margin-bottom: 0.75rem;
-    }
-
-    .course-card-instructor {
-        color: #374151;
-        font-size: 0.875rem;
-        margin-bottom: 0.5rem;
-    }
-
-    .course-card-price {
-        font-weight: 600;
-        color: #00352b;
-        font-size: 1rem;
-    }
 
     /* Responsive */
     @media (max-width: 768px) {
         .category-title {
             font-size: 1.875rem;
-        }
-        
-        .courses-grid {
-            grid-template-columns: 1fr;
         }
         
         .house-card-stats {
@@ -617,45 +487,5 @@
     </div>
 </section>
 
-<!-- Son Eklenen Kurslar -->
-@if($recentCourses->count() > 0)
-<section class="recent-courses-section">
-    <div class="container">
-        <h2 class="section-title">Son Eklenen Kurslar</h2>
-        
-        <div class="courses-grid">
-            @foreach($recentCourses as $course)
-            <div class="course-card">
-                <div class="course-card-header">
-                    <h4 class="course-card-title">{{ $course->name }}</h4>
-                    <span class="course-house-badge">{{ $course->cankayaHouse->name }}</span>
-                </div>
-                
-                @if($course->start_date && $course->end_date)
-                <div class="course-card-dates">
-                    <i class="fas fa-calendar-alt"></i>
-                    <span>{{ $course->start_date->format('d.m.Y') }} - {{ $course->end_date->format('d.m.Y') }}</span>
-                </div>
-                @endif
-                
-                @if($course->instructor)
-                    <div class="course-card-instructor">
-                        <i class="fas fa-user-tie"></i>
-                        Eğitmen: {{ $course->instructor }}
-                    </div>
-                @endif
-                
-                <div class="course-card-price">
-                    @if($course->price)
-                        {{ number_format($course->price, 0, ',', '.') }} ₺
-                    @else
-                        Ücretsiz
-                    @endif
-                </div>
-            </div>
-            @endforeach
-        </div>
-    </div>
-</section>
-@endif
+
 @endsection 

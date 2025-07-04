@@ -387,7 +387,7 @@ Route::middleware(['auth', 'role:admin'])->name('admin.')->prefix('admin')->grou
     });
     
     // Müdürlükler Kategorisi Yönetimi
-    Route::resource('mudurlukler-kategorisi', ServiceCategoryController::class)->names('service-categories');
+    Route::resource('mudurlukler-kategorisi', ServiceCategoryController::class)->names('service-categories')->parameters(['mudurlukler-kategorisi' => 'serviceCategory']);
     Route::post('/mudurlukler-kategorisi/update-order', [ServiceCategoryController::class, 'updateOrder'])->name('service-categories.update-order');
     
     // Hizmet Etiketleri Yönetimi
