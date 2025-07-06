@@ -494,7 +494,7 @@
             
             <div class="mt-4 text-center">
                 <p class="text-sm text-gray-500">
-                    <i class="fas fa-heart text-red-500 mr-1"></i>
+                    Çankaya Belediyesi olarak sağlığınız için buradayız.
                 </p>
             </div>
         </div>
