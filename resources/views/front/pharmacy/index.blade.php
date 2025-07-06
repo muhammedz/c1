@@ -1,8 +1,76 @@
 @extends('layouts.front')
 
-@section('title', 'Çankaya Nöbetçi Eczaneler - Ankara')
+@section('title', 'Çankaya Nöbetçi Eczaneler - Ankara | Güncel Liste 2025')
 
-@section('meta_description', 'Ankara Çankaya ilçesindeki nöbetçi eczaneleri sorgulayın. Güncel nöbetçi eczane listesi, adres ve telefon bilgileri.')
+@section('meta_description', 'Ankara Çankaya ilçesindeki nöbetçi eczanelerin güncel listesi. Adres, telefon ve harita bilgileri ile 7/24 açık eczaneler. ✅ Anlık güncellenen veriler.')
+
+<!-- Ek SEO meta etiketleri -->
+@section('additional_head')
+<meta name="keywords" content="çankaya nöbetçi eczane, ankara nöbetçi eczane, çankaya eczane, nöbetçi eczaneler ankara, çankaya belediyesi eczane">
+<meta name="robots" content="index, follow">
+<meta name="author" content="Çankaya Belediyesi">
+<meta property="og:title" content="Çankaya Nöbetçi Eczaneler - Ankara | Güncel Liste 2025">
+<meta property="og:description" content="Ankara Çankaya ilçesindeki nöbetçi eczanelerin güncel listesi. Adres, telefon ve harita bilgileri ile 7/24 açık eczaneler.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="{{ url()->current() }}">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Çankaya Nöbetçi Eczaneler - Ankara">
+<meta name="twitter:description" content="Ankara Çankaya ilçesindeki nöbetçi eczanelerin güncel listesi.">
+<link rel="canonical" href="{{ url()->current() }}">
+
+<!-- Yapısal Veri (JSON-LD) -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "name": "Çankaya Nöbetçi Eczaneler",
+  "description": "Ankara Çankaya ilçesindeki nöbetçi eczanelerin güncel listesi",
+  "url": "{{ url()->current() }}",
+  "publisher": {
+    "@type": "Organization",
+    "name": "Çankaya Belediyesi",
+    "url": "https://www.cankaya.bel.tr"
+  },
+  "about": {
+    "@type": "Service",
+    "name": "Nöbetçi Eczane Hizmeti",
+    "description": "7/24 açık eczane bilgileri"
+  }
+}
+</script>
+
+@if(count($pharmacies) > 0)
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  "name": "Çankaya Nöbetçi Eczaneler Listesi",
+  "description": "{{ $date }} tarihinde Ankara Çankaya ilçesindeki nöbetçi eczaneler",
+  "numberOfItems": {{ count($pharmacies) }},
+  "itemListElement": [
+    @foreach($pharmacies as $index => $pharmacy)
+    {
+      "@type": "ListItem",
+      "position": {{ $index + 1 }},
+      "item": {
+        "@type": "Pharmacy",
+        "name": "{{ $pharmacy['name'] }}",
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": "{{ $pharmacy['address'] ?? '' }}",
+          "addressLocality": "{{ $pharmacy['district'] }}",
+          "addressRegion": "Ankara",
+          "addressCountry": "TR"
+        },
+        "telephone": "{{ $pharmacy['phone'] ?? '' }}"
+      }
+    }@if(!$loop->last),@endif
+    @endforeach
+  ]
+}
+</script>
+@endif
+@endsection
 
 @section('css')
 <style>
@@ -204,26 +272,18 @@
                 <span>Sağlık Hizmetleri</span>
             </div>
             <h1 class="text-3xl md:text-4xl font-bold text-white mb-4">
-                Nöbetçi <span class="text-[#e6a23c]">Eczaneler</span>
+                Çankaya <span class="text-[#e6a23c]">Nöbetçi Eczaneler</span>
             </h1>
             <p class="text-white/80 text-lg mb-5 max-w-4xl">
-                Ankara Çankaya ilçesindeki nöbetçi eczanelerin güncel listesi, adres ve iletişim bilgileri.
+                Ankara Çankaya ilçesindeki 7/24 açık nöbetçi eczanelerin güncel listesi. 
+                {{ $date }} tarihi için adres, telefon ve harita bilgileri.
             </p>
         </div>
     </div>
 </div>
 
 <div class="pharmacy-container">
-    <!-- Debug Bilgileri Console'a yazdır -->
-    @if(isset($debugInfo) && count($debugInfo) > 0)
-        <script>
-            console.group('🔍 Nöbetçi Eczane Debug Bilgileri');
-            @foreach($debugInfo as $info)
-                console.log('{{ addslashes($info) }}');
-            @endforeach
-            console.groupEnd();
-        </script>
-    @endif
+
 
 
 
@@ -308,37 +368,136 @@
             </div>
         </div>
         
-        <!-- Cache temizleme ve sayfa yenileme script'i -->
+        <!-- SEO dostu cache temizleme script'i -->
         <script>
-            // Sayfa yüklendiğinde cache temizleme işlemini başlat
+            // Sadece kullanıcı etkileşimi sonrası cache temizleme
             document.addEventListener('DOMContentLoaded', function() {
-                // Cache temizleme API'sini çağır
-                fetch('{{ url("/system/cache-clear/pharmacy-cache-clear-2025") }}', {
-                    method: 'GET',
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'Accept': 'application/json'
-                    }
-                })
-                .then(response => response.json())
-                .then(data => {
-                    console.log('Cache temizleme sonucu:', data);
+                // Bot kontrolü - sadece gerçek kullanıcılar için çalışsın
+                if (navigator.userAgent.indexOf('bot') !== -1 || 
+                    navigator.userAgent.indexOf('crawler') !== -1 ||
+                    navigator.userAgent.indexOf('spider') !== -1) {
+                    return; // Botlar için çıkış
+                }
+                
+                // Cache temizleme butonunu göster
+                const retryButton = document.createElement('button');
+                retryButton.innerHTML = '<i class="fas fa-sync-alt"></i> Verileri Yenile';
+                retryButton.className = 'btn btn-primary mt-3';
+                retryButton.style.cssText = 'background: linear-gradient(135deg, #00352b 0%, #20846c 100%); border: none; padding: 12px 24px; border-radius: 8px; color: white; font-weight: 600; cursor: pointer; transition: all 0.3s ease;';
+                
+                retryButton.onclick = function() {
+                    retryButton.disabled = true;
+                    retryButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Yenileniyor...';
                     
-                    // 1 saniye bekle ve sayfayı yenile
-                    setTimeout(function() {
-                        window.location.reload();
-                    }, 1000);
-                })
-                .catch(error => {
-                    console.error('Cache temizleme hatası:', error);
-                    
-                    // Hata durumunda da sayfayı yenile
-                    setTimeout(function() {
-                        window.location.reload();
-                    }, 1000);
-                });
+                    // Cache temizleme API'sini çağır
+                    fetch('{{ url("/system/cache-clear/pharmacy-cache-clear-2025") }}', {
+                        method: 'GET',
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Accept': 'application/json'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        // 1 saniye bekle ve sayfayı yenile
+                        setTimeout(function() {
+                            window.location.reload();
+                        }, 1000);
+                    })
+                    .catch(error => {
+                        // Hata durumunda da sayfayı yenile
+                        setTimeout(function() {
+                            window.location.reload();
+                        }, 1000);
+                    });
+                };
+                
+                // Butonu "Sonuç Bulunamadı" alanına ekle
+                const noResultsDiv = document.querySelector('.no-results');
+                if (noResultsDiv) {
+                    noResultsDiv.appendChild(retryButton);
+                }
             });
         </script>
     @endif
+
+    <!-- Bilgilendirici İçerik Bölümü -->
+    <div class="mt-12 bg-white rounded-lg shadow-sm border border-gray-100 p-6">
+        <h2 class="text-2xl font-bold text-[#00352b] mb-4 flex items-center">
+            <i class="fas fa-info-circle text-[#20846c] mr-3"></i>
+            Çankaya Nöbetçi Eczaneler Hakkında
+        </h2>
+        
+        <div class="prose prose-lg max-w-none text-gray-700">
+            <p class="mb-4">
+                <strong>Çankaya Belediyesi</strong> olarak vatandaşlarımızın sağlık ihtiyaçlarını karşılamak amacıyla 
+                Ankara Çankaya ilçesindeki <strong>nöbetçi eczanelerin güncel listesini</strong> sunuyoruz.
+            </p>
+            
+            <div class="grid md:grid-cols-2 gap-6 mt-6">
+                <div class="bg-gradient-to-br from-[#00352b]/5 to-[#20846c]/5 p-4 rounded-lg border-l-4 border-[#20846c]">
+                    <h3 class="font-semibold text-[#00352b] mb-2 flex items-center">
+                        <i class="fas fa-clock text-[#20846c] mr-2"></i>
+                        7/24 Hizmet
+                    </h3>
+                    <p class="text-sm text-gray-600">
+                        Nöbetçi eczaneler hafta sonları ve resmi tatil günlerinde de hizmet vererek, 
+                        acil ilaç ihtiyaçlarınızı karşılar.
+                    </p>
+                </div>
+                
+                <div class="bg-gradient-to-br from-[#00352b]/5 to-[#20846c]/5 p-4 rounded-lg border-l-4 border-[#20846c]">
+                    <h3 class="font-semibold text-[#00352b] mb-2 flex items-center">
+                        <i class="fas fa-map-marker-alt text-[#20846c] mr-2"></i>
+                        Kolay Ulaşım
+                    </h3>
+                    <p class="text-sm text-gray-600">
+                        Her eczanenin detaylı adres bilgileri ve harita linkleri ile 
+                        size en yakın nöbetçi eczaneyi kolayca bulabilirsiniz.
+                    </p>
+                </div>
+                
+                <div class="bg-gradient-to-br from-[#00352b]/5 to-[#20846c]/5 p-4 rounded-lg border-l-4 border-[#20846c]">
+                    <h3 class="font-semibold text-[#00352b] mb-2 flex items-center">
+                        <i class="fas fa-phone text-[#20846c] mr-2"></i>
+                        Telefon Bilgileri
+                    </h3>
+                    <p class="text-sm text-gray-600">
+                        Eczaneye gitmeden önce telefon ile açık olduğunu teyit edebilir, 
+                        ilaç bulunup bulunmadığını sorabilirsiniz.
+                    </p>
+                </div>
+                
+                <div class="bg-gradient-to-br from-[#00352b]/5 to-[#20846c]/5 p-4 rounded-lg border-l-4 border-[#20846c]">
+                    <h3 class="font-semibold text-[#00352b] mb-2 flex items-center">
+                        <i class="fas fa-sync-alt text-[#20846c] mr-2"></i>
+                        Güncel Veriler
+                    </h3>
+                    <p class="text-sm text-gray-600">
+                        Çankaya Nöbetçi eczane listemiz günlük olarak güncellenir ve 
+                        en doğru bilgileri almanızı sağlar.
+                    </p>
+                </div>
+            </div>
+            
+            <div class="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                <h3 class="font-semibold text-blue-800 mb-2 flex items-center">
+                    <i class="fas fa-lightbulb text-blue-600 mr-2"></i>
+                    Önemli Hatırlatma
+                </h3>
+                <p class="text-sm text-blue-700">
+                    Nöbetçi eczaneler genellikle akşam 19:00'dan ertesi gün sabah 09:00'a kadar hizmet verir. 
+                    Hafta sonları ve resmi tatillerde ise 24 saat açık kalırlar. 
+                    Eczaneye gitmeden önce telefon ile açık olduğunu teyit etmenizi öneririz.
+                </p>
+            </div>
+            
+            <div class="mt-4 text-center">
+                <p class="text-sm text-gray-500">
+                    <i class="fas fa-heart text-red-500 mr-1"></i>
+                </p>
+            </div>
+        </div>
+    </div>
 </div>
 @endsection 

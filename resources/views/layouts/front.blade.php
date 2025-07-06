@@ -1383,6 +1383,9 @@
     @endif
     
     @yield('css')
+    
+    <!-- Ek SEO meta etiketleri -->
+    @yield('additional_head')
 </head>
 
 <body class="bg-slate-100 overflow-x-hidden">
