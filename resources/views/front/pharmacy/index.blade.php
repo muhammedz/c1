@@ -307,6 +307,38 @@
                 </p>
             </div>
         </div>
+        
+        <!-- Cache temizleme ve sayfa yenileme script'i -->
+        <script>
+            // Sayfa yüklendiğinde cache temizleme işlemini başlat
+            document.addEventListener('DOMContentLoaded', function() {
+                // Cache temizleme API'sini çağır
+                fetch('{{ url("/system/cache-clear/pharmacy-cache-clear-2025") }}', {
+                    method: 'GET',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Cache temizleme sonucu:', data);
+                    
+                    // 1 saniye bekle ve sayfayı yenile
+                    setTimeout(function() {
+                        window.location.reload();
+                    }, 1000);
+                })
+                .catch(error => {
+                    console.error('Cache temizleme hatası:', error);
+                    
+                    // Hata durumunda da sayfayı yenile
+                    setTimeout(function() {
+                        window.location.reload();
+                    }, 1000);
+                });
+            });
+        </script>
     @endif
 </div>
 @endsection 
