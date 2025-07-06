@@ -492,11 +492,7 @@
                 </p>
             </div>
             
-            <div class="mt-4 text-center">
-                <p class="text-sm text-gray-500">
-                    Çankaya Belediyesi olarak sağlığınız için buradayız.
-                </p>
-            </div>
+
         </div>
     </div>
 </div>
