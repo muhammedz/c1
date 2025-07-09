@@ -1,440 +1,182 @@
-/**
- * Frontend DataTables Stilleri
- * TinyMCE tablolarına uygulanan DataTables için özel CSS
- */
-
 /* ========================================
-   DATATABLE WRAPPER GENEL STİLLER
+   SIMPLE DATATABLES STİLLER - Zero Configuration Benzeri
    ======================================== */
 
-.frontend-datatable {
-    margin: 25px 0;
-    background-color: #fff;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-    overflow: hidden;
+.simple-datatable {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 20px 0;
 }
 
 .datatable-wrapper {
-    margin: 25px 0;
-    padding: 0;
+    margin: 20px 0;
+    overflow-x: auto;
 }
 
 /* ========================================
-   DATATABLE CONTROLS (TOP)
+   SEARCH AREA STİLLER
    ======================================== */
 
-.frontend-datatable .dataTables_length,
-.frontend-datatable .dataTables_filter {
-    margin-bottom: 15px;
+.simple-datatable .dataTables_filter {
+    text-align: right;
+    margin-bottom: 20px;
 }
 
-.frontend-datatable .dataTables_length label {
-    font-weight: 500;
-    font-size: 14px;
-    color: #495057;
-    margin-bottom: 0;
+.simple-datatable .dataTables_filter label {
+    font-weight: normal;
+    white-space: nowrap;
+    text-align: left;
     display: flex;
     align-items: center;
-    gap: 8px;
-}
-
-.frontend-datatable .dataTables_length select {
-    padding: 6px 12px;
-    border: 1px solid #ced4da;
-    border-radius: 6px;
-    background-color: #fff;
-    font-size: 14px;
-    min-width: 80px;
-}
-
-.frontend-datatable .dataTables_filter label {
-    font-weight: 500;
-    font-size: 14px;
-    color: #495057;
-    margin-bottom: 0;
-    display: flex;
-    align-items: center;
-    gap: 8px;
+    gap: 10px;
+    flex-wrap: wrap;
     justify-content: flex-end;
 }
 
-.frontend-datatable .dataTables_filter input {
-    padding: 8px 12px;
-    border: 1px solid #ced4da;
-    border-radius: 6px;
-    background-color: #fff;
-    font-size: 14px;
+.simple-datatable .dataTables_filter input {
+    margin-left: 0.5em;
+    display: inline-block;
+    width: auto;
     min-width: 200px;
-    margin-left: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 6px 12px;
+    font-size: 14px;
 }
 
-.frontend-datatable .dataTables_filter input:focus {
+.simple-datatable .dataTables_filter input:focus {
     border-color: #00352b;
-    box-shadow: 0 0 0 0.2rem rgba(0, 53, 43, 0.25);
-    outline: none;
+    outline: 0;
+    box-shadow: 0 0 0 2px rgba(0, 53, 43, 0.25);
 }
 
 /* ========================================
-   DATATABLE TABLO STİLLER
+   TABLE STİLLER
    ======================================== */
 
-.frontend-datatable table.dataTable {
-    width: 100% !important;
+.simple-datatable table.dataTable {
+    width: 100%;
+    margin: 0 auto;
+    clear: both;
     border-collapse: separate;
     border-spacing: 0;
-    margin: 0 !important;
-    background-color: #fff;
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 4px;
 }
 
-.frontend-datatable table.dataTable thead th {
-    background-color: #00352b;
-    color: white;
-    font-weight: 600;
-    text-align: left;
-    padding: 14px 16px;
-    font-size: 14px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    border-bottom: none;
-    position: relative;
-}
-
-.frontend-datatable table.dataTable thead th.sorting:before,
-.frontend-datatable table.dataTable thead th.sorting:after,
-.frontend-datatable table.dataTable thead th.sorting_asc:before,
-.frontend-datatable table.dataTable thead th.sorting_asc:after,
-.frontend-datatable table.dataTable thead th.sorting_desc:before,
-.frontend-datatable table.dataTable thead th.sorting_desc:after {
-    color: white !important;
-    opacity: 0.7;
-}
-
-.frontend-datatable table.dataTable tbody td {
-    padding: 12px 16px;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-    font-size: 14px;
-    vertical-align: middle;
-    background-color: #fff;
-}
-
-.frontend-datatable table.dataTable tbody tr:nth-child(even) {
-    background-color: rgba(0, 0, 0, 0.02);
-}
-
-.frontend-datatable table.dataTable tbody tr:nth-child(even) td {
-    background-color: rgba(0, 0, 0, 0.02);
-}
-
-.frontend-datatable table.dataTable tbody tr:hover {
-    background-color: rgba(0, 53, 43, 0.03);
-}
-
-.frontend-datatable table.dataTable tbody tr:hover td {
-    background-color: rgba(0, 53, 43, 0.03);
-}
-
-/* ========================================
-   DATATABLE CONTROLS (BOTTOM)
-   ======================================== */
-
-.frontend-datatable .dataTables_info {
-    padding-top: 15px;
-    color: #6c757d;
-    font-size: 14px;
-    font-weight: 500;
-}
-
-.frontend-datatable .dataTables_paginate {
-    padding-top: 15px;
-}
-
-.frontend-datatable .dataTables_paginate .paginate_button {
-    display: inline-block;
-    padding: 8px 12px;
-    margin: 0 2px;
-    font-size: 14px;
-    font-weight: 500;
-    color: #495057;
-    background-color: #fff;
-    border: 1px solid #dee2e6;
-    border-radius: 6px;
-    text-decoration: none;
-    transition: all 0.2s ease;
+.simple-datatable table.dataTable thead th {
+    font-weight: bold;
+    padding: 10px 18px;
+    border-bottom: 1px solid #ddd;
+    background-color: #f9f9f9;
+    color: #333;
     cursor: pointer;
+    vertical-align: middle;
 }
 
-.frontend-datatable .dataTables_paginate .paginate_button:hover {
-    background-color: #e9ecef;
-    border-color: #adb5bd;
-    color: #495057;
+.simple-datatable table.dataTable thead th:first-child {
+    border-top-left-radius: 4px;
 }
 
-.frontend-datatable .dataTables_paginate .paginate_button.current {
-    background-color: #00352b;
-    border-color: #00352b;
-    color: #fff;
+.simple-datatable table.dataTable thead th:last-child {
+    border-top-right-radius: 4px;
 }
 
-.frontend-datatable .dataTables_paginate .paginate_button.disabled {
-    color: #6c757d;
-    background-color: #fff;
-    border-color: #dee2e6;
-    cursor: not-allowed;
-    opacity: 0.6;
+.simple-datatable table.dataTable thead th.sorting:before,
+.simple-datatable table.dataTable thead th.sorting:after,
+.simple-datatable table.dataTable thead th.sorting_asc:before,
+.simple-datatable table.dataTable thead th.sorting_asc:after,
+.simple-datatable table.dataTable thead th.sorting_desc:before,
+.simple-datatable table.dataTable thead th.sorting_desc:after {
+    bottom: 0.5em;
+    font-size: 12px;
 }
 
+.simple-datatable table.dataTable tbody td {
+    padding: 10px 18px;
+    vertical-align: top;
+    border-top: 1px solid #ddd;
+}
 
+.simple-datatable table.dataTable tbody tr {
+    background-color: white;
+}
+
+.simple-datatable table.dataTable tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.simple-datatable table.dataTable tbody tr:hover {
+    background-color: #f5f5f5;
+}
 
 /* ========================================
-   MOBİL RESPONSIVE STİLLER
+   EMPTY STATE
    ======================================== */
 
-/* Scroll Hint */
-.scroll-hint {
-    background: linear-gradient(135deg, #e8f5e8 0%, #f8f9fa 100%);
-    border: 1px solid #00352b;
-    border-radius: 8px;
-    padding: 8px 12px;
-    margin-bottom: 10px;
-    font-size: 12px;
-    color: #00352b;
+.simple-datatable .dataTables_empty {
     text-align: center;
-    font-weight: 500;
-    animation: fadeInOut 3s infinite;
+    padding: 40px 20px;
+    color: #999;
+    font-style: italic;
 }
 
-@keyframes fadeInOut {
-    0%, 100% { opacity: 0.8; }
-    50% { opacity: 1; }
-}
-
-/* Mobile Scroll View Specific Styles */
-.frontend-datatable.mobile-scroll-view {
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-/* Scrolling Table Styles */
-.frontend-datatable .dataTables_scrollHead {
-    background: #f8f9fa;
-    border-bottom: 2px solid #00352b;
-    border-radius: 8px 8px 0 0;
-}
-
-.frontend-datatable .dataTables_scrollBody {
-    border-radius: 0 0 8px 8px;
-    max-height: 50vh;
-}
-
-.frontend-datatable .dataTables_scrollHeadInner,
-.frontend-datatable .dataTables_scrollBody table {
-    width: 100% !important;
-}
-
-/* Scroll container için özel stil */
-.frontend-datatable .dataTables_scroll {
-    clear: both;
-}
-
-/* Scroll Table İçerik Stilleri */
-.frontend-datatable table.dataTable tbody td {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 200px;
-}
-
-.frontend-datatable table.dataTable thead th {
-    white-space: nowrap;
-    position: sticky;
-    top: 0;
-    background: linear-gradient(135deg, #00352b 0%, #20846c 100%);
-    z-index: 10;
-}
+/* ========================================
+   MOBİL RESPONSİVE - Natural Overflow
+   ======================================== */
 
 @media (max-width: 768px) {
-    /* Wrapper optimizasyonları */
-    .frontend-datatable .dataTables_wrapper {
-        padding: 15px;
-        background: white;
-        border-radius: 12px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    }
-    
-    /* Top controls */
-    .frontend-datatable .dataTables_filter {
+    .simple-datatable .dataTables_filter {
+        text-align: left;
         margin-bottom: 15px;
     }
     
-    .frontend-datatable .dataTables_filter label {
-        display: flex;
+    .simple-datatable .dataTables_filter label {
+        justify-content: flex-start;
         flex-direction: column;
-        gap: 8px;
-        font-size: 14px;
-        font-weight: 500;
-        color: #495057;
+        align-items: flex-start;
+        gap: 5px;
     }
     
-    .frontend-datatable .dataTables_filter input {
-        padding: 12px 16px;
-        border: 2px solid #e9ecef;
-        border-radius: 8px;
-        font-size: 14px;
+    .simple-datatable .dataTables_filter input {
         width: 100%;
-        transition: border-color 0.3s ease;
+        min-width: auto;
+        margin-left: 0;
     }
     
-    .frontend-datatable .dataTables_filter input:focus {
-        border-color: #00352b;
-        box-shadow: 0 0 0 3px rgba(0, 53, 43, 0.1);
+    .simple-datatable table.dataTable {
+        font-size: 14px;
     }
     
-    /* Scroll container mobil */
-    .frontend-datatable .dataTables_scrollBody {
-        max-height: 40vh !important;
-        border: 2px solid #e9ecef;
-        border-radius: 8px;
+    .simple-datatable table.dataTable thead th {
+        padding: 8px 12px;
+        font-size: 13px;
     }
     
-    /* Table styles */
-    .frontend-datatable table.dataTable {
-        font-size: 12px;
-        margin: 0;
+    .simple-datatable table.dataTable tbody td {
+        padding: 8px 12px;
+        font-size: 13px;
     }
     
-    .frontend-datatable table.dataTable thead th {
-        padding: 10px 6px;
-        font-size: 11px;
-        min-width: 80px;
-    }
-    
-    .frontend-datatable table.dataTable tbody td {
-        padding: 10px 6px;
-        font-size: 12px;
-        min-width: 80px;
-        max-width: 150px;
-    }
-    
-    /* Info styling */
-    .frontend-datatable .dataTables_info {
-        background: #f8f9fa;
-        padding: 10px;
-        border-radius: 8px;
-        font-size: 12px;
-        font-weight: 500;
-        color: #495057;
-        margin: 10px 0;
-        border-left: 4px solid #00352b;
+    /* Tablo horizontal overflow için */
+    .datatable-wrapper {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
     }
 }
-
-/* ========================================
-   KÜÇÜK MOBİL CİHAZLAR İÇİN SCROLL OPTİMİZASYONU
-   ======================================== */
 
 @media (max-width: 480px) {
-    .frontend-datatable .dataTables_wrapper {
-        padding: 10px;
+    .simple-datatable table.dataTable {
+        font-size: 12px;
     }
     
-    .frontend-datatable .dataTables_filter label {
-        font-size: 13px;
+    .simple-datatable table.dataTable thead th {
+        padding: 6px 8px;
+        font-size: 12px;
     }
     
-    .frontend-datatable .dataTables_filter input {
-        padding: 10px 12px;
-        font-size: 13px;
+    .simple-datatable table.dataTable tbody td {
+        padding: 6px 8px;
+        font-size: 12px;
     }
-    
-    .frontend-datatable .dataTables_scrollBody {
-        max-height: 35vh !important;
-    }
-    
-    .frontend-datatable table.dataTable thead th {
-        padding: 8px 4px;
-        font-size: 10px;
-        min-width: 60px;
-    }
-    
-    .frontend-datatable table.dataTable tbody td {
-        padding: 8px 4px;
-        font-size: 11px;
-        min-width: 60px;
-        max-width: 120px;
-    }
-    
-    .frontend-datatable .dataTables_info {
-        font-size: 11px;
-        padding: 8px;
-    }
-    
-    .scroll-hint {
-        font-size: 11px;
-        padding: 6px 10px;
-    }
-}
-
-/* ========================================
-   LOADING VE EMPTY STATE STİLLER
-   ======================================== */
-
-.frontend-datatable .dataTables_processing {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 200px;
-    margin-left: -100px;
-    margin-top: -25px;
-    height: 50px;
-    background-color: #fff;
-    border: 1px solid #dee2e6;
-    border-radius: 6px;
-    color: #495057;
-    font-size: 14px;
-    font-weight: 500;
-    text-align: center;
-    line-height: 50px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-.frontend-datatable .dataTables_empty {
-    text-align: center;
-    padding: 40px 20px;
-    color: #6c757d;
-    font-size: 16px;
-    font-weight: 500;
-}
-
-/* ========================================
-   UTILITY CLASSES
-   ======================================== */
-
-.frontend-datatable .dataTables_scrollBody {
-    border-radius: 0 0 8px 8px;
-}
-
-.frontend-datatable .dataTables_scrollHead {
-    border-radius: 8px 8px 0 0;
-    overflow: hidden;
-}
-
-.frontend-datatable .text-center {
-    text-align: center !important;
-}
-
-.frontend-datatable .text-right {
-    text-align: right !important;
-}
-
-.frontend-datatable .text-nowrap {
-    white-space: nowrap !important;
-}
-
-.frontend-datatable .text-truncate {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    max-width: 200px;
 }

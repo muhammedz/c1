@@ -247,7 +247,7 @@
                     @if($mudurluk->files->where('is_active', true)->count() > 0)
                     <a href="#dosyalar" class="flex items-center px-4 py-2 rounded-lg text-gray-600 hover:bg-[#00352b]/10 hover:text-[#00352b] font-medium transition-colors">
                         <i class="material-icons mr-3 text-lg">description</i>
-                        Dosyalar ve Dökümanlar
+                        Dosyalar ve Dokümanlar
                     </a>
                     @endif
                     @if($relatedServices->count() > 0)
@@ -278,11 +278,11 @@
             </section>
             @endif
             
-            <!-- Dosyalar ve Dökümanlar -->
+            <!-- Dosyalar ve Dokümanlar -->
             @if($mudurluk->files->where('is_active', true)->count() > 0)
             <section id="dosyalar" class="service-content-section">
-                <h2>Dosyalar ve Dökümanlar</h2>
-                <p class="mb-5">{{ $mudurluk->name }} resmi belgeler ve dökümanları aşağıdan indirebilirsiniz:</p>
+                <h2>Dosyalar ve Dokümanlar</h2>
+                <p class="mb-5">{{ $mudurluk->name }} resmi belgeler ve dokümanları aşağıdan indirebilirsiniz:</p>
                 
                                                 <!-- Hizmet Standartları -->
                 @php

@@ -86,6 +86,15 @@ Arama - Çankaya Belediyesi
                         </div>
                         @endif
                         
+                        @if(isset($results['pages']) && $results['pages']->count() > 0)
+                        <div class="bg-white p-3 md:p-4 border-b border-gray-200">
+                            <a href="#pages" class="text-[#004d2e] hover:underline flex justify-between text-sm md:text-base">
+                                <span>Sayfalar</span>
+                                <span>{{ $results['pages']->count() }}</span>
+                            </a>
+                        </div>
+                        @endif
+                        
                         @if(isset($results['projects']) && $results['projects']->count() > 0)
                         <div class="bg-white p-3 md:p-4 border-b border-gray-200">
                             <a href="#projects" class="text-[#004d2e] hover:underline flex justify-between text-sm md:text-base">
@@ -269,6 +278,39 @@ Arama - Çankaya Belediyesi
                                                     </div>
                                                     <span class="text-xs text-gray-400 block italic hidden md:block">{{ route('news.show', $newsItem->slug) }}</span>
                                                     <p class="text-xs text-gray-600 mt-1">{{ Str::limit($newsItem->summary, 80) }}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                        @endif
+                        
+                        <!-- Sayfalar Sonuçları -->
+                        @if(isset($results['pages']) && $results['pages']->count() > 0)
+                            <div id="pages" class="mb-4 md:mb-6">
+                                <h2 class="text-lg md:text-xl font-bold text-gray-900 mb-2 md:mb-3 border-b border-gray-200 pb-2">Sayfalar ({{ $results['pages']->count() }})</h2>
+                                <div class="space-y-2">
+                                    @foreach($results['pages'] as $page)
+                                        <div class="bg-white border border-gray-200 rounded-lg overflow-hidden transition-all hover:shadow-md">
+                                            <div class="p-3 md:p-2">
+                                                <div class="flex-1">
+                                                    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-1 sm:gap-2">
+                                                        <a href="{{ route('pages.show', $page->slug) }}" class="text-sm md:text-base font-medium text-[#004d2e] hover:underline block">{{ $page->title }}</a>
+                                                        @if($page->published_at)
+                                                            <div class="flex items-center text-gray-500 text-xs whitespace-nowrap">
+                                                                <span class="material-icons text-xs mr-1">calendar_today</span>
+                                                                <span>{{ $page->published_at->format('d.m.Y') }}</span>
+                                                            </div>
+                                                        @endif
+                                                    </div>
+                                                    <span class="text-xs text-gray-400 block italic hidden md:block">{{ route('pages.show', $page->slug) }}</span>
+                                                    @if($page->summary)
+                                                        <p class="text-xs text-gray-600 mt-1">{{ Str::limit($page->summary, 80) }}</p>
+                                                    @elseif($page->content)
+                                                        <p class="text-xs text-gray-600 mt-1">{{ Str::limit(strip_tags($page->content), 80) }}</p>
+                                                    @endif
+                                                    <span class="inline-block bg-indigo-100 text-indigo-800 text-xs px-2 py-1 rounded-full mt-1">Sayfa</span>
                                                 </div>
                                             </div>
                                         </div>

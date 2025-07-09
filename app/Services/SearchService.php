@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Service;
 use App\Models\News;
+use App\Models\Page;
 use App\Models\Project;
 use App\Models\GuidePlace;
 use App\Models\CankayaHouse;
@@ -15,7 +16,7 @@ use Illuminate\Support\Collection;
 class SearchService
 {
     /**
-     * Gelişmiş arama işlemi
+     * Gelişmiş arama işlemi - Kelime sınırları ile optimize edilmiş
      * 
      * @param string $query
      * @return array
@@ -27,6 +28,7 @@ class SearchService
                 'priority_links' => collect(),
                 'services' => collect(),
                 'news' => collect(),
+                'pages' => collect(),
                 'projects' => collect(),
                 'guides' => collect(),
                 'cankaya_houses' => collect(),
@@ -46,19 +48,21 @@ class SearchService
         // Farklı arama stratejileri uygula
         $services = $this->searchServices($normalizedQuery, $query);
         $news = $this->searchNews($normalizedQuery, $query);
+        $pages = $this->searchPages($normalizedQuery, $query);
         $projects = $this->searchProjects($normalizedQuery, $query);
         $guides = $this->searchGuides($normalizedQuery, $query);
         $cankayaHouses = $this->searchCankayaHouses($normalizedQuery, $query);
         $mudurlukler = $this->searchMudurlukler($normalizedQuery, $query);
         $archives = $this->searchArchives($normalizedQuery, $query);
         
-        $totalCount = $priorityLinks->count() + $services->count() + $news->count() + $projects->count() + 
+        $totalCount = $priorityLinks->count() + $services->count() + $news->count() + $pages->count() + $projects->count() + 
                      $guides->count() + $cankayaHouses->count() + $mudurlukler->count() + $archives->count();
         
         return [
             'priority_links' => $priorityLinks,
             'services' => $services,
             'news' => $news,
+            'pages' => $pages,
             'projects' => $projects,
             'guides' => $guides,
             'cankaya_houses' => $cankayaHouses,
@@ -83,7 +87,19 @@ class SearchService
     }
     
     /**
-     * Hizmetlerde arama yap
+     * Kelime sınırları ile REGEXP oluştur - "kent" != "Başkent"
+     * 
+     * @param string $word
+     * @return string
+     */
+    private function createWordBoundaryRegex(string $word): string
+    {
+        // MySQL word boundaries: [[:<:]] ve [[:>:]]
+        return "[[:<:]]" . preg_quote($word, '/') . "[[:>:]]";
+    }
+    
+    /**
+     * Hizmetlerde arama yap - İyileştirilmiş algoritma
      * 
      * @param string $normalizedQuery
      * @param string $originalQuery
@@ -103,27 +119,47 @@ class SearchService
             // Scout hatası durumunda devam et
         }
         
-        // 2. Veritabanında LIKE ile arama (sadece başlık)
-        $likeResults = Service::where('status', 'published')
+        // 2. Tam cümle/ifade arama (öncelik)
+        $exactResults = Service::where('status', 'published')
             ->where(function($q) use ($originalQuery, $normalizedQuery) {
                 $q->where('title', 'LIKE', "%{$originalQuery}%")
                   ->orWhere('title', 'LIKE', "%{$normalizedQuery}%");
             })
             ->get();
         
-        // Tekrarları önleyerek birleştir
         $existingIds = $results->pluck('id')->toArray();
-        $additionalResults = $likeResults->whereNotIn('id', $existingIds);
+        $additionalResults = $exactResults->whereNotIn('id', $existingIds);
         $results = $results->merge($additionalResults);
         
-        // 3. Kelime kelime arama (sadece başlık) - İyileştirilmiş
-        $words = explode(' ', $normalizedQuery);
-        if (count($words) > 1 && $results->count() < 5) {
+        // 3. Kelime sınırları ile arama (daha kesin) - Sadece yeterli sonuç yoksa
+        if ($results->count() < 3) {
+            $words = explode(' ', $normalizedQuery);
+            if (count($words) > 1) {
+                foreach ($words as $word) {
+                    // Minimum 5 karakter ve blacklist kontrolü (daha katı)
+                    if (strlen($word) >= 5 && !$this->isBlacklistedWord($word)) {
+                        $wordRegex = $this->createWordBoundaryRegex($word);
+                        
+                        $wordResults = Service::where('status', 'published')
+                            ->where('title', 'REGEXP', $wordRegex)
+                            ->get();
+                        
+                        $existingIds = $results->pluck('id')->toArray();
+                        $additionalResults = $wordResults->whereNotIn('id', $existingIds);
+                        $results = $results->merge($additionalResults);
+                    }
+                }
+            }
+        }
+        
+        // 4. Fallback: LIKE arama - sadece çok az sonuç varsa
+        if ($results->count() < 2) {
+            $words = explode(' ', $normalizedQuery);
             foreach ($words as $word) {
-                // Minimum 4 karakter ve blacklist kontrolü
                 if (strlen($word) >= 4 && !$this->isBlacklistedWord($word)) {
                     $wordResults = Service::where('status', 'published')
                         ->where('title', 'LIKE', "%{$word}%")
+                        ->limit(3)
                         ->get();
                     
                     $existingIds = $results->pluck('id')->toArray();
@@ -133,19 +169,11 @@ class SearchService
             }
         }
         
-        // 4. Fuzzy matching (benzer kelimeler) - sadece çok az sonuç varsa
-        if ($results->count() < 2) {
-            $fuzzyResults = $this->fuzzySearchServices($normalizedQuery);
-            $existingIds = $results->pluck('id')->toArray();
-            $additionalResults = $fuzzyResults->whereNotIn('id', $existingIds);
-            $results = $results->merge($additionalResults);
-        }
-        
         return $results;
     }
     
     /**
-     * Haberlerde arama yap
+     * Haberlerde arama yap - İyileştirilmiş algoritma
      * 
      * @param string $normalizedQuery
      * @param string $originalQuery
@@ -165,8 +193,8 @@ class SearchService
             // Scout hatası durumunda devam et
         }
         
-        // 2. Veritabanında LIKE ile arama (sadece başlık)
-        $likeResults = News::where('status', 'published')
+        // 2. Tam cümle/ifade arama (öncelik)
+        $exactResults = News::where('status', 'published')
             ->where(function($q) use ($originalQuery, $normalizedQuery) {
                 $q->where('title', 'LIKE', "%{$originalQuery}%")
                   ->orWhere('title', 'LIKE', "%{$normalizedQuery}%");
@@ -174,17 +202,37 @@ class SearchService
             ->get();
         
         $existingIds = $results->pluck('id')->toArray();
-        $additionalResults = $likeResults->whereNotIn('id', $existingIds);
+        $additionalResults = $exactResults->whereNotIn('id', $existingIds);
         $results = $results->merge($additionalResults);
         
-        // 3. Kelime kelime arama (sadece başlık) - İyileştirilmiş
-        $words = explode(' ', $normalizedQuery);
-        if (count($words) > 1 && $results->count() < 5) {
+        // 3. Kelime sınırları ile arama - Sadece yeterli sonuç yoksa
+        if ($results->count() < 3) {
+            $words = explode(' ', $normalizedQuery);
+            if (count($words) > 1) {
+                foreach ($words as $word) {
+                    if (strlen($word) >= 5 && !$this->isBlacklistedWord($word)) {
+                        $wordRegex = $this->createWordBoundaryRegex($word);
+                        
+                        $wordResults = News::where('status', 'published')
+                            ->where('title', 'REGEXP', $wordRegex)
+                            ->get();
+                        
+                        $existingIds = $results->pluck('id')->toArray();
+                        $additionalResults = $wordResults->whereNotIn('id', $existingIds);
+                        $results = $results->merge($additionalResults);
+                    }
+                }
+            }
+        }
+        
+        // 4. Fallback: LIKE arama
+        if ($results->count() < 2) {
+            $words = explode(' ', $normalizedQuery);
             foreach ($words as $word) {
-                // Minimum 4 karakter ve blacklist kontrolü
                 if (strlen($word) >= 4 && !$this->isBlacklistedWord($word)) {
                     $wordResults = News::where('status', 'published')
                         ->where('title', 'LIKE', "%{$word}%")
+                        ->limit(3)
                         ->get();
                     
                     $existingIds = $results->pluck('id')->toArray();
@@ -194,152 +242,69 @@ class SearchService
             }
         }
         
-        // 4. Fuzzy matching - sadece çok az sonuç varsa
-        if ($results->count() < 2) {
-            $fuzzyResults = $this->fuzzySearchNews($normalizedQuery);
-            $existingIds = $results->pluck('id')->toArray();
-            $additionalResults = $fuzzyResults->whereNotIn('id', $existingIds);
-            $results = $results->merge($additionalResults);
-        }
-        
         return $results;
     }
     
     /**
-     * Hizmetler için fuzzy search
-     * 
-     * @param string $query
-     * @return Collection
-     */
-    private function fuzzySearchServices(string $query): Collection
-    {
-        $results = collect();
-        
-        // Tek karakter toleransı ile arama
-        $variations = $this->generateQueryVariations($query);
-        
-        foreach ($variations as $variation) {
-            $variationResults = Service::where('status', 'published')
-                ->where('title', 'LIKE', "%{$variation}%")
-                ->limit(5)
-                ->get();
-            
-            $existingIds = $results->pluck('id')->toArray();
-            $additionalResults = $variationResults->whereNotIn('id', $existingIds);
-            $results = $results->merge($additionalResults);
-            
-            if ($results->count() >= 10) break;
-        }
-        
-        return $results;
-    }
-    
-    /**
-     * Haberler için fuzzy search
-     * 
-     * @param string $query
-     * @return Collection
-     */
-    private function fuzzySearchNews(string $query): Collection
-    {
-        $results = collect();
-        
-        $variations = $this->generateQueryVariations($query);
-        
-        foreach ($variations as $variation) {
-            $variationResults = News::where('status', 'published')
-                ->where('title', 'LIKE', "%{$variation}%")
-                ->limit(5)
-                ->get();
-            
-            $existingIds = $results->pluck('id')->toArray();
-            $additionalResults = $variationResults->whereNotIn('id', $existingIds);
-            $results = $results->merge($additionalResults);
-            
-            if ($results->count() >= 10) break;
-        }
-        
-        return $results;
-    }
-    
-    /**
-     * Sorgu varyasyonları oluştur (typo toleransı için)
-     * 
-     * @param string $query
-     * @return array
-     */
-    private function generateQueryVariations(string $query): array
-    {
-        $variations = [];
-        
-        // Orijinal sorgu
-        $variations[] = $query;
-        
-        // Yaygın Türkçe yazım hataları
-        $commonMistakes = [
-            'egitim' => ['eğitim', 'egitim'],
-            'eğitim' => ['egitim', 'eğitim'],
-            'eğitin' => ['eğitim', 'egitim'], // eğitin -> eğitim
-            'egtin' => ['eğitim', 'egitim'],   // egtin -> eğitim
-            'saglik' => ['sağlık', 'saglik'],
-            'sağlık' => ['saglik', 'sağlık'],
-            'kultur' => ['kültür', 'kultur'],
-            'kültür' => ['kultur', 'kültür'],
-            'spor' => ['spor'],
-            'sosyal' => ['sosyal'],
-            'hizmet' => ['hizmet'],
-            'destek' => ['destek'],
-            'yardim' => ['yardım', 'yardim'],
-            'yardım' => ['yardim', 'yardım']
-        ];
-        
-        foreach ($commonMistakes as $mistake => $corrections) {
-            if (strpos($query, $mistake) !== false) {
-                foreach ($corrections as $correction) {
-                    $variations[] = str_replace($mistake, $correction, $query);
-                }
-            }
-        }
-        
-        // Tek karakter eksik/fazla varyasyonları (sadece son karakter için)
-        if (strlen($query) >= 5 && strlen($query) <= 8) {
-            // Sadece son karakteri çıkar (ilk karakteri çıkarmayı kaldırdık)
-            $variations[] = substr($query, 0, -1);
-            
-            // Yaygın son ekler
-            $variations[] = $query . 'i';
-            $variations[] = $query . 'ı';
-            $variations[] = $query . 'e';
-            $variations[] = $query . 'a';
-            $variations[] = $query . 'm'; // eğitin + m = eğitim
-        }
-        
-        // Levenshtein distance ile benzer kelimeler (daha sıkı kontrol)
-        if (strlen($query) >= 5) {
-            $commonWords = ['eğitim', 'egitim', 'sağlık', 'saglik', 'kültür', 'kultur', 'sosyal', 'hizmet'];
-            foreach ($commonWords as $word) {
-                if (levenshtein($query, $word) <= 1 && strlen($query) >= strlen($word) - 1) { // En fazla 1 karakter fark ve uzunluk kontrolü
-                    $variations[] = $word;
-                }
-            }
-        }
-        
-        return array_unique($variations);
-    }
-    
-    /**
-     * Projelerde arama yap
+     * Sayfalarda arama yap - İyileştirilmiş algoritma
      * 
      * @param string $normalizedQuery
      * @param string $originalQuery
      * @return Collection
+     */
+    private function searchPages(string $normalizedQuery, string $originalQuery): Collection
+    {
+        $results = collect();
+        
+        // 1. Tam cümle/ifade arama (öncelik)
+        $exactResults = Page::published()
+            ->where(function($q) use ($originalQuery, $normalizedQuery) {
+                $q->where('title', 'LIKE', "%{$originalQuery}%")
+                  ->orWhere('title', 'LIKE', "%{$normalizedQuery}%")
+                  ->orWhere('content', 'LIKE', "%{$originalQuery}%")
+                  ->orWhere('content', 'LIKE', "%{$normalizedQuery}%")
+                  ->orWhere('summary', 'LIKE', "%{$originalQuery}%")
+                  ->orWhere('summary', 'LIKE', "%{$normalizedQuery}%");
+            })
+            ->get();
+        
+        $results = $results->merge($exactResults);
+        
+        // 2. Kelime sınırları ile arama - Sadece yeterli sonuç yoksa
+        if ($results->count() < 3) {
+            $words = explode(' ', $normalizedQuery);
+            if (count($words) > 1) {
+                foreach ($words as $word) {
+                    if (strlen($word) >= 5 && !$this->isBlacklistedWord($word)) {
+                        $wordRegex = $this->createWordBoundaryRegex($word);
+                        
+                        $wordResults = Page::published()
+                            ->where(function($q) use ($wordRegex) {
+                                $q->where('title', 'REGEXP', $wordRegex)
+                                  ->orWhere('summary', 'REGEXP', $wordRegex);
+                            })
+                            ->get();
+                        
+                        $existingIds = $results->pluck('id')->toArray();
+                        $additionalResults = $wordResults->whereNotIn('id', $existingIds);
+                        $results = $results->merge($additionalResults);
+                    }
+                }
+            }
+        }
+        
+        return $results;
+    }
+    
+    /**
+     * Projelerde arama yap - İyileştirilmiş algoritma
      */
     private function searchProjects(string $normalizedQuery, string $originalQuery): Collection
     {
         $results = collect();
         
-        // Aktif projelerde LIKE ile arama (sadece başlık)
-        $likeResults = Project::where('is_active', true)
+        // Tam ifade arama
+        $exactResults = Project::where('is_active', true)
             ->where(function($q) use ($originalQuery, $normalizedQuery) {
                 $q->where('title', 'LIKE', "%{$originalQuery}%")
                   ->orWhere('title', 'LIKE', "%{$normalizedQuery}%");
@@ -347,16 +312,17 @@ class SearchService
             ->with('category')
             ->get();
         
-        $results = $results->merge($likeResults);
+        $results = $results->merge($exactResults);
         
-        // Kelime kelime arama (sadece başlık) - İyileştirilmiş
-        $words = explode(' ', $normalizedQuery);
-        if (count($words) > 1 && $results->count() < 5) {
+        // Kelime sınırları ile arama
+        if ($results->count() < 3) {
+            $words = explode(' ', $normalizedQuery);
             foreach ($words as $word) {
-                // Minimum 4 karakter ve blacklist kontrolü
-                if (strlen($word) >= 4 && !$this->isBlacklistedWord($word)) {
+                if (strlen($word) >= 5 && !$this->isBlacklistedWord($word)) {
+                    $wordRegex = $this->createWordBoundaryRegex($word);
+                    
                     $wordResults = Project::where('is_active', true)
-                        ->where('title', 'LIKE', "%{$word}%")
+                        ->where('title', 'REGEXP', $wordRegex)
                         ->with('category')
                         ->get();
                     
@@ -371,18 +337,14 @@ class SearchService
     }
     
     /**
-     * Rehber yerlerinde arama yap
-     * 
-     * @param string $normalizedQuery
-     * @param string $originalQuery
-     * @return Collection
+     * Rehber yerlerinde arama yap - İyileştirilmiş algoritma
      */
     private function searchGuides(string $normalizedQuery, string $originalQuery): Collection
     {
         $results = collect();
         
-        // Aktif rehber yerlerinde LIKE ile arama (sadece başlık)
-        $likeResults = GuidePlace::where('is_active', true)
+        // Tam ifade arama
+        $exactResults = GuidePlace::where('is_active', true)
             ->where(function($q) use ($originalQuery, $normalizedQuery) {
                 $q->where('title', 'LIKE', "%{$originalQuery}%")
                   ->orWhere('title', 'LIKE', "%{$normalizedQuery}%");
@@ -390,16 +352,17 @@ class SearchService
             ->with('category')
             ->get();
         
-        $results = $results->merge($likeResults);
+        $results = $results->merge($exactResults);
         
-        // Kelime kelime arama (sadece başlık) - İyileştirilmiş
-        $words = explode(' ', $normalizedQuery);
-        if (count($words) > 1 && $results->count() < 5) {
+        // Kelime sınırları ile arama
+        if ($results->count() < 3) {
+            $words = explode(' ', $normalizedQuery);
             foreach ($words as $word) {
-                // Minimum 4 karakter ve blacklist kontrolü
-                if (strlen($word) >= 4 && !$this->isBlacklistedWord($word)) {
+                if (strlen($word) >= 5 && !$this->isBlacklistedWord($word)) {
+                    $wordRegex = $this->createWordBoundaryRegex($word);
+                    
                     $wordResults = GuidePlace::where('is_active', true)
-                        ->where('title', 'LIKE', "%{$word}%")
+                        ->where('title', 'REGEXP', $wordRegex)
                         ->with('category')
                         ->get();
                     
@@ -414,34 +377,31 @@ class SearchService
     }
     
     /**
-     * Çankaya Evlerinde arama yap
-     * 
-     * @param string $normalizedQuery
-     * @param string $originalQuery
-     * @return Collection
+     * Çankaya Evlerinde arama yap - İyileştirilmiş algoritma
      */
     private function searchCankayaHouses(string $normalizedQuery, string $originalQuery): Collection
     {
         $results = collect();
         
-        // Aktif Çankaya Evlerinde LIKE ile arama (sadece isim)
-        $likeResults = CankayaHouse::where('status', 'active')
+        // Tam ifade arama
+        $exactResults = CankayaHouse::where('status', 'active')
             ->where(function($q) use ($originalQuery, $normalizedQuery) {
                 $q->where('name', 'LIKE', "%{$originalQuery}%")
                   ->orWhere('name', 'LIKE', "%{$normalizedQuery}%");
             })
             ->get();
         
-        $results = $results->merge($likeResults);
+        $results = $results->merge($exactResults);
         
-        // Kelime kelime arama (sadece isim) - İyileştirilmiş
-        $words = explode(' ', $normalizedQuery);
-        if (count($words) > 1 && $results->count() < 5) {
+        // Kelime sınırları ile arama
+        if ($results->count() < 3) {
+            $words = explode(' ', $normalizedQuery);
             foreach ($words as $word) {
-                // Minimum 4 karakter ve blacklist kontrolü
-                if (strlen($word) >= 4 && !$this->isBlacklistedWord($word)) {
+                if (strlen($word) >= 5 && !$this->isBlacklistedWord($word)) {
+                    $wordRegex = $this->createWordBoundaryRegex($word);
+                    
                     $wordResults = CankayaHouse::where('status', 'active')
-                        ->where('name', 'LIKE', "%{$word}%")
+                        ->where('name', 'REGEXP', $wordRegex)
                         ->get();
                     
                     $existingIds = $results->pluck('id')->toArray();
@@ -455,34 +415,31 @@ class SearchService
     }
     
     /**
-     * Müdürlüklerde arama yap
-     * 
-     * @param string $normalizedQuery
-     * @param string $originalQuery
-     * @return Collection
+     * Müdürlüklerde arama yap - İyileştirilmiş algoritma
      */
     private function searchMudurlukler(string $normalizedQuery, string $originalQuery): Collection
     {
         $results = collect();
         
-        // Aktif müdürlüklerde LIKE ile arama (sadece isim)
-        $likeResults = Mudurluk::where('is_active', true)
+        // Tam ifade arama
+        $exactResults = Mudurluk::where('is_active', true)
             ->where(function($q) use ($originalQuery, $normalizedQuery) {
                 $q->where('name', 'LIKE', "%{$originalQuery}%")
                   ->orWhere('name', 'LIKE', "%{$normalizedQuery}%");
             })
             ->get();
         
-        $results = $results->merge($likeResults);
+        $results = $results->merge($exactResults);
         
-        // Kelime kelime arama (sadece isim) - İyileştirilmiş
-        $words = explode(' ', $normalizedQuery);
-        if (count($words) > 1 && $results->count() < 5) {
+        // Kelime sınırları ile arama
+        if ($results->count() < 3) {
+            $words = explode(' ', $normalizedQuery);
             foreach ($words as $word) {
-                // Minimum 4 karakter ve blacklist kontrolü
-                if (strlen($word) >= 4 && !$this->isBlacklistedWord($word)) {
+                if (strlen($word) >= 5 && !$this->isBlacklistedWord($word)) {
+                    $wordRegex = $this->createWordBoundaryRegex($word);
+                    
                     $wordResults = Mudurluk::where('is_active', true)
-                        ->where('name', 'LIKE', "%{$word}%")
+                        ->where('name', 'REGEXP', $wordRegex)
                         ->get();
                     
                     $existingIds = $results->pluck('id')->toArray();
@@ -492,7 +449,7 @@ class SearchService
             }
         }
         
-        // Search settings kontrolü - müdürlük dosyalarında arama aktif mi?
+        // Müdürlük dosyalarında arama
         $searchSettings = \App\Models\SearchSetting::getSettings();
         if ($searchSettings->search_in_mudurluk_files) {
             $fileResults = $this->searchMudurlukFiles($normalizedQuery, $originalQuery);
@@ -501,12 +458,15 @@ class SearchService
         
         return $results;
     }
-
+    
+    /**
+     * Arşivlerde arama yap - İyileştirilmiş algoritma
+     */
     private function searchArchives(string $normalizedQuery, string $originalQuery): Collection
     {
         $results = collect();
         
-        // 1. Scout ile tam arama
+        // Scout ve tam ifade arama
         try {
             $scoutResults = Archive::search($normalizedQuery)
                 ->where('status', 'published')
@@ -516,8 +476,7 @@ class SearchService
             // Scout hatası durumunda devam et
         }
         
-        // 2. Veritabanında LIKE ile arama (sadece başlık)
-        $likeResults = Archive::where('status', 'published')
+        $exactResults = Archive::where('status', 'published')
             ->where(function($q) use ($originalQuery, $normalizedQuery) {
                 $q->where('title', 'LIKE', "%{$originalQuery}%")
                   ->orWhere('title', 'LIKE', "%{$normalizedQuery}%");
@@ -525,17 +484,18 @@ class SearchService
             ->get();
         
         $existingIds = $results->pluck('id')->toArray();
-        $additionalResults = $likeResults->whereNotIn('id', $existingIds);
+        $additionalResults = $exactResults->whereNotIn('id', $existingIds);
         $results = $results->merge($additionalResults);
         
-        // 3. Kelime kelime arama (sadece başlık) - İyileştirilmiş
-        $words = explode(' ', $normalizedQuery);
-        if (count($words) > 1 && $results->count() < 5) {
+        // Kelime sınırları ile arama
+        if ($results->count() < 3) {
+            $words = explode(' ', $normalizedQuery);
             foreach ($words as $word) {
-                // Minimum 4 karakter ve blacklist kontrolü
-                if (strlen($word) >= 4 && !$this->isBlacklistedWord($word)) {
+                if (strlen($word) >= 5 && !$this->isBlacklistedWord($word)) {
+                    $wordRegex = $this->createWordBoundaryRegex($word);
+                    
                     $wordResults = Archive::where('status', 'published')
-                        ->where('title', 'LIKE', "%{$word}%")
+                        ->where('title', 'REGEXP', $wordRegex)
                         ->get();
                     
                     $existingIds = $results->pluck('id')->toArray();
@@ -545,58 +505,18 @@ class SearchService
             }
         }
         
-        // 4. Fuzzy matching - sadece çok az sonuç varsa
-        if ($results->count() < 2) {
-            $fuzzyResults = $this->fuzzySearchArchives($normalizedQuery);
-            $existingIds = $results->pluck('id')->toArray();
-            $additionalResults = $fuzzyResults->whereNotIn('id', $existingIds);
-            $results = $results->merge($additionalResults);
-        }
-        
         return $results;
     }
     
     /**
-     * Arşivler için fuzzy search
-     * 
-     * @param string $query
-     * @return Collection
-     */
-    private function fuzzySearchArchives(string $query): Collection
-    {
-        $results = collect();
-        
-        $variations = $this->generateQueryVariations($query);
-        
-        foreach ($variations as $variation) {
-            $variationResults = Archive::where('status', 'published')
-                ->where('title', 'LIKE', "%{$variation}%")
-                ->limit(5)
-                ->get();
-            
-            $existingIds = $results->pluck('id')->toArray();
-            $additionalResults = $variationResults->whereNotIn('id', $existingIds);
-            $results = $results->merge($additionalResults);
-            
-            if ($results->count() >= 10) break;
-        }
-        
-        return $results;
-    }
-    
-    /**
-     * Müdürlük dosyalarında arama yap
-     * 
-     * @param string $normalizedQuery
-     * @param string $originalQuery
-     * @return Collection
+     * Müdürlük dosyalarında arama yap - İyileştirilmiş algoritma
      */
     private function searchMudurlukFiles(string $normalizedQuery, string $originalQuery): Collection
     {
         $results = collect();
         
         try {
-            // MudurlukFile tablosunda arama yap
+            // Tam ifade arama
             $fileResults = \App\Models\MudurlukFile::with('mudurluk')
                 ->whereHas('mudurluk', function($q) {
                     $q->where('is_active', true);
@@ -612,11 +532,8 @@ class SearchService
             // Dosya sonuçlarını özel format ile hazırla
             foreach ($fileResults as $file) {
                 if ($file->mudurluk) {
-                    // Dosya uzantısını al
                     $extension = strtoupper(pathinfo($file->file_name, PATHINFO_EXTENSION));
-                    $extensionText = $extension ? " ({$extension})" : '';
                     
-                    // Başlığı oluştur: "Müdürlük Adı - Dosya Adı"
                     $fileItem = (object)[
                         'id' => 'mudurluk_file_' . $file->id,
                         'type' => 'mudurluk_file',
@@ -635,56 +552,7 @@ class SearchService
                 }
             }
             
-            // Kelime kelime arama - İyileştirilmiş
-            $words = explode(' ', $normalizedQuery);
-            if (count($words) > 1 && $results->count() < 5) {
-                foreach ($words as $word) {
-                    // Minimum 4 karakter ve blacklist kontrolü
-                    if (strlen($word) >= 4 && !$this->isBlacklistedWord($word)) {
-                        $wordResults = \App\Models\MudurlukFile::with('mudurluk')
-                            ->whereHas('mudurluk', function($q) {
-                                $q->where('is_active', true);
-                            })
-                            ->where(function($q) use ($word) {
-                                $q->where('title', 'LIKE', "%{$word}%")
-                                  ->orWhere('file_name', 'LIKE', "%{$word}%");
-                            })
-                            ->get();
-                        
-                        $existingIds = $results->pluck('id')->toArray();
-                        
-                        foreach ($wordResults as $file) {
-                            if ($file->mudurluk) {
-                                $fileId = 'mudurluk_file_' . $file->id;
-                                
-                                if (!in_array($fileId, $existingIds)) {
-                                    $extension = strtoupper(pathinfo($file->file_name, PATHINFO_EXTENSION));
-                                    
-                                    $fileItem = (object)[
-                                        'id' => $fileId,
-                                        'type' => 'mudurluk_file',
-                                        'title' => $file->mudurluk->name . ' - ' . $file->title,
-                                        'url' => '/mudurlukler/' . $file->mudurluk->slug,
-                                        'description' => 'Müdürlük Dosyası: ' . $file->title,
-                                        'mudurluk_name' => $file->mudurluk->name,
-                                        'file_title' => $file->title,
-                                        'file_name' => $file->file_name,
-                                        'file_extension' => $extension,
-                                        'file_path' => $file->file_path,
-                                        'original_file' => $file
-                                    ];
-                                    
-                                    $results->push($fileItem);
-                                    $existingIds[] = $fileId;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            
         } catch (\Exception $e) {
-            // Hata durumunda log'la ama aramaya devam et
             \Log::error('Müdürlük dosyalarında arama hatası: ' . $e->getMessage());
         }
         
@@ -692,7 +560,7 @@ class SearchService
     }
     
     /**
-     * Blacklist'teki kelimeleri kontrol et
+     * İyileştirilmiş Blacklist - daha az kısıtlayıcı
      * 
      * @param string $word
      * @return bool
@@ -700,15 +568,21 @@ class SearchService
     private function isBlacklistedWord(string $word): bool
     {
         $blacklist = [
-            // 3 karakterlik yaygın kelimeler
-            'evi', 'ver', 'dev', 'bir', 'için', 'ile', 'den', 'dan', 'ten', 'tan',
-            // Alakasız olabilecek kelimeler
-            'alan', 'alani', 'yeri', 'devir', 'talep', 'talebi', 'islem', 'islemi',
-            'salon', 'salonu', 'merkez', 'merkezi', 'kultur', 'hizmet', 'hizmetler',
+            // Çok yaygın 3 karakterlik kelimeler
+            'bir', 'ile', 'den', 'dan', 'ten', 'tan', 'için', 'evi', 'ver', 'dev',
+            
+            // Çok genel 4+ karakterlik kelimeler (sadece çok sorunlu olanlar)
+            'olan', 'göre', 'daha', 'çok', 'tüm', 'her', 'genel', 'özel',
+            'büyük', 'küçük', 'yeni', 'eski', 'açık', 'kapalı',
+            
+            // Belediye genel terimleri (çok geniş sonuç verenler)
+            'hizmet', 'hizmetler', 'merkez', 'merkezi', 'alan', 'alani',
+            'belediye', 'belediyesi', 'müdür', 'müdürü', 'başkan', 'başkanı',
+            
             // İngilizce yaygın kelimeler
             'the', 'and', 'that', 'with', 'from', 'have', 'this', 'they'
         ];
         
         return in_array($word, $blacklist);
     }
-} 
+}

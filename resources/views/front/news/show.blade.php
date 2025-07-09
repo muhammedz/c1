@@ -797,23 +797,7 @@
         
         <!-- Yan Sütun -->
         <div class="news-sidebar">
-            <!-- Kategoriler -->
-            <div class="news-sidebar-section">
-                <div class="sidebar-header">
-                    <h3 class="sidebar-title">Kategoriler</h3>
-                </div>
-                <div class="sidebar-content">
-                    <div class="category-list">
-                        @php
-                            $categories = \App\Models\NewsCategory::where('is_active', true)->get();
-                        @endphp
-                        
-                        @foreach($categories as $category)
-                            <a href="{{ route('news.category', $category->slug) }}" class="category-item">{{ $category->name }}</a>
-                        @endforeach
-                    </div>
-                </div>
-            </div>
+
             
             <!-- Popüler Haberler -->
             <div class="news-sidebar-section">

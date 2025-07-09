@@ -140,6 +140,7 @@ class NewsCategoryController extends Controller
             'icon' => 'nullable|string|max:50',
             'description' => 'nullable|string',
             'parent_id' => 'nullable|exists:news_categories,id',
+            'order' => 'nullable|integer|min:0',
             'is_active' => 'boolean'
         ]);
         
