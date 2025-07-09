@@ -91,20 +91,53 @@ function applyDataTables($table) {
                 }
             },
             
-            // Mobil responsive ayarları
+            // Mobil responsive ayarları - daha iyi mobil deneyim
             responsive: {
                 details: {
-                    type: 'column',
-                    target: 'tr'
-                }
+                    type: 'inline',
+                    target: 'tr',
+                    renderer: function (api, rowIdx, columns) {
+                        var data = $.map(columns, function (col, i) {
+                            return col.hidden ?
+                                '<div class="mobile-detail-row">' +
+                                '<span class="mobile-detail-title">' + col.title + ':</span> ' +
+                                '<span class="mobile-detail-data">' + col.data + '</span>' +
+                                '</div>' :
+                                '';
+                        }).join('');
+                        
+                        return data ? 
+                            '<div class="mobile-details-container">' + data + '</div>' : 
+                            false;
+                    }
+                },
+                breakpoints: [
+                    { name: 'bigdesktop', width: Infinity },
+                    { name: 'meddesktop', width: 1480 },
+                    { name: 'smalldesktop', width: 1280 },
+                    { name: 'medium', width: 1024 },
+                    { name: 'tablet', width: 768 },
+                    { name: 'fablet', width: 480 },
+                    { name: 'phone', width: 320 }
+                ]
             },
             
-            // Sütun tanımları
+            // Sütun tanımları - mobil için optimize
             columnDefs: [
                 {
-                    className: 'dtr-control',
-                    orderable: false,
+                    // İlk sütunu mobile-first yapmak için
+                    className: 'all',
                     targets: 0
+                },
+                {
+                    // Diğer sütunlar için responsive sınıflar
+                    className: 'tablet-l',
+                    targets: [1, 2]
+                },
+                {
+                    // En az önemli sütunlar sadece desktop'ta
+                    className: 'desktop',
+                    targets: '_all'
                 }
             ],
             
@@ -148,22 +181,82 @@ function applyCustomStyling($table) {
  * Mobil Optimizasyon
  */
 function optimizeForMobile($table) {
+    const $wrapper = $table.closest('.dataTables_wrapper');
+    
     if ($(window).width() <= 768) {
-        const $wrapper = $table.closest('.dataTables_wrapper');
+        // Mobil görünüm için class ekle
+        $wrapper.addClass('mobile-view');
         
         // Mobil için filter ve length'i üst üste diz
-        $wrapper.find('.dataTables_length, .dataTables_filter').parent().removeClass('col-md-6').addClass('col-12');
+        $wrapper.find('.dataTables_length, .dataTables_filter').parent()
+            .removeClass('col-md-6')
+            .addClass('col-12 mb-3');
         
         // Info ve pagination'ı da üst üste diz
-        $wrapper.find('.dataTables_info, .dataTables_paginate').parent().removeClass('col-md-5 col-md-7').addClass('col-12');
+        $wrapper.find('.dataTables_info, .dataTables_paginate').parent()
+            .removeClass('col-md-5 col-md-7')
+            .addClass('col-12');
+        
+        // Info'yu merkeze al
+        $wrapper.find('.dataTables_info').addClass('text-center mb-3');
+        
+        // Pagination'ı merkeze al
+        $wrapper.find('.dataTables_paginate').addClass('text-center');
+        
+        // Length select'i küçült
+        $wrapper.find('.dataTables_length select').addClass('form-select-sm');
+        
+        // Search input'u tam genişlik yap
+        $wrapper.find('.dataTables_filter input').addClass('w-100');
+        
+        // Tablo wrapper'ına scroll indicator ekle
+        if (!$wrapper.find('.scroll-indicator').length) {
+            $wrapper.prepend('<div class="scroll-indicator">← Kaydırarak daha fazla sütun görebilirsiniz →</div>');
+        }
+        
+    } else {
+        // Desktop görünümü geri yükle
+        $wrapper.removeClass('mobile-view');
+        $wrapper.find('.scroll-indicator').remove();
+        
+        // Desktop layout'u geri yükle
+        $wrapper.find('.dataTables_length').parent()
+            .removeClass('col-12 mb-3')
+            .addClass('col-md-6');
+        
+        $wrapper.find('.dataTables_filter').parent()
+            .removeClass('col-12 mb-3')
+            .addClass('col-md-6');
+        
+        $wrapper.find('.dataTables_info').parent()
+            .removeClass('col-12')
+            .addClass('col-md-5')
+            .find('.dataTables_info')
+            .removeClass('text-center mb-3');
+        
+        $wrapper.find('.dataTables_paginate').parent()
+            .removeClass('col-12')
+            .addClass('col-md-7')
+            .find('.dataTables_paginate')
+            .removeClass('text-center');
     }
 }
 
 /**
- * Window resize event'i dinle
+ * Window resize event'i dinle - throttle ile optimize edilmiş
  */
+let resizeTimeout;
 $(window).on('resize', function() {
-    $('.dataTables_wrapper table').each(function() {
-        optimizeForMobile($(this));
-    });
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(function() {
+        $('.dataTables_wrapper table').each(function() {
+            const $table = $(this);
+            optimizeForMobile($table);
+            
+            // DataTable varsa responsive recalculation yap
+            if ($.fn.DataTable && $.fn.DataTable.isDataTable($table)) {
+                $table.DataTable().columns.adjust().responsive.recalc();
+            }
+        });
+    }, 150);
 }); 

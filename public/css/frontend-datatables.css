@@ -219,87 +219,271 @@
    MOBİL RESPONSIVE STİLLER
    ======================================== */
 
+/* Scroll Indicator */
+.scroll-indicator {
+    background: linear-gradient(135deg, #e3f2fd 0%, #f8f9fa 100%);
+    border: 1px solid #2196f3;
+    border-radius: 8px;
+    padding: 8px 12px;
+    margin-bottom: 15px;
+    font-size: 12px;
+    color: #1976d2;
+    text-align: center;
+    font-weight: 500;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+/* Mobile View Specific Styles */
+.frontend-datatable.mobile-view {
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Mobile Detail Rows */
+.mobile-details-container {
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    padding: 15px;
+    margin: 10px 0;
+    border-left: 4px solid #00352b;
+}
+
+.mobile-detail-row {
+    display: flex;
+    padding: 8px 0;
+    border-bottom: 1px solid #e9ecef;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.mobile-detail-row:last-child {
+    border-bottom: none;
+}
+
+.mobile-detail-title {
+    font-weight: 600;
+    color: #00352b;
+    min-width: 80px;
+    flex-shrink: 0;
+    font-size: 12px;
+}
+
+.mobile-detail-data {
+    color: #495057;
+    flex: 1;
+    word-wrap: break-word;
+    font-size: 12px;
+    line-height: 1.4;
+}
+
 @media (max-width: 768px) {
-    .frontend-datatable .dataTables_length,
-    .frontend-datatable .dataTables_filter {
-        margin-bottom: 10px;
+    /* Wrapper optimizasyonları */
+    .frontend-datatable .dataTables_wrapper {
+        padding: 15px;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     }
     
-    .frontend-datatable .dataTables_length label,
+    /* Top controls */
+    .frontend-datatable .dataTables_length,
+    .frontend-datatable .dataTables_filter {
+        margin-bottom: 15px;
+    }
+    
+    .frontend-datatable .dataTables_length label {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 14px;
+        font-weight: 500;
+        color: #495057;
+        flex-wrap: wrap;
+    }
+    
     .frontend-datatable .dataTables_filter label {
-        display: block;
-        text-align: left;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        font-size: 14px;
+        font-weight: 500;
+        color: #495057;
     }
     
     .frontend-datatable .dataTables_filter input {
-        min-width: 100%;
-        margin-left: 0;
-        margin-top: 5px;
+        padding: 12px 16px;
+        border: 2px solid #e9ecef;
+        border-radius: 8px;
+        font-size: 14px;
+        width: 100%;
+        transition: border-color 0.3s ease;
     }
     
-    .frontend-datatable table.dataTable thead th {
-        padding: 10px 8px;
-        font-size: 12px;
+    .frontend-datatable .dataTables_filter input:focus {
+        border-color: #00352b;
+        box-shadow: 0 0 0 3px rgba(0, 53, 43, 0.1);
     }
     
-    .frontend-datatable table.dataTable tbody td {
-        padding: 10px 8px;
-        font-size: 12px;
-    }
-    
-    .frontend-datatable .dataTables_info {
-        text-align: center;
-        font-size: 12px;
-        padding-top: 10px;
-        margin-bottom: 10px;
-    }
-    
-    .frontend-datatable .dataTables_paginate {
-        text-align: center;
-        padding-top: 10px;
-    }
-    
-    .frontend-datatable .dataTables_paginate .paginate_button {
-        padding: 6px 10px;
-        margin: 0 1px;
-        font-size: 12px;
-    }
-}
-
-@media (max-width: 480px) {
-    .datatable-wrapper {
-        margin: 15px -15px;
-    }
-    
-    .frontend-datatable {
-        border-radius: 0;
+    /* Table styles */
+    .frontend-datatable table.dataTable {
+        font-size: 13px;
         margin: 0;
     }
     
     .frontend-datatable table.dataTable thead th {
+        padding: 12px 8px;
+        font-size: 12px;
+        background: linear-gradient(135deg, #00352b 0%, #20846c 100%);
+        white-space: nowrap;
+    }
+    
+    .frontend-datatable table.dataTable tbody td {
+        padding: 12px 8px;
+        font-size: 13px;
+        line-height: 1.4;
+        vertical-align: top;
+    }
+    
+    /* Row hover effect */
+    .frontend-datatable table.dataTable tbody tr:hover {
+        background-color: rgba(0, 53, 43, 0.05);
+        transform: scale(1.01);
+        transition: all 0.2s ease;
+    }
+    
+    /* Info styling */
+    .frontend-datatable .dataTables_info {
+        background: #f8f9fa;
+        padding: 12px;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 500;
+        color: #495057;
+        margin: 15px 0;
+        border-left: 4px solid #00352b;
+    }
+    
+    /* Pagination styling */
+    .frontend-datatable .dataTables_paginate {
+        padding: 15px 0;
+    }
+    
+    .frontend-datatable .dataTables_paginate .paginate_button {
+        padding: 10px 12px;
+        margin: 0 3px;
+        font-size: 13px;
+        font-weight: 500;
+        border-radius: 8px;
+        background: white;
+        border: 2px solid #e9ecef;
+        color: #495057;
+        transition: all 0.3s ease;
+    }
+    
+    .frontend-datatable .dataTables_paginate .paginate_button:hover {
+        background: #00352b;
+        border-color: #00352b;
+        color: white;
+        transform: translateY(-1px);
+    }
+    
+    .frontend-datatable .dataTables_paginate .paginate_button.current {
+        background: #00352b;
+        border-color: #00352b;
+        color: white;
+        box-shadow: 0 2px 4px rgba(0, 53, 43, 0.3);
+    }
+}
+
+/* ========================================
+   KÜÇÜK MOBİL CİHAZLAR İÇİN EKSTRA OPTİMİZASYON
+   ======================================== */
+
+@media (max-width: 480px) {
+    .frontend-datatable .dataTables_wrapper {
+        padding: 10px;
+    }
+    
+    .frontend-datatable .dataTables_length label,
+    .frontend-datatable .dataTables_filter label {
+        font-size: 13px;
+    }
+    
+    .frontend-datatable .dataTables_filter input {
+        padding: 10px 12px;
+        font-size: 13px;
+    }
+    
+    .frontend-datatable table.dataTable thead th {
         padding: 8px 6px;
         font-size: 11px;
     }
     
     .frontend-datatable table.dataTable tbody td {
         padding: 8px 6px;
-        font-size: 11px;
-    }
-    
-    .frontend-datatable .dataTables_filter input {
         font-size: 12px;
-        padding: 6px 10px;
-    }
-    
-    .frontend-datatable .dataTables_length select {
-        font-size: 12px;
-        padding: 4px 8px;
-        min-width: 60px;
     }
     
     .frontend-datatable .dataTables_paginate .paginate_button {
-        padding: 4px 8px;
+        padding: 8px 10px;
+        font-size: 12px;
+        margin: 0 2px;
+    }
+    
+    .frontend-datatable .dataTables_info {
+        font-size: 12px;
+        padding: 10px;
+    }
+    
+    .scroll-indicator {
         font-size: 11px;
+        padding: 6px 10px;
+    }
+    
+    .mobile-detail-title {
+        min-width: 70px;
+        font-size: 11px;
+    }
+    
+    .mobile-detail-data {
+        font-size: 11px;
+    }
+}
+
+/* ========================================
+   ÇOOK KÜÇÜK EKRANLAR (iPhone SE, vb.)
+   ======================================== */
+
+@media (max-width: 375px) {
+    .frontend-datatable table.dataTable thead th {
+        padding: 6px 4px;
+        font-size: 10px;
+    }
+    
+    .frontend-datatable table.dataTable tbody td {
+        padding: 6px 4px;
+        font-size: 11px;
+    }
+    
+    .frontend-datatable .dataTables_paginate .paginate_button {
+        padding: 6px 8px;
+        font-size: 11px;
+        margin: 0 1px;
+    }
+    
+    .mobile-detail-title {
+        min-width: 60px;
+        font-size: 10px;
+    }
+    
+    .mobile-detail-data {
+        font-size: 10px;
     }
 }
 
@@ -335,7 +519,7 @@
 }
 
 /* ========================================
-   SCROLL AREAS
+   UTILITY CLASSES
    ======================================== */
 
 .frontend-datatable .dataTables_scrollBody {
@@ -346,10 +530,6 @@
     border-radius: 8px 8px 0 0;
     overflow: hidden;
 }
-
-/* ========================================
-   CUSTOM UTILITY CLASSES
-   ======================================== */
 
 .frontend-datatable .text-center {
     text-align: center !important;
@@ -368,4 +548,4 @@
     text-overflow: ellipsis;
     white-space: nowrap;
     max-width: 200px;
-} 
+}
