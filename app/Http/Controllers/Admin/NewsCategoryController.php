@@ -6,24 +6,24 @@ use App\Http\Controllers\Controller;
 use App\Models\NewsCategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
-use Illuminate\Support\Facades\DB;
 
 class NewsCategoryController extends Controller
 {
     /**
-     * Haber Kategorileri listesi
+     * Haber kategorileri listesi
      */
     public function index()
     {
         $newsCategories = NewsCategory::with('parent')
-            ->orderBy('order')
-            ->paginate(20);
+            ->orderBy('order', 'asc')
+            ->orderBy('name', 'asc')
+            ->get();
             
         return view('admin.news-categories.index', compact('newsCategories'));
     }
     
     /**
-     * Yeni haber kategorisi oluşturma formu
+     * Haber kategorisi ekleme formu
      */
     public function create()
     {
@@ -32,12 +32,12 @@ class NewsCategoryController extends Controller
     }
     
     /**
-     * Haber kategorisi kaydetme
+     * Haber kategorisi ekleme
      */
     public function store(Request $request)
     {
-        \Illuminate\Support\Facades\Log::info('Haber kategorisi eklenmeye çalışılıyor - BAŞLANGIÇ', [
-            'http_method' => $request->method(),
+        \Illuminate\Support\Facades\Log::info('NewsCategoryController@store başladı', [
+            'method' => $request->method(),
             'url' => $request->url(),
             'is_ajax' => $request->ajax(),
             'all_input' => $request->all(),
@@ -131,58 +131,121 @@ class NewsCategoryController extends Controller
     }
     
     /**
-     * Haber kategorisi güncelleme
+     * Haber kategorisi güncelleme - DEBUG EKLENMIŞ
      */
     public function update(Request $request, NewsCategory $newsCategory)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'icon' => 'nullable|string|max:50',
-            'description' => 'nullable|string',
-            'parent_id' => 'nullable|exists:news_categories,id',
-            'order' => 'nullable|integer|min:0',
-            'is_active' => 'boolean'
+        \Illuminate\Support\Facades\Log::info('NewsCategoryController@update başladı', [
+            'category_id' => $newsCategory->id,
+            'category_name' => $newsCategory->name,
+            'method' => $request->method(),
+            'url' => $request->url(),
+            'all_input' => $request->all(),
+            'has_csrf' => $request->has('_token'),
         ]);
         
-        // Kendisini parent olarak seçmeyi engelle
-        if ($request->parent_id == $newsCategory->id) {
-            return redirect()->back()
-                ->withInput()
-                ->with('error', 'Bir haber kategorisi kendisini üst kategori olarak seçemez.');
-        }
-        
-        // Alt kategorileri kendisine parent olarak seçmeyi engelle
-        $childIds = $this->getAllChildIds($newsCategory);
-        if ($request->parent_id && in_array($request->parent_id, $childIds)) {
-            return redirect()->back()
-                ->withInput()
-                ->with('error', 'Bir alt haber kategorisi, üst kategori olarak seçilemez.');
-        }
-        
-        // Slug kontrolü
-        $newSlug = Str::slug($request->name);
-        $existingCategory = NewsCategory::where('slug', $newSlug)
-            ->where('id', '!=', $newsCategory->id)
-            ->first();
+        try {
+            // Validasyon
+            $validatedData = $request->validate([
+                'name' => 'required|string|max:255',
+                'icon' => 'nullable|string|max:50',
+                'description' => 'nullable|string',
+                'parent_id' => 'nullable|exists:news_categories,id',
+                'order' => 'nullable|integer|min:0',
+                'is_active' => 'boolean'
+            ]);
             
-        if ($existingCategory) {
+            \Illuminate\Support\Facades\Log::info('Update validasyon başarılı', ['validated_data' => $validatedData]);
+            
+            // Kendisini parent olarak seçmeyi engelle
+            if ($request->parent_id == $newsCategory->id) {
+                \Illuminate\Support\Facades\Log::warning('Kendini parent olarak seçme denemesi', [
+                    'category_id' => $newsCategory->id,
+                    'parent_id' => $request->parent_id
+                ]);
+                return redirect()->back()
+                    ->withInput()
+                    ->with('error', 'Bir haber kategorisi kendisini üst kategori olarak seçemez.');
+            }
+            
+            // Alt kategorileri kendisine parent olarak seçmeyi engelle
+            $childIds = $this->getAllChildIds($newsCategory);
+            if ($request->parent_id && in_array($request->parent_id, $childIds)) {
+                \Illuminate\Support\Facades\Log::warning('Alt kategoriyi parent olarak seçme denemesi', [
+                    'category_id' => $newsCategory->id,
+                    'parent_id' => $request->parent_id,
+                    'child_ids' => $childIds
+                ]);
+                return redirect()->back()
+                    ->withInput()
+                    ->with('error', 'Bir alt haber kategorisi, üst kategori olarak seçilemez.');
+            }
+            
+            // Slug kontrolü
+            $newSlug = Str::slug($request->name);
+            $existingCategory = NewsCategory::where('slug', $newSlug)
+                ->where('id', '!=', $newsCategory->id)
+                ->first();
+                
+            if ($existingCategory) {
+                \Illuminate\Support\Facades\Log::warning('Aynı slug ile başka kategori mevcut', [
+                    'new_slug' => $newSlug,
+                    'existing_category_id' => $existingCategory->id,
+                    'existing_category_name' => $existingCategory->name
+                ]);
+                return redirect()->back()
+                    ->withInput()
+                    ->with('error', 'Bu isme sahip başka bir haber kategorisi zaten mevcut. Lütfen farklı bir isim seçin.');
+            }
+            
+            // Güncelleme verileri hazırla
+            $updateData = [
+                'name' => $request->name,
+                'slug' => $newSlug,
+                'icon' => $request->icon,
+                'description' => $request->description,
+                'parent_id' => $request->parent_id,
+                'order' => $request->order ?? 0,
+                'is_active' => $request->has('is_active')
+            ];
+            
+            \Illuminate\Support\Facades\Log::info('Update verileri hazırlandı', [
+                'update_data' => $updateData,
+                'old_data' => $newsCategory->toArray()
+            ]);
+            
+            // Güncelleme işlemi
+            $updateResult = $newsCategory->update($updateData);
+            
+            \Illuminate\Support\Facades\Log::info('Update işlemi tamamlandı', [
+                'update_result' => $updateResult,
+                'new_data' => $newsCategory->fresh()->toArray()
+            ]);
+            
+            return redirect()->route('admin.news-categories.index')
+                ->with('success', 'Haber kategorisi başarıyla güncellendi.');
+                
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            \Illuminate\Support\Facades\Log::error('Update validasyon hatası', [
+                'category_id' => $newsCategory->id,
+                'errors' => $e->errors(),
+                'input' => $request->all()
+            ]);
+            
+            throw $e;
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Update sırasında hata oluştu', [
+                'category_id' => $newsCategory->id,
+                'error' => $e->getMessage(),
+                'class' => get_class($e),
+                'trace' => $e->getTraceAsString(),
+                'input' => $request->all()
+            ]);
+            
             return redirect()->back()
                 ->withInput()
-                ->with('error', 'Bu isme sahip başka bir haber kategorisi zaten mevcut. Lütfen farklı bir isim seçin.');
+                ->with('error', 'Haber kategorisi güncellenirken bir hata oluştu: ' . $e->getMessage());
         }
-        
-        $newsCategory->update([
-            'name' => $request->name,
-            'slug' => $newSlug,
-            'icon' => $request->icon,
-            'description' => $request->description,
-            'parent_id' => $request->parent_id,
-            'order' => $request->order ?? 0,
-            'is_active' => $request->has('is_active')
-        ]);
-        
-        return redirect()->route('admin.news-categories.index')
-            ->with('success', 'Haber kategorisi başarıyla güncellendi.');
     }
     
     /**
@@ -237,4 +300,4 @@ class NewsCategoryController extends Controller
         
         return $ids;
     }
-} 
+}
