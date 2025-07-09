@@ -45,14 +45,15 @@ function applyDataTables($table) {
         
         // DataTables'ı başlat
         $table.DataTable({
-            // Responsive özellikler
-            responsive: true,
+            // Table width and layout
             autoWidth: false,
             
-            // Sayfalama
-            paging: true,
-            pageLength: 10,
-            lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "Tümü"]],
+            // Vertical Scrolling - mobilde de aynı görünüm
+            scrollY: $(window).width() <= 768 ? '40vh' : '50vh',
+            scrollCollapse: true,
+            
+            // Sayfalama kapalı - scroll kullanacağız
+            paging: false,
             
             // Arama
             searching: true,
@@ -63,93 +64,38 @@ function applyDataTables($table) {
             // Bilgi göstergesi
             info: true,
             
-            // DOM yapısı - mobil uyumlu
-            dom: '<"row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"f>>' +
-                 '<"row"<"col-sm-12"t>>' +
-                 '<"row"<"col-sm-12 col-md-5"i><"col-sm-12 col-md-7"p>>',
+            // DOM yapısı - basit layout
+            dom: '<"row"<"col-sm-12 col-md-6"f><"col-sm-12 col-md-6 text-end"i>>' +
+                 '<"row"<"col-sm-12"t>>',
             
             // Türkçe dil desteği
             language: {
                 "emptyTable": "Tabloda herhangi bir veri mevcut değil",
-                "info": "_TOTAL_ kayıttan _START_ - _END_ arasındaki kayıtlar gösteriliyor",
+                "info": "_TOTAL_ kayıt gösteriliyor",
                 "infoEmpty": "Kayıt yok",
                 "infoFiltered": "(_MAX_ kayıt içerisinden bulunan)",
-                "lengthMenu": "Sayfada _MENU_ kayıt göster",
                 "loadingRecords": "Yükleniyor...",
                 "processing": "İşleniyor...",
-                "search": "Ara:",
+                "search": "Tabloda ara:",
+                "searchPlaceholder": "Arama yapın...",
                 "zeroRecords": "Eşleşen kayıt bulunamadı",
-                "paginate": {
-                    "first": "İlk",
-                    "last": "Son",
-                    "next": "Sonraki",
-                    "previous": "Önceki"
-                },
                 "aria": {
                     "sortAscending": ": artan sütun sıralamasını aktifleştir",
                     "sortDescending": ": azalan sütun sıralamasını aktifleştir"
                 }
             },
             
-            // Mobil responsive ayarları - daha iyi mobil deneyim
-            responsive: {
-                details: {
-                    type: 'inline',
-                    target: 'tr',
-                    renderer: function (api, rowIdx, columns) {
-                        var data = $.map(columns, function (col, i) {
-                            return col.hidden ?
-                                '<div class="mobile-detail-row">' +
-                                '<span class="mobile-detail-title">' + col.title + ':</span> ' +
-                                '<span class="mobile-detail-data">' + col.data + '</span>' +
-                                '</div>' :
-                                '';
-                        }).join('');
-                        
-                        return data ? 
-                            '<div class="mobile-details-container">' + data + '</div>' : 
-                            false;
-                    }
-                },
-                breakpoints: [
-                    { name: 'bigdesktop', width: Infinity },
-                    { name: 'meddesktop', width: 1480 },
-                    { name: 'smalldesktop', width: 1280 },
-                    { name: 'medium', width: 1024 },
-                    { name: 'tablet', width: 768 },
-                    { name: 'fablet', width: 480 },
-                    { name: 'phone', width: 320 }
-                ]
-            },
-            
-            // Sütun tanımları - mobil için optimize
-            columnDefs: [
-                {
-                    // İlk sütunu mobile-first yapmak için
-                    className: 'all',
-                    targets: 0
-                },
-                {
-                    // Diğer sütunlar için responsive sınıflar
-                    className: 'tablet-l',
-                    targets: [1, 2]
-                },
-                {
-                    // En az önemli sütunlar sadece desktop'ta
-                    className: 'desktop',
-                    targets: '_all'
-                }
-            ],
-            
             // Callback fonksiyonları
             initComplete: function() {
                 // DataTables başlatıldıktan sonra custom styling uygula
                 applyCustomStyling($table);
+                // Scroll container optimizasyonu
+                optimizeScrollContainer($table);
             },
             
             drawCallback: function() {
-                // Her çizim sonrası mobil optimizasyonu
-                optimizeForMobile($table);
+                // Her çizim sonrası scroll optimizasyonu
+                optimizeScrollContainer($table);
             }
         });
         
@@ -170,75 +116,66 @@ function applyCustomStyling($table) {
     // Search input'a placeholder ekle
     $wrapper.find('input[type="search"]').attr('placeholder', 'Tabloda ara...');
     
-    // Length select'e responsive class ekle
-    $wrapper.find('select').addClass('form-select form-select-sm');
+    // Search input styling
+    $wrapper.find('input[type="search"]').addClass('form-control');
     
-    // Pagination'a custom class ekle
-    $wrapper.find('.paginate_button').addClass('btn btn-sm');
+    // Info container styling
+    $wrapper.find('.dataTables_info').addClass('small text-muted');
 }
 
 /**
- * Mobil Optimizasyon
+ * Scroll Container Optimizasyonu
  */
-function optimizeForMobile($table) {
+function optimizeScrollContainer($table) {
     const $wrapper = $table.closest('.dataTables_wrapper');
+    const isMobile = $(window).width() <= 768;
     
-    if ($(window).width() <= 768) {
+    if (isMobile) {
         // Mobil görünüm için class ekle
-        $wrapper.addClass('mobile-view');
+        $wrapper.addClass('mobile-scroll-view');
         
-        // Mobil için filter ve length'i üst üste diz
-        $wrapper.find('.dataTables_length, .dataTables_filter').parent()
+        // Mobil için controls'ı üst üste diz
+        $wrapper.find('.dataTables_filter').parent()
             .removeClass('col-md-6')
             .addClass('col-12 mb-3');
         
-        // Info ve pagination'ı da üst üste diz
-        $wrapper.find('.dataTables_info, .dataTables_paginate').parent()
-            .removeClass('col-md-5 col-md-7')
-            .addClass('col-12');
-        
-        // Info'yu merkeze al
-        $wrapper.find('.dataTables_info').addClass('text-center mb-3');
-        
-        // Pagination'ı merkeze al
-        $wrapper.find('.dataTables_paginate').addClass('text-center');
-        
-        // Length select'i küçült
-        $wrapper.find('.dataTables_length select').addClass('form-select-sm');
+        $wrapper.find('.dataTables_info').parent()
+            .removeClass('col-md-6 text-end')
+            .addClass('col-12 text-center');
         
         // Search input'u tam genişlik yap
         $wrapper.find('.dataTables_filter input').addClass('w-100');
         
-        // Tablo wrapper'ına scroll indicator ekle
-        if (!$wrapper.find('.scroll-indicator').length) {
-            $wrapper.prepend('<div class="scroll-indicator">← Kaydırarak daha fazla sütun görebilirsiniz →</div>');
+        // Scroll hint ekle
+        if (!$wrapper.find('.scroll-hint').length) {
+            $wrapper.find('.dataTables_scrollBody').before(
+                '<div class="scroll-hint">↔ Yatay kaydırarak tüm sütunları görebilirsiniz</div>'
+            );
         }
+        
+        // Scroll body styling
+        const $scrollBody = $wrapper.find('.dataTables_scrollBody');
+        $scrollBody.css({
+            'border': '1px solid #dee2e6',
+            'border-radius': '8px',
+            'background': 'white'
+        });
         
     } else {
         // Desktop görünümü geri yükle
-        $wrapper.removeClass('mobile-view');
-        $wrapper.find('.scroll-indicator').remove();
+        $wrapper.removeClass('mobile-scroll-view');
+        $wrapper.find('.scroll-hint').remove();
         
         // Desktop layout'u geri yükle
-        $wrapper.find('.dataTables_length').parent()
-            .removeClass('col-12 mb-3')
-            .addClass('col-md-6');
-        
         $wrapper.find('.dataTables_filter').parent()
             .removeClass('col-12 mb-3')
             .addClass('col-md-6');
         
         $wrapper.find('.dataTables_info').parent()
-            .removeClass('col-12')
-            .addClass('col-md-5')
-            .find('.dataTables_info')
-            .removeClass('text-center mb-3');
-        
-        $wrapper.find('.dataTables_paginate').parent()
-            .removeClass('col-12')
-            .addClass('col-md-7')
-            .find('.dataTables_paginate')
-            .removeClass('text-center');
+            .removeClass('col-12 text-center')
+            .addClass('col-md-6 text-end');
+            
+        $wrapper.find('.dataTables_filter input').removeClass('w-100');
     }
 }
 
@@ -251,11 +188,13 @@ $(window).on('resize', function() {
     resizeTimeout = setTimeout(function() {
         $('.dataTables_wrapper table').each(function() {
             const $table = $(this);
-            optimizeForMobile($table);
+            optimizeScrollContainer($table);
             
-            // DataTable varsa responsive recalculation yap
+            // DataTable varsa scroll height'ı güncelle
             if ($.fn.DataTable && $.fn.DataTable.isDataTable($table)) {
-                $table.DataTable().columns.adjust().responsive.recalc();
+                const newScrollY = $(window).width() <= 768 ? '40vh' : '50vh';
+                $table.DataTable().settings()[0].oScroll.sY = newScrollY;
+                $table.DataTable().columns.adjust().draw();
             }
         });
     }, 150);
