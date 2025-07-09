@@ -116,11 +116,12 @@ class SearchService
         $additionalResults = $likeResults->whereNotIn('id', $existingIds);
         $results = $results->merge($additionalResults);
         
-        // 3. Kelime kelime arama (sadece başlık)
+        // 3. Kelime kelime arama (sadece başlık) - İyileştirilmiş
         $words = explode(' ', $normalizedQuery);
-        if (count($words) > 1) {
+        if (count($words) > 1 && $results->count() < 5) {
             foreach ($words as $word) {
-                if (strlen($word) > 2) {
+                // Minimum 4 karakter ve blacklist kontrolü
+                if (strlen($word) >= 4 && !$this->isBlacklistedWord($word)) {
                     $wordResults = Service::where('status', 'published')
                         ->where('title', 'LIKE', "%{$word}%")
                         ->get();
@@ -176,11 +177,12 @@ class SearchService
         $additionalResults = $likeResults->whereNotIn('id', $existingIds);
         $results = $results->merge($additionalResults);
         
-        // 3. Kelime kelime arama (sadece başlık)
+        // 3. Kelime kelime arama (sadece başlık) - İyileştirilmiş
         $words = explode(' ', $normalizedQuery);
-        if (count($words) > 1) {
+        if (count($words) > 1 && $results->count() < 5) {
             foreach ($words as $word) {
-                if (strlen($word) > 2) {
+                // Minimum 4 karakter ve blacklist kontrolü
+                if (strlen($word) >= 4 && !$this->isBlacklistedWord($word)) {
                     $wordResults = News::where('status', 'published')
                         ->where('title', 'LIKE', "%{$word}%")
                         ->get();
@@ -347,11 +349,12 @@ class SearchService
         
         $results = $results->merge($likeResults);
         
-        // Kelime kelime arama (sadece başlık)
+        // Kelime kelime arama (sadece başlık) - İyileştirilmiş
         $words = explode(' ', $normalizedQuery);
-        if (count($words) > 1) {
+        if (count($words) > 1 && $results->count() < 5) {
             foreach ($words as $word) {
-                if (strlen($word) > 2) {
+                // Minimum 4 karakter ve blacklist kontrolü
+                if (strlen($word) >= 4 && !$this->isBlacklistedWord($word)) {
                     $wordResults = Project::where('is_active', true)
                         ->where('title', 'LIKE', "%{$word}%")
                         ->with('category')
@@ -389,11 +392,12 @@ class SearchService
         
         $results = $results->merge($likeResults);
         
-        // Kelime kelime arama (sadece başlık)
+        // Kelime kelime arama (sadece başlık) - İyileştirilmiş
         $words = explode(' ', $normalizedQuery);
-        if (count($words) > 1) {
+        if (count($words) > 1 && $results->count() < 5) {
             foreach ($words as $word) {
-                if (strlen($word) > 2) {
+                // Minimum 4 karakter ve blacklist kontrolü
+                if (strlen($word) >= 4 && !$this->isBlacklistedWord($word)) {
                     $wordResults = GuidePlace::where('is_active', true)
                         ->where('title', 'LIKE', "%{$word}%")
                         ->with('category')
@@ -430,11 +434,12 @@ class SearchService
         
         $results = $results->merge($likeResults);
         
-        // Kelime kelime arama (sadece isim)
+        // Kelime kelime arama (sadece isim) - İyileştirilmiş
         $words = explode(' ', $normalizedQuery);
-        if (count($words) > 1) {
+        if (count($words) > 1 && $results->count() < 5) {
             foreach ($words as $word) {
-                if (strlen($word) > 2) {
+                // Minimum 4 karakter ve blacklist kontrolü
+                if (strlen($word) >= 4 && !$this->isBlacklistedWord($word)) {
                     $wordResults = CankayaHouse::where('status', 'active')
                         ->where('name', 'LIKE', "%{$word}%")
                         ->get();
@@ -470,11 +475,12 @@ class SearchService
         
         $results = $results->merge($likeResults);
         
-        // Kelime kelime arama (sadece isim)
+        // Kelime kelime arama (sadece isim) - İyileştirilmiş
         $words = explode(' ', $normalizedQuery);
-        if (count($words) > 1) {
+        if (count($words) > 1 && $results->count() < 5) {
             foreach ($words as $word) {
-                if (strlen($word) > 2) {
+                // Minimum 4 karakter ve blacklist kontrolü
+                if (strlen($word) >= 4 && !$this->isBlacklistedWord($word)) {
                     $wordResults = Mudurluk::where('is_active', true)
                         ->where('name', 'LIKE', "%{$word}%")
                         ->get();
@@ -522,11 +528,12 @@ class SearchService
         $additionalResults = $likeResults->whereNotIn('id', $existingIds);
         $results = $results->merge($additionalResults);
         
-        // 3. Kelime kelime arama (sadece başlık)
+        // 3. Kelime kelime arama (sadece başlık) - İyileştirilmiş
         $words = explode(' ', $normalizedQuery);
-        if (count($words) > 1) {
+        if (count($words) > 1 && $results->count() < 5) {
             foreach ($words as $word) {
-                if (strlen($word) > 2) {
+                // Minimum 4 karakter ve blacklist kontrolü
+                if (strlen($word) >= 4 && !$this->isBlacklistedWord($word)) {
                     $wordResults = Archive::where('status', 'published')
                         ->where('title', 'LIKE', "%{$word}%")
                         ->get();
@@ -628,11 +635,12 @@ class SearchService
                 }
             }
             
-            // Kelime kelime arama
+            // Kelime kelime arama - İyileştirilmiş
             $words = explode(' ', $normalizedQuery);
-            if (count($words) > 1) {
+            if (count($words) > 1 && $results->count() < 5) {
                 foreach ($words as $word) {
-                    if (strlen($word) > 2) {
+                    // Minimum 4 karakter ve blacklist kontrolü
+                    if (strlen($word) >= 4 && !$this->isBlacklistedWord($word)) {
                         $wordResults = \App\Models\MudurlukFile::with('mudurluk')
                             ->whereHas('mudurluk', function($q) {
                                 $q->where('is_active', true);
@@ -681,5 +689,26 @@ class SearchService
         }
         
         return $results;
+    }
+    
+    /**
+     * Blacklist'teki kelimeleri kontrol et
+     * 
+     * @param string $word
+     * @return bool
+     */
+    private function isBlacklistedWord(string $word): bool
+    {
+        $blacklist = [
+            // 3 karakterlik yaygın kelimeler
+            'evi', 'ver', 'dev', 'bir', 'için', 'ile', 'den', 'dan', 'ten', 'tan',
+            // Alakasız olabilecek kelimeler
+            'alan', 'alani', 'yeri', 'devir', 'talep', 'talebi', 'islem', 'islemi',
+            'salon', 'salonu', 'merkez', 'merkezi', 'kultur', 'hizmet', 'hizmetler',
+            // İngilizce yaygın kelimeler
+            'the', 'and', 'that', 'with', 'from', 'have', 'this', 'they'
+        ];
+        
+        return in_array($word, $blacklist);
     }
 } 

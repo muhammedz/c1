@@ -61,12 +61,16 @@ class NewsRepository extends BaseRepository
             });
         }
         
-        // Manşet filtresi
+        // Manşet ve özellik filtresi
         if (isset($filters['headline'])) {
             if ($filters['headline'] === 'only') {
                 $query->where('is_headline', true);
             } elseif ($filters['headline'] === 'exclude') {
                 $query->where('is_headline', false);
+            } elseif ($filters['headline'] === 'featured') {
+                $query->where('is_featured', true);
+            } elseif ($filters['headline'] === 'archived') {
+                $query->where('is_archived', true);
             }
             // 'all' değeri için filtreleme yapma, tüm haberleri getir
         }

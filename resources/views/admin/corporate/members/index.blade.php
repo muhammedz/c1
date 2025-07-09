@@ -46,7 +46,28 @@
                         @endisset
                     </div>
                 </div>
-                <div class="card-body table-responsive p-0">
+                
+                <div class="card-body p-0">
+                    <!-- Arama Formu -->
+                    <div class="p-3 bg-light border-bottom">
+                        <form action="{{ isset($categoryObject) ? route('admin.corporate.members.index', $categoryObject->id) : route('admin.corporate.members.index') }}" method="GET" class="form-inline">
+                            <div class="input-group">
+                                <input type="text" name="search" class="form-control" placeholder="Üye ara..." value="{{ request('search') }}">
+                                <div class="input-group-append">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-search"></i> Ara
+                                    </button>
+                                </div>
+                            </div>
+                            @if(request()->filled('search'))
+                            <a href="{{ isset($categoryObject) ? route('admin.corporate.members.index', $categoryObject->id) : route('admin.corporate.members.index') }}" class="btn btn-outline-secondary ml-2">
+                                <i class="fas fa-times"></i> Filtreyi Temizle
+                            </a>
+                            @endif
+                        </form>
+                    </div>
+                
+                <div class="table-responsive p-0">
                     @if(session('success'))
                     <div class="alert alert-success m-3">
                         {{ session('success') }}
@@ -76,7 +97,7 @@
                         <tbody id="sortable-members">
                             @foreach($members as $member)
                             <tr data-id="{{ $member->id }}" class="member-row">
-                                <td>{{ $loop->iteration }}</td>
+                                <td>{{ ($members->currentPage() - 1) * $members->perPage() + $loop->iteration }}</td>
                                 <td>
                                     @if($member->image)
                                     <img src="{{ asset($member->image) }}" class="img-thumbnail" alt="{{ $member->name }}" style="max-width: 50px;">
@@ -111,6 +132,13 @@
                             @endforeach
                         </tbody>
                     </table>
+                    
+                    <!-- Laravel Pagination Linkleri -->
+                    <div class="pagination-wrapper">
+                        <div class="d-flex justify-content-center">
+                            {{ $members->links('custom.pagination') }}
+                        </div>
+                    </div>
                     @else
                     <div class="alert alert-info m-3">
                         Henüz kayıtlı üye bulunmamaktadır.
@@ -126,6 +154,73 @@
         </div>
     </div>
 </div>
+@stop
+
+@section('css')
+<style>
+    /* Pagination Stilleri */
+    .pagination {
+        gap: 5px;
+        margin: 0;
+    }
+    
+    .pagination .page-item .page-link {
+        border: 1px solid #dee2e6;
+        color: #495057;
+        font-size: 0.875rem;
+        padding: 8px 12px;
+        border-radius: 6px;
+        transition: all 0.2s ease;
+        background-color: #fff;
+        margin: 0 2px;
+    }
+    
+    .pagination .page-item .page-link:hover {
+        background-color: #e9ecef;
+        border-color: #adb5bd;
+        color: #495057;
+    }
+    
+    .pagination .page-item.active .page-link {
+        background-color: #007bff;
+        border-color: #007bff;
+        color: #fff;
+        font-weight: 500;
+    }
+    
+    .pagination .page-item.disabled .page-link {
+        color: #6c757d;
+        background-color: #fff;
+        border-color: #dee2e6;
+        cursor: not-allowed;
+    }
+    
+    /* Sadece SVG ok işaretlerini gizle, yazıları koru */
+    .pagination .page-link svg,
+    .pagination .page-link path,
+    .pagination .page-item .page-link svg,
+    .pagination .page-item .page-link path {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+    }
+    
+    /* Previous/Next butonlarını küçük ve şık yap */
+    .pagination .page-item:first-child .page-link,
+    .pagination .page-item:last-child .page-link {
+        font-size: 0.875rem;
+        padding: 8px 12px;
+        font-weight: 500;
+    }
+    
+    /* Pagination container */
+    .pagination-wrapper {
+        background-color: #f8f9fa;
+        padding: 15px;
+        border-radius: 8px;
+        border-top: 1px solid #dee2e6;
+    }
+</style>
 @stop
 
 @section('js')

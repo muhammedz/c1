@@ -30,7 +30,7 @@ class CorporateMemberController extends Controller
             $query->where('name', 'like', '%' . $request->search . '%');
         }
 
-        $members = $query->orderBy('order', 'asc')->orderBy('created_at', 'desc')->paginate(20);
+        $members = $query->orderBy('order', 'asc')->orderBy('created_at', 'desc')->paginate(10)->appends($request->except('page'));
         $categories = CorporateCategory::orderBy('name', 'asc')->pluck('name', 'id');
 
         return view('admin.corporate.members.index', compact('members', 'categories', 'category', 'categoryObject'));

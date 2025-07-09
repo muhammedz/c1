@@ -228,41 +228,19 @@ $(document).ready(function () {
         }
     };
 
-    // DataTables - Sadece arama ve filtreleme için kullan, pagination Laravel'de
+    // DataTables - Sadece temel tablo özellikleri için kullan
     var newsTable = $('#news-table').DataTable({
         language: turkishLanguage,
         responsive: true,
         ordering: false, // Sıralamayı kapat, backend sıralamasını kullan
         paging: false, // DataTables pagination'ını kapat
         info: false, // Info yazısını kapat
+        searching: false, // Arama özelliğini kapat, sunucu taraflı arama kullanılacak
         columnDefs: [
             { orderable: false, targets: [0, 1, 7] } // Bu sütunları sıralanamaz yap
         ],
         // Sadece table göster, pagination Laravel'de olacak
         dom: "<'row'<'col-sm-12'tr>>"
-    });
-    
-    // DataTables özel arama kutusu
-    $('#custom-search').on('keyup', function() {
-        newsTable.search(this.value).draw();
-    });
-
-    // Kategori filtresi
-    $('#category-filter').on('change', function() {
-        var searchTerm = $(this).val();
-        newsTable.column(3).search(searchTerm).draw();
-    });
-
-    // Durum filtresi
-    $('#status-filter').on('change', function() {
-        var searchTerm = $(this).val();
-        newsTable.column(4).search(searchTerm).draw();
-    });
-
-    // Özellik filtresi
-    $('#feature-filter').on('change', function() {
-        var searchTerm = $(this).val();
-        newsTable.column(5).search(searchTerm).draw();
     });
 
     // Tümünü seç
@@ -1268,39 +1246,99 @@ $(document).ready(function () {
         <div class="card-body">
             <div class="search-container p-2 rounded mb-3 d-flex flex-wrap align-items-center gap-2">
                 <div class="dropdown-filter">
-                    <select id="category-filter" class="form-select form-select-sm border-0 bg-light text-secondary">
-                        <option value="">Tüm Kategoriler</option>
-                        @foreach($newsCategories as $category)
-                            <option value="{{ $category->name }}">{{ $category->name }}</option>
-                        @endforeach
-                    </select>
+                    <form action="{{ route('admin.news.index') }}" method="GET" id="category-form">
+                        @if(request()->has('search'))
+                            <input type="hidden" name="search" value="{{ request('search') }}">
+                        @endif
+                        @if(request()->has('status'))
+                            <input type="hidden" name="status" value="{{ request('status') }}">
+                        @endif
+                        @if(request()->has('headline'))
+                            <input type="hidden" name="headline" value="{{ request('headline') }}">
+                        @endif
+                        <select id="category-filter" name="category" class="form-select form-select-sm border-0 bg-light text-secondary" onchange="document.getElementById('category-form').submit()">
+                            <option value="">Tüm Kategoriler</option>
+                            @foreach($newsCategories as $category)
+                                <option value="{{ $category->id }}" {{ request('category') == $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
+                            @endforeach
+                        </select>
+                    </form>
                 </div>
 
                 <div class="dropdown-filter">
-                    <select id="status-filter" class="form-select form-select-sm border-0 bg-light text-secondary">
-                        <option value="">Tüm Durumlar</option>
-                        <option value="Yayında">Yayında</option>
-                        <option value="Taslak">Taslak</option>
-                    </select>
+                    <form action="{{ route('admin.news.index') }}" method="GET" id="status-form">
+                        @if(request()->has('search'))
+                            <input type="hidden" name="search" value="{{ request('search') }}">
+                        @endif
+                        @if(request()->has('category'))
+                            <input type="hidden" name="category" value="{{ request('category') }}">
+                        @endif
+                        @if(request()->has('headline'))
+                            <input type="hidden" name="headline" value="{{ request('headline') }}">
+                        @endif
+                        <select id="status-filter" name="status" class="form-select form-select-sm border-0 bg-light text-secondary" onchange="document.getElementById('status-form').submit()">
+                            <option value="">Tüm Durumlar</option>
+                            <option value="published" {{ request('status') == 'published' ? 'selected' : '' }}>Yayında</option>
+                            <option value="draft" {{ request('status') == 'draft' ? 'selected' : '' }}>Taslak</option>
+                        </select>
+                    </form>
                 </div>
                 
                 <div class="dropdown-filter">
-                    <select id="feature-filter" class="form-select form-select-sm border-0 bg-light text-secondary">
-                        <option value="">Tüm Özellikler</option>
-                        <option value="Manşet">Manşet</option>
-                        <option value="Öne Çıkan">Öne Çıkan</option>
-                        <option value="Arşivlenmiş">Arşivlenmiş</option>
-                    </select>
+                    <form action="{{ route('admin.news.index') }}" method="GET" id="headline-form">
+                        @if(request()->has('search'))
+                            <input type="hidden" name="search" value="{{ request('search') }}">
+                        @endif
+                        @if(request()->has('category'))
+                            <input type="hidden" name="category" value="{{ request('category') }}">
+                        @endif
+                        @if(request()->has('status'))
+                            <input type="hidden" name="status" value="{{ request('status') }}">
+                        @endif
+                        <select id="feature-filter" name="headline" class="form-select form-select-sm border-0 bg-light text-secondary" onchange="document.getElementById('headline-form').submit()">
+                            <option value="all">Tüm Özellikler</option>
+                            <option value="only" {{ request('headline') == 'only' ? 'selected' : '' }}>Manşet</option>
+                            <option value="exclude" {{ request('headline') == 'exclude' ? 'selected' : '' }}>Manşet Olmayan</option>
+                            <option value="featured" {{ request('headline') == 'featured' ? 'selected' : '' }}>Öne Çıkan</option>
+                            <option value="archived" {{ request('headline') == 'archived' ? 'selected' : '' }}>Arşivlenmiş</option>
+                        </select>
+                    </form>
                 </div>
                 
                 <div class="ms-auto search-box">
-                    <div class="input-group border-0 bg-light rounded pe-0">
-                        <span class="input-group-text border-0 bg-transparent px-2">
-                            <i class="fas fa-search text-muted"></i>
-                        </span>
-                        <input type="search" id="custom-search" class="form-control form-control-sm border-0 bg-light shadow-none" placeholder="Ara...">
-                    </div>
+                    <form action="{{ route('admin.news.index') }}" method="GET" class="m-0">
+                        @if(request()->has('category'))
+                            <input type="hidden" name="category" value="{{ request('category') }}">
+                        @endif
+                        @if(request()->has('status'))
+                            <input type="hidden" name="status" value="{{ request('status') }}">
+                        @endif
+                        @if(request()->has('headline'))
+                            <input type="hidden" name="headline" value="{{ request('headline') }}">
+                        @endif
+                        @if(request()->has('sort'))
+                            <input type="hidden" name="sort" value="{{ request('sort') }}">
+                        @endif
+                        @if(request()->has('direction'))
+                            <input type="hidden" name="direction" value="{{ request('direction') }}">
+                        @endif
+                        <div class="input-group border-0 bg-light rounded pe-0">
+                            <span class="input-group-text border-0 bg-transparent px-2">
+                                <i class="fas fa-search text-muted"></i>
+                            </span>
+                            <input type="search" name="search" id="custom-search" class="form-control form-control-sm border-0 bg-light shadow-none" placeholder="Ara..." value="{{ request('search') }}">
+                            <button type="submit" class="btn btn-sm btn-primary">Ara</button>
+                        </div>
+                    </form>
                 </div>
+                
+                @if(request()->anyFilled(['search', 'category', 'status', 'headline']))
+                <div>
+                    <a href="{{ route('admin.news.index') }}" class="btn btn-sm btn-outline-secondary">
+                        <i class="fas fa-times-circle me-1"></i> Filtreleri Temizle
+                    </a>
+                </div>
+                @endif
             </div>
             
             <div class="table-responsive">

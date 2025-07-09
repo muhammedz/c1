@@ -431,10 +431,15 @@
             <!-- İlgili Haberler -->
             @if($relatedNews->count() > 0)
             <section id="ilgili-haberler" class="service-content-section">
-                <h2>İlgili Haberler</h2>
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="mb-0">İlgili Haberler</h2>
+                    <div class="text-sm text-gray-500">
+                        Toplam {{ $relatedNews->total() }} haber bulundu
+                    </div>
+                </div>
                 <p class="mb-5">{{ $service->title }} hizmetimizle ilgili güncel haberler ve duyurular:</p>
                 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                     @foreach($relatedNews as $news)
                     <div class="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-all">
                         <div class="p-5 flex flex-col h-full">
@@ -458,12 +463,25 @@
                     </div>
                     @endforeach
                 </div>
+
+                                        <!-- Sayfalama -->
+                        @if($relatedNews->hasPages())
+                        <div class="mt-6">
+                            <div class="flex justify-center items-center">
+                                <div class="inline-flex items-center space-x-1 bg-gray-50 rounded-lg p-2 shadow-sm">
+                                    {{ $relatedNews->appends(request()->except('page'))->fragment('ilgili-haberler')->links('custom.pagination') }}
+                                </div>
+                            </div>
+                        </div>
+                        @endif
             </section>
             @endif
         </div>
     </div>
 </div>
 @endsection
+
+
 
 @section('after_scripts')
 <script>

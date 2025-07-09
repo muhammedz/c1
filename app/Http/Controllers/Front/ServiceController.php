@@ -90,9 +90,10 @@ class ServiceController extends Controller
      * Hizmet detayını gösterir
      *
      * @param  string  $slug
+     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\View\View
      */
-    public function show($slug)
+    public function show($slug, Request $request)
     {
         $service = Service::where('slug', $slug)
             ->published()
@@ -105,10 +106,10 @@ class ServiceController extends Controller
         // İlgili hizmetleri getir
         $relatedServices = $service->getRelatedServices(4);
         
-        // İlgili haberleri getir (seçilen kategorilerdeki haberler)
+        // İlgili haberleri getir (seçilen kategorilerdeki haberler) - Sayfalama ile
         $relatedNews = collect();
         if ($service->newsCategories->count() > 0) {
-            $relatedNews = $service->relatedNews()->limit(6)->get();
+            $relatedNews = $service->relatedNews()->paginate(6);
         }
         
         $categories = ServiceCategory::where('is_active', true)
