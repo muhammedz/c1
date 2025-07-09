@@ -107,6 +107,13 @@
     <!-- Font Awesome Icons - Yerel -->
     <link rel="stylesheet" href="{{ asset('vendor/fontawesome-free/css/all.min.css') }}">
     
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.4/css/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.2.7/css/responsive.bootstrap4.min.css">
+    
+    <!-- Frontend DataTables Custom CSS -->
+    <link rel="stylesheet" href="{{ asset('css/frontend-datatables.css') }}">
+    
     <!-- Font tanımlamaları -->
     <style>
        html, body {
@@ -1389,8 +1396,17 @@
     <!-- Ek SEO meta etiketleri -->
     @yield('additional_head')
     
-    <!-- Responsive Tables JavaScript -->
-    <script src="{{ asset('js/responsive-tables.js') }}" defer></script>
+    <!-- jQuery (DataTables için gerekli) -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    
+    <!-- DataTables JavaScript -->
+    <script src="https://cdn.datatables.net/1.11.4/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.4/js/dataTables.bootstrap4.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.2.7/js/dataTables.responsive.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.2.7/js/responsive.bootstrap4.min.js"></script>
+    
+    <!-- Frontend DataTables Custom JavaScript -->
+    <script src="{{ asset('js/frontend-datatables.js') }}" defer></script>
 </head>
 
 <body class="bg-slate-100 overflow-x-hidden">
