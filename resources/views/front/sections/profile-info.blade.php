@@ -3,38 +3,38 @@
     <div class="flex flex-col md:flex-row gap-8">
         <!-- Profil Kartı -->
         <div class="bg-white rounded-3xl shadow-lg overflow-hidden md:w-1/2">
-            <div class="p-0">
+            <div class="p-0" style="padding-bottom: 0 !important;">
                 <div class="flex flex-col md:flex-row">
                     <!-- Profil Fotoğrafı ve Sosyal Medya İkonları -->
                     <div class="w-full relative">
                         @if($profileSettings->filemanagersystem_profile_photo)
                             <!-- Mobil görünüm -->
                             <div class="mobile-profile-photo mobile-profile-photo-only relative">
-                                <a href="/baskan">
-                                    <img src="{{ asset($profileSettings->filemanagersystem_profile_photo) }}" alt="{{ $profileSettings->filemanagersystem_profile_photo_alt ?? $profileSettings->name }}" class="w-full">
+                                <a href="/baskan" style="display: block; line-height: 0;">
+                                    <img src="{{ asset($profileSettings->filemanagersystem_profile_photo) }}" alt="{{ $profileSettings->filemanagersystem_profile_photo_alt ?? $profileSettings->name }}" class="w-full" style="margin-top: 10px; margin-bottom: -10px; display: block; vertical-align: bottom;">
                                 </a>
                                 <!-- Sosyal medya ikonları sağ alt köşede -->
-                                <div class="absolute bottom-2 right-2 flex flex-row gap-1">
+                                <div class="absolute right-4 flex flex-row gap-1" style="bottom: 14px;">
                                     @if($profileSettings->facebook_url)
-                                        <a href="{{ $profileSettings->facebook_url }}" target="_blank" class="w-6 h-6 bg-[#007d32] rounded-md flex items-center justify-center hover:bg-[#003d24] transition-colors" aria-label="Facebook sayfamızı ziyaret edin">
+                                        <a href="{{ $profileSettings->facebook_url }}" target="_blank" class="w-5 h-5 bg-[#007d32] rounded-md flex items-center justify-center hover:bg-[#003d24] transition-colors" aria-label="Facebook sayfamızı ziyaret edin">
                                             <i class="fab fa-facebook-f text-white text-xs"></i>
                                         </a>
                                     @endif
                                     
                                     @if($profileSettings->instagram_url)
-                                        <a href="{{ $profileSettings->instagram_url }}" target="_blank" class="w-6 h-6 bg-[#007d32] rounded-md flex items-center justify-center hover:bg-[#003d24] transition-colors" aria-label="Instagram sayfamızı ziyaret edin">
+                                        <a href="{{ $profileSettings->instagram_url }}" target="_blank" class="w-5 h-5 bg-[#007d32] rounded-md flex items-center justify-center hover:bg-[#003d24] transition-colors" aria-label="Instagram sayfamızı ziyaret edin">
                                             <i class="fab fa-instagram text-white text-xs"></i>
                                         </a>
                                     @endif
                                     
                                     @if($profileSettings->twitter_url)
-                                        <a href="{{ $profileSettings->twitter_url }}" target="_blank" class="w-6 h-6 bg-[#007d32] rounded-md flex items-center justify-center hover:bg-[#003d24] transition-colors" aria-label="Twitter sayfamızı ziyaret edin">
-                                            <span class="text-white font-bold" style="font-family: serif; font-size: 14px;">𝕏</span>
+                                        <a href="{{ $profileSettings->twitter_url }}" target="_blank" class="w-5 h-5 bg-[#007d32] rounded-md flex items-center justify-center hover:bg-[#003d24] transition-colors" aria-label="Twitter sayfamızı ziyaret edin">
+                                            <span class="text-white font-bold" style="font-family: serif; font-size: 12px;">𝕏</span>
                                         </a>
                                     @endif
                                     
                                     @if($profileSettings->youtube_url)
-                                        <a href="{{ $profileSettings->youtube_url }}" target="_blank" class="w-6 h-6 bg-[#007d32] rounded-md flex items-center justify-center hover:bg-[#003d24] transition-colors" aria-label="YouTube kanalımızı ziyaret edin">
+                                        <a href="{{ $profileSettings->youtube_url }}" target="_blank" class="w-5 h-5 bg-[#007d32] rounded-md flex items-center justify-center hover:bg-[#003d24] transition-colors" aria-label="YouTube kanalımızı ziyaret edin">
                                             <i class="fab fa-youtube text-white text-xs"></i>
                                         </a>
                                     @endif
@@ -58,11 +58,11 @@
                             <!-- Desktop görünüm -->
                             <div class="hidden md:flex">
                                 <div class="w-3/4">
-                                    <a href="/baskan">
-                                        <img src="{{ asset($profileSettings->filemanagersystem_profile_photo) }}" alt="{{ $profileSettings->filemanagersystem_profile_photo_alt ?? $profileSettings->name }}" class="w-full">
+                                    <a href="/baskan" style="display: block; line-height: 0;">
+                                        <img src="{{ asset($profileSettings->filemanagersystem_profile_photo) }}" alt="{{ $profileSettings->filemanagersystem_profile_photo_alt ?? $profileSettings->name }}" class="w-full" style="margin-top: 15px; margin-bottom: -35px; display: block; vertical-align: bottom; position: relative; bottom: -5px;">
                                     </a>
                                 </div>
-                                <div class="w-1/4 bg-white p-3 flex flex-col justify-center items-center gap-2">
+                                <div class="w-1/4 bg-white p-3 flex flex-col justify-center items-center gap-2" style="padding-top: 20px; position: relative; top: 15px;">
                                     @if($profileSettings->facebook_url)
                                         <a href="{{ $profileSettings->facebook_url }}" target="_blank" class="w-8 h-8 bg-[#007d32] rounded-lg flex items-center justify-center hover:bg-[#003d24] transition-colors" aria-label="Facebook sayfamızı ziyaret edin">
                                             <i class="fab fa-facebook-f text-white text-xs"></i>
@@ -106,31 +106,31 @@
                         @elseif($profileSettings->profile_photo)
                             <!-- Mobil görünüm -->
                             <div class="mobile-profile-fallback mobile-profile-fallback-only relative">
-                                <a href="/baskan">
-                                    <img src="{{ asset('storage/' . $profileSettings->profile_photo) }}" alt="{{ $profileSettings->name }}" class="w-full">
+                                <a href="/baskan" style="display: block; line-height: 0;">
+                                    <img src="{{ asset('storage/' . $profileSettings->profile_photo) }}" alt="{{ $profileSettings->name }}" class="w-full" style="margin-top: 10px; margin-bottom: -10px; display: block; vertical-align: bottom;">
                                 </a>
                                 <!-- Sosyal medya ikonları sağ alt köşede -->
-                                <div class="absolute bottom-2 right-2 flex flex-row gap-1">
+                                <div class="absolute right-4 flex flex-row gap-1" style="bottom: 14px;">
                                     @if($profileSettings->facebook_url)
-                                        <a href="{{ $profileSettings->facebook_url }}" target="_blank" class="w-6 h-6 bg-[#007d32] rounded-md flex items-center justify-center hover:bg-[#003d24] transition-colors" aria-label="Facebook sayfamızı ziyaret edin">
+                                        <a href="{{ $profileSettings->facebook_url }}" target="_blank" class="w-5 h-5 bg-[#007d32] rounded-md flex items-center justify-center hover:bg-[#003d24] transition-colors" aria-label="Facebook sayfamızı ziyaret edin">
                                             <i class="fab fa-facebook-f text-white text-xs"></i>
                                         </a>
                                     @endif
                                     
                                     @if($profileSettings->instagram_url)
-                                        <a href="{{ $profileSettings->instagram_url }}" target="_blank" class="w-6 h-6 bg-[#007d32] rounded-md flex items-center justify-center hover:bg-[#003d24] transition-colors" aria-label="Instagram sayfamızı ziyaret edin">
+                                        <a href="{{ $profileSettings->instagram_url }}" target="_blank" class="w-5 h-5 bg-[#007d32] rounded-md flex items-center justify-center hover:bg-[#003d24] transition-colors" aria-label="Instagram sayfamızı ziyaret edin">
                                             <i class="fab fa-instagram text-white text-xs"></i>
                                         </a>
                                     @endif
                                     
                                     @if($profileSettings->twitter_url)
-                                        <a href="{{ $profileSettings->twitter_url }}" target="_blank" class="w-6 h-6 bg-[#007d32] rounded-md flex items-center justify-center hover:bg-[#003d24] transition-colors" aria-label="Twitter sayfamızı ziyaret edin">
-                                            <span class="text-white font-bold" style="font-family: serif; font-size: 14px;">𝕏</span>
+                                        <a href="{{ $profileSettings->twitter_url }}" target="_blank" class="w-5 h-5 bg-[#007d32] rounded-md flex items-center justify-center hover:bg-[#003d24] transition-colors" aria-label="Twitter sayfamızı ziyaret edin">
+                                            <span class="text-white font-bold" style="font-family: serif; font-size: 12px;">𝕏</span>
                                         </a>
                                     @endif
                                     
                                     @if($profileSettings->youtube_url)
-                                        <a href="{{ $profileSettings->youtube_url }}" target="_blank" class="w-6 h-6 bg-[#007d32] rounded-md flex items-center justify-center hover:bg-[#003d24] transition-colors" aria-label="YouTube kanalımızı ziyaret edin">
+                                        <a href="{{ $profileSettings->youtube_url }}" target="_blank" class="w-5 h-5 bg-[#007d32] rounded-md flex items-center justify-center hover:bg-[#003d24] transition-colors" aria-label="YouTube kanalımızı ziyaret edin">
                                             <i class="fab fa-youtube text-white text-xs"></i>
                                         </a>
                                     @endif
@@ -154,11 +154,11 @@
                             <!-- Desktop görünüm -->
                             <div class="hidden md:flex">
                                 <div class="w-3/4">
-                                    <a href="/baskan">
-                                        <img src="{{ asset('storage/' . $profileSettings->profile_photo) }}" alt="{{ $profileSettings->name }}" class="w-full">
+                                    <a href="/baskan" style="display: block; line-height: 0;">
+                                        <img src="{{ asset('storage/' . $profileSettings->profile_photo) }}" alt="{{ $profileSettings->name }}" class="w-full" style="margin-top: 15px; margin-bottom: -35px; display: block; vertical-align: bottom; position: relative; bottom: -5px;">
                                     </a>
                                 </div>
-                                <div class="w-1/4 bg-white p-3 flex flex-col justify-center items-center gap-2">
+                                <div class="w-1/4 bg-white p-3 flex flex-col justify-center items-center gap-2" style="padding-top: 20px; position: relative; top: 15px;">
                                     @if($profileSettings->facebook_url)
                                         <a href="{{ $profileSettings->facebook_url }}" target="_blank" class="w-8 h-8 bg-[#007d32] rounded-lg flex items-center justify-center hover:bg-[#003d24] transition-colors" aria-label="Facebook sayfamızı ziyaret edin">
                                             <i class="fab fa-facebook-f text-white text-xs"></i>
@@ -202,31 +202,31 @@
                         @else
                             <!-- Mobil görünüm -->
                             <div class="mobile-profile-default mobile-profile-default-only relative">
-                                <a href="/baskan">
-                                    <img src="{{ asset('assets/image/person.png') }}" alt="{{ $profileSettings->name ?? 'Profil' }}" class="w-full">
+                                <a href="/baskan" style="display: block; line-height: 0;">
+                                    <img src="{{ asset('assets/image/person.png') }}" alt="{{ $profileSettings->name ?? 'Profil' }}" class="w-full" style="margin-top: 10px; margin-bottom: -10px; display: block; vertical-align: bottom;">
                                 </a>
                                 <!-- Sosyal medya ikonları sağ alt köşede -->
-                                <div class="absolute bottom-2 right-2 flex flex-row gap-1">
+                                <div class="absolute right-4 flex flex-row gap-1" style="bottom: 14px;">
                                     @if($profileSettings->facebook_url)
-                                        <a href="{{ $profileSettings->facebook_url }}" target="_blank" class="w-6 h-6 bg-[#007d32] rounded-md flex items-center justify-center hover:bg-[#003d24] transition-colors" aria-label="Facebook sayfamızı ziyaret edin">
+                                        <a href="{{ $profileSettings->facebook_url }}" target="_blank" class="w-5 h-5 bg-[#007d32] rounded-md flex items-center justify-center hover:bg-[#003d24] transition-colors" aria-label="Facebook sayfamızı ziyaret edin">
                                             <i class="fab fa-facebook-f text-white text-xs"></i>
                                         </a>
                                     @endif
                                     
                                     @if($profileSettings->instagram_url)
-                                        <a href="{{ $profileSettings->instagram_url }}" target="_blank" class="w-6 h-6 bg-[#007d32] rounded-md flex items-center justify-center hover:bg-[#003d24] transition-colors" aria-label="Instagram sayfamızı ziyaret edin">
+                                        <a href="{{ $profileSettings->instagram_url }}" target="_blank" class="w-5 h-5 bg-[#007d32] rounded-md flex items-center justify-center hover:bg-[#003d24] transition-colors" aria-label="Instagram sayfamızı ziyaret edin">
                                             <i class="fab fa-instagram text-white text-xs"></i>
                                         </a>
                                     @endif
                                     
                                     @if($profileSettings->twitter_url)
-                                        <a href="{{ $profileSettings->twitter_url }}" target="_blank" class="w-6 h-6 bg-[#007d32] rounded-md flex items-center justify-center hover:bg-[#003d24] transition-colors" aria-label="Twitter sayfamızı ziyaret edin">
-                                            <span class="text-white font-bold" style="font-family: serif; font-size: 14px;">𝕏</span>
+                                        <a href="{{ $profileSettings->twitter_url }}" target="_blank" class="w-5 h-5 bg-[#007d32] rounded-md flex items-center justify-center hover:bg-[#003d24] transition-colors" aria-label="Twitter sayfamızı ziyaret edin">
+                                            <span class="text-white font-bold" style="font-family: serif; font-size: 12px;">𝕏</span>
                                         </a>
                                     @endif
                                     
                                     @if($profileSettings->youtube_url)
-                                        <a href="{{ $profileSettings->youtube_url }}" target="_blank" class="w-6 h-6 bg-[#007d32] rounded-md flex items-center justify-center hover:bg-[#003d24] transition-colors" aria-label="YouTube kanalımızı ziyaret edin">
+                                        <a href="{{ $profileSettings->youtube_url }}" target="_blank" class="w-5 h-5 bg-[#007d32] rounded-md flex items-center justify-center hover:bg-[#003d24] transition-colors" aria-label="YouTube kanalımızı ziyaret edin">
                                             <i class="fab fa-youtube text-white text-xs"></i>
                                         </a>
                                     @endif
@@ -250,11 +250,11 @@
                             <!-- Desktop görünüm -->
                             <div class="hidden md:flex">
                                 <div class="w-3/4">
-                                    <a href="/baskan">
-                                        <img src="{{ asset('assets/image/person.png') }}" alt="{{ $profileSettings->name ?? 'Profil' }}" class="w-full">
+                                    <a href="/baskan" style="display: block; line-height: 0;">
+                                        <img src="{{ asset('assets/image/person.png') }}" alt="{{ $profileSettings->name ?? 'Profil' }}" class="w-full" style="margin-top: 15px; margin-bottom: -35px; display: block; vertical-align: bottom; position: relative; bottom: -5px;">
                                     </a>
                                 </div>
-                                <div class="w-1/4 bg-white p-3 flex flex-col justify-center items-center gap-2">
+                                <div class="w-1/4 bg-white p-3 flex flex-col justify-center items-center gap-2" style="padding-top: 20px; position: relative; top: 15px;">
                                     @if($profileSettings->facebook_url)
                                         <a href="{{ $profileSettings->facebook_url }}" target="_blank" class="w-8 h-8 bg-[#007d32] rounded-lg flex items-center justify-center hover:bg-[#003d24] transition-colors" aria-label="Facebook sayfamızı ziyaret edin">
                                             <i class="fab fa-facebook-f text-white text-xs"></i>
@@ -308,7 +308,7 @@
                     <div class="w-full">
                         <!-- Mobil görünüm -->
                         <div class="mobile-contact-section mobile-contact-only flex h-full">
-                            <div class="w-2/5 bg-white p-2 flex flex-col justify-center items-start pl-4" style="padding-top: 30px">
+                            <div class="w-2/5 bg-white p-2 flex flex-col justify-center items-start pl-4" style="padding-top: 20px">
                                 <div class="text-left">
                                     <div class="flex flex-col items-start">
                                         <h2 class="text-xl font-bold" style="font-family: 'TT Norms Pro', sans-serif;">İletişim</h2>
@@ -320,14 +320,21 @@
                                             <span class="w-6 h-6 bg-[#0066cc] rounded-full flex items-center justify-center mr-2">
                                                 <i class="fas fa-phone-alt text-white text-xs"></i>
                                             </span>
-                                            <span class="text-sm font-bold">444 06 01</span>
+                                            <span class="text-sm font-medium">444 06 01</span>
                                         </a>
                                         
                                         <a href="https://wa.me/905051671967" target="_blank" class="flex items-center">
                                             <span class="w-6 h-6 bg-[#25D366] rounded-full flex items-center justify-center mr-2">
                                                 <i class="fab fa-whatsapp text-white text-xs"></i>
                                             </span>
-                                            <span class="text-xs font-medium">0505 167 19 67</span>
+                                            <span class="text-sm font-medium">0505 167 19 67</span>
+                                        </a>
+                                        
+                                        <a href="https://bridge360.cankaya.bel.tr/web-ticket.html" target="_blank" class="flex items-center">
+                                            <span class="w-6 h-6 bg-[#007d32] rounded-full flex items-center justify-center mr-2">
+                                                <i class="fas fa-envelope text-white text-xs"></i>
+                                            </span>
+                                            <span class="text-sm font-medium">İletişim Formu</span>
                                         </a>
                                     </div>
                                 </div>
@@ -350,19 +357,19 @@
                         </div>
                         <!-- Desktop görünüm -->
                         <div class="hidden md:flex h-full">
-                            <div class="w-1/3 bg-white p-3 flex flex-col justify-center items-center" style="padding-top: 50px">
-                                <div class="text-center pl-4">
-                                    <div class="flex justify-center items-center whitespace-nowrap">
+                            <div class="w-1/3 bg-white p-3 flex flex-col justify-center items-start" style="padding-top: 35px">
+                                <div class="text-left pl-4">
+                                    <div class="flex justify-start items-center whitespace-nowrap">
                                         <h2 class="text-3xl font-bold" style="font-family: 'TT Norms Pro', sans-serif;">İletişim</h2>
                                         <h2 class="text-2xl ml-2" style="font-family: 'TT Norms Pro', sans-serif;">Merkezi</h2>
                                     </div>
                                     
-                                    <div class="flex flex-col items-center justify-center mt-5 gap-2">
+                                    <div class="flex flex-col items-start justify-center mt-5 gap-2">
                                         <a href="tel:4440601" class="flex items-center">
                                             <span class="w-8 h-8 bg-[#0066cc] rounded-full flex items-center justify-center mr-2">
                                                 <i class="fas fa-phone-alt text-white text-sm"></i>
                                             </span>
-                                            <span class="text-lg font-bold">444 06 01</span>
+                                            <span class="text-sm font-medium">444 06 01</span>
                                         </a>
                                         
                                         <a href="https://wa.me/905051671967" target="_blank" class="flex items-center">
@@ -370,6 +377,13 @@
                                                 <i class="fab fa-whatsapp text-white text-sm"></i>
                                             </span>
                                             <span class="text-sm font-medium">0505 167 19 67</span>
+                                        </a>
+                                        
+                                        <a href="https://bridge360.cankaya.bel.tr/web-ticket.html" target="_blank" class="flex items-center">
+                                            <span class="w-8 h-8 bg-[#007d32] rounded-full flex items-center justify-center mr-2">
+                                                <i class="fas fa-envelope text-white text-sm"></i>
+                                            </span>
+                                            <span class="text-sm font-medium">İletişim Formu</span>
                                         </a>
                                     </div>
                                 </div>
