@@ -330,14 +330,31 @@ class ResponsiveTableHelper {
      * Pencere boyutu değişimi
      */
     handleResize() {
-        // Mobil kart görünümünü toggle et
+        // Mobil optimizasyonları uygula
         const isMobile = window.innerWidth <= 480;
         const tables = document.querySelectorAll('.responsive-table');
         
         tables.forEach(table => {
             const wrapper = table.closest('.table-responsive-mobile');
-            if (wrapper) {
-                wrapper.parentElement.classList.toggle('table-to-cards', isMobile);
+            if (wrapper && isMobile) {
+                // Mobilde tam ekran modunda scroll göstergesi güncelle
+                wrapper.classList.add('mobile-fullscreen');
+                
+                // Sayfa container'ının padding'ini kontrol et
+                const pageContainer = wrapper.closest('.container, .container-fluid');
+                if (pageContainer) {
+                    pageContainer.style.paddingLeft = '0px';
+                    pageContainer.style.paddingRight = '0px';
+                }
+            } else if (wrapper) {
+                wrapper.classList.remove('mobile-fullscreen');
+                
+                // Desktop'ta normal padding'i geri yükle
+                const pageContainer = wrapper.closest('.container, .container-fluid');
+                if (pageContainer) {
+                    pageContainer.style.paddingLeft = '';
+                    pageContainer.style.paddingRight = '';
+                }
             }
         });
     }
@@ -401,13 +418,25 @@ window.optimizeTinyMCETables = function() {
     helper.optimizeTinyMCETables();
 };
 
-// Manuel olarak kart görünümüne geç
-window.toggleTableCardView = function(tableSelector, enable = true) {
+// Manuel olarak tam ekran görünümüne geç
+window.toggleTableFullscreen = function(tableSelector, enable = true) {
     const table = document.querySelector(tableSelector);
     if (table) {
         const wrapper = table.closest('.table-responsive-mobile');
         if (wrapper) {
-            wrapper.parentElement.classList.toggle('table-to-cards', enable);
+            wrapper.classList.toggle('mobile-fullscreen', enable);
+            
+            // Container padding'ini ayarla
+            const pageContainer = wrapper.closest('.container, .container-fluid');
+            if (pageContainer) {
+                if (enable) {
+                    pageContainer.style.paddingLeft = '0px';
+                    pageContainer.style.paddingRight = '0px';
+                } else {
+                    pageContainer.style.paddingLeft = '';
+                    pageContainer.style.paddingRight = '';
+                }
+            }
         }
     }
 };

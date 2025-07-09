@@ -128,64 +128,80 @@
 }
 
 /* ========================================
-   CARD LAYOUT ALTERNATIVE (En küçük ekranlar için)
+   TAM EKRAN TABLOHAGENİŞLETME (Tüm mobil cihazlar için)
    ======================================== */
 
 @media (max-width: 480px) {
-    .table-to-cards .table-responsive-mobile {
-        overflow: visible;
-        background: transparent;
-        box-shadow: none;
+    /* Tablo container'ı tam ekran yap */
+    .table-responsive-mobile {
+        margin: 0 -15px; /* Sayfa padding'ini iptal et */
+        border-radius: 0; /* Köşe yuvarlama kaldır */
+        box-shadow: none; /* Gölge kaldır */
+        width: calc(100% + 30px); /* Tam genişlik */
     }
     
-    .table-to-cards .responsive-table,
-    .table-to-cards .responsive-table thead,
-    .table-to-cards .responsive-table tbody,
-    .table-to-cards .responsive-table th,
-    .table-to-cards .responsive-table td,
-    .table-to-cards .responsive-table tr {
-        display: block;
+    /* Tablo kendisini tam ekrana yay */
+    .responsive-table {
+        width: 100% !important;
+        min-width: 100% !important;
+        font-size: 10px !important; /* Daha küçük font */
+        border-radius: 0 !important;
     }
     
-    .table-to-cards .responsive-table thead tr {
-        position: absolute;
-        top: -9999px;
-        left: -9999px;
+    /* Header stilleri mobilde */
+    .responsive-table th {
+        padding: 6px 4px !important;
+        font-size: 9px !important;
+        white-space: nowrap !important;
+        text-overflow: ellipsis !important;
+        overflow: hidden !important;
+        max-width: 80px;
     }
     
-    .table-to-cards .responsive-table tr {
-        background: white;
-        border-radius: 8px;
-        padding: 15px;
-        margin-bottom: 15px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        border: 1px solid #e5e7eb;
+    /* Cell stilleri mobilde */
+    .responsive-table td {
+        padding: 6px 4px !important;
+        font-size: 9px !important;
+        white-space: nowrap !important;
+        text-overflow: ellipsis !important;
+        overflow: hidden !important;
+        max-width: 80px;
+        border-right: 1px solid #e5e7eb !important;
     }
     
-    .table-to-cards .responsive-table td {
-        border: none;
-        border-bottom: 1px solid #f3f4f6;
-        position: relative;
-        padding: 8px 0 8px 40%;
-        text-align: left;
-        max-width: none;
-        white-space: normal;
+    /* Önemli sütunlar biraz daha geniş */
+    .responsive-table th.important,
+    .responsive-table td.important {
+        max-width: 120px !important;
+        min-width: 100px !important;
+        white-space: normal !important;
+        word-wrap: break-word !important;
+        font-size: 10px !important;
     }
     
-    .table-to-cards .responsive-table td:before {
-        content: attr(data-label) ":";
-        position: absolute;
-        left: 0;
-        width: 35%;
-        padding-right: 10px;
-        white-space: nowrap;
-        font-weight: 600;
-        color: #374151;
+    /* Son sütun border kaldır */
+    .responsive-table td:last-child {
+        border-right: none !important;
+    }
+    
+    /* Aksiyon butonları daha küçük */
+    .responsive-table .action-buttons .btn {
+        padding: 2px 4px !important;
+        font-size: 8px !important;
+        margin: 0 1px !important;
+        min-width: auto !important;
+    }
+    
+    /* Scroll göstergesi daha belirgin */
+    .table-responsive-mobile::before {
+        content: "👈 Yaklaştırın veya kaydırın";
+        background: rgba(0,53,43,0.95);
+        padding: 6px 10px;
         font-size: 11px;
-    }
-    
-    .table-to-cards .responsive-table td:last-child {
-        border-bottom: none;
+        border-radius: 4px;
+        top: 5px;
+        right: 5px;
+        z-index: 1000;
     }
 }
 
@@ -237,6 +253,8 @@
     .mce-content-body table {
         font-size: 12px !important;
         margin: 15px 0 !important;
+        width: 100% !important;
+        table-layout: auto !important;
     }
     
     .mce-content-body table th {
@@ -247,11 +265,64 @@
     .mce-content-body table td {
         padding: 8px 6px !important;
         font-size: 12px !important;
-        max-width: 150px !important;
+        max-width: 120px !important;
         overflow: hidden !important;
         text-overflow: ellipsis !important;
         white-space: nowrap !important;
     }
+}
+
+/* En küçük mobil ekranlar için TinyMCE tabloları */
+@media (max-width: 480px) {
+    .mce-content-body table {
+        font-size: 10px !important;
+        margin: 10px -15px !important; /* Sayfa kenarlarına dayat */
+        width: calc(100% + 30px) !important;
+        border-radius: 0 !important;
+    }
+    
+    .mce-content-body table th {
+        padding: 6px 4px !important;
+        font-size: 9px !important;
+        max-width: 80px !important;
+        text-overflow: ellipsis !important;
+        overflow: hidden !important;
+    }
+    
+    .mce-content-body table td {
+        padding: 6px 4px !important;
+        font-size: 9px !important;
+        max-width: 80px !important;
+        white-space: nowrap !important;
+        text-overflow: ellipsis !important;
+        overflow: hidden !important;
+    }
+}
+
+/* ========================================
+   TAM EKRAN MOBİL SINIFI
+   ======================================== */
+
+/* Mobil fullscreen sınıfı için ek optimizasyonlar */
+.mobile-fullscreen {
+    margin-left: -15px !important;
+    margin-right: -15px !important;
+    width: calc(100% + 30px) !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+}
+
+.mobile-fullscreen .responsive-table {
+    border-radius: 0 !important;
+    width: 100% !important;
+    min-width: 100% !important;
+}
+
+/* Container'a uygulanan fullscreen stili */
+.container.table-fullscreen,
+.container-fluid.table-fullscreen {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
 }
 
 /* ========================================
