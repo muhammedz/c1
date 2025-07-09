@@ -852,25 +852,7 @@
             automatic_uploads: false, // Otomatik yüklemeyi devre dışı bıraktık
             object_resizing: 'img',
             file_picker_types: 'file media', // image tipini de ekleyelim
-            
-            // Responsive Table Ayarları
-            table_default_attributes: {
-                'width': '100%',
-                'border': '1',
-                'cellpadding': '8',
-                'cellspacing': '0'
-            },
-            table_default_styles: {
-                'width': '100%',
-                'border-collapse': 'collapse',
-                'margin': '20px 0',
-                'border-radius': '8px',
-                'overflow': 'hidden',
-                'box-shadow': '0 2px 8px rgba(0,0,0,0.1)'
-            },
-            table_sizing_mode: 'responsive', // Responsive tablo modu
-            table_style_by_css: true, // CSS ile stillendirme
-            table_resize_bars: true, // Tablo boyutlandırma çubukları
+
             
             // Varsayılan resim dialogunu tamamen devre dışı bırak
             images_upload_handler: function (blobInfo, success, failure) {

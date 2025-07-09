@@ -1372,11 +1372,7 @@
        }
     </style>
     
-    <!-- Responsive Tables CSS -->
-    <link rel="stylesheet" href="{{ asset('css/responsive-tables.css') }}">
-    
-    <!-- Responsive Tables JavaScript -->
-    <script src="{{ asset('js/responsive-tables.js') }}" defer></script>
+
     
     <!-- Dinamik Header CSS -->
     @php
