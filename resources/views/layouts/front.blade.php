@@ -1372,6 +1372,9 @@
        }
     </style>
     
+    <!-- Responsive Tables CSS -->
+    <link rel="stylesheet" href="{{ asset('css/responsive-tables.css') }}">
+    
     <!-- Dinamik Header CSS -->
     @php
         $headerSettings = app(\App\Services\HeaderService::class)->getHeaderSettings();
@@ -1386,6 +1389,9 @@
     
     <!-- Ek SEO meta etiketleri -->
     @yield('additional_head')
+    
+    <!-- Responsive Tables JavaScript -->
+    <script src="{{ asset('js/responsive-tables.js') }}" defer></script>
 </head>
 
 <body class="bg-slate-100 overflow-x-hidden">

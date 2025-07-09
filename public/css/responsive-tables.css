@@ -1,0 +1,366 @@
+/* ========================================
+   RESPONSIVE TABLES CSS
+   Mobil cihazlar için tablo optimizasyonu
+   ======================================== */
+
+/* Genel Tablo Container */
+.table-responsive-mobile {
+    position: relative;
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin: 1rem 0;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    background: white;
+}
+
+/* Mobil Scroll Göstergesi */
+.table-responsive-mobile::before {
+    content: "👈 Kaydırın";
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(0,53,43,0.9);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    z-index: 10;
+    display: none;
+}
+
+/* Temel Tablo Stilleri */
+.responsive-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0;
+    font-size: 14px;
+    background: white;
+    min-width: 600px; /* Minimum genişlik - yatay kaydırma için */
+}
+
+.responsive-table thead {
+    background: linear-gradient(135deg, #00352b 0%, #004d3a 100%);
+    color: white;
+}
+
+.responsive-table th {
+    padding: 12px 8px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border: 1px solid rgba(255,255,255,0.2);
+    white-space: nowrap;
+}
+
+.responsive-table td {
+    padding: 10px 8px;
+    border-bottom: 1px solid #e5e7eb;
+    vertical-align: middle;
+    border-right: 1px solid #f3f4f6;
+}
+
+.responsive-table tbody tr:nth-child(even) {
+    background-color: #f9fafb;
+}
+
+.responsive-table tbody tr:hover {
+    background-color: #f3f4f6;
+    transform: scale(1.001);
+    transition: all 0.2s ease;
+}
+
+/* ========================================
+   MOBIL OPTIMIZASYONLARI
+   ======================================== */
+
+@media (max-width: 768px) {
+    /* Scroll göstergesi aktif */
+    .table-responsive-mobile::before {
+        display: block;
+    }
+    
+    .responsive-table {
+        font-size: 12px;
+        min-width: 550px;
+    }
+    
+    .responsive-table th {
+        padding: 8px 6px;
+        font-size: 11px;
+    }
+    
+    .responsive-table td {
+        padding: 8px 6px;
+        font-size: 12px;
+    }
+    
+    /* Kısa metin için otomatik kırpma */
+    .responsive-table td {
+        max-width: 120px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    
+    /* Önemli sütunlar için genişlik korunur */
+    .responsive-table th.important,
+    .responsive-table td.important {
+        min-width: 100px;
+        white-space: normal;
+        word-wrap: break-word;
+    }
+    
+    /* Aksiyon butonları */
+    .responsive-table .action-buttons {
+        white-space: nowrap;
+        min-width: 80px;
+    }
+    
+    .responsive-table .action-buttons .btn {
+        padding: 4px 8px;
+        font-size: 10px;
+        margin: 1px;
+    }
+}
+
+/* ========================================
+   CARD LAYOUT ALTERNATIVE (En küçük ekranlar için)
+   ======================================== */
+
+@media (max-width: 480px) {
+    .table-to-cards .table-responsive-mobile {
+        overflow: visible;
+        background: transparent;
+        box-shadow: none;
+    }
+    
+    .table-to-cards .responsive-table,
+    .table-to-cards .responsive-table thead,
+    .table-to-cards .responsive-table tbody,
+    .table-to-cards .responsive-table th,
+    .table-to-cards .responsive-table td,
+    .table-to-cards .responsive-table tr {
+        display: block;
+    }
+    
+    .table-to-cards .responsive-table thead tr {
+        position: absolute;
+        top: -9999px;
+        left: -9999px;
+    }
+    
+    .table-to-cards .responsive-table tr {
+        background: white;
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 15px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        border: 1px solid #e5e7eb;
+    }
+    
+    .table-to-cards .responsive-table td {
+        border: none;
+        border-bottom: 1px solid #f3f4f6;
+        position: relative;
+        padding: 8px 0 8px 40%;
+        text-align: left;
+        max-width: none;
+        white-space: normal;
+    }
+    
+    .table-to-cards .responsive-table td:before {
+        content: attr(data-label) ":";
+        position: absolute;
+        left: 0;
+        width: 35%;
+        padding-right: 10px;
+        white-space: nowrap;
+        font-weight: 600;
+        color: #374151;
+        font-size: 11px;
+    }
+    
+    .table-to-cards .responsive-table td:last-child {
+        border-bottom: none;
+    }
+}
+
+/* ========================================
+   TINYMCE TABLO İYİLEŞTİRMELERİ
+   ======================================== */
+
+/* TinyMCE editörde oluşturulan tablolar için */
+.mce-content-body table {
+    width: 100% !important;
+    max-width: 100% !important;
+    table-layout: auto !important;
+    border-collapse: collapse !important;
+    margin: 20px 0 !important;
+    background: white !important;
+    border-radius: 8px !important;
+    overflow: hidden !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
+}
+
+.mce-content-body table th {
+    background: #00352b !important;
+    color: white !important;
+    padding: 12px 10px !important;
+    font-weight: 600 !important;
+    font-size: 14px !important;
+    text-align: left !important;
+    border: 1px solid rgba(255,255,255,0.2) !important;
+}
+
+.mce-content-body table td {
+    padding: 10px !important;
+    border: 1px solid #e5e7eb !important;
+    vertical-align: middle !important;
+    font-size: 14px !important;
+    line-height: 1.4 !important;
+}
+
+.mce-content-body table tbody tr:nth-child(even) {
+    background-color: #f8fafc !important;
+}
+
+.mce-content-body table tbody tr:hover {
+    background-color: #f1f5f9 !important;
+}
+
+/* Mobilde TinyMCE tabloları */
+@media (max-width: 768px) {
+    .mce-content-body table {
+        font-size: 12px !important;
+        margin: 15px 0 !important;
+    }
+    
+    .mce-content-body table th {
+        padding: 8px 6px !important;
+        font-size: 12px !important;
+    }
+    
+    .mce-content-body table td {
+        padding: 8px 6px !important;
+        font-size: 12px !important;
+        max-width: 150px !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        white-space: nowrap !important;
+    }
+}
+
+/* ========================================
+   YARDIMCI SINIFLAR
+   ======================================== */
+
+/* Responsive wrapper otomatik sarma */
+.auto-responsive-table {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin: 1rem 0;
+}
+
+/* Tam genişlik tabloları */
+.full-width-table {
+    width: 100% !important;
+    min-width: 100% !important;
+}
+
+/* Sıkışık tablo */
+.compact-table th,
+.compact-table td {
+    padding: 6px 8px !important;
+    font-size: 12px !important;
+}
+
+/* Geniş tablo (masaüstü) */
+.wide-table {
+    min-width: 800px;
+}
+
+/* Renk varyantları */
+.table-success thead {
+    background: linear-gradient(135deg, #059669 0%, #047857 100%) !important;
+}
+
+.table-info thead {
+    background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%) !important;
+}
+
+.table-warning thead {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important;
+}
+
+.table-danger thead {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
+}
+
+/* ========================================
+   JAVASCRIPT ETKİLEŞİMLERİ İÇİN
+   ======================================== */
+
+/* Sıralanabilir tablolar */
+.sortable-table th {
+    cursor: pointer;
+    user-select: none;
+    position: relative;
+}
+
+.sortable-table th:hover {
+    background-color: rgba(255,255,255,0.1) !important;
+}
+
+.sortable-table th.sorted-asc::after {
+    content: "↑";
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.sortable-table th.sorted-desc::after {
+    content: "↓";
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+/* Filtreli tablolar */
+.filterable-table .filter-row {
+    background: #f8fafc !important;
+}
+
+.filterable-table .filter-row input {
+    width: 100%;
+    padding: 4px 6px;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    font-size: 12px;
+}
+
+/* Loading durumu */
+.table-loading {
+    opacity: 0.6;
+    pointer-events: none;
+    position: relative;
+}
+
+.table-loading::after {
+    content: "Yükleniyor...";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0,53,43,0.9);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 4px;
+    font-size: 14px;
+    z-index: 100;
+} 
