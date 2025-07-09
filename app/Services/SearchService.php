@@ -16,7 +16,7 @@ use Illuminate\Support\Collection;
 class SearchService
 {
     /**
-     * Gelişmiş arama işlemi - Kelime sınırları ile optimize edilmiş
+     * Gelişmiş arama işlemi - MySQL 9.x uyumlu
      * 
      * @param string $query
      * @return array
@@ -87,15 +87,15 @@ class SearchService
     }
     
     /**
-     * Kelime sınırları ile REGEXP oluştur - "kent" != "Başkent"
+     * Kelime sınırları ile REGEXP oluştur - MySQL 9.x uyumlu
      * 
      * @param string $word
      * @return string
      */
     private function createWordBoundaryRegex(string $word): string
     {
-        // MySQL word boundaries: [[:<:]] ve [[:>:]]
-        return "[[:<:]]" . preg_quote($word, '/') . "[[:>:]]";
+        // MySQL 9.x için \\b kelime sınırları kullan
+        return '\\b' . preg_quote($word, '/') . '\\b';
     }
     
     /**
@@ -131,22 +131,34 @@ class SearchService
         $additionalResults = $exactResults->whereNotIn('id', $existingIds);
         $results = $results->merge($additionalResults);
         
-        // 3. Kelime sınırları ile arama (daha kesin) - Sadece yeterli sonuç yoksa
+        // 3. Kelime sınırları ile arama - Sadece yeterli sonuç yoksa
         if ($results->count() < 3) {
             $words = explode(' ', $normalizedQuery);
             if (count($words) > 1) {
                 foreach ($words as $word) {
-                    // Minimum 5 karakter ve blacklist kontrolü (daha katı)
+                    // Minimum 5 karakter ve blacklist kontrolü
                     if (strlen($word) >= 5 && !$this->isBlacklistedWord($word)) {
-                        $wordRegex = $this->createWordBoundaryRegex($word);
-                        
-                        $wordResults = Service::where('status', 'published')
-                            ->where('title', 'REGEXP', $wordRegex)
-                            ->get();
-                        
-                        $existingIds = $results->pluck('id')->toArray();
-                        $additionalResults = $wordResults->whereNotIn('id', $existingIds);
-                        $results = $results->merge($additionalResults);
+                        try {
+                            $wordRegex = $this->createWordBoundaryRegex($word);
+                            
+                            $wordResults = Service::where('status', 'published')
+                                ->where('title', 'REGEXP', $wordRegex)
+                                ->get();
+                            
+                            $existingIds = $results->pluck('id')->toArray();
+                            $additionalResults = $wordResults->whereNotIn('id', $existingIds);
+                            $results = $results->merge($additionalResults);
+                        } catch (\Exception $e) {
+                            // REGEXP hatası durumunda LIKE kullan
+                            $wordResults = Service::where('status', 'published')
+                                ->where('title', 'LIKE', "%{$word}%")
+                                ->limit(3)
+                                ->get();
+                            
+                            $existingIds = $results->pluck('id')->toArray();
+                            $additionalResults = $wordResults->whereNotIn('id', $existingIds);
+                            $results = $results->merge($additionalResults);
+                        }
                     }
                 }
             }
@@ -211,15 +223,27 @@ class SearchService
             if (count($words) > 1) {
                 foreach ($words as $word) {
                     if (strlen($word) >= 5 && !$this->isBlacklistedWord($word)) {
-                        $wordRegex = $this->createWordBoundaryRegex($word);
-                        
-                        $wordResults = News::where('status', 'published')
-                            ->where('title', 'REGEXP', $wordRegex)
-                            ->get();
-                        
-                        $existingIds = $results->pluck('id')->toArray();
-                        $additionalResults = $wordResults->whereNotIn('id', $existingIds);
-                        $results = $results->merge($additionalResults);
+                        try {
+                            $wordRegex = $this->createWordBoundaryRegex($word);
+                            
+                            $wordResults = News::where('status', 'published')
+                                ->where('title', 'REGEXP', $wordRegex)
+                                ->get();
+                            
+                            $existingIds = $results->pluck('id')->toArray();
+                            $additionalResults = $wordResults->whereNotIn('id', $existingIds);
+                            $results = $results->merge($additionalResults);
+                        } catch (\Exception $e) {
+                            // REGEXP hatası durumunda LIKE kullan
+                            $wordResults = News::where('status', 'published')
+                                ->where('title', 'LIKE', "%{$word}%")
+                                ->limit(3)
+                                ->get();
+                            
+                            $existingIds = $results->pluck('id')->toArray();
+                            $additionalResults = $wordResults->whereNotIn('id', $existingIds);
+                            $results = $results->merge($additionalResults);
+                        }
                     }
                 }
             }
@@ -276,18 +300,33 @@ class SearchService
             if (count($words) > 1) {
                 foreach ($words as $word) {
                     if (strlen($word) >= 5 && !$this->isBlacklistedWord($word)) {
-                        $wordRegex = $this->createWordBoundaryRegex($word);
-                        
-                        $wordResults = Page::published()
-                            ->where(function($q) use ($wordRegex) {
-                                $q->where('title', 'REGEXP', $wordRegex)
-                                  ->orWhere('summary', 'REGEXP', $wordRegex);
-                            })
-                            ->get();
-                        
-                        $existingIds = $results->pluck('id')->toArray();
-                        $additionalResults = $wordResults->whereNotIn('id', $existingIds);
-                        $results = $results->merge($additionalResults);
+                        try {
+                            $wordRegex = $this->createWordBoundaryRegex($word);
+                            
+                            $wordResults = Page::published()
+                                ->where(function($q) use ($wordRegex) {
+                                    $q->where('title', 'REGEXP', $wordRegex)
+                                      ->orWhere('summary', 'REGEXP', $wordRegex);
+                                })
+                                ->get();
+                            
+                            $existingIds = $results->pluck('id')->toArray();
+                            $additionalResults = $wordResults->whereNotIn('id', $existingIds);
+                            $results = $results->merge($additionalResults);
+                        } catch (\Exception $e) {
+                            // REGEXP hatası durumunda LIKE kullan
+                            $wordResults = Page::published()
+                                ->where(function($q) use ($word) {
+                                    $q->where('title', 'LIKE', "%{$word}%")
+                                      ->orWhere('summary', 'LIKE', "%{$word}%");
+                                })
+                                ->limit(3)
+                                ->get();
+                            
+                            $existingIds = $results->pluck('id')->toArray();
+                            $additionalResults = $wordResults->whereNotIn('id', $existingIds);
+                            $results = $results->merge($additionalResults);
+                        }
                     }
                 }
             }
@@ -297,7 +336,7 @@ class SearchService
     }
     
     /**
-     * Projelerde arama yap - İyileştirilmiş algoritma
+     * Projelerde arama yap - Basitleştirilmiş
      */
     private function searchProjects(string $normalizedQuery, string $originalQuery): Collection
     {
@@ -314,16 +353,15 @@ class SearchService
         
         $results = $results->merge($exactResults);
         
-        // Kelime sınırları ile arama
+        // LIKE ile kelime arama (REGEXP yerine)
         if ($results->count() < 3) {
             $words = explode(' ', $normalizedQuery);
             foreach ($words as $word) {
                 if (strlen($word) >= 5 && !$this->isBlacklistedWord($word)) {
-                    $wordRegex = $this->createWordBoundaryRegex($word);
-                    
                     $wordResults = Project::where('is_active', true)
-                        ->where('title', 'REGEXP', $wordRegex)
+                        ->where('title', 'LIKE', "%{$word}%")
                         ->with('category')
+                        ->limit(3)
                         ->get();
                     
                     $existingIds = $results->pluck('id')->toArray();
@@ -337,7 +375,7 @@ class SearchService
     }
     
     /**
-     * Rehber yerlerinde arama yap - İyileştirilmiş algoritma
+     * Rehber yerlerinde arama yap - Basitleştirilmiş
      */
     private function searchGuides(string $normalizedQuery, string $originalQuery): Collection
     {
@@ -354,16 +392,15 @@ class SearchService
         
         $results = $results->merge($exactResults);
         
-        // Kelime sınırları ile arama
+        // LIKE ile kelime arama
         if ($results->count() < 3) {
             $words = explode(' ', $normalizedQuery);
             foreach ($words as $word) {
                 if (strlen($word) >= 5 && !$this->isBlacklistedWord($word)) {
-                    $wordRegex = $this->createWordBoundaryRegex($word);
-                    
                     $wordResults = GuidePlace::where('is_active', true)
-                        ->where('title', 'REGEXP', $wordRegex)
+                        ->where('title', 'LIKE', "%{$word}%")
                         ->with('category')
+                        ->limit(3)
                         ->get();
                     
                     $existingIds = $results->pluck('id')->toArray();
@@ -377,7 +414,7 @@ class SearchService
     }
     
     /**
-     * Çankaya Evlerinde arama yap - İyileştirilmiş algoritma
+     * Çankaya Evlerinde arama yap - Basitleştirilmiş
      */
     private function searchCankayaHouses(string $normalizedQuery, string $originalQuery): Collection
     {
@@ -393,15 +430,14 @@ class SearchService
         
         $results = $results->merge($exactResults);
         
-        // Kelime sınırları ile arama
+        // LIKE ile kelime arama
         if ($results->count() < 3) {
             $words = explode(' ', $normalizedQuery);
             foreach ($words as $word) {
                 if (strlen($word) >= 5 && !$this->isBlacklistedWord($word)) {
-                    $wordRegex = $this->createWordBoundaryRegex($word);
-                    
                     $wordResults = CankayaHouse::where('status', 'active')
-                        ->where('name', 'REGEXP', $wordRegex)
+                        ->where('name', 'LIKE', "%{$word}%")
+                        ->limit(3)
                         ->get();
                     
                     $existingIds = $results->pluck('id')->toArray();
@@ -415,7 +451,7 @@ class SearchService
     }
     
     /**
-     * Müdürlüklerde arama yap - İyileştirilmiş algoritma
+     * Müdürlüklerde arama yap - Basitleştirilmiş
      */
     private function searchMudurlukler(string $normalizedQuery, string $originalQuery): Collection
     {
@@ -431,15 +467,14 @@ class SearchService
         
         $results = $results->merge($exactResults);
         
-        // Kelime sınırları ile arama
+        // LIKE ile kelime arama
         if ($results->count() < 3) {
             $words = explode(' ', $normalizedQuery);
             foreach ($words as $word) {
                 if (strlen($word) >= 5 && !$this->isBlacklistedWord($word)) {
-                    $wordRegex = $this->createWordBoundaryRegex($word);
-                    
                     $wordResults = Mudurluk::where('is_active', true)
-                        ->where('name', 'REGEXP', $wordRegex)
+                        ->where('name', 'LIKE', "%{$word}%")
+                        ->limit(3)
                         ->get();
                     
                     $existingIds = $results->pluck('id')->toArray();
@@ -450,17 +485,21 @@ class SearchService
         }
         
         // Müdürlük dosyalarında arama
-        $searchSettings = \App\Models\SearchSetting::getSettings();
-        if ($searchSettings->search_in_mudurluk_files) {
-            $fileResults = $this->searchMudurlukFiles($normalizedQuery, $originalQuery);
-            $results = $results->merge($fileResults);
+        try {
+            $searchSettings = \App\Models\SearchSetting::getSettings();
+            if ($searchSettings->search_in_mudurluk_files) {
+                $fileResults = $this->searchMudurlukFiles($normalizedQuery, $originalQuery);
+                $results = $results->merge($fileResults);
+            }
+        } catch (\Exception $e) {
+            // SearchSetting modeli yoksa devam et
         }
         
         return $results;
     }
     
     /**
-     * Arşivlerde arama yap - İyileştirilmiş algoritma
+     * Arşivlerde arama yap - Basitleştirilmiş
      */
     private function searchArchives(string $normalizedQuery, string $originalQuery): Collection
     {
@@ -487,15 +526,14 @@ class SearchService
         $additionalResults = $exactResults->whereNotIn('id', $existingIds);
         $results = $results->merge($additionalResults);
         
-        // Kelime sınırları ile arama
+        // LIKE ile kelime arama
         if ($results->count() < 3) {
             $words = explode(' ', $normalizedQuery);
             foreach ($words as $word) {
                 if (strlen($word) >= 5 && !$this->isBlacklistedWord($word)) {
-                    $wordRegex = $this->createWordBoundaryRegex($word);
-                    
                     $wordResults = Archive::where('status', 'published')
-                        ->where('title', 'REGEXP', $wordRegex)
+                        ->where('title', 'LIKE', "%{$word}%")
+                        ->limit(3)
                         ->get();
                     
                     $existingIds = $results->pluck('id')->toArray();
@@ -509,7 +547,7 @@ class SearchService
     }
     
     /**
-     * Müdürlük dosyalarında arama yap - İyileştirilmiş algoritma
+     * Müdürlük dosyalarında arama yap
      */
     private function searchMudurlukFiles(string $normalizedQuery, string $originalQuery): Collection
     {
@@ -560,7 +598,7 @@ class SearchService
     }
     
     /**
-     * İyileştirilmiş Blacklist - daha az kısıtlayıcı
+     * İyileştirilmiş Blacklist - MySQL REGEXP sorunları için
      * 
      * @param string $word
      * @return bool
@@ -578,6 +616,9 @@ class SearchService
             // Belediye genel terimleri (çok geniş sonuç verenler)
             'hizmet', 'hizmetler', 'merkez', 'merkezi', 'alan', 'alani',
             'belediye', 'belediyesi', 'müdür', 'müdürü', 'başkan', 'başkanı',
+            
+            // Problematik kelimeler - şimdilik kaldırıldı
+            // 'kent' - çok kısıtlayıcı olduğu için kaldırıldı
             
             // İngilizce yaygın kelimeler
             'the', 'and', 'that', 'with', 'from', 'have', 'this', 'they'
