@@ -699,6 +699,14 @@
                     <div class="news-content">
                         {!! html_entity_decode($news->content) !!}
                     </div>
+                    
+                    <!-- Mobil kullanıcılar için tablo uyarısı -->
+                    <div class="mobile-table-warning d-block d-md-none" style="background: linear-gradient(135deg, #e3f2fd 0%, #f8f9fa 100%); border: 1px solid #2196f3; border-radius: 8px; padding: 12px; margin: 15px 0; font-size: 12px; color: #1976d2;">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <i class="fas fa-info-circle" style="color: #2196f3;"></i>
+                            <span><strong>Mobil Görüntüleme İpucu:</strong> Tablolarda detay görmek için cihazınızı yaklaştırabilir veya yatay kaydırma yapabilirsiniz.</span>
+                        </div>
+                    </div>
 
                     <!-- Galeri Bölümü -->
                     @if(!empty($news->filemanagersystem_gallery))

@@ -1257,11 +1257,11 @@ $(document).ready(function () {
                             <input type="hidden" name="headline" value="{{ request('headline') }}">
                         @endif
                         <select id="category-filter" name="category" class="form-select form-select-sm border-0 bg-light text-secondary" onchange="document.getElementById('category-form').submit()">
-                            <option value="">Tüm Kategoriler</option>
-                            @foreach($newsCategories as $category)
+                        <option value="">Tüm Kategoriler</option>
+                        @foreach($newsCategories as $category)
                                 <option value="{{ $category->id }}" {{ request('category') == $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
-                            @endforeach
-                        </select>
+                        @endforeach
+                    </select>
                     </form>
                 </div>
 
@@ -1277,10 +1277,10 @@ $(document).ready(function () {
                             <input type="hidden" name="headline" value="{{ request('headline') }}">
                         @endif
                         <select id="status-filter" name="status" class="form-select form-select-sm border-0 bg-light text-secondary" onchange="document.getElementById('status-form').submit()">
-                            <option value="">Tüm Durumlar</option>
+                        <option value="">Tüm Durumlar</option>
                             <option value="published" {{ request('status') == 'published' ? 'selected' : '' }}>Yayında</option>
                             <option value="draft" {{ request('status') == 'draft' ? 'selected' : '' }}>Taslak</option>
-                        </select>
+                    </select>
                     </form>
                 </div>
                 
@@ -1301,7 +1301,7 @@ $(document).ready(function () {
                             <option value="exclude" {{ request('headline') == 'exclude' ? 'selected' : '' }}>Manşet Olmayan</option>
                             <option value="featured" {{ request('headline') == 'featured' ? 'selected' : '' }}>Öne Çıkan</option>
                             <option value="archived" {{ request('headline') == 'archived' ? 'selected' : '' }}>Arşivlenmiş</option>
-                        </select>
+                    </select>
                     </form>
                 </div>
                 
@@ -1322,13 +1322,13 @@ $(document).ready(function () {
                         @if(request()->has('direction'))
                             <input type="hidden" name="direction" value="{{ request('direction') }}">
                         @endif
-                        <div class="input-group border-0 bg-light rounded pe-0">
-                            <span class="input-group-text border-0 bg-transparent px-2">
-                                <i class="fas fa-search text-muted"></i>
-                            </span>
+                    <div class="input-group border-0 bg-light rounded pe-0">
+                        <span class="input-group-text border-0 bg-transparent px-2">
+                            <i class="fas fa-search text-muted"></i>
+                        </span>
                             <input type="search" name="search" id="custom-search" class="form-control form-control-sm border-0 bg-light shadow-none" placeholder="Ara..." value="{{ request('search') }}">
                             <button type="submit" class="btn btn-sm btn-primary">Ara</button>
-                        </div>
+                    </div>
                     </form>
                 </div>
                 

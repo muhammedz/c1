@@ -252,50 +252,67 @@
 @media (max-width: 768px) {
     .mce-content-body table {
         font-size: 12px !important;
-        margin: 15px 0 !important;
-        width: 100% !important;
-        table-layout: auto !important;
+        margin: 15px -15px !important; /* Mobilde kenarlara dayat */
+        width: calc(100% + 30px) !important; /* Tam genişlik */
+        table-layout: fixed !important; /* Sütunları eşit genişlikte yap */
+        border-radius: 0 !important; /* Köşe yuvarlama kaldır */
+        box-shadow: none !important; /* Gölge kaldır */
     }
     
     .mce-content-body table th {
-        padding: 8px 6px !important;
+        padding: 10px 8px !important;
         font-size: 12px !important;
+        white-space: nowrap !important;
+        text-overflow: ellipsis !important;
+        overflow: hidden !important;
     }
     
     .mce-content-body table td {
-        padding: 8px 6px !important;
+        padding: 10px 8px !important;
         font-size: 12px !important;
-        max-width: 120px !important;
-        overflow: hidden !important;
-        text-overflow: ellipsis !important;
         white-space: nowrap !important;
+        text-overflow: ellipsis !important;
+        overflow: hidden !important;
+        word-break: break-word !important;
     }
 }
 
 /* En küçük mobil ekranlar için TinyMCE tabloları */
 @media (max-width: 480px) {
     .mce-content-body table {
-        font-size: 10px !important;
+        font-size: 11px !important;
         margin: 10px -15px !important; /* Sayfa kenarlarına dayat */
         width: calc(100% + 30px) !important;
         border-radius: 0 !important;
+        table-layout: fixed !important; /* Sütun genişliklerini eşitle */
     }
     
     .mce-content-body table th {
-        padding: 6px 4px !important;
-        font-size: 9px !important;
-        max-width: 80px !important;
+        padding: 8px 6px !important;
+        font-size: 10px !important;
+        max-width: none !important; /* Max-width kısıtlamasını kaldır */
+        width: auto !important;
         text-overflow: ellipsis !important;
         overflow: hidden !important;
+        white-space: nowrap !important;
     }
     
     .mce-content-body table td {
-        padding: 6px 4px !important;
-        font-size: 9px !important;
-        max-width: 80px !important;
+        padding: 8px 6px !important;
+        font-size: 10px !important;
+        max-width: none !important; /* Max-width kısıtlamasını kaldır */
+        width: auto !important;
         white-space: nowrap !important;
         text-overflow: ellipsis !important;
         overflow: hidden !important;
+        word-break: break-word !important;
+    }
+    
+    /* Her sütunun eşit genişlikte olmasını sağla */
+    .mce-content-body table th,
+    .mce-content-body table td {
+        min-width: 0 !important;
+        max-width: none !important;
     }
 }
 
@@ -323,6 +340,100 @@
 .container-fluid.table-fullscreen {
     padding-left: 0 !important;
     padding-right: 0 !important;
+}
+
+/* ========================================
+   FRONTEND SAYFA İÇERİKLERİ İÇİN ÖZEl KURALLAR
+   ======================================== */
+
+/* Frontend sayfalarında prose sınıfı içerisindeki tablolar */
+.prose table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    margin: 25px 0 !important;
+    border-radius: 8px !important;
+    overflow: hidden !important;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05) !important;
+}
+
+.prose table thead {
+    background-color: #00352b !important;
+    color: white !important;
+}
+
+.prose table th {
+    font-weight: 600 !important;
+    text-align: left !important;
+    padding: 14px 16px !important;
+    font-size: 14px !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+}
+
+.prose table td {
+    padding: 12px 16px !important;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05) !important;
+    font-size: 14px !important;
+    vertical-align: middle !important;
+}
+
+.prose table tr:last-child td {
+    border-bottom: none !important;
+}
+
+.prose table tr:nth-child(even) {
+    background-color: rgba(0, 0, 0, 0.02) !important;
+}
+
+.prose table tr:hover {
+    background-color: rgba(0, 53, 43, 0.03) !important;
+}
+
+/* Frontend mobil tam ekran tablolar */
+@media (max-width: 768px) {
+    .prose table {
+        margin: 20px -15px !important; /* Sayfa padding'ini iptal et */
+        width: calc(100% + 30px) !important; /* Tam genişlik */
+        border-radius: 0 !important; /* Köşe yuvarlama kaldır */
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important; /* Daha hafif gölge */
+        table-layout: fixed !important; /* Sütunları eşit genişlikte yap */
+    }
+    
+    .prose table th {
+        padding: 10px 8px !important;
+        font-size: 12px !important;
+        white-space: nowrap !important;
+        text-overflow: ellipsis !important;
+        overflow: hidden !important;
+    }
+    
+    .prose table td {
+        padding: 10px 8px !important;
+        font-size: 12px !important;
+        white-space: nowrap !important;
+        text-overflow: ellipsis !important;
+        overflow: hidden !important;
+        word-break: break-word !important;
+    }
+}
+
+/* En küçük mobil ekranlar için frontend tablolar */
+@media (max-width: 480px) {
+    .prose table {
+        margin: 15px -15px !important;
+        width: calc(100% + 30px) !important;
+        font-size: 11px !important;
+    }
+    
+    .prose table th {
+        padding: 8px 6px !important;
+        font-size: 10px !important;
+    }
+    
+    .prose table td {
+        padding: 8px 6px !important;
+        font-size: 10px !important;
+    }
 }
 
 /* ========================================

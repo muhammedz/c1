@@ -203,6 +203,62 @@
         text-align: left;
         caption-side: top;
     }
+    
+    /* ========================================
+       MOBİL TAM EKRAN TABLO OPTİMİZASYONU
+       ======================================== */
+    
+    /* Tablet ve mobil için tam ekran tablolar */
+    @media (max-width: 768px) {
+        table {
+            margin: 20px -15px !important; /* Sayfa padding'ini iptal et */
+            width: calc(100% + 30px) !important; /* Tam genişlik */
+            border-radius: 0 !important; /* Köşe yuvarlama kaldır */
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important; /* Daha hafif gölge */
+            table-layout: fixed !important; /* Sütunları eşit genişlikte yap */
+        }
+        
+        table th {
+            padding: 10px 8px !important;
+            font-size: 12px !important;
+            white-space: nowrap !important;
+            text-overflow: ellipsis !important;
+            overflow: hidden !important;
+        }
+        
+        table td {
+            padding: 10px 8px !important;
+            font-size: 12px !important;
+            white-space: nowrap !important;
+            text-overflow: ellipsis !important;
+            overflow: hidden !important;
+            word-break: break-word !important;
+        }
+        
+        table caption {
+            margin: 0 15px !important; /* Caption için kenarlık */
+            border-radius: 0 !important;
+        }
+    }
+    
+    /* En küçük mobil ekranlar için */
+    @media (max-width: 480px) {
+        table {
+            margin: 15px -15px !important;
+            width: calc(100% + 30px) !important;
+            font-size: 11px !important;
+        }
+        
+        table th {
+            padding: 8px 6px !important;
+            font-size: 10px !important;
+        }
+        
+        table td {
+            padding: 8px 6px !important;
+            font-size: 10px !important;
+        }
+    }
 </style>
 @endsection
 
@@ -320,6 +376,14 @@
             <article class="prose prose-lg max-w-none mb-8 prose-headings:text-gray-800 prose-p:text-gray-700 prose-a:text-[#00352b] prose-a:no-underline hover:prose-a:text-[#20846c] hover:prose-a:underline prose-img:rounded-lg">
                 {!! $page->content !!}
             </article>
+            
+            <!-- Mobil kullanıcılar için tablo uyarısı -->
+            <div class="mobile-table-warning d-block d-md-none" style="background: linear-gradient(135deg, #e3f2fd 0%, #f8f9fa 100%); border: 1px solid #2196f3; border-radius: 8px; padding: 12px; margin: 15px 0; font-size: 12px; color: #1976d2;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-info-circle" style="color: #2196f3;"></i>
+                    <span><strong>Mobil Görüntüleme İpucu:</strong> Tablolarda detay görmek için cihazınızı yaklaştırabilir veya yatay kaydırma yapabilirsiniz.</span>
+                </div>
+            </div>
         </div>
         
         <!-- Galeri Bölümü -->

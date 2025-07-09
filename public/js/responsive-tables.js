@@ -451,12 +451,54 @@ if (typeof tinymce !== 'undefined') {
     // TinyMCE editörü başlatıldığında tabloları optimize et
     tinymce.on('AddEditor', function(e) {
         e.editor.on('init', function() {
-            this.on('NodeChange', function() {
+            const editor = this;
+            
+            // İçerik değişikliklerini dinle
+            editor.on('NodeChange SetContent KeyUp', function() {
                 // Editör içeriği değiştiğinde tabloları kontrol et
                 setTimeout(() => {
                     window.optimizeTinyMCETables();
+                    
+                    // Tüm tabloları responsive yap
+                    const editorBody = editor.getBody();
+                    const tables = editorBody.querySelectorAll('table');
+                    tables.forEach(table => {
+                        // Responsive CSS sınıfları ekle
+                        if (!table.classList.contains('responsive-table')) {
+                            table.classList.add('responsive-table');
+                        }
+                        
+                        // Mobil optimizasyonu için inline stilleri ekle
+                        table.style.width = '100%';
+                        table.style.borderCollapse = 'collapse';
+                        table.style.tableLayout = 'auto';
+                        
+                        // Başlık ve hücrelere responsive sınıflar ekle
+                        const headers = table.querySelectorAll('th');
+                        const cells = table.querySelectorAll('td');
+                        
+                        headers.forEach(th => {
+                            th.style.padding = '12px 8px';
+                            th.style.fontSize = '14px';
+                            th.style.textAlign = 'left';
+                        });
+                        
+                        cells.forEach(td => {
+                            td.style.padding = '10px 8px';
+                            td.style.fontSize = '14px';
+                            td.style.borderBottom = '1px solid #e5e7eb';
+                            td.style.verticalAlign = 'middle';
+                        });
+                    });
                 }, 100);
             });
         });
+    });
+    
+    // TinyMCE başlatıldıktan sonra tablo stillerini uygula
+    document.addEventListener('DOMContentLoaded', function() {
+        setTimeout(() => {
+            window.optimizeTinyMCETables();
+        }, 1000);
     });
 } 
