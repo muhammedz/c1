@@ -184,36 +184,7 @@
     opacity: 0.6;
 }
 
-/* ========================================
-   RESPONSIVE DATATABLE STİLLER
-   ======================================== */
 
-.frontend-datatable .dtr-control:before {
-    background-color: #00352b;
-    color: white;
-    border-radius: 50%;
-    text-align: center;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.frontend-datatable .dtr-details {
-    background-color: #f8f9fa;
-    border: 1px solid #dee2e6;
-    border-radius: 6px;
-    padding: 15px;
-    margin-top: 10px;
-}
-
-.frontend-datatable .dtr-details .dtr-title {
-    font-weight: 600;
-    color: #00352b;
-    margin-bottom: 5px;
-}
-
-.frontend-datatable .dtr-details .dtr-data {
-    color: #495057;
-    word-wrap: break-word;
-}
 
 /* ========================================
    MOBİL RESPONSIVE STİLLER

@@ -109,10 +109,9 @@
     
     <!-- DataTables CSS -->
     <link rel="stylesheet" href="https://cdn.datatables.net/1.11.4/css/dataTables.bootstrap4.min.css">
-    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.2.7/css/responsive.bootstrap4.min.css">
     
     <!-- Frontend DataTables Custom CSS -->
-    <link rel="stylesheet" href="{{ asset('css/frontend-datatables.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/frontend-datatables.css') }}?v={{ time() }}">
     
     <!-- Font tanımlamaları -->
     <style>
@@ -1402,11 +1401,9 @@
     <!-- DataTables JavaScript -->
     <script src="https://cdn.datatables.net/1.11.4/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.11.4/js/dataTables.bootstrap4.min.js"></script>
-    <script src="https://cdn.datatables.net/responsive/2.2.7/js/dataTables.responsive.min.js"></script>
-    <script src="https://cdn.datatables.net/responsive/2.2.7/js/responsive.bootstrap4.min.js"></script>
     
     <!-- Frontend DataTables Custom JavaScript -->
-    <script src="{{ asset('js/frontend-datatables.js') }}" defer></script>
+    <script src="{{ asset('js/frontend-datatables.js') }}?v={{ time() }}" defer></script>
 </head>
 
 <body class="bg-slate-100 overflow-x-hidden">
