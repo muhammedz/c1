@@ -12,12 +12,32 @@ class NewsCategoryController extends Controller
     /**
      * Haber kategorileri listesi
      */
-    public function index()
+    public function index(Request $request)
     {
-        $newsCategories = NewsCategory::with('parent')
-            ->orderBy('order', 'asc')
+        $query = NewsCategory::with('parent');
+        
+        // Arama filtresi
+        if ($request->has('search') && !empty($request->search)) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%");
+            });
+        }
+        
+        // Durum filtresi
+        if ($request->has('status') && $request->status !== '') {
+            if ($request->status === 'active') {
+                $query->where('is_active', true);
+            } elseif ($request->status === 'inactive') {
+                $query->where('is_active', false);
+            }
+        }
+        
+        $newsCategories = $query->orderBy('order', 'asc')
             ->orderBy('name', 'asc')
-            ->get();
+            ->paginate(20)
+            ->appends($request->all());
             
         return view('admin.news-categories.index', compact('newsCategories'));
     }
