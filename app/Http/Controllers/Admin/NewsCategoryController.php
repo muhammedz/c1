@@ -131,7 +131,7 @@ class NewsCategoryController extends Controller
     }
     
     /**
-     * Haber kategorisi güncelleme - DEBUG EKLENMIŞ
+     * Haber kategorisi güncelleme - CHECKBOX SORUNU ÇÖZÜLDİ
      */
     public function update(Request $request, NewsCategory $newsCategory)
     {
@@ -145,14 +145,14 @@ class NewsCategoryController extends Controller
         ]);
         
         try {
-            // Validasyon
+            // Validasyon - checkbox için düzeltildi
             $validatedData = $request->validate([
                 'name' => 'required|string|max:255',
                 'icon' => 'nullable|string|max:50',
                 'description' => 'nullable|string',
                 'parent_id' => 'nullable|exists:news_categories,id',
                 'order' => 'nullable|integer|min:0',
-                'is_active' => 'boolean'
+                // Checkbox için doğru validasyon: nullable|in:on veya hiç validate etmeyelim
             ]);
             
             \Illuminate\Support\Facades\Log::info('Update validasyon başarılı', ['validated_data' => $validatedData]);
@@ -198,7 +198,7 @@ class NewsCategoryController extends Controller
                     ->with('error', 'Bu isme sahip başka bir haber kategorisi zaten mevcut. Lütfen farklı bir isim seçin.');
             }
             
-            // Güncelleme verileri hazırla
+            // Güncelleme verileri hazırla - checkbox handling düzeltildi
             $updateData = [
                 'name' => $request->name,
                 'slug' => $newSlug,
@@ -206,12 +206,14 @@ class NewsCategoryController extends Controller
                 'description' => $request->description,
                 'parent_id' => $request->parent_id,
                 'order' => $request->order ?? 0,
-                'is_active' => $request->has('is_active')
+                'is_active' => $request->has('is_active') ? true : false  // Checkbox için doğru yaklaşım
             ];
             
             \Illuminate\Support\Facades\Log::info('Update verileri hazırlandı', [
                 'update_data' => $updateData,
-                'old_data' => $newsCategory->toArray()
+                'old_data' => $newsCategory->toArray(),
+                'checkbox_value' => $request->input('is_active'),
+                'has_checkbox' => $request->has('is_active')
             ]);
             
             // Güncelleme işlemi
