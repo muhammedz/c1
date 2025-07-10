@@ -330,7 +330,7 @@
                                             <span class="text-sm font-medium">0505 167 19 67</span>
                                         </a>
                                         
-                                        <a href="https://bridge360.cankaya.bel.tr/web-ticket.html?tscf=1" target="_blank" class="flex items-center" style="display: none;">
+                                        <a href="https://bridge360.cankaya.bel.tr/web-ticket.html?tscf=1" target="_blank" class="flex items-center">
                                             <span class="w-6 h-6 bg-[#007d32] rounded-full flex items-center justify-center mr-2">
                                                 <i class="fas fa-envelope text-white text-xs"></i>
                                             </span>
@@ -379,7 +379,7 @@
                                             <span class="text-sm font-medium">0505 167 19 67</span>
                                         </a>
                                         
-                                        <a href="https://bridge360.cankaya.bel.tr/web-ticket.html?tscf=1" target="_blank" class="flex items-center" style="display: none;">
+                                        <a href="https://bridge360.cankaya.bel.tr/web-ticket.html?tscf=1" target="_blank" class="flex items-center">
                                             <span class="w-8 h-8 bg-[#007d32] rounded-full flex items-center justify-center mr-2">
                                                 <i class="fas fa-envelope text-white text-sm"></i>
                                             </span>
