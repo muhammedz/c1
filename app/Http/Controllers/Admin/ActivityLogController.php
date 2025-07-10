@@ -51,7 +51,7 @@ class ActivityLogController extends Controller
             });
         }
 
-        $activityLogs = $query->paginate(20);
+        $activityLogs = $query->paginate(20)->withQueryString();
 
         // Filtre seçenekleri için veri
         $users = User::select('id', 'name')->orderBy('name')->get();

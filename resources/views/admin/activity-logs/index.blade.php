@@ -200,7 +200,7 @@
             <div class="card-footer text-center">
                 <div class="btn-group" role="group">
                     @if($activityLogs->previousPageUrl())
-                        <a href="{{ $activityLogs->previousPageUrl() }}" class="btn btn-outline-primary">
+                        <a href="{{ $activityLogs->appends(request()->query())->previousPageUrl() }}" class="btn btn-outline-primary">
                             <i class="fas fa-chevron-left"></i> Geri
                         </a>
                     @else
@@ -214,7 +214,7 @@
                     </span>
                     
                     @if($activityLogs->nextPageUrl())
-                        <a href="{{ $activityLogs->nextPageUrl() }}" class="btn btn-outline-primary">
+                        <a href="{{ $activityLogs->appends(request()->query())->nextPageUrl() }}" class="btn btn-outline-primary">
                             İleri <i class="fas fa-chevron-right"></i>
                         </a>
                     @else
