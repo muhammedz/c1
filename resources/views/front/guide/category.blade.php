@@ -129,44 +129,46 @@
 <section class="py-20 bg-gray-50">
     <div class="container max-w-6xl mx-auto px-4">
         @if($places->count() > 0)
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-6">
                 @foreach($places as $place)
                     <div class="bg-white rounded-2xl shadow-sm border border-gray-200 hover:shadow-lg hover:border-green-200 transition-all duration-300 overflow-hidden group">
                         <!-- Resim -->
                         <div class="aspect-video relative overflow-hidden">
-                            @if($place->featured_image_url)
-                                <img src="{{ $place->featured_image_url }}" 
-                                     alt="{{ $place->title }}"
-                                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                            @else
-                                <img src="{{ asset('images/cankaya-default.jpeg') }}" 
-                                     alt="{{ $place->title }}"
-                                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                            @endif
-                            <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                            <a href="{{ route('guide.place', [$category->slug, $place->slug]) }}" class="relative z-10 block w-full h-full">
+                                @if($place->featured_image_url)
+                                    <img src="{{ $place->featured_image_url }}" 
+                                         alt="{{ $place->title }}"
+                                         class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 cursor-pointer">
+                                @else
+                                    <img src="{{ asset('images/cankaya-default.jpeg') }}" 
+                                         alt="{{ $place->title }}"
+                                         class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 cursor-pointer">
+                                @endif
+                            </a>
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
                         </div>
                         
                         <!-- İçerik -->
-                        <div class="p-5">
+                        <div class="p-3 md:p-5">
                             <!-- Başlık -->
                             <a href="{{ route('guide.place', [$category->slug, $place->slug]) }}">
-                                <h3 class="text-lg font-bold text-gray-900 mb-3 line-clamp-2 hover:text-green-700 transition-colors duration-300 cursor-pointer">
+                                <h3 class="text-sm md:text-lg font-bold text-gray-900 mb-2 md:mb-3 line-clamp-2 hover:text-green-700 transition-colors duration-300 cursor-pointer">
                                     {{ $place->title }}
                                 </h3>
                             </a>
                             
                             <!-- İletişim Bilgileri -->
-                            <div class="space-y-2 mb-4">
+                            <div class="space-y-1 md:space-y-2 mb-3 md:mb-4">
                                 @if($place->address)
-                                    <div class="flex items-start text-sm text-gray-600">
-                                        <i class="fas fa-map-marker-alt text-green-600 mt-1 mr-3 text-xs"></i>
-                                        <span class="flex-1 leading-relaxed">{{ $place->address }}</span>
+                                    <div class="flex items-start text-xs md:text-sm text-gray-600">
+                                        <i class="fas fa-map-marker-alt text-green-600 mt-1 mr-2 md:mr-3 text-xs"></i>
+                                        <span class="flex-1 leading-relaxed">{{ Str::limit($place->address, 50) }}</span>
                                     </div>
                                 @endif
                                 
                                 @if($place->phone)
-                                    <div class="flex items-center text-sm text-gray-600">
-                                        <i class="fas fa-phone text-green-600 mr-3 text-xs"></i>
+                                    <div class="flex items-center text-xs md:text-sm text-gray-600">
+                                        <i class="fas fa-phone text-green-600 mr-2 md:mr-3 text-xs"></i>
                                         <span>{{ $place->phone }}</span>
                                     </div>
                                 @endif
@@ -175,16 +177,16 @@
                             <!-- Aksiyon Butonları -->
                             <div class="flex items-center justify-between pt-2 border-t border-gray-100">
                                 <a href="{{ route('guide.place', [$category->slug, $place->slug]) }}" 
-                                   class="inline-flex items-center text-sm font-medium text-green-700 hover:text-green-800 transition-colors">
-                                    <span>Detayları Gör</span>
-                                    <i class="fas fa-arrow-right ml-2 text-xs"></i>
+                                   class="inline-flex items-center text-xs md:text-sm font-medium text-green-700 hover:text-green-800 transition-colors">
+                                    <span>Detaylar</span>
+                                    <i class="fas fa-arrow-right ml-1 md:ml-2 text-xs"></i>
                                 </a>
                                 
-                                <div class="flex items-center gap-2">
+                                <div class="flex items-center gap-1 md:gap-2">
                                     @if($place->maps_link)
                                         <a href="{{ $place->maps_link }}" 
                                            target="_blank" 
-                                           class="inline-flex items-center justify-center w-9 h-9 bg-green-50 hover:bg-green-100 text-green-700 hover:text-green-800 rounded-lg transition-all duration-200 hover:scale-105"
+                                           class="inline-flex items-center justify-center w-7 h-7 md:w-9 md:h-9 bg-green-50 hover:bg-green-100 text-green-700 hover:text-green-800 rounded-lg transition-all duration-200 hover:scale-105"
                                            title="Haritada Göster">
                                             <i class="fas fa-map-marker-alt text-xs"></i>
                                         </a>
@@ -193,7 +195,7 @@
                                     @if($place->website)
                                         <a href="{{ $place->website }}" 
                                            target="_blank" 
-                                           class="inline-flex items-center justify-center w-9 h-9 bg-blue-50 hover:bg-blue-100 text-blue-700 hover:text-blue-800 rounded-lg transition-all duration-200 hover:scale-105"
+                                           class="inline-flex items-center justify-center w-7 h-7 md:w-9 md:h-9 bg-blue-50 hover:bg-blue-100 text-blue-700 hover:text-blue-800 rounded-lg transition-all duration-200 hover:scale-105"
                                            title="Website'yi Ziyaret Et">
                                             <i class="fas fa-external-link-alt text-xs"></i>
                                         </a>
