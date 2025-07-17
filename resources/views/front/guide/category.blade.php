@@ -162,7 +162,7 @@
                                 @if($place->address)
                                     <div class="flex items-start text-xs md:text-sm text-gray-600">
                                         <i class="fas fa-map-marker-alt text-green-600 mt-1 mr-2 md:mr-3 text-xs"></i>
-                                        <span class="flex-1 leading-relaxed">{{ Str::limit($place->address, 50) }}</span>
+                                        <span class="flex-1 leading-relaxed">{{ $place->address }}</span>
                                     </div>
                                 @endif
                                 
