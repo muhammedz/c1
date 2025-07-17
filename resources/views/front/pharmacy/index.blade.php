@@ -284,13 +284,24 @@
 
 <div class="pharmacy-container">
 
-
-
-
-    <!-- Hata Mesajları -->
-    @if($error)
-        <div class="alert alert-danger">
-            <i class="fas fa-exclamation-triangle"></i>
+    <!-- Hata durumunda otomatik yenileme için script -->
+    @if($error && strpos($error, 'cURL error 56') !== false)
+        <div id="loading-message" class="alert alert-info">
+            <i class="fas fa-sync fa-spin"></i>
+            Veriler yenileniyor, lütfen bekleyiniz...
+        </div>
+        
+        <script>
+            // Sayfa yüklendiğinde 2 saniye sonra yenile
+            document.addEventListener('DOMContentLoaded', function() {
+                setTimeout(function() {
+                    window.location.reload();
+                }, 2000);
+            });
+        </script>
+    @elseif($error)
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i>
             {{ $error }}
         </div>
     @endif

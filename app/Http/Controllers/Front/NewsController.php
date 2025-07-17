@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\News;
 use App\Models\NewsCategory;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class NewsController extends Controller
 {
@@ -122,5 +124,37 @@ class NewsController extends Controller
         }
 
         return response()->download(public_path($document->file_path), $document->file_name);
+    }
+
+    /**
+     * Haberi PDF olarak indir
+     * 
+     * Bu method, verilen slug'a sahip haberi PDF formatında kullanıcıya sunar.
+     * PDF içeriği anlık olarak oluşturulur ve diske yazılmaz.
+     * 
+     * @param string $slug Haber slug'ı
+     * @return \Illuminate\Http\Response PDF response
+     * 
+     * @example GET /haber/ornek-haber-basligi/pdf
+     */
+    public function downloadPdf($slug)
+    {
+        // Haberi veritabanından çek (aktif ve yayınlanmış olmalı)
+        $news = News::where('slug', $slug)
+            ->where('status', true)
+            ->firstOrFail();
+
+        // PDF için özel view hazırla
+        $pdf = Pdf::loadView('pdf.haber-pdf', compact('news'));
+        
+        // PDF ayarları
+        $pdf->setPaper('A4', 'portrait'); // A4 boyut, dikey
+        $pdf->setOption('defaultFont', 'DejaVu Sans'); // Türkçe karakter desteği
+        
+        // PDF dosya adını hazırla (tarih + başlık)
+        $filename = date('Y-m-d') . '_' . Str::slug($news->title) . '.pdf';
+        
+        // PDF'i kullanıcıya indir
+        return $pdf->download($filename);
     }
 } 

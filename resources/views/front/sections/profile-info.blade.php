@@ -317,21 +317,21 @@
                                     
                                     <div class="flex flex-col items-start justify-center mt-3 gap-2">
                                         <a href="tel:4440601" class="flex items-center">
-                                            <span class="w-6 h-6 bg-[#007b32] rounded-lg flex items-center justify-center mr-2 hover:bg-[#00352b] hover:scale-105 transition-all shadow-md">
+                                            <span class="w-6 h-6 bg-[#0066cc] rounded-full flex items-center justify-center mr-2">
                                                 <i class="fas fa-phone-alt text-white text-xs"></i>
                                             </span>
                                             <span class="text-sm font-medium">444 06 01</span>
                                         </a>
                                         
                                         <a href="https://wa.me/905051671967" target="_blank" class="flex items-center">
-                                            <span class="w-6 h-6 bg-[#007b32] rounded-lg flex items-center justify-center mr-2 hover:bg-[#00352b] hover:scale-105 transition-all shadow-md">
+                                            <span class="w-6 h-6 bg-[#25D366] rounded-full flex items-center justify-center mr-2">
                                                 <i class="fab fa-whatsapp text-white text-xs"></i>
                                             </span>
                                             <span class="text-sm font-medium">0505 167 19 67</span>
                                         </a>
                                         
                                         <a href="https://bridge360.cankaya.bel.tr/web-ticket.html?tscf=1" target="_blank" class="flex items-center">
-                                            <span class="w-6 h-6 bg-[#007b32] rounded-lg flex items-center justify-center mr-2 hover:bg-[#00352b] hover:scale-105 transition-all shadow-md">
+                                            <span class="w-6 h-6 bg-[#007d32] rounded-full flex items-center justify-center mr-2">
                                                 <i class="fas fa-envelope text-white text-xs"></i>
                                             </span>
                                             <span class="text-sm font-medium">İletişim Formu</span>
@@ -366,21 +366,21 @@
                                     
                                     <div class="flex flex-col items-start justify-center mt-5 gap-2">
                                         <a href="tel:4440601" class="flex items-center">
-                                            <span class="w-8 h-8 bg-[#007b32] rounded-lg flex items-center justify-center mr-2 hover:bg-[#00352b] hover:scale-105 transition-all shadow-md">
+                                            <span class="w-8 h-8 bg-[#0066cc] rounded-full flex items-center justify-center mr-2">
                                                 <i class="fas fa-phone-alt text-white text-sm"></i>
                                             </span>
                                             <span class="text-sm font-medium">444 06 01</span>
                                         </a>
                                         
                                         <a href="https://wa.me/905051671967" target="_blank" class="flex items-center">
-                                            <span class="w-8 h-8 bg-[#007b32] rounded-lg flex items-center justify-center mr-2 hover:bg-[#00352b] hover:scale-105 transition-all shadow-md">
+                                            <span class="w-8 h-8 bg-[#25D366] rounded-full flex items-center justify-center mr-2">
                                                 <i class="fab fa-whatsapp text-white text-sm"></i>
                                             </span>
                                             <span class="text-sm font-medium">0505 167 19 67</span>
                                         </a>
                                         
                                         <a href="https://bridge360.cankaya.bel.tr/web-ticket.html?tscf=1" target="_blank" class="flex items-center">
-                                            <span class="w-8 h-8 bg-[#007b32] rounded-lg flex items-center justify-center mr-2 hover:bg-[#00352b] hover:scale-105 transition-all shadow-md">
+                                            <span class="w-8 h-8 bg-[#007d32] rounded-full flex items-center justify-center mr-2">
                                                 <i class="fas fa-envelope text-white text-sm"></i>
                                             </span>
                                             <span class="text-sm font-medium">İletişim Formu</span>

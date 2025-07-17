@@ -51,6 +51,8 @@ use App\Http\Controllers\Admin\NotFoundController;
 use App\Http\Controllers\Admin\RedirectController;
 use App\Http\Controllers\PharmacyController;
 use App\Http\Controllers\Admin\ActivityLogController;
+use App\Http\Controllers\PageFeedbackController;
+use App\Http\Controllers\Admin\PageFeedbackController as AdminPageFeedbackController;
 use Illuminate\Support\Facades\Cache;
 
 /*
@@ -86,6 +88,13 @@ Route::get('/arama', function() {
 // Öncelikli link tıklama tracking (public)
 Route::post('/priority-link-click/{priorityLink}', [App\Http\Controllers\Admin\SearchPriorityLinkController::class, 'trackClick'])->name('priority-link.track-click');
 
+// Sayfa Geri Bildirim API Route'ları
+Route::prefix('api/page-feedback')->name('page-feedback.')->group(function () {
+    Route::post('/', [PageFeedbackController::class, 'store'])->name('store');
+    Route::get('/stats', [PageFeedbackController::class, 'getPageStats'])->name('stats');
+    Route::get('/check', [PageFeedbackController::class, 'checkUserFeedback'])->name('check');
+});
+
 Route::get('/', [App\Http\Controllers\FrontController::class, 'index'])->name('front.home');
 
 // İletişim Sayfası
@@ -96,6 +105,7 @@ Route::prefix('haberler')->name('news.')->group(function () {
     Route::get('/', [App\Http\Controllers\Front\NewsController::class, 'index'])->name('index');
     Route::get('/kategori/{slug}', [App\Http\Controllers\Front\NewsController::class, 'category'])->name('category');
     Route::get('/{newsSlug}/belgeler/{document}/indir', [App\Http\Controllers\Front\NewsController::class, 'downloadDocument'])->name('documents.download');
+    Route::get('/{slug}/pdf', [App\Http\Controllers\Front\NewsController::class, 'downloadPdf'])->name('pdf.download');
     Route::get('/{slug}', [App\Http\Controllers\Front\NewsController::class, 'show'])->name('show');
 });
 
@@ -200,7 +210,11 @@ Route::get('/system/cache-clear/{secret}', function($secret) {
 // Side Menu API - Mobil menü için
 Route::get('/api/menu-items/{menuId}', [App\Http\Controllers\Admin\MenuSystemController::class, 'getMenuItemsForSideMenu'])->name('api.menu-items');
 
-Auth::routes();
+/**
+ * Authentication Routes
+ * Register rotası devre dışı bırakıldı - siteye üyelik istenmiyor
+ */
+Auth::routes(['register' => false]);
 
 // Arama Rotası - Yeni spesifik isimle - şimdilik devre dışı
 // Route::get('/search-page', [App\Http\Controllers\SearchController::class, 'index'])->name('search');
@@ -826,6 +840,16 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     Route::put('/mudurlukler/{mudurluk}/documents/{document}', [App\Http\Controllers\Admin\MudurlukController::class, 'updateDocument'])->name('mudurlukler.update-document');
     Route::delete('/mudurlukler/{mudurluk}/documents/{document}', [App\Http\Controllers\Admin\MudurlukController::class, 'destroyDocument'])->name('mudurlukler.destroy-document');
     Route::post('/mudurlukler/{mudurluk}/documents/{document}/toggle-status', [App\Http\Controllers\Admin\MudurlukController::class, 'toggleDocumentStatus'])->name('mudurlukler.toggle-document-status');
+    
+    // Sayfa Geri Bildirim Yönetimi
+    Route::prefix('page-feedback')->name('page-feedback.')->group(function () {
+        Route::get('/', [AdminPageFeedbackController::class, 'index'])->name('index');
+        Route::get('/show', [AdminPageFeedbackController::class, 'show'])->name('show');
+        Route::delete('/{feedback}', [AdminPageFeedbackController::class, 'destroy'])->name('destroy');
+        Route::delete('/page/all', [AdminPageFeedbackController::class, 'destroyPageFeedbacks'])->name('destroy-page');
+        Route::get('/stats', [AdminPageFeedbackController::class, 'getStats'])->name('stats');
+        Route::get('/export', [AdminPageFeedbackController::class, 'export'])->name('export');
+    });
 });
 
 // Duplicate services route'u kaldırıldı - admin içindeki yeterli

@@ -622,6 +622,12 @@ return [
         
         ['header' => 'SİSTEM YÖNETİMİ'],
         [
+            'text' => 'Sayfa Geri Bildirimleri',
+            'url'  => 'admin/page-feedback',
+            'icon' => 'fas fa-fw fa-comments',
+            'active' => ['admin/page-feedback', 'admin/page-feedback/*']
+        ],
+        [
             'text' => 'Aktivite Günlükleri',
             'url'  => 'admin/activity-logs',
             'icon' => 'fas fa-fw fa-history',

@@ -476,6 +476,12 @@
                         @endif
             </section>
             @endif
+            
+            <!-- Sayfa Geri Bildirim Widget'ı -->
+            @include('components.page-feedback', [
+                'pageUrl' => request()->url(),
+                'pageTitle' => $service->title
+            ])
         </div>
     </div>
 </div>

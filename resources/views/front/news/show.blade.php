@@ -700,7 +700,8 @@
                         {!! html_entity_decode($news->content) !!}
                     </div>
                     
-
+                    <!-- Haber Paylaşım Bileşeni -->
+                    @include('components.haber-paylasim', ['news' => $news])
 
                     <!-- Galeri Bölümü -->
                     @if(!empty($news->filemanagersystem_gallery))
