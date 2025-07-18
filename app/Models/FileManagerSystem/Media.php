@@ -3,13 +3,14 @@
 namespace App\Models\FileManagerSystem;
 
 use App\Models\User;
+use App\Traits\LogsActivity;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Media extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, LogsActivity;
 
     protected $table = 'filemanagersystem_medias';
 
@@ -47,6 +48,35 @@ class Media extends Model
         'height' => 'integer',
         'compression_quality' => 'integer',
     ];
+
+    /**
+     * Boot the model.
+     */
+    protected static function boot()
+    {
+        parent::boot();
+
+        // Aktivite günlük event'leri
+        static::created(function ($media) {
+            $trait = new class { use LogsActivity; };
+            $trait->logCreated($media);
+        });
+
+        static::updated(function ($media) {
+            $trait = new class { use LogsActivity; };
+            $trait->logUpdated($media);
+        });
+
+        static::deleted(function ($media) {
+            $trait = new class { use LogsActivity; };
+            $trait->logDeleted($media);
+        });
+
+        static::restored(function ($media) {
+            $trait = new class { use LogsActivity; };
+            $trait->logRestored($media);
+        });
+    }
 
     /**
      * Dosya sahibi (kullanıcı) ilişkisi

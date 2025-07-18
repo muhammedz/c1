@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Intervention\Image\Laravel\Facades\Image;
 use App\Helpers\FileManagerHelper;
+use App\Models\ActivityLog;
 
 class FilemanagersystemMediaController extends Controller
 {
@@ -229,6 +230,20 @@ class FilemanagersystemMediaController extends Controller
                 }
                 
                 $media->save();
+                
+                // Dosya yükleme aktivitesi için özel günlük kaydı
+                ActivityLog::createLog(
+                    $media,
+                    'uploaded',
+                    null,
+                    [
+                        'original_name' => $originalName,
+                        'file_size' => $this->formatFileSize($originalSize),
+                        'mime_type' => $mimeType,
+                        'folder' => $media->folder ? $media->folder->folder_name : 'Ana Klasör'
+                    ],
+                    "'{$originalName}' dosyası FileManagerSystem'e yüklendi (" . $this->formatFileSize($originalSize) . ")"
+                );
                 
                 // Güvenlik logu
                 Log::info('Dosya başarıyla yüklendi', [
@@ -459,10 +474,34 @@ class FilemanagersystemMediaController extends Controller
             'is_public' => 'boolean',
         ]);
         
+        // Eski değerleri kaydet
+        $oldValues = [
+            'original_name' => $media->original_name,
+            'folder' => $media->folder ? $media->folder->folder_name : 'Ana Klasör',
+            'is_public' => $media->is_public ? 'Açık' : 'Kapalı'
+        ];
+        
         $media->original_name = $request->original_name;
         $media->folder_id = $request->folder_id;
         $media->is_public = $request->has('is_public') ? $request->is_public : false;
+        
+        // Yeni değerleri hazırla
+        $newValues = [
+            'original_name' => $media->original_name,
+            'folder' => $media->folder_id ? Folder::find($media->folder_id)->folder_name : 'Ana Klasör',
+            'is_public' => $media->is_public ? 'Açık' : 'Kapalı'
+        ];
+        
         $media->save();
+        
+        // Dosya düzenleme aktivitesi için günlük kaydı
+        ActivityLog::createLog(
+            $media,
+            'file_edited',
+            $oldValues,
+            $newValues,
+            "'{$media->original_name}' dosyasının bilgileri güncellendi"
+        );
         
         return redirect()->route('admin.filemanagersystem.index')
             ->with('success', 'Dosya bilgileri başarıyla güncellendi.');
@@ -475,6 +514,23 @@ class FilemanagersystemMediaController extends Controller
     {
         try {
             $folderId = $media->folder_id;
+            $originalName = $media->original_name;
+            $fileSize = $media->size;
+            $folderName = $media->folder ? $media->folder->folder_name : 'Ana Klasör';
+            
+            // Dosya silme aktivitesi için özel günlük kaydı (silmeden önce)
+            ActivityLog::createLog(
+                $media,
+                'file_deleted',
+                [
+                    'original_name' => $originalName,
+                    'file_size' => $this->formatFileSize($fileSize),
+                    'mime_type' => $media->mime_type,
+                    'folder' => $folderName
+                ],
+                null,
+                "'{$originalName}' dosyası FileManagerSystem'den silindi (" . $this->formatFileSize($fileSize) . ")"
+            );
             
             // Fiziksel dosyaları sil (orijinal ve WebP)
             if (Storage::disk('uploads')->exists($media->path)) {
@@ -810,5 +866,19 @@ class FilemanagersystemMediaController extends Controller
             
             return $result;
         }
+    }
+
+    /**
+     * Dosya boyutunu insan tarafından okunabilir formatta döndürür
+     */
+    private function formatFileSize($bytes)
+    {
+        $units = ['B', 'KB', 'MB', 'GB', 'TB'];
+        
+        for ($i = 0; $bytes > 1024; $i++) {
+            $bytes /= 1024;
+        }
+        
+        return round($bytes, 2) . ' ' . $units[$i];
     }
 } 

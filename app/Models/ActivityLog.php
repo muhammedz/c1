@@ -110,6 +110,10 @@ class ActivityLog extends Model
             'deleted' => 'Silindi',
             'restored' => 'Geri Yüklendi',
             'force_deleted' => 'Kalıcı Olarak Silindi',
+            'uploaded' => 'Yüklendi',
+            'file_deleted' => 'Silindi',
+            'bulk_deleted' => 'Toplu Silindi',
+            'file_edited' => 'Düzenlendi',
         ];
 
         return $actions[$this->action] ?? $this->action;
@@ -145,6 +149,10 @@ class ActivityLog extends Model
             'App\\Models\\Mudurluk' => 'Müdürlük',
             'App\\Models\\Announcement' => 'Duyuru',
             'App\\Models\\Tender' => 'İhale',
+            'App\\Models\\FileManagerSystem\\Media' => 'Dosya',
+            'App\\Models\\FileManagerSystem\\Folder' => 'Klasör',
+            'App\\Models\\FileManagerSystem\\Category' => 'Dosya Kategorisi',
+            'App\\Models\\FileManagerSystem\\MediaRelation' => 'Dosya İlişkisi',
         ];
         
         return $modelNames[$this->model_type] ?? class_basename($this->model_type);

@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use ZipArchive;
 use App\Helpers\FileManagerHelper;
+use App\Models\ActivityLog;
 
 class FilemanagersystemController extends Controller
 {
@@ -366,6 +367,20 @@ class FilemanagersystemController extends Controller
 
                 case 'delete':
                     foreach ($files as $file) {
+                        // Toplu silme aktivitesi için günlük kaydı
+                        ActivityLog::createLog(
+                            $file,
+                            'bulk_deleted',
+                            [
+                                'original_name' => $file->original_name,
+                                'file_size' => $this->formatFileSize($file->size),
+                                'mime_type' => $file->mime_type,
+                                'folder' => $file->folder ? $file->folder->folder_name : 'Ana Klasör'
+                            ],
+                            null,
+                            "'{$file->original_name}' dosyası toplu silme ile FileManagerSystem'den silindi"
+                        );
+                        
                         $file->delete();
                     }
                     break;
@@ -472,5 +487,19 @@ class FilemanagersystemController extends Controller
         $categories = Category::with('children')->whereNull('parent_id')->get();
 
         return view('filemanagersystem.tinymce', compact('folders', 'categories'));
+    }
+
+    /**
+     * Dosya boyutunu insan tarafından okunabilir formatta döndürür
+     */
+    private function formatFileSize($bytes)
+    {
+        $units = ['B', 'KB', 'MB', 'GB', 'TB'];
+        
+        for ($i = 0; $bytes > 1024; $i++) {
+            $bytes /= 1024;
+        }
+        
+        return round($bytes, 2) . ' ' . $units[$i];
     }
 }
