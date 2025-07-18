@@ -39,8 +39,19 @@ class SecureCookieMiddleware
     {
         $cookies = $response->headers->getCookies();
         
-        // Mevcut çerezleri temizle
-        $response->headers->removeCookie(null);
+        // Eğer çerez yoksa işlem yapma
+        if (empty($cookies)) {
+            return;
+        }
+        
+        // Mevcut çerezleri tek tek temizle
+        foreach ($cookies as $cookie) {
+            $response->headers->removeCookie(
+                $cookie->getName(),
+                $cookie->getPath(),
+                $cookie->getDomain()
+            );
+        }
         
         foreach ($cookies as $cookie) {
             // Güvenlik bayrakları ile yeni çerez oluştur
