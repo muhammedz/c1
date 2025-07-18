@@ -101,7 +101,7 @@
                         </div>
                         
                         <div class="flex-1 min-w-0">
-                            <h3 class="font-bold text-[#00352b] text-lg group-hover:text-[#007b32] transition-colors duration-300 leading-tight mb-1">{{ $topic->name }}</h3>
+                            <h3 class="font-bold text-[#00352b] text-lg group-hover:text-[#007b32] transition-colors duration-300 leading-tight mb-1 cursor-pointer @if($topic->tooltip_text) tooltip-trigger @endif" @if($topic->tooltip_text) data-tooltip="{{ $topic->tooltip_text }}" @endif>{{ $topic->name }}</h3>
                             @if($topic->description)
                                 <p class="text-sm text-gray-600 line-clamp-2">{{ Str::limit($topic->description, 80) }}</p>
                             @endif
@@ -174,5 +174,126 @@
     -webkit-box-orient: vertical;
     overflow: hidden;
 }
+
+/* Global Tooltip Styles */
+.custom-tooltip {
+    position: fixed !important;
+    z-index: 99999 !important;
+    background-color: #00352b !important;
+    color: white !important;
+    padding: 8px 12px !important;
+    border-radius: 8px !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    transition: all 0.3s ease !important;
+    white-space: nowrap !important;
+    pointer-events: none !important;
+    max-width: 300px !important;
+}
+
+.custom-tooltip.show {
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+.custom-tooltip::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-top: 6px solid #00352b;
+}
+
+/* Alt tarafta gösterildiğinde arrow'u ters çevir */
+.custom-tooltip.bottom-tooltip::after {
+    top: -6px;
+    border-top: none;
+    border-bottom: 6px solid #00352b;
+}
 </style>
+
+<script>
+/**
+ * Hizmet kategorileri için tooltip sistemi
+ * Kategori başlıklarına hover edildiğinde tooltip gösterir
+ */
+function initTooltips() {
+    // Mevcut tooltip'leri temizle
+    const existingTooltips = document.querySelectorAll('.simple-tooltip');
+    existingTooltips.forEach(t => t.remove());
+    
+    const triggers = document.querySelectorAll('.tooltip-trigger');
+    
+    triggers.forEach((trigger) => {
+        trigger.addEventListener('mouseenter', function() {
+            const text = trigger.getAttribute('data-tooltip');
+            if (!text) return;
+            
+            // Tooltip oluştur
+            const tooltip = document.createElement('div');
+            tooltip.className = 'simple-tooltip';
+            tooltip.textContent = text;
+            tooltip.style.cssText = `
+                position: fixed;
+                z-index: 99999;
+                background: #00352b;
+                color: white;
+                padding: 8px 12px;
+                border-radius: 6px;
+                font-size: 14px;
+                font-weight: 500;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+                pointer-events: none;
+                white-space: nowrap;
+                transition: opacity 0.2s ease;
+            `;
+            
+            document.body.appendChild(tooltip);
+            
+            // Konum hesapla
+            const rect = trigger.getBoundingClientRect();
+            const tooltipRect = tooltip.getBoundingClientRect();
+            
+            let left = rect.left + (rect.width / 2) - (tooltipRect.width / 2);
+            let top = rect.top - tooltipRect.height - 8;
+            
+            // Viewport sınır kontrolü
+            if (left < 5) left = 5;
+            if (left + tooltipRect.width > window.innerWidth - 5) {
+                left = window.innerWidth - tooltipRect.width - 5;
+            }
+            if (top < 5) {
+                top = rect.bottom + 8;
+            }
+            
+            tooltip.style.left = left + 'px';
+            tooltip.style.top = top + 'px';
+        });
+        
+        trigger.addEventListener('mouseleave', function() {
+            const tooltips = document.querySelectorAll('.simple-tooltip');
+            tooltips.forEach(t => t.remove());
+        });
+    });
+}
+
+// DOM yüklendikten sonra başlat
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initTooltips);
+} else {
+    initTooltips();
+}
+
+// Sayfa değişikliklerinde yeniden başlat
+setTimeout(initTooltips, 1000);
+</script>
+
 @endsection 

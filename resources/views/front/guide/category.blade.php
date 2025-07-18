@@ -135,18 +135,18 @@
                         <!-- Resim -->
                         <div class="aspect-video relative overflow-hidden">
                             <a href="{{ route('guide.place', [$category->slug, $place->slug]) }}" class="relative z-10 block w-full h-full">
-                                @if($place->featured_image_url)
-                                    <img src="{{ $place->featured_image_url }}" 
-                                         alt="{{ $place->title }}"
+                        @if($place->featured_image_url)
+                                <img src="{{ $place->featured_image_url }}" 
+                                     alt="{{ $place->title }}"
                                          class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 cursor-pointer">
-                                @else
-                                    <img src="{{ asset('images/cankaya-default.jpeg') }}" 
-                                         alt="{{ $place->title }}"
+                        @else
+                                <img src="{{ asset('images/cankaya-default.jpeg') }}" 
+                                     alt="{{ $place->title }}"
                                          class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 cursor-pointer">
                                 @endif
                             </a>
                             <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
-                        </div>
+                            </div>
                         
                         <!-- İçerik -->
                         <div class="p-3 md:p-5">

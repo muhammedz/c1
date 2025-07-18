@@ -225,7 +225,7 @@ Auth::routes(['register' => false]);
 
 
 // Admin Panel Route Tanımlamaları
-Route::middleware(['auth', 'role:admin'])->name('admin.')->prefix('admin')->group(function () {
+Route::middleware(['auth', 'role:admin', 'dynamic.session.timeout'])->name('admin.')->prefix('admin')->group(function () {
     // Dashboard
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/profile', [DashboardController::class, 'profile'])->name('profile');
@@ -812,6 +812,8 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     Route::get('/settings', [App\Http\Controllers\Admin\SettingsController::class, 'index'])->name('settings.index');
     Route::post('/settings/seo', [App\Http\Controllers\Admin\SettingsController::class, 'updateSeo'])->name('settings.seo.update');
     Route::post('/settings/preloader', [App\Http\Controllers\Admin\SettingsController::class, 'updatePreloader'])->name('settings.preloader.update');
+    Route::post('/settings/session-timeout', [App\Http\Controllers\Admin\SettingsController::class, 'updateSessionTimeout'])->name('settings.session-timeout.update');
+    Route::post('/settings/file-upload-limit', [App\Http\Controllers\Admin\SettingsController::class, 'updateFileUploadLimit'])->name('settings.file-upload-limit.update');
     Route::post('/settings/favicon', [App\Http\Controllers\Admin\SettingsController::class, 'updateFavicon'])->name('settings.favicon.update');
     Route::get('/settings/favicon/delete', [App\Http\Controllers\Admin\SettingsController::class, 'deleteFavicon'])->name('settings.favicon.delete');
     

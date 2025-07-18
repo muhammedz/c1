@@ -66,6 +66,22 @@
                     @enderror
                 </div>
                 
+                <div class="mb-3">
+                    <label for="tooltip_text" class="form-label">
+                        <i class="fas fa-info-circle text-primary"></i> Tooltip Metni
+                    </label>
+                    <input type="text" class="form-control @error('tooltip_text') is-invalid @enderror" 
+                        id="tooltip_text" name="tooltip_text" value="{{ old('tooltip_text') }}" 
+                        placeholder="Kategori başlığına hover edildiğinde gösterilecek metin">
+                    @error('tooltip_text')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                    <small class="text-muted">
+                        <i class="fas fa-lightbulb text-warning"></i> 
+                        Bu alan boş bırakılırsa tooltip görünmez. Doldurulursa kategori başlığının üzerine gelindiğinde gösterilir.
+                    </small>
+                </div>
+                
                 <div class="row mb-3">
                     <div class="col-md-4">
                         <div class="mb-3">

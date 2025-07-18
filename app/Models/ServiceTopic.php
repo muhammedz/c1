@@ -14,6 +14,7 @@ class ServiceTopic extends Model
         'name',
         'slug',
         'description',
+        'tooltip_text',
         'icon',
         'color',
         'order',

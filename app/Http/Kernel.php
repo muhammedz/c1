@@ -80,6 +80,7 @@ class Kernel extends HttpKernel
         'filemanagersystem.upload.security' => \App\Http\Middleware\FilemanagersystemUploadSecurity::class,
         'track.404' => \App\Http\Middleware\Track404Middleware::class,
         'redirect' => \App\Http\Middleware\RedirectMiddleware::class,
+        'dynamic.session.timeout' => \App\Http\Middleware\DynamicSessionTimeout::class,
     ];
 
     /**

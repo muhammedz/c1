@@ -15,7 +15,7 @@ class SettingsController extends Controller
      */
     public function index()
     {
-        $settings = Setting::whereIn('group', ['seo', 'general', 'preloader'])->get()->keyBy('key');
+        $settings = Setting::whereIn('group', ['seo', 'general', 'preloader', 'security', 'file_management'])->get()->keyBy('key');
         
         return view('admin.settings.index', compact('settings'));
     }
@@ -195,5 +195,79 @@ class SettingsController extends Controller
 
         return redirect()->route('admin.settings.index')
             ->with('success', 'Preloader ayarları başarıyla güncellendi.');
+    }
+
+    /**
+     * Session timeout ayarlarını güncelle
+     */
+    public function updateSessionTimeout(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'session_timeout' => 'required|integer|min:5|max:1440',
+        ], [
+            'session_timeout.required' => 'Oturum süresi zorunludur.',
+            'session_timeout.integer' => 'Oturum süresi sayısal bir değer olmalıdır.',
+            'session_timeout.min' => 'Oturum süresi en az 5 dakika olmalıdır.',
+            'session_timeout.max' => 'Oturum süresi en fazla 1440 dakika (24 saat) olabilir.',
+        ]);
+
+        if ($validator->fails()) {
+            return redirect()->back()
+                ->withErrors($validator)
+                ->withInput();
+        }
+
+        // Session timeout ayarını güncelle veya oluştur
+        Setting::updateOrCreate(
+            ['key' => 'session_timeout', 'group' => 'security'],
+            [
+                'value' => $request->session_timeout,
+                'display_name' => 'Oturum Süresi (Dakika)',
+                'type' => 'number',
+                'description' => 'Admin paneli oturum zaman aşımı süresi (dakika cinsinden)',
+                'is_public' => false,
+                'order' => 1
+            ]
+        );
+
+        return redirect()->route('admin.settings.index')
+            ->with('success', 'Oturum süresi ayarları başarıyla güncellendi.');
+    }
+
+    /**
+     * Dosya yükleme limiti ayarlarını güncelle
+     */
+    public function updateFileUploadLimit(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'max_file_upload_size' => 'required|integer|min:1|max:500',
+        ], [
+            'max_file_upload_size.required' => 'Dosya yükleme limiti zorunludur.',
+            'max_file_upload_size.integer' => 'Dosya yükleme limiti sayısal bir değer olmalıdır.',
+            'max_file_upload_size.min' => 'Dosya yükleme limiti en az 1 MB olmalıdır.',
+            'max_file_upload_size.max' => 'Dosya yükleme limiti en fazla 500 MB olabilir.',
+        ]);
+
+        if ($validator->fails()) {
+            return redirect()->back()
+                ->withErrors($validator)
+                ->withInput();
+        }
+
+        // Dosya yükleme limiti ayarını güncelle veya oluştur
+        Setting::updateOrCreate(
+            ['key' => 'max_file_upload_size', 'group' => 'file_management'],
+            [
+                'value' => $request->max_file_upload_size,
+                'display_name' => 'Maksimum Dosya Boyutu (MB)',
+                'type' => 'number',
+                'description' => 'Tek seferde yüklenebilecek maksimum dosya boyutu (MB cinsinden)',
+                'is_public' => false,
+                'order' => 1
+            ]
+        );
+
+        return redirect()->route('admin.settings.index')
+            ->with('success', 'Dosya yükleme limiti ayarları başarıyla güncellendi.');
     }
 } 

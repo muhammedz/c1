@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use App\Services\FileManagerSystem\FilemanagersystemService;
+use App\Models\Setting;
 use Illuminate\Support\Facades\Log;
 
 class FilemanagersystemUploadSecurity
@@ -34,18 +35,28 @@ class FilemanagersystemUploadSecurity
         'application/vnd.ms-powerpoint',
         'application/vnd.openxmlformats-officedocument.presentationml.presentation',
         'text/plain', 'text/csv',
-        // Medya
-        'video/mp4', 'video/avi', 'video/quicktime', 'video/x-msvideo',
-        'audio/mpeg', 'audio/wav', 'audio/ogg',
+        // Video formatları
+        'video/mp4', 'video/mpeg', 'video/quicktime', 'video/x-msvideo', 'video/avi',
+        'video/webm', 'video/ogg', 'video/3gpp', 'video/x-flv', 'video/x-ms-wmv',
+        'video/mp2t', 'video/x-matroska', 'application/mp4',
+        // Ses formatları
+        'audio/mpeg', 'audio/mp3', 'audio/wav', 'audio/ogg', 'audio/aac',
+        'audio/x-wav', 'audio/mp4', 'audio/webm', 'audio/flac',
         // Arşivler
         'application/zip', 'application/x-rar-compressed', 'application/x-tar', 'application/gzip'
     ];
 
     // İzin verilen dosya uzantıları
     private $allowedExtensions = [
+        // Resimler
         'jpg', 'jpeg', 'png', 'gif', 'webp', 'svg', 'bmp',
+        // Belgeler
         'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'txt', 'csv',
-        'mp4', 'avi', 'mov', 'mp3', 'wav', 'ogg',
+        // Video formatları
+        'mp4', 'avi', 'mov', 'wmv', 'flv', 'webm', 'mkv', 'ogg', '3gp', 'ts',
+        // Ses formatları
+        'mp3', 'wav', 'ogg', 'aac', 'flac', 'm4a', 'wma',
+        // Arşivler
         'zip', 'rar', 'tar', 'gz'
     ];
 
@@ -123,6 +134,7 @@ class FilemanagersystemUploadSecurity
                 Log::warning('İzin verilmeyen MIME türü', [
                     'mime_type' => $mimeType,
                     'filename' => $originalName,
+                    'extension' => $extension,
                     'ip' => $request->ip()
                 ]);
                 return false;
@@ -156,6 +168,17 @@ class FilemanagersystemUploadSecurity
                     'ip' => $request->ip()
                 ]);
                 return false;
+            }
+
+            // Başarılı video dosyası yüklemelerini loglama
+            if (str_starts_with($mimeType, 'video/')) {
+                Log::info('✅ Başarılı video dosyası yüklemesi', [
+                    'filename' => $originalName,
+                    'extension' => $extension,
+                    'mime_type' => $mimeType,
+                    'size_mb' => round($size / (1024 * 1024), 2),
+                    'ip' => $request->ip()
+                ]);
             }
 
             return true;
@@ -225,7 +248,16 @@ class FilemanagersystemUploadSecurity
      */
     private function validateFileSize($size)
     {
-        $maxSize = 50 * 1024 * 1024; // 50MB sabit limit
+        try {
+            // Admin ayarlarından dosya boyutu limitini al (MB cinsinden)
+            $maxSizeMB = Setting::get('max_file_upload_size', 50);
+            $maxSize = (int) $maxSizeMB * 1024 * 1024; // Byte'a çevir
+        } catch (\Exception $e) {
+            // Hata durumunda varsayılan değeri kullan
+            Log::warning('Dosya boyutu limiti ayarı alınamadı, varsayılan değer kullanılıyor: ' . $e->getMessage());
+            $maxSize = 50 * 1024 * 1024; // 50MB varsayılan
+        }
+        
         return $size <= $maxSize;
     }
 
@@ -245,7 +277,12 @@ class FilemanagersystemUploadSecurity
             'image/png' => ["\x89\x50\x4E\x47"],
             'image/gif' => ["\x47\x49\x46\x38"],
             'application/pdf' => ["\x25\x50\x44\x46"],
-            'application/zip' => ["\x50\x4B\x03\x04", "\x50\x4B\x05\x06", "\x50\x4B\x07\x08"]
+            'application/zip' => ["\x50\x4B\x03\x04", "\x50\x4B\x05\x06", "\x50\x4B\x07\x08"],
+            // Video dosyaları için magic numbers
+            'video/mp4' => ["\x00\x00\x00\x18\x66\x74\x79\x70", "\x00\x00\x00\x20\x66\x74\x79\x70"],
+            'application/mp4' => ["\x00\x00\x00\x18\x66\x74\x79\x70", "\x00\x00\x00\x20\x66\x74\x79\x70"],
+            'video/avi' => ["\x52\x49\x46\x46"],
+            'video/x-msvideo' => ["\x52\x49\x46\x46"],
         ];
 
         // Magic number kontrolü
@@ -290,6 +327,17 @@ class FilemanagersystemUploadSecurity
             'image/webp' => ['image/x-webp'],
             'image/x-webp' => ['image/webp'],
             'text/plain' => ['text/csv'],
+            // Video dosyaları için uyumlu türler
+            'video/mp4' => ['application/mp4', 'video/mpeg'],
+            'application/mp4' => ['video/mp4'],
+            'video/quicktime' => ['video/mov'],
+            'video/x-msvideo' => ['video/avi'],
+            'video/avi' => ['video/x-msvideo'],
+            // Ses dosyaları için uyumlu türler
+            'audio/mpeg' => ['audio/mp3'],
+            'audio/mp3' => ['audio/mpeg'],
+            'audio/wav' => ['audio/x-wav'],
+            'audio/x-wav' => ['audio/wav'],
         ];
 
         if (isset($compatibleTypes[$declared])) {
@@ -298,6 +346,22 @@ class FilemanagersystemUploadSecurity
 
         // PNG için özel kontrol - bazen farklı MIME type algılanabiliyor
         if ($declared === 'image/png' && in_array($actual, ['image/png', 'image/x-png', 'application/octet-stream'])) {
+            return true;
+        }
+
+        // Video dosyaları için özel kontrol
+        if (str_starts_with($declared, 'video/') && str_starts_with($actual, 'video/')) {
+            return true;
+        }
+
+        // MP4 dosyaları için özel kontrol - bazen application/mp4 olarak algılanabiliyor
+        if (($declared === 'video/mp4' && $actual === 'application/mp4') || 
+            ($declared === 'application/mp4' && $actual === 'video/mp4')) {
+            return true;
+        }
+
+        // Ses dosyaları için özel kontrol
+        if (str_starts_with($declared, 'audio/') && str_starts_with($actual, 'audio/')) {
             return true;
         }
 
