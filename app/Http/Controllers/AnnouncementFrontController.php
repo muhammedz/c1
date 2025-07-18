@@ -32,8 +32,18 @@ class AnnouncementFrontController extends Controller
             // Görülen duyurular listesine ekle
             $viewedAnnouncements[] = $announcementId;
             
-            // Cookie'yi güncelle (1 yıl süreyle)
-            $cookie = cookie('viewed_announcements', json_encode($viewedAnnouncements), 525600);
+            // ✅ Güvenli çerez oluşturma (Secure, HttpOnly, SameSite=Strict)
+            $cookie = cookie(
+                'viewed_announcements',                // name
+                json_encode($viewedAnnouncements),     // value
+                525600,                                // minutes (1 yıl)
+                '/',                                   // path
+                null,                                  // domain (otomatik)
+                request()->secure(),                   // secure (HTTPS kontrolü)
+                true,                                  // httpOnly (JavaScript erişimi engelle)
+                false,                                 // raw
+                'strict'                               // sameSite (maksimum güvenlik)
+            );
             
             return response()->json(['success' => true])
                 ->cookie($cookie);
