@@ -1,2 +1,6 @@
 .env
 *.md
+
+# Google Analytics Credentials (Sensitive)
+public/uploads/analytics/google-analytics-credentials.json
+public/uploads/analytics/*.json

@@ -235,6 +235,21 @@ Route::middleware(['auth', 'role:admin', 'dynamic.session.timeout'])->name('admi
     Route::get('/test', [TestController::class, 'index'])->name('test.index');
     Route::get('/test-departments', [TestDepartmentController::class, 'index'])->name('test-departments.index');
     
+    // Analytics (İstatistikler) Yönetimi
+    Route::prefix('analytics')->name('analytics.')->group(function () {
+        Route::get('/', [App\Http\Controllers\Admin\AnalyticsController::class, 'index'])->name('index');
+        Route::get('/setup', [App\Http\Controllers\Admin\AnalyticsController::class, 'setup'])->name('setup');
+        Route::get('/reports', [App\Http\Controllers\Admin\AnalyticsController::class, 'reports'])->name('reports');
+        Route::get('/settings', [App\Http\Controllers\Admin\AnalyticsController::class, 'settings'])->name('settings');
+        Route::post('/test-connection', [App\Http\Controllers\Admin\AnalyticsController::class, 'testConnection'])->name('test-connection');
+        Route::post('/clear-cache', [App\Http\Controllers\Admin\AnalyticsController::class, 'clearCache'])->name('clear-cache');
+        Route::get('/daily-visitors', [App\Http\Controllers\Admin\AnalyticsController::class, 'getDailyVisitorsData'])->name('daily-visitors');
+        Route::get('/top-pages', [App\Http\Controllers\Admin\AnalyticsController::class, 'getTopPagesData'])->name('top-pages');
+        Route::get('/widget-data', [App\Http\Controllers\Admin\AnalyticsController::class, 'getWidgetData'])->name('widget-data');
+        Route::get('/traffic-sources', [App\Http\Controllers\Admin\AnalyticsController::class, 'getTrafficSources'])->name('traffic-sources');
+        Route::post('/save-credentials', [App\Http\Controllers\Admin\AnalyticsController::class, 'saveCredentials'])->name('save-credentials');
+    });
+    
     // Activity Logs Yönetimi
     Route::prefix('activity-logs')->name('activity-logs.')->group(function () {
         Route::get('/', [ActivityLogController::class, 'index'])->name('index');
@@ -586,8 +601,7 @@ Route::middleware(['auth', 'role:admin', 'dynamic.session.timeout'])->name('admi
 // Etkinlik Yönetimi Rotaları
 Route::prefix('admin/events')->name('admin.events.')->middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/', [App\Http\Controllers\Admin\EventManagerController::class, 'index'])->name('index');
-    Route::get('/create', [App\Http\Controllers\Admin\EventManagerController::class, 'create'])->name('create');
-    Route::post('/store', [App\Http\Controllers\Admin\EventManagerController::class, 'store'])->name('store');
+    // Create ve store route'ları kaldırıldı - tekrar eklenecek
     Route::get('/edit/{id}', [App\Http\Controllers\Admin\EventManagerController::class, 'edit'])->name('edit');
     Route::post('/update/{id}', [App\Http\Controllers\Admin\EventManagerController::class, 'update'])->name('update');
     Route::delete('/delete/{id}', [App\Http\Controllers\Admin\EventManagerController::class, 'delete'])->name('delete');

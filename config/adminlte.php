@@ -478,12 +478,7 @@ return [
                     'icon' => 'fas fa-list',
                     'active' => ['admin/events', 'admin/events/*/edit'],
                 ],
-                [
-                    'text' => 'Yeni Etkinlik Ekle',
-                    'url'  => 'admin/events/create',
-                    'icon' => 'fas fa-plus',
-                    'active' => ['admin/events/create'],
-                ],
+                // Yeni Etkinlik Ekle menüsü kaldırıldı - tekrar eklenecek
                 [
                     'text' => 'Kategoriler',
                     'url'  => 'admin/events/categories',
@@ -616,6 +611,32 @@ return [
                     'url'  => 'admin/mudurlukler/create',
                     'icon' => 'fas fa-plus',
                     'active' => ['admin/mudurlukler/create']
+                ],
+            ],
+        ],
+        
+        ['header' => 'ANALİTİK VE RAPORLAR'],
+        [
+            'text'    => 'Google Analytics',
+            'icon'    => 'fab fa-google',
+            'submenu' => [
+                [
+                    'text' => 'İstatistikler',
+                    'url'  => 'admin/analytics',
+                    'icon' => 'fas fa-chart-bar',
+                    'active' => ['admin/analytics'],
+                ],
+                [
+                    'text' => 'Detaylı Raporlar',
+                    'url'  => 'admin/analytics/reports',
+                    'icon' => 'fas fa-chart-line',
+                    'active' => ['admin/analytics/reports'],
+                ],
+                [
+                    'text' => 'Ayarlar',
+                    'url'  => 'admin/analytics/settings',
+                    'icon' => 'fas fa-tools',
+                    'active' => ['admin/analytics/settings'],
                 ],
             ],
         ],

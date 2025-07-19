@@ -29,9 +29,7 @@
                         <a href="{{ route('admin.events.check') }}" class="btn btn-info btn-sm mr-2">
                             <i class="fas fa-sync-alt"></i> Etkinlik Kontrol Et
                         </a>
-                        <a href="{{ route('admin.events.create') }}" class="btn btn-primary btn-sm">
-                            <i class="fas fa-plus"></i> Yeni Etkinlik Ekle
-                        </a>
+                        <!-- Yeni Etkinlik Ekle butonu kaldırıldı - tekrar eklenecek -->
                     </div>
                 </div>
                 <div class="card-body">
