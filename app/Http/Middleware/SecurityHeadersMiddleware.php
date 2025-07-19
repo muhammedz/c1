@@ -61,10 +61,10 @@ class SecurityHeadersMiddleware
             $response->headers->set('Strict-Transport-Security', $securityConfig['strict_transport_security']);
         }
         
-        // Content-Security-Policy: XSS ve injection koruması (geçici olarak devre dışı)
-        // if (isset($securityConfig['content_security_policy'])) {
-        //     $response->headers->set('Content-Security-Policy', $securityConfig['content_security_policy']);
-        // }
+        // Content-Security-Policy: XSS ve injection koruması
+        if (isset($securityConfig['content_security_policy'])) {
+            $response->headers->set('Content-Security-Policy', $securityConfig['content_security_policy']);
+        }
         
         // Content-Security-Policy-Report-Only: Test modu (opsiyonel)
         if (isset($securityConfig['csp_report_only'])) {

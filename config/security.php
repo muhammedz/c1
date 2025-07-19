@@ -51,11 +51,29 @@ return [
         */
         'content_security_policy' => env('SECURITY_CSP', 
             "default-src 'self'; " .
-            "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com https://cdn.jsdelivr.net https://cdn.tailwindcss.com https://code.jquery.com https://cdn.datatables.net; " .
-            "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net https://cdn.tailwindcss.com https://cdn.datatables.net; " .
-            "font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net; " .
+            "script-src 'self' 'unsafe-inline' 'unsafe-eval' " .
+                "https://www.googletagmanager.com " .
+                "https://www.google-analytics.com " .
+                "https://cdn.jsdelivr.net " .
+                "https://cdn.tailwindcss.com " .
+                "https://code.jquery.com " .
+                "https://cdn.datatables.net " .
+                "https://cdnjs.cloudflare.com " .
+                "https://cdn.tiny.cloud; " .
+            "style-src 'self' 'unsafe-inline' " .
+                "https://fonts.googleapis.com " .
+                "https://cdn.jsdelivr.net " .
+                "https://cdn.tailwindcss.com " .
+                "https://cdn.datatables.net " .
+                "https://cdnjs.cloudflare.com; " .
+            "font-src 'self' " .
+                "https://fonts.gstatic.com " .
+                "https://cdn.jsdelivr.net " .
+                "https://cdnjs.cloudflare.com; " .
             "img-src 'self' data: https: http:; " .
-            "connect-src 'self' https://www.google-analytics.com; " .
+            "connect-src 'self' " .
+                "https://www.google-analytics.com " .
+                "https://cdn.tiny.cloud; " .
             "frame-src 'self'; " .
             "object-src 'none'; " .
             "base-uri 'self';"
