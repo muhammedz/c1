@@ -4,111 +4,6 @@
 
 @section('css')
 <style>
-    /* Hero Bölümü */
-    .category-header {
-        position: relative;
-        background: linear-gradient(to right, #00352b, #20846c);
-        padding: 3rem 0;
-        overflow: hidden;
-    }
-
-    .pattern-overlay {
-        position: absolute;
-        inset: 0;
-        opacity: 0.08;
-        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Cg fill='none' stroke='white' stroke-width='1'%3E%3Cpath d='M30 0v60M0 30h60'/%3E%3Ccircle cx='30' cy='30' r='20'/%3E%3C/g%3E%3C/svg%3E");
-        pointer-events: none;
-        z-index: 1;
-    }
-    
-    .decorative-shape-1 {
-        position: absolute;
-        right: -5rem;
-        bottom: -5rem;
-        width: 16rem;
-        height: 16rem;
-        border-radius: 9999px;
-        background: rgba(230, 162, 60, 0.1);
-        filter: blur(24px);
-        z-index: 1;
-    }
-
-    .decorative-shape-2 {
-        position: absolute;
-        left: -2.5rem;
-        top: 2.5rem;
-        width: 10rem;
-        height: 10rem;
-        border-radius: 9999px;
-        background: rgba(255, 255, 255, 0.05);
-        filter: blur(16px);
-        z-index: 1;
-    }
-
-    .category-container {
-        max-width: 1280px;
-        margin: 0 auto;
-        padding: 0 1rem;
-        position: relative;
-        z-index: 5;
-    }
-
-    .breadcrumb {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        margin-bottom: 1rem;
-        font-size: 0.75rem;
-        position: relative;
-        z-index: 20;
-    }
-
-    .breadcrumb-item {
-        color: rgba(255, 255, 255, 0.8);
-    }
-    
-    .breadcrumb-separator {
-        color: rgba(255, 255, 255, 0.6);
-    }
-    
-    .breadcrumb-link {
-        color: rgba(255, 255, 255, 0.9);
-        transition: all 0.2s ease;
-        text-decoration: none;
-        padding: 0.2rem 0.4rem;
-        border-radius: 0.25rem;
-        position: relative;
-        z-index: 30;
-        cursor: pointer;
-        background-color: rgba(255, 255, 255, 0.05);
-    }
-
-    .breadcrumb-link:hover {
-        color: white;
-        background-color: rgba(255, 255, 255, 0.15);
-        text-decoration: underline;
-    }
-    
-    .category-title {
-        font-size: 2.25rem;
-        font-weight: 700;
-        color: white;
-        margin: 0;
-        line-height: 1.2;
-        position: relative;
-        z-index: 10;
-    }
-
-    .category-description {
-        color: rgba(255, 255, 255, 0.8);
-        font-size: 1.125rem;
-        margin-top: 0.75rem;
-        max-width: 36rem;
-        line-height: 1.5;
-        position: relative;
-        z-index: 10;
-    }
-
     /* İçerik Bölümü */
     .houses-portal {
         padding: 3rem 0;
@@ -118,232 +13,61 @@
     /* Çankaya Evleri Grid */
     .houses-grid {
         display: grid;
-        grid-template-columns: repeat(4, 1fr);
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
         gap: 1.5rem;
         margin-bottom: 4rem;
     }
     
-    @media (max-width: 1200px) {
+    @media (max-width: 768px) {
         .houses-grid {
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.75rem;
+        }
+        
+        /* Mobilde padding'leri küçült */
+        .houses-portal {
+            padding: 2rem 0;
         }
     }
-    
-    @media (max-width: 992px) {
+
+    @media (min-width: 769px) and (max-width: 1024px) {
         .houses-grid {
             grid-template-columns: repeat(2, 1fr);
         }
     }
-    
-    @media (max-width: 768px) {
-        .houses-grid {
-            grid-template-columns: 1fr;
-        }
-    }
 
-    .house-card-link {
-        text-decoration: none;
-        color: inherit;
-        display: block;
-        height: 100%;
-    }
-    
-    .house-card-link:hover {
-        text-decoration: none;
-        color: inherit;
-    }
-    
-    .house-card {
-        background-color: white;
-        border-radius: 0.75rem;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-        overflow: hidden;
-        transition: all 0.3s ease;
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-        border: 1px solid #e5e7eb;
-        position: relative;
-        cursor: pointer;
-    }
-    
-    .house-card-link:hover .house-card {
-        transform: translateY(-4px);
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-        border-color: #00352b;
-    }
-
-    .house-card-image-container {
-        width: 100%;
-        height: 200px;
-        overflow: hidden;
-        position: relative;
-        background-color: #f3f4f6;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
-
-    .house-card-image {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        object-position: center;
-        transition: transform 0.5s ease;
-    }
-
-    .house-card-link:hover .house-card-image {
-        transform: scale(1.05);
-    }
-
-    .house-card-content {
-        padding: 1.5rem;
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-    }
-
-    .house-card-title {
-        font-size: 1.25rem;
-        font-weight: 600;
-        color: #1f2937;
-        margin: 0 0 0.75rem 0;
-        line-height: 1.3;
-    }
-
-    .house-card-address {
-        color: #6b7280;
-        font-size: 0.875rem;
-        margin-bottom: 1rem;
-        display: flex;
-        align-items: flex-start;
-        gap: 0.5rem;
-    }
-
-    .house-card-stats {
-        display: flex;
-        gap: 1rem;
-        margin-bottom: 1rem;
-        padding-top: 1rem;
-        border-top: 1px solid #e5e7eb;
-    }
-
-    .house-stat {
-        display: flex;
-        align-items: center;
-        gap: 0.25rem;
-        font-size: 0.875rem;
-        color: #6b7280;
-    }
-
-    .house-stat-number {
-        font-weight: 600;
-        color: #00352b;
-    }
-
-
-
-    .house-card-footer {
-        padding: 1rem 1.5rem;
-        background-color: #f9fafb;
-        border-top: 1px solid #e5e7eb;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-
-    .house-contact-info {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        font-size: 0.875rem;
-        color: #6b7280;
-    }
-
-    .view-house-btn {
-        background: linear-gradient(135deg, #00352b 0%, #20846c 100%);
-        color: white;
-        padding: 0.75rem 1.5rem;
-        border-radius: 0.5rem;
-        font-size: 0.875rem;
-        font-weight: 600;
-        text-decoration: none;
-        transition: all 0.3s ease;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 0.5rem;
-        border: none;
-        box-shadow: 0 2px 8px rgba(0, 53, 43, 0.2);
-        position: relative;
+    /* Line clamp utility */
+    .line-clamp-2 {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
         overflow: hidden;
     }
 
-    .view-house-btn::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: -100%;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-        transition: left 0.5s ease;
-    }
-
-    .house-card-link:hover .view-house-btn {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 15px rgba(0, 53, 43, 0.3);
-        background: linear-gradient(135deg, #20846c 0%, #00352b 100%);
-    }
-
-    .house-card-link:hover .view-house-btn::before {
-        left: 100%;
-    }
-
-    .view-house-btn i {
-        transition: transform 0.3s ease;
-    }
-
-    .house-card-link:hover .view-house-btn i {
-        transform: translateX(3px);
-    }
-
-
-
-    /* Responsive */
-    @media (max-width: 768px) {
-        .category-title {
-            font-size: 1.875rem;
-        }
-        
-        .house-card-stats {
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-        
-        .house-card-content {
-            padding: 1rem;
-        }
-    }
-
-    /* Boş durum */
+    /* Empty state */
     .empty-state {
         text-align: center;
         padding: 4rem 2rem;
-        color: #6b7280;
+        background-color: white;
+        border-radius: 1rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
     }
-
+    
     .empty-state i {
-        font-size: 4rem;
-        margin-bottom: 1rem;
+        font-size: 3rem;
         color: #d1d5db;
+        margin-bottom: 1rem;
     }
-
+    
     .empty-state h3 {
-        font-size: 1.5rem;
+        font-size: 1.25rem;
         font-weight: 600;
+        color: #1f2937;
         margin-bottom: 0.5rem;
-        color: #374151;
+    }
+    
+    .empty-state p {
+        color: #6b7280;
     }
 </style>
 @endsection
@@ -448,33 +172,78 @@
             <!-- Çankaya Evleri Grid -->
             <div class="houses-grid">
                 @foreach($cankayaHouses as $house)
-                <a href="{{ route('cankaya-houses.show', $house) }}" class="house-card-link">
-                    <div class="house-card">
-                        <div class="house-card-image-container">
-                            @if($house->first_image)
-                                <img src="{{ $house->first_image }}" 
-                                     alt="{{ $house->name }}" 
-                                     class="house-card-image">
-                            @else
-                                <div class="d-flex align-items-center justify-content-center h-100 text-muted">
-                                    <i class="fas fa-home fa-3x"></i>
-                                </div>
-                            @endif
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-200 hover:shadow-lg hover:border-green-200 transition-all duration-300 overflow-hidden group">
+                        <!-- Resim -->
+                        <div class="aspect-video relative overflow-hidden">
+                            <a href="{{ route('cankaya-houses.show', $house) }}" class="relative z-10 block w-full h-full">
+                                @if($house->first_image)
+                                    <img src="{{ $house->first_image }}" 
+                                         alt="{{ $house->name }}"
+                                         class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 cursor-pointer">
+                                @else
+                                    <div class="w-full h-full bg-gradient-to-br from-[#00352b] to-[#20846c] flex items-center justify-center">
+                                        <i class="fas fa-home text-white text-4xl"></i>
+                                    </div>
+                                @endif
+                            </a>
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
                         </div>
                         
-                        <div class="house-card-content">
-                            <h3 class="house-card-title">{{ $house->name }}</h3>
+                        <!-- İçerik -->
+                        <div class="p-3 md:p-5">
+                            <!-- Başlık -->
+                            <a href="{{ route('cankaya-houses.show', $house) }}">
+                                <h3 class="text-sm md:text-lg font-bold text-gray-900 mb-2 md:mb-3 line-clamp-2 hover:text-green-700 transition-colors duration-300 cursor-pointer">
+                                    {{ $house->name }}
+                                </h3>
+                            </a>
                             
-                            <div class="mt-auto">
-                                <span class="view-house-btn w-100 text-center">
-                                    <i class="fas fa-eye"></i>
-                                    İncele
-                                    <i class="fas fa-arrow-right"></i>
-                                </span>
+                            <!-- İletişim Bilgileri -->
+                            <div class="space-y-1 md:space-y-2 mb-3 md:mb-4">
+                                @if($house->address)
+                                    <div class="flex items-start text-xs md:text-sm text-gray-600">
+                                        <i class="fas fa-map-marker-alt text-green-600 mt-1 mr-2 md:mr-3 text-xs"></i>
+                                        <span class="flex-1 leading-relaxed">{{ $house->address }}</span>
+                                    </div>
+                                @endif
+                                
+                                @if($house->phone)
+                                    <div class="flex items-center text-xs md:text-sm text-gray-600">
+                                        <i class="fas fa-phone text-green-600 mr-2 md:mr-3 text-xs"></i>
+                                        <span>{{ $house->phone }}</span>
+                                    </div>
+                                @endif
+                            </div>
+                            
+                            <!-- Aksiyon Butonları -->
+                            <div class="flex items-center justify-between pt-2 border-t border-gray-100">
+                                <a href="{{ route('cankaya-houses.show', $house) }}" 
+                                   class="inline-flex items-center text-xs md:text-sm font-medium text-green-700 hover:text-green-800 transition-colors">
+                                    <span>Detaylar</span>
+                                    <i class="fas fa-arrow-right ml-1 md:ml-2 text-xs"></i>
+                                </a>
+                                
+                                <div class="flex items-center gap-1 md:gap-2">
+                                    @if($house->location_link)
+                                        <a href="{{ $house->location_link }}" 
+                                           target="_blank" 
+                                           class="inline-flex items-center justify-center w-7 h-7 md:w-9 md:h-9 bg-green-50 hover:bg-green-100 text-green-700 hover:text-green-800 rounded-lg transition-all duration-200 hover:scale-105"
+                                           title="Haritada Göster">
+                                            <i class="fas fa-map-marker-alt text-xs"></i>
+                                        </a>
+                                    @endif
+                                    
+                                    @if($house->phone)
+                                        <a href="tel:{{ preg_replace('/[^0-9+]/', '', $house->phone) }}" 
+                                           class="inline-flex items-center justify-center w-7 h-7 md:w-9 md:h-9 bg-blue-50 hover:bg-blue-100 text-blue-700 hover:text-blue-800 rounded-lg transition-all duration-200 hover:scale-105"
+                                           title="Telefon Aç">
+                                            <i class="fas fa-phone text-xs"></i>
+                                        </a>
+                                    @endif
+                                </div>
                             </div>
                         </div>
                     </div>
-                </a>
                 @endforeach
             </div>
         @else
