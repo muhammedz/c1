@@ -69,7 +69,16 @@ class AnalyticsController extends Controller
      */
     public function setup()
     {
-        $connectionStatus = $this->analyticsService->testConnection();
+        try {
+            $connectionStatus = $this->analyticsService->testConnection();
+        } catch (\Exception $e) {
+            // Eğer servis hatası varsa varsayılan durum
+            $connectionStatus = [
+                'status' => 'error',
+                'message' => 'Servis hatası: ' . $e->getMessage(),
+                'details' => []
+            ];
+        }
         
         return view('admin.analytics.setup', compact('connectionStatus'));
     }

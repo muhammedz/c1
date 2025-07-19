@@ -32,18 +32,18 @@
                 </div>
                 <div class="card-body">
                     <div id="connectionStatus">
-                        @if($connectionStatus['status'] === 'success')
+                        @if(isset($connectionStatus) && is_array($connectionStatus) && $connectionStatus['status'] === 'success')
                             <div class="alert alert-success">
                                 <h5><i class="fas fa-check mr-2"></i>Bağlantı Başarılı!</h5>
-                                <p>{{ $connectionStatus['message'] }}</p>
+                                <p>{{ $connectionStatus['message'] ?? 'Google Analytics API bağlantısı başarılı!' }}</p>
                                 <a href="{{ route('admin.analytics.index') }}" class="btn btn-success">
                                     <i class="fas fa-chart-line mr-2"></i>İstatistikleri Görüntüle
                                 </a>
                             </div>
-                        @else
+                        @elseif(isset($connectionStatus) && is_array($connectionStatus))
                             <div class="alert alert-danger">
                                 <h5><i class="fas fa-exclamation-triangle mr-2"></i>Bağlantı Hatası</h5>
-                                <p>{{ $connectionStatus['message'] }}</p>
+                                <p>{{ $connectionStatus['message'] ?? 'Bilinmeyen bağlantı hatası' }}</p>
                                 
                                 @if(isset($connectionStatus['details']) && is_array($connectionStatus['details']))
                                     <ul class="mb-0">
@@ -54,6 +54,14 @@
                                         @endforeach
                                     </ul>
                                 @endif
+                            </div>
+                        @else
+                            <div class="alert alert-warning">
+                                <h5><i class="fas fa-clock mr-2"></i>Bağlantı Durumu Kontrol Edilmiyor</h5>
+                                <p>API kurulumunu tamamladıktan sonra "Bağlantıyı Test Et" butonuna tıklayın.</p>
+                                <button class="btn btn-primary" onclick="testConnection()">
+                                    <i class="fas fa-sync mr-2"></i>Bağlantıyı Test Et
+                                </button>
                             </div>
                         @endif
                     </div>
