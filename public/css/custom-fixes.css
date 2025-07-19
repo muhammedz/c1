@@ -150,8 +150,8 @@ button.close span[aria-hidden="true"] {
     
     /* İkon konteyner düzeltmeleri */
     .featured-service-icon {
-        width: 50px !important;
-        height: 50px !important;
+        width: 60px !important;
+        height: 60px !important;
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
@@ -166,23 +166,23 @@ button.close span[aria-hidden="true"] {
     
     /* Tüm ikon türleri için genel boyut zorlama */
     .featured-service-icon * {
-        width: 28px !important;
-        height: 28px !important;
-        max-width: 28px !important;
-        max-height: 28px !important;
-        min-width: 28px !important;
-        min-height: 28px !important;
-        font-size: 28px !important;
-        line-height: 28px !important;
+        width: 36px !important;
+        height: 36px !important;
+        max-width: 36px !important;
+        max-height: 36px !important;
+        min-width: 36px !important;
+        min-height: 36px !important;
+        font-size: 36px !important;
+        line-height: 36px !important;
     }
     
     /* FontAwesome ikonları için boyut standardizasyonu */
     .featured-service-icon i {
-        font-size: 28px !important;
+        font-size: 36px !important;
         line-height: 1 !important;
         color: #00352b !important;
-        width: 28px !important;
-        height: 28px !important;
+        width: 36px !important;
+        height: 36px !important;
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
@@ -190,20 +190,20 @@ button.close span[aria-hidden="true"] {
     
     /* SVG ikonları için boyut standardizasyonu */
     .featured-service-icon svg {
-        width: 28px !important;
-        height: 28px !important;
-        max-width: 28px !important;
-        max-height: 28px !important;
+        width: 36px !important;
+        height: 36px !important;
+        max-width: 36px !important;
+        max-height: 36px !important;
         fill: #00352b !important;
         color: #00352b !important;
     }
     
     /* IMG ikonları için boyut standardizasyonu */
     .featured-service-icon img {
-        width: 28px !important;
-        height: 28px !important;
-        max-width: 28px !important;
-        max-height: 28px !important;
+        width: 36px !important;
+        height: 36px !important;
+        max-width: 36px !important;
+        max-height: 36px !important;
         object-fit: contain !important;
     }
     
@@ -247,13 +247,13 @@ button.close span[aria-hidden="true"] {
     .mobile-services-grid .featured-service-icon img,
     .mobile-services-grid .featured-service-icon span,
     .mobile-services-grid .featured-service-icon .material-icons {
-        width: 28px !important;
-        height: 28px !important;
-        max-width: 28px !important;
-        max-height: 28px !important;
-        min-width: 28px !important;
-        min-height: 28px !important;
-        font-size: 28px !important;
+        width: 36px !important;
+        height: 36px !important;
+        max-width: 36px !important;
+        max-height: 36px !important;
+        min-width: 36px !important;
+        min-height: 36px !important;
+        font-size: 36px !important;
         line-height: 1 !important;
         display: flex !important;
         align-items: center !important;
@@ -263,21 +263,21 @@ button.close span[aria-hidden="true"] {
     
     /* İkon konteyner için özel boyut */
     .mobile-services-grid .featured-service-icon {
-        width: 50px !important;
-        height: 50px !important;
-        max-width: 50px !important;
-        max-height: 50px !important;
-        min-width: 50px !important;
-        min-height: 50px !important;
+        width: 60px !important;
+        height: 60px !important;
+        max-width: 60px !important;
+        max-height: 60px !important;
+        min-width: 60px !important;
+        min-height: 60px !important;
     }
     
     /* Material Icons için boyut standardizasyonu */
     .featured-service-icon .material-icons {
-        font-size: 28px !important;
+        font-size: 36px !important;
         line-height: 1 !important;
         color: #00352b !important;
-        width: 28px !important;
-        height: 28px !important;
+        width: 36px !important;
+        height: 36px !important;
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
@@ -365,14 +365,14 @@ button.close span[aria-hidden="true"] {
     .featured-services-section .mobile-services-grid .service-item .featured-service-card .featured-service-icon img,
     .featured-services-section .mobile-services-grid .service-item .featured-service-card .featured-service-icon span,
     .featured-services-section .mobile-services-grid .service-item .featured-service-card .featured-service-icon .material-icons {
-        width: 28px !important;
-        height: 28px !important;
-        max-width: 28px !important;
-        max-height: 28px !important;
-        min-width: 28px !important;
-        min-height: 28px !important;
-        font-size: 28px !important;
-        line-height: 28px !important;
+        width: 36px !important;
+        height: 36px !important;
+        max-width: 36px !important;
+        max-height: 36px !important;
+        min-width: 36px !important;
+        min-height: 36px !important;
+        font-size: 36px !important;
+        line-height: 36px !important;
         transform: scale(1) !important;
     }
     
@@ -383,13 +383,13 @@ button.close span[aria-hidden="true"] {
     .featured-services-section .mobile-services-grid .service-item .featured-service-card .featured-service-icon [class*="svg-icon"] *,
     .featured-services-section .mobile-services-grid .service-item .featured-service-card .featured-service-icon [class*="svg-icon"] svg,
     .featured-services-section .mobile-services-grid .service-item .featured-service-card .featured-service-icon [class*="svg-icon"] svg * {
-        width: 28px !important;
-        height: 28px !important;
-        max-width: 28px !important;
-        max-height: 28px !important;
-        min-width: 28px !important;
-        min-height: 28px !important;
-        font-size: 28px !important;
+        width: 36px !important;
+        height: 36px !important;
+        max-width: 36px !important;
+        max-height: 36px !important;
+        min-width: 36px !important;
+        min-height: 36px !important;
+        font-size: 36px !important;
         line-height: 1 !important;
         transform: none !important;
         transform-origin: center center !important;
@@ -398,12 +398,12 @@ button.close span[aria-hidden="true"] {
     /* PNG ve resim ikonları için özel boyut zorlaması */
     .featured-services-section .mobile-services-grid .service-item .featured-service-card .featured-service-icon img,
     .featured-services-section .mobile-services-grid .service-item .featured-service-card .featured-service-icon [class*="image-icon"] {
-        width: 28px !important;
-        height: 28px !important;
-        max-width: 28px !important;
-        max-height: 28px !important;
-        min-width: 28px !important;
-        min-height: 28px !important;
+        width: 36px !important;
+        height: 36px !important;
+        max-width: 36px !important;
+        max-height: 36px !important;
+        min-width: 36px !important;
+        min-height: 36px !important;
         object-fit: contain !important;
         object-position: center !important;
         display: block !important;
@@ -412,12 +412,12 @@ button.close span[aria-hidden="true"] {
     
     /* İkon konteyner ultra güçlü boyut */
     .featured-services-section .mobile-services-grid .service-item .featured-service-card .featured-service-icon {
-        width: 50px !important;
-        height: 50px !important;
-        max-width: 50px !important;
-        max-height: 50px !important;
-        min-width: 50px !important;
-        min-height: 50px !important;
+        width: 60px !important;
+        height: 60px !important;
+        max-width: 60px !important;
+        max-height: 60px !important;
+        min-width: 60px !important;
+        min-height: 60px !important;
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
@@ -427,23 +427,23 @@ button.close span[aria-hidden="true"] {
     
     /* Inline style'ları geçersiz kılmak için ultra güçlü CSS */
     .featured-services-section .mobile-services-grid .service-item .featured-service-card .featured-service-icon *[style] {
-        width: 28px !important;
-        height: 28px !important;
-        max-width: 28px !important;
-        max-height: 28px !important;
-        min-width: 28px !important;
-        min-height: 28px !important;
+        width: 36px !important;
+        height: 36px !important;
+        max-width: 36px !important;
+        max-height: 36px !important;
+        min-width: 36px !important;
+        min-height: 36px !important;
     }
     
     /* Style attribute'u olan SVG'ler için özel kural */
     .featured-services-section .mobile-services-grid .service-item .featured-service-card .featured-service-icon svg[style],
     .featured-services-section .mobile-services-grid .service-item .featured-service-card .featured-service-icon img[style] {
-        width: 28px !important;
-        height: 28px !important;
-        max-width: 28px !important;
-        max-height: 28px !important;
-        min-width: 28px !important;
-        min-height: 28px !important;
+        width: 36px !important;
+        height: 36px !important;
+        max-width: 36px !important;
+        max-height: 36px !important;
+        min-width: 36px !important;
+        min-height: 36px !important;
     }
 }
 

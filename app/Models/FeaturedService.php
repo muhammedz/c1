@@ -59,8 +59,8 @@ class FeaturedService extends Model
         if ($isAdmin) {
             return 24; // Admin panelde küçük
         } else {
-            // Mobilde TÜM ikonlar 28px olacak - CSS ile uyumlu
-            return $this->isMobileDevice() ? 28 : ($this->svg_size ?? 48);
+            // Mobilde TÜM ikonlar 36px olacak - CSS ile uyumlu
+            return $this->isMobileDevice() ? 36 : ($this->svg_size ?? 48);
         }
     }
 

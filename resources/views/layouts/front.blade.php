@@ -1239,23 +1239,23 @@
            }
            
            .featured-service-icon {
-               width: 32px;
-               height: 32px;
+               width: 40px;
+               height: 40px;
            }
            
            .featured-service-icon i {
-               font-size: 18px !important;
+               font-size: 24px !important;
            }
            
            .featured-service-icon svg {
                /* Mobilde SVG boyutları model tarafından ayarlanır, maksimum sınır */
-               max-width: 32px !important;
-               max-height: 32px !important;
+               max-width: 40px !important;
+               max-height: 40px !important;
            }
            
            .featured-service-icon img {
-               max-width: 32px !important;
-               max-height: 32px !important;
+               max-width: 40px !important;
+               max-height: 40px !important;
            }
            
            .featured-service-title {
