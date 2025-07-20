@@ -69,19 +69,46 @@ use Illuminate\Support\Facades\Cache;
 // Arama route'u - SearchService kullanarak
 Route::get('/arama', function() {
     $query = request()->input('q');
+    $hedefKitleSlug = request()->input('hedef_kitle'); // Hedef kitle filtresi
+    $dateSort = request()->input('tarih_sirala'); // Tarih sıralaması filtresi
     
     // Yeni SearchService'i kullan
     $searchService = new \App\Services\SearchService();
-    $results = $searchService->search($query ?? '');
+    $results = $searchService->search($query ?? '', $hedefKitleSlug, $dateSort);
     
     // Arama yapıldıysa loglama
     if (!empty($query)) {
         \App\Models\SearchLog::logSearch($query, $results['total'] ?? 0);
     }
     
+    // Arama ayarlarını getir
+    $searchSettings = \App\Models\SearchSetting::getSettings();
+    
+    // Hedef kitle bilgilerini getir (filtreleme için)
+    $hedefKitleler = \App\Models\HedefKitle::where('is_active', true)
+        ->orderBy('order')
+        ->orderBy('name')
+        ->get();
+    
+    // Seçili hedef kitle
+    $selectedHedefKitle = null;
+    if ($hedefKitleSlug) {
+        $selectedHedefKitle = \App\Models\HedefKitle::where('slug', $hedefKitleSlug)
+            ->where('is_active', true)
+            ->first();
+    }
+    
+
+
+    
     return view('search.index', [
         'query' => $query,
-        'results' => $results
+        'results' => $results,
+        'hedefKitleler' => $hedefKitleler,
+        'selectedHedefKitle' => $selectedHedefKitle,
+        'hedefKitleSlug' => $hedefKitleSlug,
+        'searchSettings' => $searchSettings,
+        'dateSort' => $dateSort
     ]);
 })->name('search');
 

@@ -41,8 +41,28 @@ Arama - Çankaya Belediyesi
                 <h1 class="text-2xl md:text-3xl font-bold text-white mb-2">Arama Sonuçları</h1>
                 @if(isset($query))
                 <p class="text-white/80 text-base mb-2">
-                    "<span class="font-medium">{{ $query }}</span>" için {{ isset($results['total']) ? $results['total'] : 0 }} sonuç bulundu
+                    "<span class="font-medium">{{ $query }}</span>"
+                    @if($selectedHedefKitle)
+                        <span class="text-white/60">{{ $selectedHedefKitle->name }} hedef kitlesi için</span>
+                    @endif
+                    {{ isset($results['total']) ? $results['total'] : 0 }} sonuç bulundu
                 </p>
+                
+                @if($selectedHedefKitle)
+                <div class="flex items-center gap-3 mt-3">
+                    <div class="flex items-center px-4 py-2 rounded-full bg-white/20 backdrop-blur-sm text-white border border-white/30">
+                        <span class="material-icons text-sm mr-2">filter_alt</span>
+                        <span class="text-sm font-medium">{{ $selectedHedefKitle->name }}</span>
+                    </div>
+                    <a 
+                        href="{{ route('search', ['q' => $query]) }}" 
+                        class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white/80 hover:text-white transition-all duration-200"
+                        title="Filtreyi Temizle"
+                    >
+                        <span class="material-icons text-sm">close</span>
+                    </a>
+                </div>
+                @endif
                 @endif
             </div>
         </div>
@@ -159,26 +179,106 @@ Arama - Çankaya Belediyesi
                             <label for="search_query" class="block text-gray-700 font-medium mb-3 text-sm md:text-base">Aranan Kelime</label>
                             <form action="{{ route('search') }}" method="GET" class="space-y-4">
                                 <div class="flex flex-col sm:flex-row gap-3">
-                                <div class="flex-1">
-                                    <input 
-                                        type="text" 
-                                        id="search_query"
-                                        name="q" 
-                                        value="{{ $query ?? '' }}" 
-                                        placeholder="Aramak istediğiniz kelimeyi girin..." 
+                                    <!-- Arama kutusu -->
+                                    <div class="flex-1">
+                                        <input 
+                                            type="text" 
+                                            id="search_query"
+                                            name="q" 
+                                            value="{{ $query ?? '' }}" 
+                                            placeholder="Aramak istediğiniz kelimeyi girin..." 
                                             class="w-full px-4 py-3 md:py-2 text-base md:text-sm rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#004d2e] focus:border-transparent"
-                                    >
-                                </div>
-                                
+                                        >
+                                    </div>
+                                    
+                                    @php
+                                        $searchSettings = \App\Models\SearchSetting::getSettings();
+                                    @endphp
+                                    
+                                    @if($searchSettings->show_hedef_kitle_filter && isset($hedefKitleler) && $hedefKitleler->count() > 0)
+                                    <!-- Hedef kitle filtresi -->
+                                    <div class="w-full sm:w-auto sm:min-w-[200px]">
+                                        <select 
+                                            name="hedef_kitle" 
+                                            id="hedef_kitle_filter"
+                                            class="w-full px-3 py-3 md:py-2 text-base md:text-sm rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#004d2e] focus:border-transparent"
+                                            onchange="this.form.submit()"
+                                        >
+                                            <option value="">Hedef Kitle</option>
+                                            @foreach($hedefKitleler as $hedefKitle)
+                                                <option 
+                                                    value="{{ $hedefKitle->slug }}" 
+                                                    {{ $hedefKitleSlug === $hedefKitle->slug ? 'selected' : '' }}
+                                                >
+                                                    {{ $hedefKitle->name }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    @endif
+                                    
+                                    @if($searchSettings->show_date_filter && (isset($results['news']) && $results['news']->count() > 0 || isset($results['services']) && $results['services']->count() > 0))
+                                    <!-- Tarih sıralaması filtresi -->
+                                    <div class="w-full sm:w-auto sm:min-w-[200px]">
+                                        <select 
+                                            name="tarih_sirala" 
+                                            id="date_sort_filter"
+                                            class="w-full px-3 py-3 md:py-2 text-base md:text-sm rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#004d2e] focus:border-transparent"
+                                            onchange="this.form.submit()"
+                                        >
+                                            <option value="">Tarih Sıralaması</option>
+                                            <option value="desc" {{ $dateSort === 'desc' ? 'selected' : '' }}>
+                                                <i class="fas fa-arrow-down"></i> Yeniden Eskiye
+                                            </option>
+                                            <option value="asc" {{ $dateSort === 'asc' ? 'selected' : '' }}>
+                                                <i class="fas fa-arrow-up"></i> Eskiden Yeniye
+                                            </option>
+                                        </select>
+                                    </div>
+                                    @endif
+                                    
+                                    <!-- Ara butonu -->
                                     <div class="w-full sm:w-auto">
-                                    <button 
-                                        type="submit" 
+                                        <button 
+                                            type="submit" 
                                             class="w-full sm:w-auto bg-[#004d2e] hover:bg-green-800 text-white py-3 md:py-2 px-6 rounded-md transition-colors font-medium text-base md:text-sm"
-                                    >
-                                        Ara
-                                    </button>
+                                        >
+                                            Ara
+                                        </button>
                                     </div>
                                 </div>
+                                
+                                @if($selectedHedefKitle || $dateSort)
+                                <div class="flex flex-wrap items-center gap-2 text-sm text-gray-600">
+                                    @if($selectedHedefKitle)
+                                    <div class="flex items-center bg-blue-50 px-2 py-1 rounded">
+                                        <span class="material-icons text-xs mr-1">filter_alt</span>
+                                        <span>{{ $selectedHedefKitle->name }}</span>
+                                        <a 
+                                            href="{{ route('search', array_merge(request()->all(), ['hedef_kitle' => null])) }}" 
+                                            class="ml-1 text-gray-500 hover:text-gray-700"
+                                            title="Hedef Kitle Filtresini Temizle"
+                                        >
+                                            <span class="material-icons text-xs">close</span>
+                                        </a>
+                                    </div>
+                                    @endif
+                                    
+                                    @if($dateSort)
+                                    <div class="flex items-center bg-green-50 px-2 py-1 rounded">
+                                        <span class="material-icons text-xs mr-1">schedule</span>
+                                        <span>{{ $dateSort === 'asc' ? 'Eskiden Yeniye' : 'Yeniden Eskiye' }}</span>
+                                        <a 
+                                            href="{{ route('search', array_merge(request()->all(), ['tarih_sirala' => null])) }}" 
+                                            class="ml-1 text-gray-500 hover:text-gray-700"
+                                            title="Tarih Filtresini Temizle"
+                                        >
+                                            <span class="material-icons text-xs">close</span>
+                                        </a>
+                                    </div>
+                                    @endif
+                                </div>
+                                @endif
                             </form>
                         </div>
                     </div>
@@ -541,5 +641,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
+
+
 </script>
 @endsection

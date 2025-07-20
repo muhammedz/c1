@@ -17,11 +17,14 @@ class SearchService
 {
     /**
      * Gelişmiş arama işlemi - MySQL 9.x uyumlu
+     * Hedef kitle filtresi ve tarih sıralaması ile arama yapabilir
      * 
-     * @param string $query
+     * @param string $query Arama sorgusu
+     * @param string|null $hedefKitleSlug Hedef kitle slug'ı (opsiyonel filtre)
+     * @param string|null $dateSort Tarih sıralaması (desc=yeniden eskiye, asc=eskiden yeniye)
      * @return array
      */
-    public function search(string $query): array
+    public function search(string $query, ?string $hedefKitleSlug = null, ?string $dateSort = null): array
     {
         if (empty($query) || strlen(trim($query)) < 3) {
             return [
@@ -45,15 +48,39 @@ class SearchService
         // Priority Links'i getir (önce)
         $priorityLinks = SearchPriorityLink::getMatchingLinks($query);
         
+        // Hedef kitle ID'sini bul (eğer filtre varsa)
+        $hedefKitleId = null;
+        if (!empty($hedefKitleSlug)) {
+            $hedefKitle = \App\Models\HedefKitle::where('slug', $hedefKitleSlug)
+                ->where('is_active', true)
+                ->first();
+            $hedefKitleId = $hedefKitle?->id;
+            
+
+        }
+        
         // Farklı arama stratejileri uygula
-        $services = $this->searchServices($normalizedQuery, $query);
-        $news = $this->searchNews($normalizedQuery, $query);
-        $pages = $this->searchPages($normalizedQuery, $query);
-        $projects = $this->searchProjects($normalizedQuery, $query);
-        $guides = $this->searchGuides($normalizedQuery, $query);
-        $cankayaHouses = $this->searchCankayaHouses($normalizedQuery, $query);
-        $mudurlukler = $this->searchMudurlukler($normalizedQuery, $query);
-        $archives = $this->searchArchives($normalizedQuery, $query);
+        $services = $this->searchServices($normalizedQuery, $query, $hedefKitleId, $dateSort);
+        $news = $this->searchNews($normalizedQuery, $query, $hedefKitleId, $dateSort);
+        
+        // Hedef kitle filtresi seçildiğinde sadece News ve Service ara
+        if ($hedefKitleId) {
+            // Hedef kitle filtresi aktifken diğer kategoriler boş
+            $pages = collect();
+            $projects = collect();
+            $guides = collect();
+            $cankayaHouses = collect();
+            $mudurlukler = collect();
+            $archives = collect();
+        } else {
+            // Normal arama - tüm kategoriler
+            $pages = $this->searchPages($normalizedQuery, $query);
+            $projects = $this->searchProjects($normalizedQuery, $query);
+            $guides = $this->searchGuides($normalizedQuery, $query);
+            $cankayaHouses = $this->searchCankayaHouses($normalizedQuery, $query);
+            $mudurlukler = $this->searchMudurlukler($normalizedQuery, $query);
+            $archives = $this->searchArchives($normalizedQuery, $query);
+        }
         
         $totalCount = $priorityLinks->count() + $services->count() + $news->count() + $pages->count() + $projects->count() + 
                      $guides->count() + $cankayaHouses->count() + $mudurlukler->count() + $archives->count();
@@ -100,32 +127,63 @@ class SearchService
     
     /**
      * Hizmetlerde arama yap - İyileştirilmiş algoritma
+     * Hedef kitle filtresi ve tarih sıralaması ile desteklenir
      * 
      * @param string $normalizedQuery
      * @param string $originalQuery
+     * @param int|null $hedefKitleId
+     * @param string|null $dateSort
      * @return Collection
      */
-    private function searchServices(string $normalizedQuery, string $originalQuery): Collection
+    private function searchServices(string $normalizedQuery, string $originalQuery, ?int $hedefKitleId = null, ?string $dateSort = null): Collection
     {
         $results = collect();
         
-        // 1. Scout ile tam arama
+
+        
+        // 1. Scout ile tam arama - hedef kitle filtresi ile
         try {
-            $scoutResults = Service::search($normalizedQuery)
-                ->where('status', 'published')
-                ->get();
-            $results = $results->merge($scoutResults);
+            // Hedef kitle filtresi varsa önce filtrelenmiş ID'leri al
+            if ($hedefKitleId) {
+                $filteredServiceIds = Service::where('status', 'published')
+                    ->whereHas('hedefKitleler', function($q) use ($hedefKitleId) {
+                        $q->where('hedef_kitleler.id', $hedefKitleId);
+                    })->pluck('id')->toArray();
+                
+                if (!empty($filteredServiceIds)) {
+                    $scoutResults = Service::search($normalizedQuery)
+                        ->where('status', 'published')
+                        ->whereIn('id', $filteredServiceIds)
+                        ->get();
+                    $results = $results->merge($scoutResults);
+                }
+                // Eğer hedef kitlede hiç hizmet yoksa Scout'u hiç çalıştırma
+            } else {
+                // Hedef kitle filtresi yoksa normal arama
+                $scoutResults = Service::search($normalizedQuery)
+                    ->where('status', 'published')
+                    ->get();
+                $results = $results->merge($scoutResults);
+            }
         } catch (\Exception $e) {
             // Scout hatası durumunda devam et
         }
         
         // 2. Tam cümle/ifade arama (öncelik)
-        $exactResults = Service::where('status', 'published')
+        $exactQuery = Service::where('status', 'published')
             ->where(function($q) use ($originalQuery, $normalizedQuery) {
                 $q->where('title', 'LIKE', "%{$originalQuery}%")
                   ->orWhere('title', 'LIKE', "%{$normalizedQuery}%");
-            })
-            ->get();
+            });
+        
+        // Hedef kitle filtresi uygula
+        if ($hedefKitleId) {
+            $exactQuery->whereHas('hedefKitleler', function($q) use ($hedefKitleId) {
+                $q->where('hedef_kitleler.id', $hedefKitleId);
+            });
+        }
+        
+        $exactResults = $exactQuery->get();
         
         $existingIds = $results->pluck('id')->toArray();
         $additionalResults = $exactResults->whereNotIn('id', $existingIds);
@@ -141,19 +199,35 @@ class SearchService
                         try {
                             $wordRegex = $this->createWordBoundaryRegex($word);
                             
-                            $wordResults = Service::where('status', 'published')
-                                ->where('title', 'REGEXP', $wordRegex)
-                                ->get();
+                            $wordQuery = Service::where('status', 'published')
+                                ->where('title', 'REGEXP', $wordRegex);
+                            
+                            // Hedef kitle filtresi uygula
+                            if ($hedefKitleId) {
+                                $wordQuery->whereHas('hedefKitleler', function($q) use ($hedefKitleId) {
+                                    $q->where('hedef_kitleler.id', $hedefKitleId);
+                                });
+                            }
+                            
+                            $wordResults = $wordQuery->get();
                             
                             $existingIds = $results->pluck('id')->toArray();
                             $additionalResults = $wordResults->whereNotIn('id', $existingIds);
                             $results = $results->merge($additionalResults);
                         } catch (\Exception $e) {
                             // REGEXP hatası durumunda LIKE kullan
-                            $wordResults = Service::where('status', 'published')
+                            $wordQuery = Service::where('status', 'published')
                                 ->where('title', 'LIKE', "%{$word}%")
-                                ->limit(3)
-                                ->get();
+                                ->limit(3);
+                            
+                            // Hedef kitle filtresi uygula
+                            if ($hedefKitleId) {
+                                $wordQuery->whereHas('hedefKitleler', function($q) use ($hedefKitleId) {
+                                    $q->where('hedef_kitleler.id', $hedefKitleId);
+                                });
+                            }
+                            
+                            $wordResults = $wordQuery->get();
                             
                             $existingIds = $results->pluck('id')->toArray();
                             $additionalResults = $wordResults->whereNotIn('id', $existingIds);
@@ -181,37 +255,84 @@ class SearchService
             }
         }
         
+        // Hedef kitle filtresi final kontrolü - tüm sonuçları filtrele
+        if ($hedefKitleId) {
+            $results = $results->filter(function($service) use ($hedefKitleId) {
+                return $service->hedefKitleler->contains('id', $hedefKitleId);
+            });
+        }
+        
+        // Tarih sıralaması uygula
+        if ($dateSort && $results->count() > 0) {
+            if ($dateSort === 'asc') {
+                // Eskiden yeniye
+                $results = $results->sortBy('published_at');
+            } else {
+                // Yeniden eskiye (varsayılan)
+                $results = $results->sortByDesc('published_at');
+            }
+        }
+        
         return $results;
     }
     
     /**
      * Haberlerde arama yap - İyileştirilmiş algoritma
+     * Hedef kitle filtresi ve tarih sıralaması ile desteklenir
      * 
      * @param string $normalizedQuery
      * @param string $originalQuery
+     * @param int|null $hedefKitleId
+     * @param string|null $dateSort
      * @return Collection
      */
-    private function searchNews(string $normalizedQuery, string $originalQuery): Collection
+    private function searchNews(string $normalizedQuery, string $originalQuery, ?int $hedefKitleId = null, ?string $dateSort = null): Collection
     {
         $results = collect();
         
-        // 1. Scout ile tam arama
+        // 1. Scout ile tam arama - hedef kitle filtresi ile
         try {
-            $scoutResults = News::search($normalizedQuery)
-                ->where('status', 'published')
-                ->get();
-            $results = $results->merge($scoutResults);
+            // Hedef kitle filtresi varsa önce filtrelenmiş ID'leri al
+            if ($hedefKitleId) {
+                $filteredNewsIds = News::where('status', 'published')
+                    ->whereHas('hedefKitleler', function($q) use ($hedefKitleId) {
+                        $q->where('hedef_kitleler.id', $hedefKitleId);
+                    })->pluck('id')->toArray();
+                
+                if (!empty($filteredNewsIds)) {
+                    $scoutResults = News::search($normalizedQuery)
+                        ->where('status', 'published')
+                        ->whereIn('id', $filteredNewsIds)
+                        ->get();
+                    $results = $results->merge($scoutResults);
+                }
+                // Eğer hedef kitlede hiç haber yoksa Scout'u hiç çalıştırma
+            } else {
+                // Hedef kitle filtresi yoksa normal arama
+                $scoutResults = News::search($normalizedQuery)
+                    ->where('status', 'published')
+                    ->get();
+                $results = $results->merge($scoutResults);
+            }
         } catch (\Exception $e) {
             // Scout hatası durumunda devam et
         }
         
         // 2. Tam cümle/ifade arama (öncelik)
-        $exactResults = News::where('status', 'published')
+        $exactQuery = News::where('status', 'published')
             ->where(function($q) use ($originalQuery, $normalizedQuery) {
                 $q->where('title', 'LIKE', "%{$originalQuery}%")
                   ->orWhere('title', 'LIKE', "%{$normalizedQuery}%");
-            })
-            ->get();
+            });
+        
+        // Hedef kitle filtresi uygula
+        if ($hedefKitleId) {
+            $exactQuery->whereHas('hedefKitleler', function($q) use ($hedefKitleId) {
+                $q->where('hedef_kitleler.id', $hedefKitleId);
+            });
+        }
+        
+        $exactResults = $exactQuery->get();
         
         $existingIds = $results->pluck('id')->toArray();
         $additionalResults = $exactResults->whereNotIn('id', $existingIds);
@@ -226,19 +347,35 @@ class SearchService
                         try {
                             $wordRegex = $this->createWordBoundaryRegex($word);
                             
-                            $wordResults = News::where('status', 'published')
-                                ->where('title', 'REGEXP', $wordRegex)
-                                ->get();
+                            $wordQuery = News::where('status', 'published')
+                                ->where('title', 'REGEXP', $wordRegex);
+                            
+                            // Hedef kitle filtresi uygula
+                            if ($hedefKitleId) {
+                                $wordQuery->whereHas('hedefKitleler', function($q) use ($hedefKitleId) {
+                                    $q->where('hedef_kitleler.id', $hedefKitleId);
+                                });
+                            }
+                            
+                            $wordResults = $wordQuery->get();
                             
                             $existingIds = $results->pluck('id')->toArray();
                             $additionalResults = $wordResults->whereNotIn('id', $existingIds);
                             $results = $results->merge($additionalResults);
                         } catch (\Exception $e) {
                             // REGEXP hatası durumunda LIKE kullan
-                            $wordResults = News::where('status', 'published')
+                            $wordQuery = News::where('status', 'published')
                                 ->where('title', 'LIKE', "%{$word}%")
-                                ->limit(3)
-                                ->get();
+                                ->limit(3);
+                            
+                            // Hedef kitle filtresi uygula
+                            if ($hedefKitleId) {
+                                $wordQuery->whereHas('hedefKitleler', function($q) use ($hedefKitleId) {
+                                    $q->where('hedef_kitleler.id', $hedefKitleId);
+                                });
+                            }
+                            
+                            $wordResults = $wordQuery->get();
                             
                             $existingIds = $results->pluck('id')->toArray();
                             $additionalResults = $wordResults->whereNotIn('id', $existingIds);
@@ -254,15 +391,41 @@ class SearchService
             $words = explode(' ', $normalizedQuery);
             foreach ($words as $word) {
                 if (strlen($word) >= 4 && !$this->isBlacklistedWord($word)) {
-                    $wordResults = News::where('status', 'published')
+                    $wordQuery = News::where('status', 'published')
                         ->where('title', 'LIKE', "%{$word}%")
-                        ->limit(3)
-                        ->get();
+                        ->limit(3);
+                    
+                    // Hedef kitle filtresi uygula
+                    if ($hedefKitleId) {
+                        $wordQuery->whereHas('hedefKitleler', function($q) use ($hedefKitleId) {
+                            $q->where('hedef_kitleler.id', $hedefKitleId);
+                        });
+                    }
+                    
+                    $wordResults = $wordQuery->get();
                     
                     $existingIds = $results->pluck('id')->toArray();
                     $additionalResults = $wordResults->whereNotIn('id', $existingIds);
                     $results = $results->merge($additionalResults);
                 }
+            }
+        }
+        
+        // Hedef kitle filtresi final kontrolü - tüm sonuçları filtrele
+        if ($hedefKitleId) {
+            $results = $results->filter(function($news) use ($hedefKitleId) {
+                return $news->hedefKitleler->contains('id', $hedefKitleId);
+            });
+        }
+        
+        // Tarih sıralaması uygula
+        if ($dateSort && $results->count() > 0) {
+            if ($dateSort === 'asc') {
+                // Eskiden yeniye
+                $results = $results->sortBy('published_at');
+            } else {
+                // Yeniden eskiye (varsayılan)
+                $results = $results->sortByDesc('published_at');
             }
         }
         

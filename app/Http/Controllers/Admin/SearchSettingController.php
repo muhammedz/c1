@@ -66,6 +66,8 @@ class SearchSettingController extends Controller
             'show_quick_links' => 'nullable',
             'show_popular_queries' => 'nullable',
             'search_in_mudurluk_files' => 'nullable',
+            'show_hedef_kitle_filter' => 'nullable',
+            'show_date_filter' => 'nullable',
         ]);
         
         $settings = SearchSetting::getSettings();
@@ -78,6 +80,8 @@ class SearchSettingController extends Controller
             'show_quick_links' => $request->input('show_quick_links') == '1',
             'show_popular_queries' => $request->input('show_popular_queries') == '1',
             'search_in_mudurluk_files' => $request->input('search_in_mudurluk_files') == '1',
+            'show_hedef_kitle_filter' => $request->input('show_hedef_kitle_filter') == '1',
+            'show_date_filter' => $request->input('show_date_filter') == '1',
         ]);
         
         return redirect()->route('admin.search-settings.index')

@@ -22,6 +22,8 @@ class SearchSetting extends Model
         'show_quick_links',
         'show_popular_queries',
         'search_in_mudurluk_files',
+        'show_hedef_kitle_filter',
+        'show_date_filter',
     ];
     
     /**
@@ -33,6 +35,8 @@ class SearchSetting extends Model
         'show_quick_links' => 'boolean',
         'show_popular_queries' => 'boolean',
         'search_in_mudurluk_files' => 'boolean',
+        'show_hedef_kitle_filter' => 'boolean',
+        'show_date_filter' => 'boolean',
         'max_quick_links' => 'integer',
         'max_popular_queries' => 'integer',
     ];
@@ -53,6 +57,8 @@ class SearchSetting extends Model
                 'show_quick_links' => true,
                 'show_popular_queries' => true,
                 'search_in_mudurluk_files' => false,
+                'show_hedef_kitle_filter' => false,
+                'show_date_filter' => false,
             ]);
         }
         

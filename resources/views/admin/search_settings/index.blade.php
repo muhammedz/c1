@@ -86,6 +86,40 @@
                                     </small>
                                 </div>
                             </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <div class="custom-control custom-switch">
+                                        <input type="hidden" name="show_hedef_kitle_filter" value="0">
+                                        <input type="checkbox" class="custom-control-input" id="showHedefKitleFilter" name="show_hedef_kitle_filter" value="1" {{ $settings->show_hedef_kitle_filter ? 'checked' : '' }}>
+                                        <label class="custom-control-label" for="showHedefKitleFilter">
+                                            <i class="fas fa-users mr-1"></i>
+                                            Hedef Kitle Filtresini Göster
+                                        </label>
+                                    </div>
+                                    <small class="form-text text-muted">
+                                        Bu seçenek aktif edildiğinde, arama sayfasında hedef kitle filtresi görüntülenir.
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Tarih Filtresi Ayarı -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <div class="custom-control custom-switch">
+                                        <input type="hidden" name="show_date_filter" value="0">
+                                        <input type="checkbox" class="custom-control-input" id="showDateFilter" name="show_date_filter" value="1" {{ $settings->show_date_filter ? 'checked' : '' }}>
+                                        <label class="custom-control-label" for="showDateFilter">
+                                            <i class="fas fa-calendar-alt mr-1"></i>
+                                            Tarih Sıralaması Filtresini Göster
+                                        </label>
+                                    </div>
+                                    <small class="form-text text-muted">
+                                        Bu seçenek aktif edildiğinde, arama sayfasında tarih sıralaması (Yeniden Eskiye / Eskiden Yeniye) filtresi görüntülenir.
+                                    </small>
+                                </div>
+                            </div>
                         </div>
                         
                         <div class="text-right">
