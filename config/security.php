@@ -74,7 +74,11 @@ return [
             "connect-src 'self' " .
                 "https://www.google-analytics.com " .
                 "https://cdn.tiny.cloud; " .
-            "frame-src 'self'; " .
+            "frame-src 'self' " .
+                "https://www.youtube.com " .
+                "https://youtube.com " .
+                "https://www.google.com " .
+                "https://maps.google.com; " .
             "object-src 'none'; " .
             "base-uri 'self';"
         ),
