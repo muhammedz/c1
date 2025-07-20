@@ -1555,9 +1555,30 @@
                         !img.closest('[data-critical="true"]') &&
                         !img.closest('.hero-slider-section')) {
                         img.setAttribute('loading', 'lazy');
+                        
+                        // Resim yüklendiğinde loaded class'ı ekle
+                        img.addEventListener('load', function() {
+                            this.classList.add('loaded');
+                        });
+                        
+                        // Eğer resim zaten yüklüyse
+                        if (img.complete) {
+                            img.classList.add('loaded');
+                        }
                     }
                 });
             }
+            
+            // Mevcut lazy loading resimlerine de event listener ekle
+            document.querySelectorAll('img[loading="lazy"]').forEach(img => {
+                img.addEventListener('load', function() {
+                    this.classList.add('loaded');
+                });
+                
+                if (img.complete) {
+                    img.classList.add('loaded');
+                }
+            });
         });
     </script>
     @endif
