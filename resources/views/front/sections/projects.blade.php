@@ -116,7 +116,7 @@
                                             @foreach($projectGroup as $project)
                                                 <div class="project-item">
                                                     <a href="{{ route('front.projects.detail', $project->slug) }}" data-url="{{ route('front.projects.detail', $project->slug) }}" class="project-link block aspect-video rounded-2xl overflow-hidden relative group">
-                                                        <img src="{{ $project->cover_image_url }}" alt="Proje görseli" class="w-full h-full object-cover">
+                                                        <img src="{{ $project->cover_image_url }}" alt="Proje görseli" class="w-full h-full object-cover" @if($lazyLoadingEnabled == '1') loading="lazy" @endif>
                                                         <div class="absolute inset-0 bg-black/25"></div>
                                                         <div class="absolute bottom-0 left-0 right-0 p-6">
                                                             <h3 class="text-white text-xl font-bold" style="font-family: 'TT Norms Pro', sans-serif; font-weight: 700;">{{ $project->title }}</h3>

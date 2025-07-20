@@ -1,0 +1,106 @@
+/**
+ * Lazy Loading CSS
+ * Admin ayarlarından kontrol edilen lazy loading sistemi için stiller
+ */
+
+/* Lazy loading placeholder stilleri */
+img.lazy {
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    background-color: #f3f4f6;
+    background-image: linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 50%, #f3f4f6 75%);
+    background-size: 200% 100%;
+    animation: loading-shimmer 1.5s infinite;
+}
+
+img.lazy.loaded {
+    opacity: 1;
+}
+
+/* Shimmer animasyonu */
+@keyframes loading-shimmer {
+    0% {
+        background-position: -200% 0;
+    }
+    100% {
+        background-position: 200% 0;
+    }
+}
+
+/* Loading durumunda blur efekti (opsiyonel) */
+img[loading="lazy"]:not([src*="data:"]) {
+    filter: blur(2px);
+    transition: filter 0.3s ease;
+}
+
+img[loading="lazy"][src*="data:"] {
+    filter: none;
+}
+
+/* Native lazy loading için fade-in efekti */
+@supports (loading: lazy) {
+    img[loading="lazy"] {
+        opacity: 0;
+        transition: opacity 0.3s ease-in-out;
+    }
+    
+    img[loading="lazy"].loaded,
+    img[loading="lazy"]:not([data-loaded="false"]) {
+        opacity: 1;
+    }
+}
+
+/* Grid ve flex container'larda aspect ratio korunması */
+.lazy-container {
+    position: relative;
+    overflow: hidden;
+}
+
+.lazy-container::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 24px;
+    height: 24px;
+    border: 2px solid #e5e7eb;
+    border-top: 2px solid #6b7280;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    opacity: 0.7;
+}
+
+.lazy-container img.loaded + ::before {
+    display: none;
+}
+
+@keyframes spin {
+    0% { transform: translate(-50%, -50%) rotate(0deg); }
+    100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+/* Responsive optimizasyon */
+@media (max-width: 768px) {
+    img.lazy {
+        background-size: 100% 100%;
+        animation-duration: 2s;
+    }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+    img.lazy {
+        background-color: #374151;
+        background-image: linear-gradient(90deg, #374151 25%, #4b5563 50%, #374151 75%);
+    }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    img.lazy,
+    img[loading="lazy"] {
+        animation: none;
+        transition: none;
+    }
+} 

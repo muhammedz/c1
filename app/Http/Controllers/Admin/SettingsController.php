@@ -172,6 +172,7 @@ class SettingsController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'preloader_enabled' => 'nullable|boolean',
+            'lazy_loading_enabled' => 'nullable|boolean',
         ]);
 
         if ($validator->fails()) {
@@ -193,8 +194,21 @@ class SettingsController extends Controller
             ]
         );
 
+        // Lazy Loading aktif/pasif ayarını güncelle veya oluştur
+        Setting::updateOrCreate(
+            ['key' => 'lazy_loading_enabled', 'group' => 'preloader'],
+            [
+                'value' => $request->has('lazy_loading_enabled') ? '1' : '0',
+                'display_name' => 'Lazy Loading Aktif',
+                'type' => 'checkbox',
+                'description' => 'Resimlerin görünür olduğunda yüklenmesi aktif mi?',
+                'is_public' => true,
+                'order' => 2
+            ]
+        );
+
         return redirect()->route('admin.settings.index')
-            ->with('success', 'Preloader ayarları başarıyla güncellendi.');
+            ->with('success', 'Performans ayarları başarıyla güncellendi.');
     }
 
     /**

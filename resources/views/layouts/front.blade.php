@@ -94,9 +94,14 @@
     <link href="{{ asset('assets/css/styles.css') }}" rel="stylesheet">
     
     @if($preloaderEnabled == '1')
-        <!-- Preloader CSS -->
-        <link href="{{ asset('css/preloader.css') }}" rel="stylesheet">
-    @endif
+<!-- Preloader CSS -->
+<link href="{{ asset('css/preloader.css') }}" rel="stylesheet">
+@endif
+
+@if($lazyLoadingEnabled == '1')
+<!-- Lazy Loading CSS -->
+<link href="{{ asset('css/lazy-loading.css') }}" rel="stylesheet">
+@endif
     
     <!-- Swiper CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
@@ -1490,6 +1495,70 @@
     @if($headerSettings->additional_scripts)
     <script>
         {!! $headerSettings->additional_scripts !!}
+    </script>
+    @endif
+    
+    <!-- Lazy Loading Global Variables -->
+    <script>
+        // Lazy loading durumunu global değişken olarak tanımla
+        window.lazyLoadingEnabled = {{ $lazyLoadingEnabled == '1' ? 'true' : 'false' }};
+    </script>
+    
+    @if($lazyLoadingEnabled == '1')
+    <!-- Lazy Loading JavaScript -->
+    <script>
+        /**
+         * Lazy Loading sistemi - Modern tarayıcılar için native, eski tarayıcılar için fallback
+         * Admin ayarlarından kontrol edilebilir
+         */
+        document.addEventListener('DOMContentLoaded', function() {
+            // Native lazy loading desteği kontrolü
+            const supportsNativeLazyLoading = 'loading' in HTMLImageElement.prototype;
+            
+            if (!supportsNativeLazyLoading) {
+                // Eski tarayıcılar için Intersection Observer fallback
+                if ('IntersectionObserver' in window) {
+                    const imageObserver = new IntersectionObserver((entries, observer) => {
+                        entries.forEach(entry => {
+                            if (entry.isIntersecting) {
+                                const img = entry.target;
+                                img.src = img.dataset.src;
+                                img.classList.remove('lazy');
+                                imageObserver.unobserve(img);
+                            }
+                        });
+                    });
+                    
+                    // Lazy class'ı olan resimleri gözlemle
+                    document.querySelectorAll('img[data-src]').forEach(img => {
+                        imageObserver.observe(img);
+                    });
+                }
+            }
+            
+            // Global fonksiyon - template'lerden kullanılabilir
+            window.enableLazyLoadingForElement = function(element) {
+                if (supportsNativeLazyLoading) {
+                    element.setAttribute('loading', 'lazy');
+                } else if ('IntersectionObserver' in window) {
+                    element.classList.add('lazy');
+                    element.dataset.src = element.src;
+                    element.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjNmNGY2Ii8+PC9zdmc+';
+                }
+            };
+            
+            // Tüm mevcut resimlere lazy loading uygula
+            if (supportsNativeLazyLoading) {
+                document.querySelectorAll('img:not([loading])').forEach(img => {
+                    // Hero slider gibi kritik alanları hariç tut
+                    if (!img.closest('.swiper-slide:first-child') && 
+                        !img.closest('[data-critical="true"]') &&
+                        !img.closest('.hero-slider-section')) {
+                        img.setAttribute('loading', 'lazy');
+                    }
+                });
+            }
+        });
     </script>
     @endif
     

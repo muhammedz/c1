@@ -91,9 +91,9 @@
                             </div>
                         </div>
 
-                        <div class="alert alert-info">
-                            <i class="fas fa-lightbulb"></i>
-                            <strong>Bilgi:</strong> Bu ayarlar web sitenizin arama motorlarında nasıl görüneceğini belirler. 
+                        <div class="alert alert-info" style="background-color: #d1ecf1 !important; color: #0c5460 !important; border: 1px solid #bee5eb !important; padding: 0.75rem 1.25rem !important;">
+                            <i class="fas fa-lightbulb" style="color: #17a2b8 !important; margin-right: 8px;"></i>
+                            <strong style="color: #0c5460 !important; font-weight: 600;">Bilgi:</strong> Bu ayarlar web sitenizin arama motorlarında nasıl görüneceğini belirler. 
                             Başlık ve açıklama alanları Google ve diğer arama motorlarında sitenizin tanıtımı için kullanılır.
                         </div>
                     </div>
@@ -174,9 +174,9 @@
                             </div>
                         </div>
 
-                        <div class="alert alert-info">
-                            <i class="fas fa-lightbulb"></i>
-                            <strong>Bilgi:</strong> Favicon, web sitenizin tarayıcı sekmesinde görünen küçük simgedir. 
+                        <div class="alert alert-info" style="background-color: #d1ecf1 !important; color: #0c5460 !important; border: 1px solid #bee5eb !important; padding: 0.75rem 1.25rem !important;">
+                            <i class="fas fa-lightbulb" style="color: #17a2b8 !important; margin-right: 8px;"></i>
+                            <strong style="color: #0c5460 !important; font-weight: 600;">Bilgi:</strong> Favicon, web sitenizin tarayıcı sekmesinde görünen küçük simgedir. 
                             Yüklediğiniz favicon tüm sitede kullanılacaktır.
                         </div>
                     </div>
@@ -196,7 +196,7 @@
             <div class="card card-warning">
                 <div class="card-header">
                     <h3 class="card-title">
-                        <i class="fas fa-spinner"></i> Preloader Ayarları
+                        <i class="fas fa-tachometer-alt"></i> Performans Ayarları
                     </h3>
                 </div>
                 <form action="{{ route('admin.settings.preloader.update') }}" method="POST">
@@ -222,17 +222,40 @@
                                     </small>
                                 </div>
                             </div>
+                            
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <div class="custom-control custom-switch">
+                                            <input type="checkbox" 
+                                                   class="custom-control-input" 
+                                                   id="lazy_loading_enabled" 
+                                                   name="lazy_loading_enabled" 
+                                                   value="1"
+                                                   {{ (isset($settings['lazy_loading_enabled']) && $settings['lazy_loading_enabled']->value == '1') ? 'checked' : '' }}>
+                                            <label class="custom-control-label" for="lazy_loading_enabled">
+                                                <strong>Lazy Loading'i Aktif Et</strong>
+                                            </label>
+                                        </div>
+                                        <small class="form-text text-muted">
+                                            <i class="fas fa-info-circle"></i> 
+                                            Bu seçenek aktif olduğunda resimler sadece görünür hale geldiğinde yüklenir. Sayfa performansını artırır.
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
-                        <div class="alert alert-info">
-                            <i class="fas fa-lightbulb"></i>
-                            <strong>Bilgi:</strong> Preloader sayfa yüklenme sürecini kullanıcılara göstermek için kullanılır. 
-                            Çok hızlı bir şekilde (0.05 saniye) gösterilir ve animasyon içermez.
+                        <div class="alert alert-info" style="background-color: #d1ecf1 !important; color: #0c5460 !important; border: 1px solid #bee5eb !important; padding: 0.75rem 1.25rem !important;">
+                            <i class="fas fa-lightbulb" style="color: #17a2b8 !important; margin-right: 8px;"></i>
+                            <strong style="color: #0c5460 !important; font-weight: 600;">Bilgi:</strong> 
+                            <br><strong>Preloader:</strong> Sayfa yüklenirken gösterilen animasyon (0.05 saniye).
+                            <br><strong>Lazy Loading:</strong> Resimlerin görünür olduğunda yüklenmesi. Performans ve veri tasarrufu sağlar.
                         </div>
                     </div>
                     <div class="card-footer">
                         <button type="submit" class="btn btn-warning">
-                            <i class="fas fa-save"></i> Preloader Ayarlarını Kaydet
+                            <i class="fas fa-save"></i> Performans Ayarlarını Kaydet
                         </button>
                     </div>
                 </form>
@@ -283,14 +306,14 @@
                                 </div>
                             </div>
                             <div class="col-md-6">
-                                <div class="alert alert-info">
-                                    <i class="fas fa-shield-alt"></i>
-                                    <strong>Güvenlik Bilgisi:</strong>
-                                    <br>• <strong>Kısa süreler (15-30 dk)</strong>: Yüksek güvenlik, sık login gerekir
-                                    <br>• <strong>Orta süreler (1-4 saat)</strong>: Dengeli güvenlik ve kullanım
-                                    <br>• <strong>Uzun süreler (6+ saat)</strong>: Pratik kullanım, daha az güvenlik
+                                <div class="alert alert-info" style="background-color: #d1ecf1 !important; color: #0c5460 !important; border: 1px solid #bee5eb !important; padding: 0.75rem 1.25rem !important;">
+                                    <i class="fas fa-shield-alt" style="color: #17a2b8 !important; margin-right: 8px;"></i>
+                                    <strong style="color: #0c5460 !important; font-weight: 600;">Güvenlik Bilgisi:</strong>
+                                    <br>• <strong style="color: #0c5460 !important;">Kısa süreler (15-30 dk)</strong>: Yüksek güvenlik, sık login gerekir
+                                    <br>• <strong style="color: #0c5460 !important;">Orta süreler (1-4 saat)</strong>: Dengeli güvenlik ve kullanım
+                                    <br>• <strong style="color: #0c5460 !important;">Uzun süreler (6+ saat)</strong>: Pratik kullanım, daha az güvenlik
                                     <br><br>
-                                    <strong>Varsayılan:</strong> 2 saat (kurumsal kullanım için önerilen)
+                                    <strong style="color: #0c5460 !important;">Varsayılan:</strong> 2 saat (kurumsal kullanım için önerilen)
                                 </div>
                             </div>
                         </div>
@@ -454,10 +477,49 @@
     
 
     
-    /* Bilgi Alert'i */
+    /* Bilgi Alert'i - Geliştirilmiş görünürlük */
     .alert-info {
         border-left: 4px solid #17a2b8;
-        background-color: #f8f9fa;
+        background-color: #d1ecf1 !important;
+        color: #0c5460 !important;
+        border: 1px solid #bee5eb;
+        border-radius: 0.375rem;
+        padding: 0.75rem 1.25rem;
+        margin-bottom: 1rem;
+        word-wrap: break-word;
+        white-space: normal;
+        overflow-wrap: break-word;
+        word-break: break-word;
+        line-height: 1.5;
+    }
+    
+    .alert-info strong {
+        color: #0c5460 !important;
+        font-weight: 600;
+    }
+    
+    .alert-info i {
+        color: #17a2b8 !important;
+        margin-right: 8px;
+    }
+    
+    /* AdminLTE override - Daha yüksek öncelik */
+    .content-wrapper .alert-info,
+    .card-body .alert-info {
+        background-color: #d1ecf1 !important;
+        color: #0c5460 !important;
+        border-color: #bee5eb !important;
+    }
+    
+    .content-wrapper .alert-info *,
+    .card-body .alert-info * {
+        color: #0c5460 !important;
+    }
+    
+    .content-wrapper .alert-info strong,
+    .card-body .alert-info strong {
+        color: #0c5460 !important;
+        font-weight: 600 !important;
     }
 </style>
 @stop

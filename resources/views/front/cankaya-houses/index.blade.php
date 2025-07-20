@@ -179,7 +179,8 @@
                                 @if($house->first_image)
                                     <img src="{{ $house->first_image }}" 
                                          alt="{{ $house->name }}"
-                                         class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 cursor-pointer">
+                                         class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 cursor-pointer"
+                                         @if($lazyLoadingEnabled == '1') loading="lazy" @endif>
                                 @else
                                     <div class="w-full h-full bg-gradient-to-br from-[#00352b] to-[#20846c] flex items-center justify-center">
                                         <i class="fas fa-home text-white text-4xl"></i>

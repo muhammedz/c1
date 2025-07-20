@@ -311,7 +311,7 @@
             @foreach($projects as $project)
                 <a href="{{ route('front.projects.detail', $project->slug) }}" class="project-card">
                     <div class="project-image-container">
-                        <img src="{{ $project->cover_image_url }}" alt="{{ $project->title }} proje görseli" class="project-image">
+                        <img src="{{ $project->cover_image_url }}" alt="{{ $project->title }} proje görseli" class="project-image" @if($lazyLoadingEnabled == '1') loading="lazy" @endif>
                         <div class="project-overlay">
                             <h3 class="project-title">{{ $project->title }}</h3>
                             <p class="project-status">{{ $project->status_text }}</p>

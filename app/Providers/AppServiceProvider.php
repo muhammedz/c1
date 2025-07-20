@@ -259,5 +259,15 @@ class AppServiceProvider extends ServiceProvider
                 $view->with('siteFavicon', null);
             }
         });
+
+        // Frontend sayfalarına lazy loading ayarlarını gönder
+        View::composer(['layouts.front', 'front.*'], function ($view) {
+            try {
+                $lazyLoadingEnabled = Setting::get('lazy_loading_enabled', '0');
+                $view->with('lazyLoadingEnabled', $lazyLoadingEnabled);
+            } catch (\Exception $e) {
+                $view->with('lazyLoadingEnabled', '0');
+            }
+        });
     }
 }
