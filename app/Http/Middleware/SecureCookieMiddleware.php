@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**
  * Çerez Güvenlik Kontrol Middleware'i
@@ -37,6 +38,12 @@ class SecureCookieMiddleware
      */
     private function secureCookies(Response $response): void
     {
+        // StreamedResponse için çerez işlemlerini atla
+        // StreamedResponse cookie() metodunu desteklemez
+        if ($response instanceof StreamedResponse) {
+            return;
+        }
+        
         $cookies = $response->headers->getCookies();
         
         // Eğer çerez yoksa işlem yapma
@@ -67,7 +74,13 @@ class SecureCookieMiddleware
                 'strict'                               // sameSite (maksimum güvenlik)
             );
             
-            $response = $response->cookie($secureCookie);
+            // StreamedResponse olmadığını kontrol ettikten sonra cookie ekle
+            if (method_exists($response, 'cookie')) {
+                $response = $response->cookie($secureCookie);
+            } else {
+                // Alternatif olarak headers ile çerez ekle
+                $response->headers->setCookie($secureCookie);
+            }
         }
     }
     
