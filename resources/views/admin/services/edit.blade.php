@@ -1191,23 +1191,25 @@
         // Dinamik tablolar için script
         console.log('Dinamik tablolar script yüklendi');
         
-        // TinyMCE basit editör yapılandırması (.tinymce sınıfı için)
+        // TinyMCE gelişmiş editör yapılandırması (.tinymce sınıfı için)
         tinymce.init({
             selector: '.tinymce',
-            height: 200,
-            menubar: false,
-            plugins: 'lists link image table code',
-            toolbar: 'undo redo | formatselect | bold italic | alignleft aligncenter alignright | bullist numlist | link image | table | code',
-            content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, sans-serif; font-size: 14px; }',
-            language: 'tr',
-            language_url: '/js/tinymce/langs/tr.js',
+            license_key: 'gpl',
+            height: 300,
+            language: null, // Dil desteğini kaldırdık
+            menubar: true,
+            plugins: 'preview importcss searchreplace autolink autosave save directionality code visualblocks visualchars fullscreen image link media codesample table charmap pagebreak nonbreaking anchor insertdatetime advlist lists wordcount help charmap quickbars emoticons',
+            toolbar: 'undo redo | bold italic underline strikethrough | forecolor backcolor | fontfamily fontsize blocks | alignleft aligncenter alignright alignjustify | outdent indent | numlist bullist | removeformat | link image media | fullscreen',
+            toolbar_sticky: true,
+            image_advtab: false,
             branding: false,
             promotion: false,
-            skin: 'oxide',
             relative_urls: false,
             remove_script_host: false,
-            convert_urls: true,
-            object_resizing: 'img',
+            convert_urls: false,
+            images_upload_url: '{{ route("admin.tinymce.upload") }}',
+            images_upload_credentials: true,
+            content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, sans-serif; font-size: 14px; }',
             paste_data_images: true,
             automatic_uploads: false,
             
